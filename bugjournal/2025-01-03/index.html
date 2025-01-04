@@ -7,7 +7,7 @@
 <meta name="robots" content="index, follow">
 <title>Bug Journal 2025-01-03 | TzJ&#39;s Net</title>
 <meta name="keywords" content="">
-<meta name="description" content="run ollama on the server &amp; use ssh to connect the server">
+<meta name="description" content="run ollama on the server &amp; model tuning">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/2025-01-03/">
 <link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.d6fcd20a4fb86efa4dfac8ec95da60244cc8871042183da1ef28e3a762ad79c8.css" integrity="sha256-1vzSCk&#43;4bvpN&#43;sjsldpgJEzIhxBCGD2h7yjjp2Ktecg=" rel="preload stylesheet" as="style">
@@ -58,7 +58,7 @@
 </noscript><meta property="og:url" content="https://tzj2006.github.io/bugjournal/2025-01-03/">
   <meta property="og:site_name" content="TzJ&#39;s Net">
   <meta property="og:title" content="Bug Journal 2025-01-03">
-  <meta property="og:description" content="run ollama on the server &amp; use ssh to connect the server">
+  <meta property="og:description" content="run ollama on the server &amp; model tuning">
   <meta property="og:locale" content="en-us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="bugjournal">
@@ -66,7 +66,7 @@
     <meta property="article:modified_time" content="2025-01-03T16:55:18-08:00">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Bug Journal 2025-01-03">
-<meta name="twitter:description" content="run ollama on the server &amp; use ssh to connect the server">
+<meta name="twitter:description" content="run ollama on the server &amp; model tuning">
 
 
 <script type="application/ld+json">
@@ -95,12 +95,12 @@
   "@type": "BlogPosting",
   "headline": "Bug Journal 2025-01-03",
   "name": "Bug Journal 2025-01-03",
-  "description": "run ollama on the server \u0026amp; use ssh to connect the server",
+  "description": "run ollama on the server \u0026amp; model tuning",
   "keywords": [
     
   ],
-  "articleBody": "Part Ollama To run ollama serve on UF that stores models on large storage, please use:\nenv OLLAMA_MODELS=/orange/qsong1/zt81.duke/Models ollama serve To list all the ollama environment, please use:\nollama list Then check whether all the models pulled are in this list.\nNote that now when dealing with ollama input, multiple role input may cause potential error.\n",
-  "wordCount" : "56",
+  "articleBody": "Part Ollama To run ollama serve on UF that stores models on large storage, please use:\nenv OLLAMA_MODELS=/orange/qsong1/zt81.duke/Models ollama serve To list all the ollama environment, please use:\nollama list Then check whether all the models pulled are in this list.\nNote that now when dealing with ollama input, multiple role input may cause potential error.\nPart Model Tuning What I did today:\nSet up llama for Sprax task.\nTest1: llama3.2 with reasoning. Result: Nearly everything outputs “Sensitive” (For both cells that has sensitive and resistent label).\n![image-20250103204922830](/Users/tongtongtot/Library/Application Support/typora-user-images/image-20250103204922830.png)\nGuess: May because there are too many genes that mislead the result of the LLM.\nDecrease the number of genes considered Result: However, the model still outputs “Sensitive” for nearly every cells.\nTry not using reasoning Result: Very unstable. Sometimes the result is very good, but in most case, it is very bad.\nTry using llama3.3 70B Result: Not much better than guess.\n![image-20250103205231023](/Users/tongtongtot/Library/Application Support/typora-user-images/image-20250103205231023.png)\nFuture work Train MLP Train an MLP using the label, and let LLM to distinguish the embedding.\nIn this case, we can tell whether the LLM is useless or the prompt is useless.\nCustomize tokenizer Change one cell to one token\nCheck Pathway Check whether the LLM is saying nonsense or saying things right.\n",
+  "wordCount" : "208",
   "inLanguage": "en",
   "datePublished": "2025-01-03T16:55:18-08:00",
   "dateModified": "2025-01-03T16:55:18-08:00",
@@ -197,6 +197,28 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">ollama list
 </span></span></code></pre></div><p>Then check whether all the models pulled are in this list.</p>
 <p><strong>Note that now when dealing with ollama input, multiple role input may cause potential error.</strong></p>
+<h2 id="part-model-tuning">Part Model Tuning<a hidden class="anchor" aria-hidden="true" href="#part-model-tuning">#</a></h2>
+<p>What I did today:</p>
+<p>Set up llama for Sprax task.</p>
+<h3 id="test1-llama32-with-reasoning">Test1: llama3.2 with reasoning.<a hidden class="anchor" aria-hidden="true" href="#test1-llama32-with-reasoning">#</a></h3>
+<p>Result: Nearly everything outputs &ldquo;Sensitive&rdquo; (For both cells that has sensitive and resistent label).</p>
+<p>![image-20250103204922830](/Users/tongtongtot/Library/Application Support/typora-user-images/image-20250103204922830.png)</p>
+<p>Guess: May because there are too many genes that mislead the result of the LLM.</p>
+<h4 id="decrease-the-number-of-genes-considered">Decrease the number of genes considered<a hidden class="anchor" aria-hidden="true" href="#decrease-the-number-of-genes-considered">#</a></h4>
+<p>Result: However, the model still outputs &ldquo;Sensitive&rdquo; for nearly every cells.</p>
+<h4 id="try-not-using-reasoning">Try not using reasoning<a hidden class="anchor" aria-hidden="true" href="#try-not-using-reasoning">#</a></h4>
+<p>Result: Very unstable. Sometimes the result is very good, but in most case, it is very bad.</p>
+<h4 id="try-using-llama33-70b">Try using llama3.3 70B<a hidden class="anchor" aria-hidden="true" href="#try-using-llama33-70b">#</a></h4>
+<p>Result: Not much better than guess.</p>
+<p>![image-20250103205231023](/Users/tongtongtot/Library/Application Support/typora-user-images/image-20250103205231023.png)</p>
+<h3 id="future-work">Future work<a hidden class="anchor" aria-hidden="true" href="#future-work">#</a></h3>
+<h4 id="train-mlp">Train MLP<a hidden class="anchor" aria-hidden="true" href="#train-mlp">#</a></h4>
+<p>Train an MLP using the label, and let LLM to distinguish the embedding.</p>
+<p>In this case, we can tell whether the LLM is useless or the prompt is useless.</p>
+<h4 id="customize-tokenizer">Customize tokenizer<a hidden class="anchor" aria-hidden="true" href="#customize-tokenizer">#</a></h4>
+<p>Change one cell to one token</p>
+<h4 id="check-pathway">Check Pathway<a hidden class="anchor" aria-hidden="true" href="#check-pathway">#</a></h4>
+<p>Check whether the LLM is saying nonsense or saying things right.</p>
 
 
   </div>
