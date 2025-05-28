@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
 <title>Bug Journal 2025-05-28 | TzJ&#39;s Net</title>
-<meta name="keywords" content="Robotics, Bug Journal, Paper Reading">
+<meta name="keywords" content="Bug Journal, Robotics, Paper Reading">
 <meta name="description" content="2025-05-28 论文阅读笔记">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/2025-05-28/">
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", function() {
   "name": "Bug Journal 2025-05-28",
   "description": "2025-05-28 论文阅读笔记",
   "keywords": [
-    "Robotics", "Bug Journal", "Paper Reading"
+    "Bug Journal", "Robotics", "Paper Reading"
   ],
   "articleBody": "模板 请仔细阅读这篇文章，并告诉我： 1.这篇文章大概讲了什么 2.这篇文章的创新点是什么 3.这篇文章解决了什么问题，之前的人为什么不能解决 4.这篇文章还有什么问题没解决 5.这篇文章有什么需要我注意的点 如果这篇文章提出了一个模型，那请告诉我： 1.这个模型的输入是什么 2.输出是什么 3.输入和输出数据经过了什么处理 4.这个模型是如何处理输入和输出数据的 主要论点 模型流程图 创新点 解决的难点 之前方法的缺点 还需要解决的难点 Take away SKIL: Semantic Keypoint Imitation Learning for Generalizable Data-efficient Manipulation 发表时间：24 Jan 2025\n主要论点 这篇文章提出了一种新的模仿学习框架 SKIL（Semantic Keypoint Imitation Learning），通过结合视觉基础模型自动提取“语义关键点”（semantic keypoints），使得机器人在仅有少量示范的条件下，依然能完成具有泛化能力和复杂步骤的操作任务（如挂毛巾、折叠布料等）。该方法显著降低了训练所需的数据量，并且在未见过的物体与场景中也表现出优越的泛化能力。\nHow can we reduce sample complexity to enable robots to learn data-efficient and generalizable manipulation tasks?\n模型流程图 创新点 自动语义关键点提取： 借助如 DiFT 等视觉基础模型与 SAM，对参考图像中的目标区域进行聚类，自动生成语义关键点，不需要人工标注或专门训练。 语义关键点描述符（descriptor）设计： 结合相似度向量（cosine similarity）与 3D 坐标构建表示，每个关键点携带语义和空间信息。 结合 Diffusion Policy 输出动作序列： 使用 Transformer 编码器和扩散模型作为动作头，实现连续动作输出。 支持跨主体学习（Cross-embodiment）： 提出的 SKIL-H 模块允许利用人类视频（无动作标签）进行辅助训练，提高数据效率和泛化性。 Ensemble 推理策略： 在推理阶段进行关键点子集 dropout 与多次采样求中位数，从而降低视觉匹配误差带来的动作抖动。 解决的难点 利用视觉大模型提取对任务有语义意义的关键点，极大降低了状态空间维度； 通过高质量、稀疏但语义强的关键点建模，提升少样本学习能力； 使用 Transformer + Diffusion Policy 构建策略网络，强化连续动作输出的能力； 提供了一种利用人类演示辅助学习的方法，不依赖标注动作。 之前方法的缺点 慢：比如ACT要收集上万个数据; GenGP 用的是完整的语意场，有太多信息了 只预测关键帧，而不是连续的动作 (注：我认为这里说不定关键帧可能好一点) 预测连续动作的模型没有 generalizability 还需要解决的难点 关键点提取质量依赖于视觉基础模型能力： 如在 “Bulb Assembly” 等精度要求极高的任务中，DiFT 模型提取的关键点不够精确，导致失败。 忽略环境障碍与场景信息： 当前关键点只从目标对象上提取，无法感知障碍物等环境元素，可能导致安全问题。 固定视角与姿态： 当前工作主要依赖固定的第三视角 RGBD 摄像头，泛化到第一视角或动态视角仍有挑战。 动作表示维度有限： 尚未充分拓展到高自由度控制（如仿人手）、复杂轨迹规划等更广泛的应用场景。 泛化问题：这个模型并不是 zero-shot,而是每个 task 都单独 train 了一个 model Take away semantic keypoints: 语义关键点 指的是一个物体和操作相关的哪一个部分。比如杯子上的把手\nDiffusion Policy: 这种方法使得 multi model 变得可行\noff-the-shelf tracking models: 约等于已经开源的动作跟踪实现\n数据集 Meta World\n",
   "wordCount" : "142",
