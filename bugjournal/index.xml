@@ -6,8 +6,38 @@
     <description>Recent content in BugJournals on TzJ&#39;s Net</description>
     <generator>Hugo -- 0.142.0</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 30 May 2025 11:04:48 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 30 May 2025 17:06:08 +0800</lastBuildDate>
     <atom:link href="https://tzj2006.github.io/bugjournal/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bug Journal 2025-05-31</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-05-31/</link>
+      <pubDate>Fri, 30 May 2025 17:06:08 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-05-31/</guid>
+      <description>&lt;h4 id=&#34;主要动机&#34;&gt;主要动机&lt;/h4&gt;
+&lt;p&gt;目前有三大挑战：数据稀缺、泛化能力不足，以及在复杂物理环境中效果不好
+作者希望通过引入大规模语言及VLA模型在自然语言处理和计算机视觉中的成功经验解决这个问题.&lt;/p&gt;
+&lt;h4 id=&#34;主要论点&#34;&gt;主要论点&lt;/h4&gt;
+&lt;p&gt;在预训练的视-语言模型（VLM，本文采用 PaliGemma）基础上，增加一个“动作专家”（action expert），通过条件流匹配（diffusion policy）生成高频、连续的动作序列（每秒可达50 Hz）&lt;/p&gt;
+&lt;h4 id=&#34;模型流程图&#34;&gt;模型流程图&lt;/h4&gt;
+&lt;p&gt;&lt;img alt=&#34;1748596153733&#34; loading=&#34;lazy&#34; src=&#34;image/2025-05-31/1748596153733.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;收集数据 -&amp;gt; 训练$\phi_0$ -&amp;gt; Zero-Shot/微调/Fine-tune&lt;/p&gt;
+&lt;p&gt;数据来自7种不同的机器人，68个不同的任务，总计 10k小时。&lt;/p&gt;
+&lt;p&gt;每一个单独机械臂的自由度在 6-7 (有些机器人有多机械臂)&lt;/p&gt;
+&lt;p&gt;输入有 3 块，分别是：Image, Language, and State&lt;/p&gt;
+&lt;p&gt;Image 用 400M Pretrained VIT SigLip 得到 embedding, 一共会有up to 3 个 Image， 所以最会有 3 个 embedding (没有就填 0)&lt;/p&gt;
+&lt;p&gt;Language 用 2.6B Pretrained LLM Gemma, 得到 embedding&lt;/p&gt;
+&lt;p&gt;最后是关节信息，最多会有 18 个(没有就填 0)。&lt;/p&gt;
+&lt;p&gt;之后运用 Diffusion Policy 来生成每一步的动作&lt;/p&gt;
+&lt;p&gt;生成的是 $p(A_t|O_t)$, 即，在给定条件(环境下)，每一个动作的概率。&lt;/p&gt;
+&lt;p&gt;这时给一个 chunk 内的真实动作加噪音，然后让模型学习如何去噪。&lt;/p&gt;
+&lt;p&gt;方式如下：
+\begin{itemize}
+\item 随机采一个噪声级别 $\tau$，采一个高斯噪声 $\varepsilon$；
+\item 构造带噪动作块 $A_t^\tau = \tau A_t + (1 - \tau)\varepsilon$；
+\item 用观测 $o_t$ 与 $A_t^\tau$ 输入网络，预测去噪速度场 $v_\theta(A_t^\tau, o_t) &amp;lt;-&amp;gt; \varepsilon - A_t$；
+\item 以 $\left| v_\theta - (\varepsilon - A_t) \right|^2$ 作为监督信号；
+\end{itemize}&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Bug Journal 2025-05-30</title>
       <link>https://tzj2006.github.io/bugjournal/2025-05-30/</link>
