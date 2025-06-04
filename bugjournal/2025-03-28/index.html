@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2025-03-28 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Talk 6: scDesign3: Semi-synthetic Negative &amp; Positive Control
+数据不够的时候需要一些 simulated data
+那这时候 simlator 就需要 interpretable &amp; realistic (real data characteristic &amp; contains ground truth data)
+e.g. single cell RNA simulator -&gt; 考虑 gene gene correlation -&gt; 考虑别的 cell types and omics -&gt; RNA count to RNA read
+这个可以用来给数据预处理&#43;降噪
+Talk 7: spacial omics data
+理解 low-rank property of Hi-C chromatin contact maps.
+数据上有 3 维（question what type of data / or do you have ground truth of the location of the spatial data? are the model predicting the location or the gene expression or both of them? ）">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2025-03-28/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.af858c2feef42adc7846f815c3e21de9982d82f8fc4f65879451b2686859975a.css" integrity="sha256-r4WML&#43;70Ktx4RvgVw&#43;Id6Zgtgvj8T2WHlFGyaGhZl1o=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2025-03-28/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2025-03-28/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2025-03-28">
+  <meta property="og:description" content="Talk 6: scDesign3: Semi-synthetic Negative &amp; Positive Control 数据不够的时候需要一些 simulated data
+那这时候 simlator 就需要 interpretable &amp; realistic (real data characteristic &amp; contains ground truth data)
+e.g. single cell RNA simulator -&gt; 考虑 gene gene correlation -&gt; 考虑别的 cell types and omics -&gt; RNA count to RNA read
+这个可以用来给数据预处理&#43;降噪
+Talk 7: spacial omics data 理解 low-rank property of Hi-C chromatin contact maps.
+数据上有 3 维（question what type of data / or do you have ground truth of the location of the spatial data? are the model predicting the location or the gene expression or both of them? ）">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2025-03-28T08:36:01-06:00">
+    <meta property="article:modified_time" content="2025-03-28T08:36:01-06:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Bug Journal 2025-03-28">
+<meta name="twitter:description" content="Talk 6: scDesign3: Semi-synthetic Negative &amp; Positive Control
+数据不够的时候需要一些 simulated data
+那这时候 simlator 就需要 interpretable &amp; realistic (real data characteristic &amp; contains ground truth data)
+e.g. single cell RNA simulator -&gt; 考虑 gene gene correlation -&gt; 考虑别的 cell types and omics -&gt; RNA count to RNA read
+这个可以用来给数据预处理&#43;降噪
+Talk 7: spacial omics data
+理解 low-rank property of Hi-C chromatin contact maps.
+数据上有 3 维（question what type of data / or do you have ground truth of the location of the spatial data? are the model predicting the location or the gene expression or both of them? ）">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "BugJournals",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2025-03-28",
+      "item": "https://tzj2006.github.io/bugjournal/2025-03-28/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2025-03-28",
+  "name": "Bug Journal 2025-03-28",
+  "description": "Talk 6: scDesign3: Semi-synthetic Negative \u0026amp; Positive Control 数据不够的时候需要一些 simulated data\n那这时候 simlator 就需要 interpretable \u0026amp; realistic (real data characteristic \u0026amp; contains ground truth data)\ne.g. single cell RNA simulator -\u0026gt; 考虑 gene gene correlation -\u0026gt; 考虑别的 cell types and omics -\u0026gt; RNA count to RNA read\n这个可以用来给数据预处理+降噪\nTalk 7: spacial omics data 理解 low-rank property of Hi-C chromatin contact maps.\n数据上有 3 维（question what type of data / or do you have ground truth of the location of the spatial data? are the model predicting the location or the gene expression or both of them? ）\n",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Talk 6: scDesign3: Semi-synthetic Negative \u0026 Positive Control 数据不够的时候需要一些 simulated data\n那这时候 simlator 就需要 interpretable \u0026 realistic (real data characteristic \u0026 contains ground truth data)\ne.g. single cell RNA simulator -\u003e 考虑 gene gene correlation -\u003e 考虑别的 cell types and omics -\u003e RNA count to RNA read\n这个可以用来给数据预处理+降噪\nTalk 7: spacial omics data 理解 low-rank property of Hi-C chromatin contact maps.\n数据上有 3 维（question what type of data / or do you have ground truth of the location of the spatial data? are the model predicting the location or the gene expression or both of them? ）\n但是问题是这个数据很 sparce. e.g. 5kb 的数据就已经是丢失了 99.5%的数据了\n所以就用了一些技术来降噪\u0026还原\n之前的 AI模型：训练完了之后就没有用生物相关的信息来预测我们想要的\n现在的 AI 模型，可以自己思考来相处一个 hypothsis，并且验证他\ne.g. 用 interatctions\n要解决的问题：\nblack box ML models, overwhelming hypothesis, false positive\nML model -\u003e intreatcion 可能的值\n现在提出一个预测的可能的可行性\n这个值是 false positive / total accept 值越低越好\n那如何预测 false positive 呢？这样，对于每一个 feature, 分开预测\n然后再liangliang 预测，然后看结合了之后是好了还是坏了\n还有一个办法，就是用元数据 + 假数据\n如果元数据和假数据得出来的差距大，那就说明这个元数据没什么用\n否则就说明这个有用\nIntegration of histology and multi-plex for understanding pancreatic cancer.\nimage are usually 2D, that is not connected to other tissues.=m telling us there is not spatial relationship.\nquestion is every slice a slice near another.\nSpacial transcriptomics platforms (PASTA))\n太稀疏啦\n怎么办呢？用 model concentrate 喽\n但是这些 model 并不一定准（你想，要用 500gene去补 20k,太难了）\n并且这些 model 没有用 cell type / pathway 信息\npathway loss + gene similarity + pathway expression + location (这不就是 STHD吗)\n但是这里预测的不是 cell type,是 gene expression\nTalk 8: AI in medication AI 可以很好的数据，但是要求很高\n所以要用很聪明的方法使用这些 AI\n另外，预测出了结果之后要做什么呢？\nAI 还可以用来提供数据\n生成式 AI VAE \u0026 Transformer (需要有 meaningful order/sequence)\nDiffusion model: forward (加噪音) and backward (去噪音) （不需要 data 是 ordered, 但是 sampling 需要很多计算资源）\n如果 black box prediction model 不正确，我应该如何 make a valid inference?\nEnd to end scalable integrative analysis ",
+  "wordCount" : "272",
+  "inLanguage": "en",
+  "datePublished": "2025-03-28T08:36:01-06:00",
+  "dateModified": "2025-03-28T08:36:01-06:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2025-03-28/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2025-03-28
+    </h1>
+    <div class="post-meta"><span title='2025-03-28 08:36:01 -0600 -0600'>March 28, 2025</span>&nbsp;·&nbsp;2 min
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="talk-6-scdesign3-semi-synthetic-negative--positive-control">Talk 6: scDesign3: Semi-synthetic Negative &amp; Positive Control<a hidden class="anchor" aria-hidden="true" href="#talk-6-scdesign3-semi-synthetic-negative--positive-control">#</a></h1>
+<p>数据不够的时候需要一些 simulated data</p>
+<p>那这时候 simlator 就需要 interpretable &amp; realistic (real data characteristic &amp; contains ground truth data)</p>
+<p>e.g. single cell RNA simulator -&gt; 考虑 gene gene correlation -&gt; 考虑别的 cell types and omics -&gt; RNA count to RNA read</p>
+<p>这个可以用来给数据预处理+降噪</p>
+<h1 id="talk-7-spacial-omics-data">Talk 7: spacial omics data<a hidden class="anchor" aria-hidden="true" href="#talk-7-spacial-omics-data">#</a></h1>
+<p>理解 low-rank property of Hi-C chromatin contact maps.</p>
+<p>数据上有 3 维（question what type of data / or do you have ground truth of the location of the spatial data? are the model predicting the location or the gene expression or both of them? ）</p>
+<p>但是问题是这个数据很 sparce. e.g. 5kb 的数据就已经是丢失了 99.5%的数据了</p>
+<p>所以就用了一些技术来降噪&amp;还原</p>
+<p>之前的 AI模型：训练完了之后就没有用生物相关的信息来预测我们想要的</p>
+<p>现在的 AI 模型，可以自己思考来相处一个 hypothsis，并且验证他</p>
+<p>e.g. 用 interatctions</p>
+<p>要解决的问题：</p>
+<p>black box ML models, overwhelming hypothesis, false positive</p>
+<p>ML model -&gt; intreatcion 可能的值</p>
+<p>现在提出一个预测的可能的可行性</p>
+<p>这个值是 false positive / total accept 值越低越好</p>
+<p>那如何预测 false positive 呢？这样，对于每一个 feature, 分开预测</p>
+<p>然后再liangliang 预测，然后看结合了之后是好了还是坏了</p>
+<p>还有一个办法，就是用元数据 + 假数据</p>
+<p>如果元数据和假数据得出来的差距大，那就说明这个元数据没什么用</p>
+<p>否则就说明这个有用</p>
+<p>Integration of histology and multi-plex for understanding pancreatic cancer.</p>
+<p>image are usually 2D, that is not connected to other tissues.=m telling us there is not spatial relationship.</p>
+<p>question is every slice a slice near another.</p>
+<p>Spacial transcriptomics platforms (PASTA))</p>
+<p>太稀疏啦</p>
+<p>怎么办呢？用 model concentrate 喽</p>
+<p>但是这些 model 并不一定准（你想，要用 500gene去补 20k,太难了）</p>
+<p>并且这些 model 没有用 cell type / pathway 信息</p>
+<p>pathway loss + gene similarity + pathway expression + location (这不就是 STHD吗)</p>
+<p>但是这里预测的不是 cell type,是 gene expression</p>
+<h1 id="talk-8-ai-in-medication">Talk 8: AI in medication<a hidden class="anchor" aria-hidden="true" href="#talk-8-ai-in-medication">#</a></h1>
+<p>AI 可以很好的数据，但是要求很高</p>
+<p>所以要用很聪明的方法使用这些 AI</p>
+<p>另外，预测出了结果之后要做什么呢？</p>
+<p>AI 还可以用来提供数据</p>
+<p>生成式 AI VAE &amp; Transformer (需要有 <strong>meaningful order/sequence</strong>)</p>
+<p>Diffusion model: forward (加噪音) and backward (去噪音) （不需要 data 是 ordered, 但是 sampling 需要很多计算资源）</p>
+<p>如果 black box prediction model 不正确，我应该如何 make a valid inference?</p>
+<h2 id="end-to-end-scalable-integrative-analysis">End to end scalable integrative analysis<a hidden class="anchor" aria-hidden="true" href="#end-to-end-scalable-integrative-analysis">#</a></h2>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2025-05-31 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="主要动机
+目前有三大挑战：数据稀缺、泛化能力不足，以及在复杂物理环境中效果不好
+作者希望通过引入大规模语言及VLA模型在自然语言处理和计算机视觉中的成功经验解决这个问题.
+主要论点
+在预训练的视-语言模型（VLM，本文采用 PaliGemma）基础上，增加一个“动作专家”（action expert），通过条件流匹配（diffusion policy）生成高频、连续的动作序列（每秒可达50 Hz）
+模型流程图
+
+收集数据 -&gt; 训练$\phi_0$ -&gt; Zero-Shot/微调/Fine-tune
+数据来自7种不同的机器人，68个不同的任务，总计 10k小时。
+每一个单独机械臂的自由度在 6-7 (有些机器人有多机械臂)
+输入有 3 块，分别是：Image, Language, and State
+Image 用 400M Pretrained VIT SigLip 得到 embedding, 一共会有up to 3 个 Image， 所以最会有 3 个 embedding (没有就填 0)
+Language 用 2.6B Pretrained LLM Gemma, 得到 embedding
+最后是关节信息，最多会有 18 个(没有就填 0)。
+之后运用 Diffusion Policy 来生成每一步的动作
+生成的是 $p(A_t|O_t)$, 即，在给定条件(环境下)，每一个动作的概率。
+这时给一个 chunk 内的真实动作加噪音，然后让模型学习如何去噪。
+方式如下：
+
+随机采一个噪声级别 $\tau$，采一个高斯噪声 $\varepsilon$；
+构造带噪动作块 $A_t^\tau = \tau A_t &#43; (1 - \tau)\varepsilon$；
+用观测 $o_t$ 与 $A_t^\tau$ 输入网络，预测去噪速度场 $v_\theta(A_t^\tau, o_t) &lt;-&gt; \varepsilon - A_t$；
+以 $\left| v_\theta - (\varepsilon - A_t) \right|^2$ 作为监督信号；
+
+推理的时候就会把这个过程分成 10-20步，每一步去噪一点点，最终得到一个动作
+注：&ldquo;这个过程&quot;指的是随机生成一个噪声，然后从这个噪声去噪的过程">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2025-05-31/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.af858c2feef42adc7846f815c3e21de9982d82f8fc4f65879451b2686859975a.css" integrity="sha256-r4WML&#43;70Ktx4RvgVw&#43;Id6Zgtgvj8T2WHlFGyaGhZl1o=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2025-05-31/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2025-05-31/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2025-05-31">
+  <meta property="og:description" content="主要动机 目前有三大挑战：数据稀缺、泛化能力不足，以及在复杂物理环境中效果不好 作者希望通过引入大规模语言及VLA模型在自然语言处理和计算机视觉中的成功经验解决这个问题.
+主要论点 在预训练的视-语言模型（VLM，本文采用 PaliGemma）基础上，增加一个“动作专家”（action expert），通过条件流匹配（diffusion policy）生成高频、连续的动作序列（每秒可达50 Hz）
+模型流程图 收集数据 -&gt; 训练$\phi_0$ -&gt; Zero-Shot/微调/Fine-tune
+数据来自7种不同的机器人，68个不同的任务，总计 10k小时。
+每一个单独机械臂的自由度在 6-7 (有些机器人有多机械臂)
+输入有 3 块，分别是：Image, Language, and State
+Image 用 400M Pretrained VIT SigLip 得到 embedding, 一共会有up to 3 个 Image， 所以最会有 3 个 embedding (没有就填 0)
+Language 用 2.6B Pretrained LLM Gemma, 得到 embedding
+最后是关节信息，最多会有 18 个(没有就填 0)。
+之后运用 Diffusion Policy 来生成每一步的动作
+生成的是 $p(A_t|O_t)$, 即，在给定条件(环境下)，每一个动作的概率。
+这时给一个 chunk 内的真实动作加噪音，然后让模型学习如何去噪。
+方式如下：
+随机采一个噪声级别 $\tau$，采一个高斯噪声 $\varepsilon$； 构造带噪动作块 $A_t^\tau = \tau A_t &#43; (1 - \tau)\varepsilon$； 用观测 $o_t$ 与 $A_t^\tau$ 输入网络，预测去噪速度场 $v_\theta(A_t^\tau, o_t) &lt;-&gt; \varepsilon - A_t$； 以 $\left| v_\theta - (\varepsilon - A_t) \right|^2$ 作为监督信号； 推理的时候就会把这个过程分成 10-20步，每一步去噪一点点，最终得到一个动作 注：“这个过程&#34;指的是随机生成一个噪声，然后从这个噪声去噪的过程">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2025-05-30T17:06:08+08:00">
+    <meta property="article:modified_time" content="2025-05-30T17:06:08+08:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Bug Journal 2025-05-31">
+<meta name="twitter:description" content="主要动机
+目前有三大挑战：数据稀缺、泛化能力不足，以及在复杂物理环境中效果不好
+作者希望通过引入大规模语言及VLA模型在自然语言处理和计算机视觉中的成功经验解决这个问题.
+主要论点
+在预训练的视-语言模型（VLM，本文采用 PaliGemma）基础上，增加一个“动作专家”（action expert），通过条件流匹配（diffusion policy）生成高频、连续的动作序列（每秒可达50 Hz）
+模型流程图
+
+收集数据 -&gt; 训练$\phi_0$ -&gt; Zero-Shot/微调/Fine-tune
+数据来自7种不同的机器人，68个不同的任务，总计 10k小时。
+每一个单独机械臂的自由度在 6-7 (有些机器人有多机械臂)
+输入有 3 块，分别是：Image, Language, and State
+Image 用 400M Pretrained VIT SigLip 得到 embedding, 一共会有up to 3 个 Image， 所以最会有 3 个 embedding (没有就填 0)
+Language 用 2.6B Pretrained LLM Gemma, 得到 embedding
+最后是关节信息，最多会有 18 个(没有就填 0)。
+之后运用 Diffusion Policy 来生成每一步的动作
+生成的是 $p(A_t|O_t)$, 即，在给定条件(环境下)，每一个动作的概率。
+这时给一个 chunk 内的真实动作加噪音，然后让模型学习如何去噪。
+方式如下：
+
+随机采一个噪声级别 $\tau$，采一个高斯噪声 $\varepsilon$；
+构造带噪动作块 $A_t^\tau = \tau A_t &#43; (1 - \tau)\varepsilon$；
+用观测 $o_t$ 与 $A_t^\tau$ 输入网络，预测去噪速度场 $v_\theta(A_t^\tau, o_t) &lt;-&gt; \varepsilon - A_t$；
+以 $\left| v_\theta - (\varepsilon - A_t) \right|^2$ 作为监督信号；
+
+推理的时候就会把这个过程分成 10-20步，每一步去噪一点点，最终得到一个动作
+注：&ldquo;这个过程&quot;指的是随机生成一个噪声，然后从这个噪声去噪的过程">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "BugJournals",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2025-05-31",
+      "item": "https://tzj2006.github.io/bugjournal/2025-05-31/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2025-05-31",
+  "name": "Bug Journal 2025-05-31",
+  "description": "主要动机 目前有三大挑战：数据稀缺、泛化能力不足，以及在复杂物理环境中效果不好 作者希望通过引入大规模语言及VLA模型在自然语言处理和计算机视觉中的成功经验解决这个问题.\n主要论点 在预训练的视-语言模型（VLM，本文采用 PaliGemma）基础上，增加一个“动作专家”（action expert），通过条件流匹配（diffusion policy）生成高频、连续的动作序列（每秒可达50 Hz）\n模型流程图 收集数据 -\u0026gt; 训练$\\phi_0$ -\u0026gt; Zero-Shot/微调/Fine-tune\n数据来自7种不同的机器人，68个不同的任务，总计 10k小时。\n每一个单独机械臂的自由度在 6-7 (有些机器人有多机械臂)\n输入有 3 块，分别是：Image, Language, and State\nImage 用 400M Pretrained VIT SigLip 得到 embedding, 一共会有up to 3 个 Image， 所以最会有 3 个 embedding (没有就填 0)\nLanguage 用 2.6B Pretrained LLM Gemma, 得到 embedding\n最后是关节信息，最多会有 18 个(没有就填 0)。\n之后运用 Diffusion Policy 来生成每一步的动作\n生成的是 $p(A_t|O_t)$, 即，在给定条件(环境下)，每一个动作的概率。\n这时给一个 chunk 内的真实动作加噪音，然后让模型学习如何去噪。\n方式如下：\n随机采一个噪声级别 $\\tau$，采一个高斯噪声 $\\varepsilon$； 构造带噪动作块 $A_t^\\tau = \\tau A_t + (1 - \\tau)\\varepsilon$； 用观测 $o_t$ 与 $A_t^\\tau$ 输入网络，预测去噪速度场 $v_\\theta(A_t^\\tau, o_t) \u0026lt;-\u0026gt; \\varepsilon - A_t$； 以 $\\left| v_\\theta - (\\varepsilon - A_t) \\right|^2$ 作为监督信号； 推理的时候就会把这个过程分成 10-20步，每一步去噪一点点，最终得到一个动作 注：\u0026ldquo;这个过程\u0026quot;指的是随机生成一个噪声，然后从这个噪声去噪的过程\n",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "主要动机 目前有三大挑战：数据稀缺、泛化能力不足，以及在复杂物理环境中效果不好 作者希望通过引入大规模语言及VLA模型在自然语言处理和计算机视觉中的成功经验解决这个问题.\n主要论点 在预训练的视-语言模型（VLM，本文采用 PaliGemma）基础上，增加一个“动作专家”（action expert），通过条件流匹配（diffusion policy）生成高频、连续的动作序列（每秒可达50 Hz）\n模型流程图 收集数据 -\u003e 训练$\\phi_0$ -\u003e Zero-Shot/微调/Fine-tune\n数据来自7种不同的机器人，68个不同的任务，总计 10k小时。\n每一个单独机械臂的自由度在 6-7 (有些机器人有多机械臂)\n输入有 3 块，分别是：Image, Language, and State\nImage 用 400M Pretrained VIT SigLip 得到 embedding, 一共会有up to 3 个 Image， 所以最会有 3 个 embedding (没有就填 0)\nLanguage 用 2.6B Pretrained LLM Gemma, 得到 embedding\n最后是关节信息，最多会有 18 个(没有就填 0)。\n之后运用 Diffusion Policy 来生成每一步的动作\n生成的是 $p(A_t|O_t)$, 即，在给定条件(环境下)，每一个动作的概率。\n这时给一个 chunk 内的真实动作加噪音，然后让模型学习如何去噪。\n方式如下：\n随机采一个噪声级别 $\\tau$，采一个高斯噪声 $\\varepsilon$； 构造带噪动作块 $A_t^\\tau = \\tau A_t + (1 - \\tau)\\varepsilon$； 用观测 $o_t$ 与 $A_t^\\tau$ 输入网络，预测去噪速度场 $v_\\theta(A_t^\\tau, o_t) \u003c-\u003e \\varepsilon - A_t$； 以 $\\left| v_\\theta - (\\varepsilon - A_t) \\right|^2$ 作为监督信号； 推理的时候就会把这个过程分成 10-20步，每一步去噪一点点，最终得到一个动作 注：“这个过程\"指的是随机生成一个噪声，然后从这个噪声去噪的过程\nCode Inference def create_trained_policy( train_config: _config.TrainConfig, # 训练配置，包含模型定义、数据配置等 checkpoint_dir: pathlib.Path | str, # 检查点目录：存放已训练模型参数和归一化统计信息的路径 *, repack_transforms: transforms.Group | None = None, # 可选的“重打包”预处理组——在所有其他 transform 之前应用 sample_kwargs: dict[str, Any] | None = None, # 传递给 policy.sample_actions 的参数字典 default_prompt: str | None = None, # 默认提示词，如果输入数据中没有 prompt，则注入该默认值 norm_stats: dict[str, transforms.NormStats] | None = None, # 归一化统计信息（均值、方差或分位数），若未提供则从 checkpoint 中加载 ) -\u003e _policy.Policy: \"”\" 从训练好的检查点创建并返回一个可交互的 Policy 对象。\nArgs: train_config: 用于创建模型和数据流水线的训练配置。 checkpoint_dir: 存储模型参数和归一化信息的目录路径。 repack_transforms: （可选）在所有其他数据变换之前应用的变换组。 sample_kwargs: （可选）调用 sample_actions 方法时使用的关键字参数。 default_prompt: （可选）注入到输入数据中的默认提示词。 norm_stats: （可选）归一化统计信息；如果未提供，会尝试从 checkpoint 加载。 \"\"\" # 如果外部没有传入 repack_transforms，则使用一个空的 transforms.Group repack_transforms = repack_transforms or transforms.Group() # 下载 checkpoint_dir = download.maybe_download(str(checkpoint_dir)) # 怀疑是这个地方卡住了，正在测试 logging.info(\"Loading model...\") # 从 checkpoint 的 params 文件中恢复模型参数，并用 jnp.bfloat16 精度加载到模型中 model = train_config.model.load( _model.restore_params(checkpoint_dir / \"params\", dtype=jnp.bfloat16) ) # 使用训练配置中的 data 部分构建数据流水线（包括 asset 路径、transform 定义等） data_config = train_config.data.create(train_config.assets_dirs, train_config.model) # 如果调用方未提供归一化统计信息，则从 checkpoint 中加载 if norm_stats is None: # 确保 data_config 中配置了 asset_id，否则无法定位归一化文件 if data_config.asset_id is None: raise ValueError(\"Asset id is required to load norm stats.\") # 从 checkpoint_dir/assets/ 文件夹加载归一化统计信息 norm_stats = _checkpoints.load_norm_stats(checkpoint_dir / \"assets\", data_config.asset_id) # 构造并返回 Policy 对象 return _policy.Policy( model, # 定义输入端的 transform 流水线 transforms=[ *repack_transforms.inputs, # 首先应用重打包变换 transforms.InjectDefaultPrompt(default_prompt), # 注入默认 prompt（如有） *data_config.data_transforms.inputs, # 然后是数据阶段的预处理（如裁剪、编码） transforms.Normalize(norm_stats, # 使用加载的统计信息做归一化 use_quantiles=data_config.use_quantile_norm), *data_config.model_transforms.inputs, # 最后是模型期望的输入 transform（如维度调整、拼接） ], # 定义输出端的 transform 流水线，用于将模型输出反向映射回原始数据格式 output_transforms=[ *data_config.model_transforms.outputs, # 模型输出后先做反向 transform（如反维度调整） transforms.Unnormalize(norm_stats, # 反归一化 use_quantiles=data_config.use_quantile_norm), *data_config.data_transforms.outputs, # 数据阶段的后处理（如解码、去补齐） *repack_transforms.outputs, # 最后应用重打包的输出变换 ], sample_kwargs=sample_kwargs, # 传给 sample_actions 的运行时参数 metadata=train_config.policy_metadata, # 附带的元数据 ) 创新点 VLM+流匹配的融合：首次将预训练视觉-语言骨干与流匹配（flow matching）动作生成相结合，实现高频连续动作预测。 跨平台预训练：采用跨样本（cross-embodiment）训练，将来自单臂、双臂及移动操纵器的多样化数据统一到同一模型中。 两阶段训练配方：借鉴大规模语言模型的“预训练–后训练”流程，预训练学会恢复与泛化行为，后训练习得高效、精炼策略。 动作专家模块：在 Transformer 上增设专门处理机器人状态与动作的子网络，相当于一种混合专家（mixture-of-experts）设计，提高对连续动作的建模能力 解决的难点 数据稀缺：以往专用策略仅依赖于任务特定的少量数据，难以涵盖错误恢复或未见场景；π0 通过多任务多平台数据缓解了此问题。 泛化与鲁棒性：先前的自回归离散动作方法（如 OpenVLA）不支持高频动作分块，难以处理精细操控；π0 的流匹配架构可生成连续、高精度动作，提升了对复杂任务的适应能力。 多阶段任务：传统方法往往针对单一任务设计，难以扩展到折叠衣物、装箱等涉及多步骤和语义推理的场景；π0 可直接通过语言提示或与高层策略结合，完成复杂多阶段流程 还需要解决的难点 预训练数据组成与加权：如何选择和加权最有助于下游任务的数据仍然未知。 任务可靠性：部分下游任务（尤其与预训练差异大者）仍存在不稳定性，需要更多高质量后训练数据。 跨领域通用性：尚不清楚该框架能否推广到更异质的机器人领域（如自主驾驶、步态运动等）。 资源需求：大规模预训练对算力和示教数据的需求极高，实际部署成本仍是瓶颈 Take away tmux CUDA_VISIBLE_DEVICES=num pdb\n",
+  "wordCount" : "351",
+  "inLanguage": "en",
+  "datePublished": "2025-05-30T17:06:08+08:00",
+  "dateModified": "2025-05-30T17:06:08+08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2025-05-31/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2025-05-31
+    </h1>
+    <div class="post-meta"><span title='2025-05-30 17:06:08 +0800 CST'>May 30, 2025</span>&nbsp;·&nbsp;2 min
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h4 id="主要动机">主要动机<a hidden class="anchor" aria-hidden="true" href="#主要动机">#</a></h4>
+<p>目前有三大挑战：数据稀缺、泛化能力不足，以及在复杂物理环境中效果不好
+作者希望通过引入大规模语言及VLA模型在自然语言处理和计算机视觉中的成功经验解决这个问题.</p>
+<h4 id="主要论点">主要论点<a hidden class="anchor" aria-hidden="true" href="#主要论点">#</a></h4>
+<p>在预训练的视-语言模型（VLM，本文采用 PaliGemma）基础上，增加一个“动作专家”（action expert），通过条件流匹配（diffusion policy）生成高频、连续的动作序列（每秒可达50 Hz）</p>
+<h4 id="模型流程图">模型流程图<a hidden class="anchor" aria-hidden="true" href="#模型流程图">#</a></h4>
+<p><img alt="1748596153733" loading="lazy" src="https://tzj2006.github.io/images/2025-05-31/1748596153733.png"></p>
+<p>收集数据 -&gt; 训练$\phi_0$ -&gt; Zero-Shot/微调/Fine-tune</p>
+<p>数据来自7种不同的机器人，68个不同的任务，总计 10k小时。</p>
+<p>每一个单独机械臂的自由度在 6-7 (有些机器人有多机械臂)</p>
+<p>输入有 3 块，分别是：Image, Language, and State</p>
+<p>Image 用 400M Pretrained VIT SigLip 得到 embedding, 一共会有up to 3 个 Image， 所以最会有 3 个 embedding (没有就填 0)</p>
+<p>Language 用 2.6B Pretrained LLM Gemma, 得到 embedding</p>
+<p>最后是关节信息，最多会有 18 个(没有就填 0)。</p>
+<p>之后运用 Diffusion Policy 来生成每一步的动作</p>
+<p>生成的是 $p(A_t|O_t)$, 即，在给定条件(环境下)，每一个动作的概率。</p>
+<p>这时给一个 chunk 内的真实动作加噪音，然后让模型学习如何去噪。</p>
+<p>方式如下：</p>
+<ol>
+<li>随机采一个噪声级别 $\tau$，采一个高斯噪声 $\varepsilon$；</li>
+<li>构造带噪动作块 $A_t^\tau = \tau A_t + (1 - \tau)\varepsilon$；</li>
+<li>用观测 $o_t$ 与 $A_t^\tau$ 输入网络，预测去噪速度场 $v_\theta(A_t^\tau, o_t) &lt;-&gt; \varepsilon - A_t$；</li>
+<li>以 $\left| v_\theta - (\varepsilon - A_t) \right|^2$ 作为监督信号；</li>
+</ol>
+<p>推理的时候就会把这个过程分成 10-20步，每一步去噪一点点，最终得到一个动作
+<em>注：&ldquo;这个过程&quot;指的是随机生成一个噪声，然后从这个噪声去噪的过程</em></p>
+<h5 id="code">Code<a hidden class="anchor" aria-hidden="true" href="#code">#</a></h5>
+<h6 id="inference">Inference<a hidden class="anchor" aria-hidden="true" href="#inference">#</a></h6>
+<p>def create_trained_policy(
+train_config: _config.TrainConfig,                    # 训练配置，包含模型定义、数据配置等
+checkpoint_dir: pathlib.Path | str,                    # 检查点目录：存放已训练模型参数和归一化统计信息的路径
+*,
+repack_transforms: transforms.Group | None = None,     # 可选的“重打包”预处理组——在所有其他 transform 之前应用
+sample_kwargs: dict[str, Any] | None = None,           # 传递给 policy.sample_actions 的参数字典
+default_prompt: str | None = None,                     # 默认提示词，如果输入数据中没有 prompt，则注入该默认值
+norm_stats: dict[str, transforms.NormStats] | None = None,  # 归一化统计信息（均值、方差或分位数），若未提供则从 checkpoint 中加载
+) -&gt; _policy.Policy:
+&quot;&rdquo;&quot;
+从训练好的检查点创建并返回一个可交互的 Policy 对象。</p>
+<pre><code>Args:
+    train_config: 用于创建模型和数据流水线的训练配置。
+    checkpoint_dir: 存储模型参数和归一化信息的目录路径。
+    repack_transforms: （可选）在所有其他数据变换之前应用的变换组。
+    sample_kwargs: （可选）调用 sample_actions 方法时使用的关键字参数。
+    default_prompt: （可选）注入到输入数据中的默认提示词。
+    norm_stats: （可选）归一化统计信息；如果未提供，会尝试从 checkpoint 加载。
+&quot;&quot;&quot;
+
+# 如果外部没有传入 repack_transforms，则使用一个空的 transforms.Group
+repack_transforms = repack_transforms or transforms.Group()
+
+# 下载
+checkpoint_dir = download.maybe_download(str(checkpoint_dir))
+
+# 怀疑是这个地方卡住了，正在测试
+
+logging.info(&quot;Loading model...&quot;)
+# 从 checkpoint 的 params 文件中恢复模型参数，并用 jnp.bfloat16 精度加载到模型中
+model = train_config.model.load(
+    _model.restore_params(checkpoint_dir / &quot;params&quot;, dtype=jnp.bfloat16)
+)
+
+# 使用训练配置中的 data 部分构建数据流水线（包括 asset 路径、transform 定义等）
+data_config = train_config.data.create(train_config.assets_dirs, train_config.model)
+
+# 如果调用方未提供归一化统计信息，则从 checkpoint 中加载
+if norm_stats is None:
+    # 确保 data_config 中配置了 asset_id，否则无法定位归一化文件
+    if data_config.asset_id is None:
+        raise ValueError(&quot;Asset id is required to load norm stats.&quot;)
+    # 从 checkpoint_dir/assets/&lt;asset_id&gt; 文件夹加载归一化统计信息
+    norm_stats = _checkpoints.load_norm_stats(checkpoint_dir / &quot;assets&quot;, data_config.asset_id)
+
+# 构造并返回 Policy 对象
+return _policy.Policy(
+    model,
+    # 定义输入端的 transform 流水线
+    transforms=[
+        *repack_transforms.inputs,                              # 首先应用重打包变换
+        transforms.InjectDefaultPrompt(default_prompt),         # 注入默认 prompt（如有）
+        *data_config.data_transforms.inputs,                   # 然后是数据阶段的预处理（如裁剪、编码）
+        transforms.Normalize(norm_stats,                       # 使用加载的统计信息做归一化
+                             use_quantiles=data_config.use_quantile_norm),
+        *data_config.model_transforms.inputs,                  # 最后是模型期望的输入 transform（如维度调整、拼接）
+    ],
+    # 定义输出端的 transform 流水线，用于将模型输出反向映射回原始数据格式
+    output_transforms=[
+        *data_config.model_transforms.outputs,                 # 模型输出后先做反向 transform（如反维度调整）
+        transforms.Unnormalize(norm_stats,                     # 反归一化
+                               use_quantiles=data_config.use_quantile_norm),
+        *data_config.data_transforms.outputs,                  # 数据阶段的后处理（如解码、去补齐）
+        *repack_transforms.outputs,                            # 最后应用重打包的输出变换
+    ],
+    sample_kwargs=sample_kwargs,                               # 传给 sample_actions 的运行时参数
+    metadata=train_config.policy_metadata,                     # 附带的元数据
+)
+</code></pre>
+<h4 id="创新点">创新点<a hidden class="anchor" aria-hidden="true" href="#创新点">#</a></h4>
+<ul>
+<li>VLM+流匹配的融合：首次将预训练视觉-语言骨干与流匹配（flow matching）动作生成相结合，实现高频连续动作预测。</li>
+<li>跨平台预训练：采用跨样本（cross-embodiment）训练，将来自单臂、双臂及移动操纵器的多样化数据统一到同一模型中。</li>
+<li>两阶段训练配方：借鉴大规模语言模型的“预训练–后训练”流程，预训练学会恢复与泛化行为，后训练习得高效、精炼策略。</li>
+<li>动作专家模块：在 Transformer 上增设专门处理机器人状态与动作的子网络，相当于一种混合专家（mixture-of-experts）设计，提高对连续动作的建模能力</li>
+</ul>
+<h4 id="解决的难点">解决的难点<a hidden class="anchor" aria-hidden="true" href="#解决的难点">#</a></h4>
+<ul>
+<li>数据稀缺：以往专用策略仅依赖于任务特定的少量数据，难以涵盖错误恢复或未见场景；π0 通过多任务多平台数据缓解了此问题。</li>
+<li>泛化与鲁棒性：先前的自回归离散动作方法（如 OpenVLA）不支持高频动作分块，难以处理精细操控；π0 的流匹配架构可生成连续、高精度动作，提升了对复杂任务的适应能力。</li>
+<li>多阶段任务：传统方法往往针对单一任务设计，难以扩展到折叠衣物、装箱等涉及多步骤和语义推理的场景；π0 可直接通过语言提示或与高层策略结合，完成复杂多阶段流程</li>
+</ul>
+<h4 id="还需要解决的难点">还需要解决的难点<a hidden class="anchor" aria-hidden="true" href="#还需要解决的难点">#</a></h4>
+<ul>
+<li>预训练数据组成与加权：如何选择和加权最有助于下游任务的数据仍然未知。</li>
+<li>任务可靠性：部分下游任务（尤其与预训练差异大者）仍存在不稳定性，需要更多高质量后训练数据。</li>
+<li>跨领域通用性：尚不清楚该框架能否推广到更异质的机器人领域（如自主驾驶、步态运动等）。</li>
+<li>资源需求：大规模预训练对算力和示教数据的需求极高，实际部署成本仍是瓶颈</li>
+</ul>
+<h4 id="take-away">Take away<a hidden class="anchor" aria-hidden="true" href="#take-away">#</a></h4>
+<p>tmux
+CUDA_VISIBLE_DEVICES=num
+pdb</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
