@@ -1,0 +1,1 @@
+function saveState(e){const t=document.getElementById(e);localStorage.setItem(e,t.checked)}function loadState(e){const t=document.getElementById(e),n=localStorage.getItem(e)==="true";t&&(t.checked=n)}document.addEventListener("DOMContentLoaded",function(){const e=["task1","task2","task3"];e.forEach(loadState)})

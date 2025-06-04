@@ -1,0 +1,890 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>TzJ&#39;s Net</title>
+    <link>https://tzj2006.github.io/</link>
+    <description>Recent content on TzJ&#39;s Net</description>
+    <generator>Hugo -- 0.142.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 04 Jun 2025 11:16:31 +0800</lastBuildDate>
+    <atom:link href="https://tzj2006.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bug Journal 2025-06-04</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-06-04/</link>
+      <pubDate>Wed, 04 Jun 2025 11:16:31 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-06-04/</guid>
+      <description>&lt;h2 id=&#34;leveraging-locality-to-boost-sample-efficiency-in-robotic-manipulation&#34;&gt;Leveraging Locality to Boost Sample Efficiency in Robotic Manipulation&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://arxiv.org/abs/2406.10615&#34;&gt;发表时间：15 Jun 2024&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;动机&#34;&gt;动机&lt;/h4&gt;
+&lt;p&gt;当前机器人操作策略（如模仿学习、RL）在训练时通常会学习一个全局策略函数 \pi(o_t)，即从全图像或全状态观察中直接输出动作。但：&lt;/p&gt;
+&lt;p&gt;问题 1：学习难度高（需要从高维图像中学全局策略）；
+问题 2：泛化差（模型可能过拟合于训练视角或场景）；
+问题 3：sample efficiency 差（训练数据需求量大）&lt;/p&gt;
+&lt;p&gt;作者提出一个核心假设：很多 manipulation 任务其实是“局部决策驱动”的，
+也就是说：只关注局部 patch（例如抓取点附近区域）即可决定动作。&lt;/p&gt;
+&lt;h4 id=&#34;主要论点&#34;&gt;主要论点&lt;/h4&gt;
+&lt;p&gt;提出 Local Policy Networks（LPN）：
+将策略函数设计为一组 局部策略（local policy heads）；
+每个 head 只负责“在自己 patch 上预测动作”；
+用 heatmap 表示哪些 patch 是可行操作区域（如抓取点）；
+最终策略通过对多个 local head 输出聚合（weighted sum）得到。&lt;/p&gt;
+&lt;h4 id=&#34;模型流程图&#34;&gt;模型流程图&lt;/h4&gt;
+&lt;p&gt;&lt;img alt=&#34;1749017331301&#34; loading=&#34;lazy&#34; src=&#34;https://tzj2006.github.io/images/2025-06-04/1749017331301.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;简单来说，就是寻找关键点，预测关键点的移动，然后整合成动作&lt;/p&gt;
+&lt;h4 id=&#34;实验-setting&#34;&gt;实验 setting:&lt;/h4&gt;
+&lt;p&gt;使用数据集：RT-1（Robotics Transformer 1）:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Google Everyday Robot（移动底座 + 7-DoF机械臂 + gripper）
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;数据来源
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;真实机器人操作任务，由人类远程操作（teleoperation）或脚本演示收集
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;数据规模
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;~130k 条实际机器人操作轨迹，覆盖 700+ 种任务
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;采样频率
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;每条轨迹包含约 50–100 帧关键帧（图像 + 动作）
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;场景
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;家庭式办公环境（桌面、水槽、地面）
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;物体
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;80+ 类常见物体（杯子、水瓶、纸巾、玩具、锅等）
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;语言指令
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;每个轨迹附有一条人类编写的自然语言 task 描述（用于多模态模型）
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;对于每一条指令：&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-06-03</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-06-03/</link>
+      <pubDate>Tue, 03 Jun 2025 11:50:32 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-06-03/</guid>
+      <description>&lt;h2 id=&#34;catch-it-learning-to-catch-in-flight-with-mobile-dexterous-hands&#34;&gt;Catch It! Learning to Catch in Flight with Mobile Dexterous Hands&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://arxiv.org/abs/2409.10319&#34;&gt;发表时间: 16 Sep 2024&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;动机&#34;&gt;动机&lt;/h4&gt;
+&lt;p&gt;Basically, 这是之前那篇 &lt;em&gt;&lt;a href=&#34;https://arxiv.org/abs/2310.08809&#34;&gt;DexCatch: Learning to Catch Arbitrary Objects with Dexterous Hands&lt;/a&gt;&lt;/em&gt; 的 follow up. 讲述了 Shanghai Qi Zhi Institute 和 Shanghai AI Lab 的人如何把上一篇文章的工作部署到真机器人上。&lt;/p&gt;
+&lt;h4 id=&#34;模型流程图&#34;&gt;模型流程图&lt;/h4&gt;
+&lt;p&gt;&lt;img alt=&#34;1748922875088&#34; loading=&#34;lazy&#34; src=&#34;https://tzj2006.github.io/images/2025-06-03/1748922875088.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;这是真机器人的样子：
+一个双目摄像头，一个 6 DoF 的机械臂，一个 16 DoF 的灵巧手，还有一个可以移动的平台。&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;1748922862160&#34; loading=&#34;lazy&#34; src=&#34;https://tzj2006.github.io/images/2025-06-03/1748922862160.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;训练的过程分为两步：&lt;/p&gt;
+&lt;p&gt;第一步是不管灵巧手，先尝试移动整个机器人让物体砸到灵巧手上。
+第二步是微调灵巧手让手抓住这个物体。&lt;/p&gt;
+&lt;p&gt;最后在控制上加了一个速度优化器解决了无法抓到从未见过的物体的问题。&lt;/p&gt;
+&lt;h4 id=&#34;解决的难点&#34;&gt;解决的难点&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;部署到真机器人上&lt;/li&gt;
+&lt;li&gt;一步到位 end-to-end 效果没那么好&lt;/li&gt;
+&lt;li&gt;抓不住从未见过的物体&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;还需要解决的难点&#34;&gt;还需要解决的难点&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;从未见过的物体还是不好抓&lt;/li&gt;
+&lt;li&gt;仍然没有考虑材质之类的问题&lt;/li&gt;
+&lt;li&gt;还是无法在当物体在空中时就判断物体的形状&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;reinforcement-learning-with-foundation-priors-let-the-embodied-agent-efficiently-learn-on-its-own&#34;&gt;Reinforcement Learning with Foundation Priors: Let the Embodied Agent Efficiently Learn on Its Own&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://arxiv.org/abs/2310.02635&#34;&gt;发布时间: 4 Oct. 2023&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-06-02</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-06-02/</link>
+      <pubDate>Mon, 02 Jun 2025 11:24:12 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-06-02/</guid>
+      <description>Review of Three base VLA models and three basic CNNs.</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-06-01</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-06-01/</link>
+      <pubDate>Sun, 01 Jun 2025 12:00:14 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-06-01/</guid>
+      <description>&lt;h1 id=&#34;主流视觉-文本多模态模型技术分析&#34;&gt;主流视觉-文本多模态模型技术分析&lt;/h1&gt;
+&lt;p&gt;近年来，视觉和文本结合的多模态模型取得了显著进展。在此，我们选取当前主流的几种模型（包括但不限于 CLIP、ALIGN、BLIP、BLIP-2、GIT、Flamingo、GPT-4V），逐一分析它们的架构设计、模态对齐方式、输入 token 统一表示方法、损失函数与训练策略、数据集与伪标签使用情况，并讨论它们如何在架构或训练上应对多模态学习的六大难点。&lt;/p&gt;
+&lt;h2 id=&#34;clip-openai-2021&#34;&gt;CLIP (OpenAI, 2021)&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;整体架构设计：&lt;/strong&gt; CLIP 采用 &lt;strong&gt;双编码器架构&lt;/strong&gt; ：包括一个图像编码器和一个文本编码器，两者分别将图像和文本映射到&lt;strong&gt;相同维度&lt;/strong&gt;的向量空间&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=The%20architecture%20consists%20of%20separate,capacity%20of%20the%20text%20encoder&#34;&gt;lightly.ai&lt;/a&gt;。图像编码器可以使用 ResNet 或 Vision Transformer 等架构，文本编码器则是基于 Transformer 的语言模型&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=The%20architecture%20consists%20of%20separate,capacity%20of%20the%20text%20encoder&#34;&gt;lightly.ai&lt;/a&gt;。在输出端，两个编码器各自接一个线性投影，将图像和文本特征投影到&lt;strong&gt;共享的多模态嵌入空间&lt;/strong&gt;&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=The%20architecture%20consists%20of%20separate,capacity%20of%20the%20text%20encoder&#34;&gt;lightly.ai&lt;/a&gt;。这种架构并不在中途融合图像和文本特征，而是各自编码后在嵌入空间对齐。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;模态对齐方式：&lt;/strong&gt; CLIP通过&lt;strong&gt;对比学习&lt;/strong&gt;实现视觉-语言对齐。训练时，模型给定一批图文对，学习&lt;strong&gt;预测哪张图像与哪段文本匹配&lt;/strong&gt;&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=trained%20to%20identify%20the%20correct,between%20visual%20and%20textual%20representations&#34;&gt;lightly.ai&lt;/a&gt;。具体而言，CLIP使用 &lt;strong&gt;对称的跨模态对比损失&lt;/strong&gt; （即分别以图像检索文本和文本检索图像计算两个方向的softmax交叉熵损失），最大化真实匹配的图文嵌入相似度，最小化非匹配对的相似度&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=trained%20to%20identify%20the%20correct,between%20visual%20and%20textual%20representations&#34;&gt;lightly.ai&lt;/a&gt;。这种训练使图像和文本编码器产生的特征在共享空间中&lt;strong&gt;成对靠近&lt;/strong&gt;&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=between%20positive%20image,between%20visual%20and%20textual%20representations&#34;&gt;lightly.ai&lt;/a&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;输入 token 表达统一：&lt;/strong&gt; CLIP并未显式统一图像和文本的输入表示格式。 &lt;strong&gt;图像和文本各有独立的token化和编码流程&lt;/strong&gt; ：文本用BPE分词作为离散token输入Transformer，图像则以像素或patch为输入到CNN/ViT得到连续特征&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=The%20architecture%20consists%20of%20separate,capacity%20of%20the%20text%20encoder&#34;&gt;lightly.ai&lt;/a&gt;。两种模态的数据直到嵌入空间才进行统一对齐。因此CLIP通过&lt;strong&gt;独立编码+对齐空间&lt;/strong&gt;的方式，规避了直接将图像作为序列token处理的不统一问题。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;损失函数与训练策略：&lt;/strong&gt; 损失采用 &lt;strong&gt;对比学习的InfoNCE损失&lt;/strong&gt; （实现为带温度系数的归一化softmax交叉熵）&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=representations%20of%20the%20image%20and,used%20for%20downstream%20visual%20and&#34;&gt;research.google&lt;/a&gt;。在一个batch中，真实的图文对作为正样本，不匹配的组合作为负样本，通过softmax拉开正负样本的评分差距。为提高训练效率，CLIP使用了&lt;strong&gt;大批量&lt;/strong&gt;训练（成千上万的对/批）以提供足够的负样本，同时在实现上对大batch的softmax作了数值稳定和分布式计算的优化&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=The%20loss%20function%20employed%20during,2023%2C%20in%20their&#34;&gt;lightly.ai&lt;/a&gt;。图像预处理上，只用了基本的数据增广（如随机裁剪）以保持图片内容与文本描述对应&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=insensitive%20to%20the%20capacity%20of,the%20text%20encoder&#34;&gt;lightly.ai&lt;/a&gt;。CLIP从&lt;strong&gt;随机初始化&lt;/strong&gt;开始端到端训练图像和文本编码器，没有使用预训练的视觉或语言模型&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=The%20architecture%20consists%20of%20separate,capacity%20of%20the%20text%20encoder&#34;&gt;lightly.ai&lt;/a&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;数据集及伪标签：&lt;/strong&gt; CLIP在一个超大规模的图文配对数据集上预训练，包含约&lt;strong&gt;4亿对图像-文本&lt;/strong&gt;&lt;a href=&#34;https://arxiv.org/abs/2103.00020#:~:text=supervision,grained%20object%20classification.%20The%20model&#34;&gt;arxiv.org&lt;/a&gt;（主要来自互联网的图片及其旁白文本）。这些文本多为图像的标题或描述，具有较大噪声，但规模极其庞大。CLIP没有使用合成的文本标签或额外的人工标注数据，完全依赖&lt;strong&gt;自然语言的弱监督&lt;/strong&gt;&lt;a href=&#34;https://arxiv.org/abs/2103.00020#:~:text=supervision,grained%20object%20classification.%20The%20model&#34;&gt;arxiv.org&lt;/a&gt;。如此大量的图文对无需人工清洗，使模型学习到广泛的视觉概念。训练中未使用伪标签技术，也未针对数据稀缺问题额外生成合成数据，因为其数据规模本身就非常巨大。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;六大难点应对：&lt;/strong&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;em&gt;模态对齐困难：&lt;/em&gt;  CLIP通过对比损失直接学习图像和文本的全局语义对齐，将匹配的图文特征拉近，不匹配的推远&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=trained%20to%20identify%20the%20correct,between%20visual%20and%20textual%20representations&#34;&gt;lightly.ai&lt;/a&gt;。超大规模多样化数据和对比学习目标极大缓解了模态对齐难题，使模型学习到稳健的跨模态表示空间。&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;token格式不统一：&lt;/em&gt;  采用双编码器架构有效避免了将图像离散化为“词”的问题。图像由专门的视觉编码器处理，文本由文本编码器处理，二者输出相同格式的向量后再比对&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=The%20architecture%20consists%20of%20separate,capacity%20of%20the%20text%20encoder&#34;&gt;lightly.ai&lt;/a&gt;。这种后期对齐的方法在不统一输入token格式的前提下，实现了多模态表示的统一。&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;语义粒度不匹配：&lt;/em&gt; CLIP对图像和文本都是提取整体级别的表示（整幅图像对应整段文本）。它没有显式对齐图像局部区域与文本片段，因此可能无法细粒度对齐具体对象。但庞大的训练语料涵盖各种粒度描述，在全局对比目标下模型隐式学到了一定程度的细粒度关联。后续研究如&lt;strong&gt;Fine-Grained CLIP&lt;/strong&gt;等正是受限于CLIP在局部语义对齐上的不足&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=The%20architecture%20consists%20of%20separate,capacity%20of%20the%20text%20encoder&#34;&gt;lightly.ai&lt;/a&gt;&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=SigLIP%3A%20Optimising%20the%20loss%20function,for%20better%20scaling&#34;&gt;lightly.ai&lt;/a&gt;。总体而言，CLIP主要对齐全局语义，对于细粒度语义不匹配问题未作专门架构设计。&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;多模态上下文保持：&lt;/em&gt; CLIP一次只处理单一的图-文对，不涉及序列化的多轮交互或多张图像输入。因此 &lt;strong&gt;多模态上下文&lt;/strong&gt; （如对话历史或多图情景）并未在架构中体现。CLIP更侧重于独立图文对的匹配，对跨时序或多轮情境无法建模。这一限制在CLIP应用于对话或多图任务时需要借助外部机制解决。&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;训练数据稀缺：&lt;/em&gt; CLIP通过&lt;strong&gt;大规模弱标注数据&lt;/strong&gt;从根本上缓解了数据稀缺的问题&lt;a href=&#34;https://arxiv.org/abs/2103.00020#:~:text=supervision,grained%20object%20classification.%20The%20model&#34;&gt;arxiv.org&lt;/a&gt;。无需逐张图人工标注类别，而是利用网络中丰富的图像文本对，实现“以量补质”。即使这些网络文本存在噪声，作者证明只要规模足够大，模型仍能学到有效特征&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=language%20models,attention%20models%2C%20and%20enable&#34;&gt;research.google&lt;/a&gt;。因此CLIP没有使用数据增强或伪标注技术，而是倾向于直接收集海量数据。&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;计算开销高：&lt;/em&gt; 训练CLIP确实需要巨大的算力和显存，但相对来说，其&lt;strong&gt;双塔架构&lt;/strong&gt;使训练可并行展开，推理时也可分别预编码图文后做相似度计算，&lt;strong&gt;具有一定的效率优势&lt;/strong&gt;&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=between%20positive%20image,between%20visual%20and%20textual%20representations&#34;&gt;lightly.ai&lt;/a&gt;。与需要跨模态交叉注意力的单体模型相比，CLIP的对比学习目标在实现分布式并行时稍有挑战，需要对大batch软max做特殊优化&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=The%20loss%20function%20employed%20during,Training%E2%80%9D%2C%20propose%20to&#34;&gt;lightly.ai&lt;/a&gt;。后续研究提出用sigmoid替代softmax（如 SigLIP）来简化分布式实现&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=implementation%20is%20numerically%20unstable%2C%20and,additional%20bias%20terms%2C%20and%20calculations&#34;&gt;lightly.ai&lt;/a&gt;。总的来说，OpenAI通过合理的工程和算法优化，使CLIP在可能的范围内降低了计算开销，但其预训练仍是大规模的（数百万 GPU 时）。值得一提的是，CLIP模型体积适中（例如ViT-B/32版约有数亿参数），推理可在单GPU上高效完成，实现了训练成本和推理效率的折中。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;参考：&lt;/strong&gt; CLIP 的论文&lt;a href=&#34;https://arxiv.org/abs/2103.00020#:~:text=supervision,grained%20object%20classification.%20The%20model&#34;&gt;arxiv.org&lt;/a&gt;详细描述了其对比预训练方法，OpenAI 的博客也提供了概述&lt;a href=&#34;https://www.lightly.ai/blog/clip-and-friends#:~:text=trained%20to%20identify%20the%20correct,between%20visual%20and%20textual%20representations&#34;&gt;lightly.ai&lt;/a&gt;。代码实现可参考 OpenAI 提供的开源版本或 HuggingFace 的CLIP模型库&lt;a href=&#34;https://huggingface.co/docs/transformers/en/model_doc/clip#:~:text=CLIP%20uses%20an%20image%20encoder,the%20same%20number%20of&#34;&gt;huggingface.co&lt;/a&gt;。&lt;/p&gt;
+&lt;h2 id=&#34;align-google-2021&#34;&gt;ALIGN (Google, 2021)&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;整体架构设计：&lt;/strong&gt; ALIGN（ &lt;strong&gt;A Large-scale ImaGe and Noisy-Text embedding&lt;/strong&gt; ）延续了与CLIP相同的&lt;strong&gt;双编码器对比学习架构&lt;/strong&gt;&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=For%20the%20purpose%20of%20building,large%20%28text%20encoder%29%20trained&#34;&gt;research.google&lt;/a&gt;。它包含独立的图像编码器和文本编码器，两者输出到同一向量空间。与CLIP不同的是，Google使用了更大规模的主干：&lt;strong&gt;EfficientNet-L2卷积网络&lt;/strong&gt;作为图像编码器，&lt;strong&gt;BERT-Large&lt;/strong&gt;作为文本编码器，并均从随机初始化开始训练&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=softmax%29%20towardsdatascience,used%20for%20downstream%20visual%20and&#34;&gt;research.google&lt;/a&gt;。模型最终投影到一个共享嵌入空间，用于图文检索和匹配任务。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;模态对齐方式：&lt;/strong&gt; ALIGN采用&lt;strong&gt;对比损失（normalized softmax）&lt;strong&gt;来训练，使匹配的图文对嵌入向量接近，不匹配的远离&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=representations%20of%20the%20image%20and,used%20for%20downstream%20visual%20and&#34;&gt;research.google&lt;/a&gt;。具体而言，对每个图像-文本对，计算嵌入的余弦相似度，并通过softmax使得正确匹配对在一批样本中得到最高的似然。损失在图到文和文到图两个方向对称计算，如同CLIP的做法。这种以&lt;/strong&gt;批为单位的跨模态对比&lt;/strong&gt;训练，使模型学到强大的图文对齐表示。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;输入 token 表达统一：&lt;/strong&gt; ALIGN同样没有将图像直接离散为token序列，而是通过&lt;strong&gt;双通道&lt;/strong&gt;处理：图像经过CNN提取特征向量，文本经过BERT编码为文本向量。两模态输出向量通过各自的投影层映射到同维空间。由于采用独立编码器，ALIGN不要求图像和文本的输入格式统一，而是在输出&lt;strong&gt;embedding空间&lt;/strong&gt;实现统一表示&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=representations%20of%20the%20image%20and,used%20for%20downstream%20visual%20and&#34;&gt;research.google&lt;/a&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;损失函数与训练策略：&lt;/strong&gt; 使用 &lt;strong&gt;对比学习损失&lt;/strong&gt; （InfoNCE变体），在&lt;strong&gt;大批量&lt;/strong&gt;上训练模型&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=For%20the%20purpose%20of%20building,large%20%28text%20encoder%29%20trained&#34;&gt;research.google&lt;/a&gt;。Google收集了极其庞大的图文数据，使每个训练step都含有大量负例，从而有效训练对比目标。与CLIP类似，ALIGN需要跨GPU同步计算softmax分母，这在工程上有所挑战。值得注意的是，作者强调尽管数据非常嘈杂，他们仅做 &lt;strong&gt;最小程度的过滤&lt;/strong&gt; ，通过&lt;strong&gt;数据规模&lt;/strong&gt;来弥补噪声&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=language%20models,attention%20models%2C%20and%20enable&#34;&gt;research.google&lt;/a&gt;。训练策略上，ALIGN从头训练EfficientNet-L2和BERT-Large，这意味着需要相当长的训练时间，但好处是模型能够充分适配新的数据分布。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;数据集及伪标签：&lt;/strong&gt; ALIGN的亮点在于使用了&lt;strong&gt;超过10亿对图像-Alt文本&lt;/strong&gt;的超大规模数据集&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=language%20models,attention%20models%2C%20and%20enable&#34;&gt;research.google&lt;/a&gt;。这些图像来自网络，文本是网页提供的替代文本（alt-text），数据 &lt;strong&gt;无需人工标注&lt;/strong&gt; 。与早期精心清洗的小型数据集（如Conceptual Captions 300万对）不同，ALIGN &lt;strong&gt;放宽过滤标准&lt;/strong&gt; ，只做了基于频率的简单过滤，最终得到约&lt;strong&gt;18亿对&lt;/strong&gt;图文数据&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=In%20this%20work%2C%20we%20follow,text%20pairs&#34;&gt;research.google&lt;/a&gt;。这些文本描述可能包含噪声甚至与图像无关，但研究表明 &lt;strong&gt;规模弥补质量&lt;/strong&gt; ：如此海量的数据使模型学到泛化的视觉语言表示&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=language%20models,attention%20models%2C%20and%20enable&#34;&gt;research.google&lt;/a&gt;。ALIGN未使用任何合成标签或伪标注技术——完全依赖真实的网络数据，其策略是用极大规模的弱标注数据来缓解数据稀缺和噪声问题&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=language%20models,attention%20models%2C%20and%20enable&#34;&gt;research.google&lt;/a&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;六大难点应对：&lt;/strong&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;em&gt;模态对齐困难：&lt;/em&gt; ALIGN证明了&lt;strong&gt;数据规模&lt;/strong&gt;在对齐中的重要作用。通过&lt;strong&gt;十倍于CLIP的数据规模&lt;/strong&gt;和强大的对比损失，模型学到了稳健的跨模态对齐能力&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=language%20models,attention%20models%2C%20and%20enable&#34;&gt;research.google&lt;/a&gt;&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=For%20the%20purpose%20of%20building,L2&#34;&gt;research.google&lt;/a&gt;。即使数据噪声较高，足够的样本多样性也促使模型捕获图像和文本的正确对应关系，在Flickr30K、COCO等检索任务上超越了之前更复杂的有交叉注意力的模型&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=language%20models,attention%20models%2C%20and%20enable&#34;&gt;research.google&lt;/a&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;token格式不统一：&lt;/em&gt; 与CLIP类似，ALIGN通过&lt;strong&gt;双编码器架构&lt;/strong&gt;回避了统一输入格式的问题。图像和文本分别编码，各自发挥最适合的网络结构（CNN对像素、Transformer对文本），最终只需统一embedding空间即可&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=For%20the%20purpose%20of%20building,large%20%28text%20encoder%29%20trained&#34;&gt;research.google&lt;/a&gt;。因此，不需要对图像进行文本化表示，也不需要修改文本token空间来容纳图像信息。&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;语义粒度不匹配：&lt;/em&gt; ALIGN的训练目标依旧作用在 &lt;strong&gt;全局图像-句子层面&lt;/strong&gt; ，没有显式对齐局部区域与词语。它依靠CNN提取图像总体特征，并用整句文本描述来监督。对于图像细节（如小物体或局部属性）与文本词汇的对应，没有专门机制来处理。这方面的不足在ALIGN中仍然存在，不过由于EfficientNet-L2具有强大的表征能力，加上海量数据涵盖各种描述粒度，一定程度上模型可以借助上下文学到细粒度信息。但总体来说，ALIGN主要解决宏观对齐，对&lt;strong&gt;细粒度语义&lt;/strong&gt;的不匹配没有特殊解决方案。&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;多模态上下文保持：&lt;/em&gt; ALIGN同样一次仅处理单一图文对，没有上下文记忆能力。它不支持在模型内部串联多轮对话或多张图片。Google在ALIGN中更关注开放域的检索和零样本分类能力&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=language%20models,attention%20models%2C%20and%20enable&#34;&gt;research.google&lt;/a&gt;，未涉及多模态对话等情境。因此，ALIGN在&lt;strong&gt;多轮交互&lt;/strong&gt;或&lt;strong&gt;长上下文&lt;/strong&gt;问题上没有新的设计。后续若需要保持多模态上下文，需要在ALIGN提取的embedding之外搭建额外机制（例如将ALIGN作为编码器，配合语言模型处理对话历史）。&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;训练数据稀缺：&lt;/em&gt; ALIGN的策略是&lt;strong&gt;极端扩增数据规模&lt;/strong&gt;以消除数据稀缺瓶颈&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=language%20models,attention%20models%2C%20and%20enable&#34;&gt;research.google&lt;/a&gt;。无需昂贵的人力标注，直接爬取网络 alt-text 即可得到十亿级别的配对。作者证明即使数据噪声大，但数量上去了，同样可以训练出SOTA模型&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=language%20models,attention%20models%2C%20and%20enable&#34;&gt;research.google&lt;/a&gt;。因此，在数据方面，ALIGN并没有使用数据增强或伪标签，而是依赖互联网海量数据源。这一思路对于普通研究者来说难以复现，但从方法上证明了解决数据匮乏的一条可行路径：即利用 &lt;strong&gt;弱标注的大数据&lt;/strong&gt; 。&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;计算开销高：&lt;/em&gt; 为训练ALIGN，Google使用了更大模型和更多数据，训练开销比CLIP更为惊人。然而ALIGN架构简单（无交叉注意力交互），这使得训练可以高效并行扩展&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=representations%20of%20the%20image%20and,used%20for%20downstream%20visual%20and&#34;&gt;research.google&lt;/a&gt;。他们成功训练了一个EfficientNet-L2（参数接近10亿级）和BERT-Large的组合，可见投入了巨大的计算资源&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=softmax%29%20towardsdatascience,used%20for%20downstream%20visual%20and&#34;&gt;research.google&lt;/a&gt;。尽管计算开销高昂，ALIGN通过 &lt;strong&gt;冻结架构复杂性&lt;/strong&gt; （只用双塔，不引入额外模块）来保障多机并行效率，也说明在同等资源下，&lt;strong&gt;优先扩大数据规模&lt;/strong&gt;比增加模型复杂度更有效&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=language%20models,attention%20models%2C%20and%20enable&#34;&gt;research.google&lt;/a&gt;&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=For%20the%20purpose%20of%20building,large%20%28text%20encoder%29%20trained&#34;&gt;research.google&lt;/a&gt;。因此，ALIGN在可用算力内追求最大的数据量和模型规模，以取得最佳性能。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;参考：&lt;/strong&gt; ALIGN 的研究细节发表于 ICML 2021&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=In%20,We&#34;&gt;research.google&lt;/a&gt;。Google Research 官方博客提供了对ALIGN的通俗描述&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=language%20models,attention%20models%2C%20and%20enable&#34;&gt;research.google&lt;/a&gt;&lt;a href=&#34;https://research.google/blog/align-scaling-up-visual-and-vision-language-representation-learning-with-noisy-text-supervision/#:~:text=For%20the%20purpose%20of%20building,large%20%28text%20encoder%29%20trained&#34;&gt;research.google&lt;/a&gt;。由于该模型未开源，实现细节可参考开源的对比学习框架或OpenCLIP等类似项目。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-05-31</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-05-31/</link>
+      <pubDate>Fri, 30 May 2025 17:06:08 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-05-31/</guid>
+      <description>&lt;h4 id=&#34;主要动机&#34;&gt;主要动机&lt;/h4&gt;
+&lt;p&gt;目前有三大挑战：数据稀缺、泛化能力不足，以及在复杂物理环境中效果不好
+作者希望通过引入大规模语言及VLA模型在自然语言处理和计算机视觉中的成功经验解决这个问题.&lt;/p&gt;
+&lt;h4 id=&#34;主要论点&#34;&gt;主要论点&lt;/h4&gt;
+&lt;p&gt;在预训练的视-语言模型（VLM，本文采用 PaliGemma）基础上，增加一个“动作专家”（action expert），通过条件流匹配（diffusion policy）生成高频、连续的动作序列（每秒可达50 Hz）&lt;/p&gt;
+&lt;h4 id=&#34;模型流程图&#34;&gt;模型流程图&lt;/h4&gt;
+&lt;p&gt;&lt;img alt=&#34;1748596153733&#34; loading=&#34;lazy&#34; src=&#34;https://tzj2006.github.io/images/2025-05-31/1748596153733.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;收集数据 -&amp;gt; 训练$\phi_0$ -&amp;gt; Zero-Shot/微调/Fine-tune&lt;/p&gt;
+&lt;p&gt;数据来自7种不同的机器人，68个不同的任务，总计 10k小时。&lt;/p&gt;
+&lt;p&gt;每一个单独机械臂的自由度在 6-7 (有些机器人有多机械臂)&lt;/p&gt;
+&lt;p&gt;输入有 3 块，分别是：Image, Language, and State&lt;/p&gt;
+&lt;p&gt;Image 用 400M Pretrained VIT SigLip 得到 embedding, 一共会有up to 3 个 Image， 所以最会有 3 个 embedding (没有就填 0)&lt;/p&gt;
+&lt;p&gt;Language 用 2.6B Pretrained LLM Gemma, 得到 embedding&lt;/p&gt;
+&lt;p&gt;最后是关节信息，最多会有 18 个(没有就填 0)。&lt;/p&gt;
+&lt;p&gt;之后运用 Diffusion Policy 来生成每一步的动作&lt;/p&gt;
+&lt;p&gt;生成的是 $p(A_t|O_t)$, 即，在给定条件(环境下)，每一个动作的概率。&lt;/p&gt;
+&lt;p&gt;这时给一个 chunk 内的真实动作加噪音，然后让模型学习如何去噪。&lt;/p&gt;
+&lt;p&gt;方式如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;随机采一个噪声级别 $\tau$，采一个高斯噪声 $\varepsilon$；&lt;/li&gt;
+&lt;li&gt;构造带噪动作块 $A_t^\tau = \tau A_t + (1 - \tau)\varepsilon$；&lt;/li&gt;
+&lt;li&gt;用观测 $o_t$ 与 $A_t^\tau$ 输入网络，预测去噪速度场 $v_\theta(A_t^\tau, o_t) &amp;lt;-&amp;gt; \varepsilon - A_t$；&lt;/li&gt;
+&lt;li&gt;以 $\left| v_\theta - (\varepsilon - A_t) \right|^2$ 作为监督信号；&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;推理的时候就会把这个过程分成 10-20步，每一步去噪一点点，最终得到一个动作
+&lt;em&gt;注：&amp;ldquo;这个过程&amp;quot;指的是随机生成一个噪声，然后从这个噪声去噪的过程&lt;/em&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-05-30</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-05-30/</link>
+      <pubDate>Fri, 30 May 2025 11:04:48 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-05-30/</guid>
+      <description>Docker 的安装和调试</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-05-29</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-05-29/</link>
+      <pubDate>Thu, 29 May 2025 09:30:00 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-05-29/</guid>
+      <description>Paper review 2025-05-29</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-05-28</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-05-28/</link>
+      <pubDate>Wed, 28 May 2025 14:41:55 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-05-28/</guid>
+      <description>2025-05-28 论文阅读笔记</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-05-27</title>
+      <link>https://tzj2006.github.io/leetcode/2025-05-27/</link>
+      <pubDate>Tue, 27 May 2025 21:19:57 +0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-05-27/</guid>
+      <description>Solution to 2894. Divisible and Non-divisible Sums Difference</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-05-27</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-05-27/</link>
+      <pubDate>Tue, 27 May 2025 16:00:00 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-05-27/</guid>
+      <description>A template for reading AI papers</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-05-25</title>
+      <link>https://tzj2006.github.io/leetcode/2025-05-25/</link>
+      <pubDate>Sun, 25 May 2025 12:17:29 +0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-05-25/</guid>
+      <description>Solution to 2131. Longest Palindrome by Concatenating Two Letter Words</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-05-24</title>
+      <link>https://tzj2006.github.io/leetcode/2025-05-24/</link>
+      <pubDate>Sat, 24 May 2025 11:19:20 +0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-05-24/</guid>
+      <description>Solution to 2942. Find Words Containing Character</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-05-23</title>
+      <link>https://tzj2006.github.io/leetcode/2025-05-23/</link>
+      <pubDate>Fri, 23 May 2025 21:16:05 +0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-05-23/</guid>
+      <description>Solution to 3068. Find the Maximum Sum of Node Values</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-05-22</title>
+      <link>https://tzj2006.github.io/leetcode/2025-05-22/</link>
+      <pubDate>Thu, 22 May 2025 22:33:45 +0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-05-22/</guid>
+      <description>Solution to 3362. Zero Array Transformation III</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-18</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-18/</link>
+      <pubDate>Wed, 21 May 2025 15:40:56 +0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-18/</guid>
+      <description>Solution to 2375. Construct Smallest Number From DI String</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-05-21</title>
+      <link>https://tzj2006.github.io/leetcode/2025-05-21/</link>
+      <pubDate>Wed, 21 May 2025 14:53:20 +0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-05-21/</guid>
+      <description>Solution to 73. Set Matrix Zeroes</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-05-20</title>
+      <link>https://tzj2006.github.io/leetcode/2025-05-20/</link>
+      <pubDate>Tue, 20 May 2025 11:34:09 +0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-05-20/</guid>
+      <description>Solution to 3355. Zero Array Transformation I</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-05-19</title>
+      <link>https://tzj2006.github.io/leetcode/2025-05-19/</link>
+      <pubDate>Mon, 19 May 2025 09:52:16 +0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-05-19/</guid>
+      <description>Solution to 3024. Type of Triangle</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-05-18</title>
+      <link>https://tzj2006.github.io/leetcode/2025-05-18/</link>
+      <pubDate>Sun, 18 May 2025 10:34:30 +0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-05-18/</guid>
+      <description>Solution to 1931. Painting a Grid With Three Different Colors</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-05-17</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-05-17/</link>
+      <pubDate>Sat, 17 May 2025 22:45:33 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-05-17/</guid>
+      <description>&lt;p&gt;Mac 监控：
+磁盘信息：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;brew&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;install&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;smartmontools&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;smartctl&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;disk0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;效果：
+&lt;img alt=&#34;1&#34; loading=&#34;lazy&#34; src=&#34;https://tzj2006.github.io/images/2025-05-17/1.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;CPU GPU占用信息：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;brew install macmon
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;macmon
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;效果展示：
+&lt;img alt=&#34;2&#34; loading=&#34;lazy&#34; src=&#34;https://tzj2006.github.io/images/2025-05-17/2.png&#34;&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-17</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-17/</link>
+      <pubDate>Sat, 17 May 2025 15:18:23 +0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-17/</guid>
+      <description>Solution to 1079. Letter Tile Possibilities</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-16</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-16/</link>
+      <pubDate>Sat, 17 May 2025 14:50:49 +0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-16/</guid>
+      <description>Solution to</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-05-17</title>
+      <link>https://tzj2006.github.io/leetcode/2025-05-17/</link>
+      <pubDate>Sat, 17 May 2025 13:37:19 +0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-05-17/</guid>
+      <description>Solution to 75. Sort Colors</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-05-25</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-05-14/</link>
+      <pubDate>Thu, 15 May 2025 00:00:00 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-05-14/</guid>
+      <description>Summary of Robotics papers</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-05-09</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-05-09/</link>
+      <pubDate>Fri, 09 May 2025 18:52:47 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-05-09/</guid>
+      <description>遇到的问题</description>
+    </item>
+    <item>
+      <title>Bug Journal 20250508</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-05-08/</link>
+      <pubDate>Thu, 08 May 2025 19:30:40 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-05-08/</guid>
+      <description>初识具身智能</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-03-28</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-03-28/</link>
+      <pubDate>Fri, 28 Mar 2025 08:36:01 -0600</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-03-28/</guid>
+      <description>&lt;h1 id=&#34;talk-6-scdesign3-semi-synthetic-negative--positive-control&#34;&gt;Talk 6: scDesign3: Semi-synthetic Negative &amp;amp; Positive Control&lt;/h1&gt;
+&lt;p&gt;数据不够的时候需要一些 simulated data&lt;/p&gt;
+&lt;p&gt;那这时候 simlator 就需要 interpretable &amp;amp; realistic (real data characteristic &amp;amp; contains ground truth data)&lt;/p&gt;
+&lt;p&gt;e.g. single cell RNA simulator -&amp;gt; 考虑 gene gene correlation -&amp;gt; 考虑别的 cell types and omics -&amp;gt; RNA count to RNA read&lt;/p&gt;
+&lt;p&gt;这个可以用来给数据预处理+降噪&lt;/p&gt;
+&lt;h1 id=&#34;talk-7-spacial-omics-data&#34;&gt;Talk 7: spacial omics data&lt;/h1&gt;
+&lt;p&gt;理解 low-rank property of Hi-C chromatin contact maps.&lt;/p&gt;
+&lt;p&gt;数据上有 3 维（question what type of data / or do you have ground truth of the location of the spatial data? are the model predicting the location or the gene expression or both of them? ）&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-03-27</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-03-27/</link>
+      <pubDate>Thu, 27 Mar 2025 13:24:41 -0600</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-03-27/</guid>
+      <description>&lt;p&gt;MCBIOS Conference Day 1:&lt;/p&gt;
+&lt;h1 id=&#34;talk-1-sharing-data&#34;&gt;Talk 1: sharing data:&lt;/h1&gt;
+&lt;h2 id=&#34;httpsdatacommonscancergov&#34;&gt;&lt;a href=&#34;https://datacommons.cancer.gov/&#34;&gt;https://datacommons.cancer.gov/&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;介绍了很多数据：特点是比较多，比较新，并且user-friendly. 还有 NIH founding 可以 use start-up server.&lt;/p&gt;
+&lt;h2 id=&#34;httpscomputationalcancergov&#34;&gt;&lt;a href=&#34;https://computational.cancer.gov/&#34;&gt;https://computational.cancer.gov/&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;介绍了很多模型：都是用来预处理数据的&lt;/p&gt;
+&lt;p&gt;比如有一个 AI-based toolbox (类似scanpy) 可以预处理所有数据&lt;/p&gt;
+&lt;p&gt;还有 Automated Data Collection&lt;/p&gt;
+&lt;p&gt;link TBD&lt;/p&gt;
+&lt;p&gt;LLM 翻译诊断结果&lt;/p&gt;
+&lt;h1 id=&#34;talk-2-write-code-with-github-copilot&#34;&gt;Talk 2: Write code with Github Copilot.&lt;/h1&gt;
+&lt;h2 id=&#34;你能用这个干嘛&#34;&gt;你能用这个干嘛&lt;/h2&gt;
+&lt;p&gt;当然是写代码啦，还能干嘛（&lt;/p&gt;
+&lt;p&gt;好处是可以直接在你的 IDE 里面生成(虽然现在 ChatGPT.app 也可以了，(反正都是一家的[doge])&lt;/p&gt;
+&lt;p&gt;比如说你可以先写一段注释来让 Copilot 生成你想要的代码&lt;/p&gt;
+&lt;p&gt;然后选中这段代码并且点击旁边的小星星来让 Copilot 更改这段代码&lt;/p&gt;
+&lt;p&gt;用于重复的项目效果更佳。比如分离数据集&lt;/p&gt;
+&lt;p&gt;修bug还挺好用的(虽然有时候越修越多[doge])&lt;/p&gt;
+&lt;p&gt;修改代码的语言：比如把 R code 换成 python code.&lt;/p&gt;
+&lt;p&gt;还可以 explain what the code is doing (by using /explain).&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-03-25</title>
+      <link>https://tzj2006.github.io/leetcode/2025-03-25/</link>
+      <pubDate>Tue, 25 Mar 2025 01:14:18 -0400</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-03-25/</guid>
+      <description>Solution to 3394. Check if Grid can be Cut into Sections</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-03-19</title>
+      <link>https://tzj2006.github.io/leetcode/2025-03-19/</link>
+      <pubDate>Tue, 18 Mar 2025 22:07:40 -0400</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-03-19/</guid>
+      <description>Solution to 3191. Minimum Operations to Make Binary Array Elements Equal to One I</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-15</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-15/</link>
+      <pubDate>Sat, 15 Feb 2025 00:13:13 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-15/</guid>
+      <description>Solution to 2698. Find the Punishment Number of an Integer</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-14</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-14/</link>
+      <pubDate>Fri, 14 Feb 2025 15:29:59 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-14/</guid>
+      <description>Solution to 1352. Product of the Last K Numbers</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-13</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-13/</link>
+      <pubDate>Thu, 13 Feb 2025 00:06:39 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-13/</guid>
+      <description>Solution to 3066. Minimum Operations to Exceed Threshold Value II</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-12</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-12/</link>
+      <pubDate>Tue, 11 Feb 2025 21:06:38 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-12/</guid>
+      <description>Solution to 2342. Max Sum of a Pair With Equal Sum of Digits</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-11</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-11/</link>
+      <pubDate>Mon, 10 Feb 2025 20:21:28 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-11/</guid>
+      <description>Solution to 1910. Remove All Occurrences of a Substring</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-10</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-10/</link>
+      <pubDate>Sun, 09 Feb 2025 19:07:12 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-10/</guid>
+      <description>Solution to 3174. Clear Digits</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-09</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-09/</link>
+      <pubDate>Sun, 09 Feb 2025 14:50:35 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-09/</guid>
+      <description>Solution to 2364. Count Number of Bad Pairs</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-08</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-08/</link>
+      <pubDate>Sat, 08 Feb 2025 14:35:49 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-08/</guid>
+      <description>Solution to 2349. Design a Number Container System</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-07</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-07/</link>
+      <pubDate>Thu, 06 Feb 2025 23:22:59 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-07/</guid>
+      <description>Solution to 3160. Find the Number of Distinct Colors Among the Balls</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-06</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-06/</link>
+      <pubDate>Wed, 05 Feb 2025 21:36:51 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-06/</guid>
+      <description>Solution to 1726. Tuple with Same Product</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-05</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-05/</link>
+      <pubDate>Wed, 05 Feb 2025 21:36:48 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-05/</guid>
+      <description>Solution to 1790. Check if One String Swap Can Make Strings Equal</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-02-04</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-02-04/</link>
+      <pubDate>Tue, 04 Feb 2025 13:26:59 -0500</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-02-04/</guid>
+      <description>&lt;p&gt;. &amp;ndash;&amp;gt; find all characters except &amp;lsquo;\n&amp;rsquo;.&lt;/p&gt;
+&lt;p&gt;^ &amp;ndash;&amp;gt; find all the start of the string&lt;/p&gt;
+&lt;p&gt;$ &amp;ndash;&amp;gt; find all the end of the string.&lt;/p&gt;
+&lt;p&gt;[&amp;hellip;] find a character inside the [].&lt;/p&gt;
+&lt;p&gt;[^] find characters not inside the [].&lt;/p&gt;
+&lt;p&gt;\. find the special characters.&lt;/p&gt;
+&lt;p&gt;\d all numbers &amp;lt;=&amp;gt; [0-9]&lt;/p&gt;
+&lt;p&gt;\D all not numbers &amp;lt;=&amp;gt; [^0-9]&lt;/p&gt;
+&lt;p&gt;\s all space characters&lt;/p&gt;
+&lt;p&gt;\S all not space characters&lt;/p&gt;
+&lt;p&gt;\w all letter, num, and &lt;em&gt;. [a-z-A-Z0-9&lt;/em&gt;].&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-04</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-04/</link>
+      <pubDate>Tue, 04 Feb 2025 13:19:11 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-04/</guid>
+      <description>Solution to 1800. Maximum Ascending Subarray Sum</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-03</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-03/</link>
+      <pubDate>Tue, 04 Feb 2025 13:19:09 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-03/</guid>
+      <description>Solution to 3105. Longest Strictly Increasing or Strictly Decreasing Subarray</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-02-02</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-02-02/</link>
+      <pubDate>Sun, 02 Feb 2025 21:31:49 -0500</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-02-02/</guid>
+      <description>Speed of M4 Pro</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-02</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-02/</link>
+      <pubDate>Sun, 02 Feb 2025 12:21:21 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-02/</guid>
+      <description>Solution to 1752. Check if Array Is Sorted and Rotated</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-30</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-30/</link>
+      <pubDate>Sat, 01 Feb 2025 13:07:45 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-30/</guid>
+      <description>Solution to 2493. Divide Nodes Into the Maximum Number of Groups</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-02-01</title>
+      <link>https://tzj2006.github.io/leetcode/2025-02-01/</link>
+      <pubDate>Sat, 01 Feb 2025 12:29:35 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-02-01/</guid>
+      <description>Solution to 3151. Special Array I</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-31</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-31/</link>
+      <pubDate>Fri, 31 Jan 2025 12:55:41 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-31/</guid>
+      <description>Solution to 827. Making A Large Island</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-29</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-29/</link>
+      <pubDate>Wed, 29 Jan 2025 10:58:22 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-29/</guid>
+      <description>Solution to 684. Redundant Connection</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-28</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-28/</link>
+      <pubDate>Tue, 28 Jan 2025 01:17:20 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-28/</guid>
+      <description>Solution to 2658. Maximum Number of Fish in a Grid</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-27</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-27/</link>
+      <pubDate>Sun, 26 Jan 2025 19:58:52 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-27/</guid>
+      <description>Solution to 1462. Course Schedule IV</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-26</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-26/</link>
+      <pubDate>Sat, 25 Jan 2025 21:16:36 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-26/</guid>
+      <description>Solution to 2127. Maximum Employees to Be Invited to a Meeting</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-25</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-25/</link>
+      <pubDate>Sat, 25 Jan 2025 21:16:34 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-25/</guid>
+      <description>Solution to 2948. Make Lexicographically Smallest Array by Swapping Elements</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-01-24</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-01-24/</link>
+      <pubDate>Fri, 24 Jan 2025 11:49:30 -0500</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-01-24/</guid>
+      <description>ipykernel, PID</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-24</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-24/</link>
+      <pubDate>Thu, 23 Jan 2025 22:31:15 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-24/</guid>
+      <description>Solution to 802. Find Eventual Safe States</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-23</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-23/</link>
+      <pubDate>Wed, 22 Jan 2025 21:23:43 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-23/</guid>
+      <description>Solution to 1267. Count Servers that Communicate</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-22</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-22/</link>
+      <pubDate>Wed, 22 Jan 2025 12:57:27 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-22/</guid>
+      <description>Solution to 1765. Map of Highest Peak</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-21</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-21/</link>
+      <pubDate>Mon, 20 Jan 2025 20:39:17 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-21/</guid>
+      <description>Solution to 2017. Grid Game</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-20</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-20/</link>
+      <pubDate>Mon, 20 Jan 2025 20:39:14 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-20/</guid>
+      <description>Solution to 2661. First Completely Painted Row or Column</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-19</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-19/</link>
+      <pubDate>Sun, 19 Jan 2025 14:51:51 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-19/</guid>
+      <description>Solution to 407. Trapping Rain Water II</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-18</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-18/</link>
+      <pubDate>Sat, 18 Jan 2025 17:47:12 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-18/</guid>
+      <description>Solution to 1368. Minimum Cost to Make at Least One Valid Path in a Grid</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-01-17</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-01-17/</link>
+      <pubDate>Fri, 17 Jan 2025 14:14:30 -0500</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-01-17/</guid>
+      <description>Ollama</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-17</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-17/</link>
+      <pubDate>Fri, 17 Jan 2025 12:06:57 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-17/</guid>
+      <description>Solution to 2683. Neighboring Bitwise XOR</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-16</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-16/</link>
+      <pubDate>Thu, 16 Jan 2025 15:35:24 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-16/</guid>
+      <description>Solution to 2425. Bitwise XOR of All Pairings</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-15</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-15/</link>
+      <pubDate>Wed, 15 Jan 2025 10:28:02 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-15/</guid>
+      <description>Solution to 2429. Minimize XOR</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-01-14</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-01-14/</link>
+      <pubDate>Tue, 14 Jan 2025 14:53:30 -0500</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-01-14/</guid>
+      <description>&lt;h2 id=&#34;part-module-load&#34;&gt;Part module load&lt;/h2&gt;
+&lt;p&gt;When you want to use something on the server, please first check whether it is on the server or not.&lt;/p&gt;
+&lt;p&gt;Use this command:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;module avail
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Then load using this command:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;module load &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;your model name&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Important:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;You can always email &lt;a href=&#34;rescomputing@duke.edu&#34;&gt;rescomputing@duke.edu&lt;/a&gt; to get support.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-13</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-14/</link>
+      <pubDate>Mon, 13 Jan 2025 21:19:48 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-14/</guid>
+      <description>Solution to 2657. Find the Prefix Common Array of Two Arrays</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-01-12</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-01-12/</link>
+      <pubDate>Sun, 12 Jan 2025 22:45:56 -0500</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-01-12/</guid>
+      <description>&lt;p&gt;When facing this problem, you can stop using GPU and change to CPU and check the error.&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;image-20250112224658415&#34; loading=&#34;lazy&#34; src=&#34;https://tzj2006.github.io/images/2025-01-12GPUError.jpg&#34;&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-13</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-13/</link>
+      <pubDate>Sun, 12 Jan 2025 22:44:37 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-13/</guid>
+      <description>&lt;ol start=&#34;3223&#34;&gt;
+&lt;li&gt;Minimum Length of String After Operations&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-12</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-12/</link>
+      <pubDate>Sat, 11 Jan 2025 23:33:48 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-12/</guid>
+      <description>&lt;ol start=&#34;2116&#34;&gt;
+&lt;li&gt;Check if a Parentheses String Can Be Valid&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-11</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-11/</link>
+      <pubDate>Fri, 10 Jan 2025 23:40:52 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-11/</guid>
+      <description>&lt;ol start=&#34;1400&#34;&gt;
+&lt;li&gt;Construct K Palindrome Strings&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-10</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-10/</link>
+      <pubDate>Thu, 09 Jan 2025 23:42:20 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-10/</guid>
+      <description>&lt;ol start=&#34;916&#34;&gt;
+&lt;li&gt;Word Subsets&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-01-09</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-01-09/</link>
+      <pubDate>Thu, 09 Jan 2025 13:42:16 -0500</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-01-09/</guid>
+      <description>&lt;h2 id=&#34;part-matplotlib&#34;&gt;Part Matplotlib&lt;/h2&gt;
+&lt;p&gt;If you want to make the word in matplotlib the a word that could be edited in Adobe illustration, please use the code below at the top of your code:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;mpl&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;rcParams&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;pdf.fonttype&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;42&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;mpl&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;rcParams&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;ps.fonttype&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;42&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-09</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-09/</link>
+      <pubDate>Wed, 08 Jan 2025 23:33:00 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-09/</guid>
+      <description>&lt;ol start=&#34;2185&#34;&gt;
+&lt;li&gt;Counting Words With a Given Prefix&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-01-08</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-01-08/</link>
+      <pubDate>Wed, 08 Jan 2025 13:42:16 -0500</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-01-08/</guid>
+      <description>&lt;h2 id=&#34;part-ssh&#34;&gt;Part SSH&lt;/h2&gt;
+&lt;p&gt;To use ssh for UF server, eduVPN app must be downloaded.&lt;/p&gt;
+&lt;p&gt;The tutorial is in &lt;a href=&#34;https://docs.rc.ufl.edu/access/federated_login/?h=eduvpn#eduvpn-connection&#34;&gt;this link&lt;/a&gt;.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-08</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-08/</link>
+      <pubDate>Wed, 08 Jan 2025 10:00:00 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-08/</guid>
+      <description>&lt;ol start=&#34;3042&#34;&gt;
+&lt;li&gt;Count Prefix and Suffix Pairs I&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-07</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-07/</link>
+      <pubDate>Tue, 07 Jan 2025 00:38:22 -0500</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-07/</guid>
+      <description>&lt;ol start=&#34;1408&#34;&gt;
+&lt;li&gt;String Matching in an Array&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-06</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-06/</link>
+      <pubDate>Mon, 06 Jan 2025 16:00:00 -0600</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-06/</guid>
+      <description>&lt;ol start=&#34;1769&#34;&gt;
+&lt;li&gt;Minimum Number of Operations to Move All Balls to Each Box&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-05</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-05/</link>
+      <pubDate>Sun, 05 Jan 2025 10:22:44 -0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-05/</guid>
+      <description>&lt;ol start=&#34;2381&#34;&gt;
+&lt;li&gt;Shifting Letters II&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-04</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-04/</link>
+      <pubDate>Sat, 04 Jan 2025 12:25:34 -0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-04/</guid>
+      <description>&lt;ol start=&#34;1930&#34;&gt;
+&lt;li&gt;Unique Length-3 Palindromic Subsequences&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-01-03</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-01-03/</link>
+      <pubDate>Fri, 03 Jan 2025 16:55:18 -0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-01-03/</guid>
+      <description>run ollama on the server &amp;amp; model tuning</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-03</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-03/</link>
+      <pubDate>Thu, 02 Jan 2025 23:11:27 -0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-03/</guid>
+      <description>2270. Number of Ways to Split Array</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-01-02</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-01-02/</link>
+      <pubDate>Thu, 02 Jan 2025 20:00:00 -0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-01-02/</guid>
+      <description>update hugo to fix bugs</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-02</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-02/</link>
+      <pubDate>Thu, 02 Jan 2025 13:12:57 -0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-02/</guid>
+      <description>2559. Count Vowel Strings in Ranges</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-01-01</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-01-01/</link>
+      <pubDate>Wed, 01 Jan 2025 21:27:04 -0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-01-01/</guid>
+      <description>create hugo website &amp;amp; Install condo</description>
+    </item>
+    <item>
+      <title>LLM Study</title>
+      <link>https://tzj2006.github.io/posts/llm-study/</link>
+      <pubDate>Wed, 01 Jan 2025 16:01:34 -0800</pubDate>
+      <guid>https://tzj2006.github.io/posts/llm-study/</guid>
+      <description>&lt;h2 id=&#34;part-chatgpt-4o&#34;&gt;Part ChatGPT 4o&lt;/h2&gt;
+&lt;h3 id=&#34;chatgpt-4o-api-demo&#34;&gt;ChatGPT 4o API demo&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kn&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;nn&#34;&gt;openai&lt;/span&gt; &lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;OpenAI&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;model_use&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;gpt-4o-2024-08-06&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;client&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;OpenAI&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;api_key&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;Your-API-key&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;completion&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;client&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;beta&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;chat&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;completions&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parse&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;n&#34;&gt;model&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;model_use&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;n&#34;&gt;messages&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;		&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;system&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;content&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;Extract the event information.&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;		&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;role&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;user&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;content&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;Alice and Bob are going to a science fair on Friday.&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;event&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;completion&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;choices&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;message&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parsed&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Note: I tried to use model &amp;ldquo;gpt-4o&amp;rdquo; but failed.&lt;/p&gt;
+&lt;h3 id=&#34;how-to-create-chatgpt-api-key&#34;&gt;How to create ChatGPT API Key&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Log in to &lt;a href=&#34;https://platform.openai.com/docs/overview&#34;&gt;openai&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Use the search bar to search &amp;ldquo;API keys&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;Create a new secret key (Shown only once, invisible after closing the tab)&lt;/li&gt;
+&lt;li&gt;Go to billing to add some credit to the account&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;part-unitox-chatgpt&#34;&gt;Part UniTox ChatGPT&lt;/h2&gt;
+&lt;h3 id=&#34;read-from-fdagov&#34;&gt;Read from fda.gov&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Read the label of the drug we are interested in from a .csv file.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>LeetCode Daily Question 2025-01-01</title>
+      <link>https://tzj2006.github.io/leetcode/2025-01-01/</link>
+      <pubDate>Wed, 01 Jan 2025 13:09:56 -0800</pubDate>
+      <guid>https://tzj2006.github.io/leetcode/2025-01-01/</guid>
+      <description>1422. Maximum Score After Splitting a String</description>
+    </item>
+    <item>
+      <title>Random Ideas</title>
+      <link>https://tzj2006.github.io/random/</link>
+      <pubDate>Wed, 01 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>https://tzj2006.github.io/random/</guid>
+      <description>&lt;ol&gt;
+&lt;li&gt;笔记本的 RAM 在关闭屏幕后还耗电吗&lt;/li&gt;
+&lt;li&gt;markdown 插入图片无法在网站上自动显示&lt;/li&gt;
+&lt;li&gt;Random 中加一个 checkbox&lt;/li&gt;
+&lt;li&gt;desktop video 英文版 √&lt;/li&gt;
+&lt;li&gt;孤波算法是什么&lt;/li&gt;
+&lt;li&gt;desktop video 多语言切换 √&lt;/li&gt;
+&lt;li&gt;是什么成就了一个奢侈品？&lt;/li&gt;
+&lt;li&gt;Desktop Video 锁屏界面播放&lt;/li&gt;
+&lt;li&gt;M4 pro V.S. M3 Max&lt;/li&gt;
+&lt;/ol&gt;</description>
+    </item>
+  </channel>
+</rss>
