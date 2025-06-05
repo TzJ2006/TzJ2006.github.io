@@ -6,8 +6,99 @@
     <description>Recent content in BugJournals on TzJ&#39;s Net</description>
     <generator>Hugo -- 0.142.0</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 04 Jun 2025 11:16:31 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 05 Jun 2025 10:00:00 +0800</lastBuildDate>
     <atom:link href="https://tzj2006.github.io/bugjournal/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bug Journal 2025-06-05</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-06-05/</link>
+      <pubDate>Thu, 05 Jun 2025 10:00:00 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-06-05/</guid>
+      <description>&lt;h2 id=&#34;demogen-synthetic-demonstration-generation-for-data-efficient-visuomotor-policy-learning&#34;&gt;DemoGen: Synthetic Demonstration Generation for Data-Efficient Visuomotor Policy Learning&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://arxiv.org/abs/2502.16932&#34;&gt;发表时间：24 Feb 2025&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;动机&#34;&gt;动机&lt;/h4&gt;
+&lt;p&gt;Robust，还得是Robust。&lt;/p&gt;
+&lt;p&gt;为什么不加数据(ο´･д･)??&lt;/p&gt;
+&lt;p&gt;过拟合严重，加数据要每个场景都测很多次，哪怕不用人测也要机器人测。&lt;/p&gt;
+&lt;p&gt;那怎么办呢(ο´･д･)??&lt;/p&gt;
+&lt;p&gt;很简单，纯计算模拟不就是了。&lt;/p&gt;
+&lt;h4 id=&#34;主要论点&#34;&gt;主要论点&lt;/h4&gt;
+&lt;p&gt;用一个演示数据生成很多演示数据，用很多的演示数据 train 机器人&lt;/p&gt;
+&lt;p&gt;这样就不需要实际操作，但是可以直接获得大量数据。&lt;/p&gt;
+&lt;h4 id=&#34;模型流程图&#34;&gt;模型流程图&lt;/h4&gt;
+&lt;p&gt;&lt;img alt=&#34;1749026226827&#34; loading=&#34;lazy&#34; src=&#34;https://tzj2006.github.io/images/2025-06-04/1749026226827.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;一言以蔽之：先算个大概，再看看这个“大概动作”能不能 work.&lt;/p&gt;
+&lt;p&gt;思路是：一张 PPT 中的图片可以旋转放大缩小，路径也可以&lt;/p&gt;
+&lt;p&gt;机器人一共有两段动作&lt;/p&gt;
+&lt;p&gt;一段是碰到物体前的动作&lt;/p&gt;
+&lt;p&gt;一段是碰到物体后的动作&lt;/p&gt;
+&lt;p&gt;对于第一段，直接用一个变换矩阵变换&lt;/p&gt;
+&lt;p&gt;对于第二段，直接规划一个新路径 (use RRT-Connect)&lt;/p&gt;
+&lt;p&gt;现在我们通过模拟环境验证这个路径行不行 (会不会穿模，会不会碰撞)&lt;/p&gt;
+&lt;p&gt;如果可以用的话&lt;/p&gt;
+&lt;p&gt;然后通过模拟环境生成这个路径的图像&lt;/p&gt;
+&lt;h4 id=&#34;实验设定&#34;&gt;实验设定&lt;/h4&gt;
+&lt;p&gt;虚拟环境：1 条 GroundTruth&lt;/p&gt;
+&lt;p&gt;真实环境: 1 条真人数据 + 2 次 Replay（机器人自己模拟一遍这个轨迹）&lt;/p&gt;
+&lt;p&gt;一共模拟 10k 帧左右的数据 (收益递减，10k 属于一个平衡点)&lt;/p&gt;
+&lt;h4 id=&#34;结果&#34;&gt;结果&lt;/h4&gt;
+&lt;p&gt;&lt;img alt=&#34;1749093303146&#34; loading=&#34;lazy&#34; src=&#34;https://tzj2006.github.io/images/2025-06-05/1749093303146.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;1749093327428&#34; loading=&#34;lazy&#34; src=&#34;https://tzj2006.github.io/images/2025-06-05/1749093327428.png&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;vs-roboground&#34;&gt;V.S. RoboGround&lt;/h4&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;&lt;strong&gt;方面&lt;/strong&gt;&lt;/th&gt;
+          &lt;th&gt;&lt;strong&gt;DemoGen&lt;/strong&gt;&lt;/th&gt;
+          &lt;th&gt;&lt;strong&gt;RoboGround&lt;/strong&gt;&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;目标问题&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;数据高效、空间泛化性差的视觉模仿学习&lt;/td&gt;
+          &lt;td&gt;多任务泛化能力差、语义-空间信息连接弱&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;核心思想&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;从少量人类演示中&lt;strong&gt;合成大量视觉演示数据&lt;/strong&gt;用于模仿学习&lt;/td&gt;
+          &lt;td&gt;grounding mask（掩码）作为embedding增强泛化&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;数据生成方式&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;从 BEHAVIOR 数据库中采样演示 → 空间重定向 → 物理优化 → 点云合成图像&lt;/td&gt;
+          &lt;td&gt;构建大量高复杂度场景 → 使用 LVLM（如 GLaMM）生成目标物体 + placement mask&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;人类演示&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;一条&lt;/td&gt;
+          &lt;td&gt;在仿真中自动生成，无需真实 rollouts&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;任务表征形式&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;(图像帧, 末端动作)&lt;strong&gt;对&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;图像 + mask + 指令 + robot state&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;中间表示&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;None（直接预测动作）&lt;/td&gt;
+          &lt;td&gt;掩码（mask）作为空间引导&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;依赖模型&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;Immitation Learning&lt;/td&gt;
+          &lt;td&gt;利用 VLM + Grounded Perceiver 构建 mask-guided policy&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;泛化方式&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;利用空间重定向与图像合成覆盖更多初始状态&lt;/td&gt;
+          &lt;td&gt;通过 grounding masks 和多样 instruction 提升语义-空间泛化&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h1 id=&#34;doglove-dexterous-manipulation-with-a-low-cost-open-source-haptic-force-feedback-glove&#34;&gt;DOGlove: Dexterous Manipulation with a Low-Cost Open-Source Haptic Force Feedback Glove&lt;/h1&gt;
+&lt;p&gt;&lt;img alt=&#34;1749095773362&#34; loading=&#34;lazy&#34; src=&#34;https://tzj2006.github.io/images/2025-06-05/1749095773362.png&#34;&gt;&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Bug Journal 2025-06-04</title>
       <link>https://tzj2006.github.io/bugjournal/2025-06-04/</link>
