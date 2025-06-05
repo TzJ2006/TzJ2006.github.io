@@ -215,8 +215,8 @@ Google Everyday Robot（移动底座 &#43; 7-DoF机械臂 &#43; gripper）
   "keywords": [
     "Bug Journal"
   ],
-  "articleBody": "Leveraging Locality to Boost Sample Efficiency in Robotic Manipulation 发表时间：15 Jun 2024\n动机 当前机器人操作策略（如模仿学习、RL）在训练时通常会学习一个全局策略函数 \\pi(o_t)，即从全图像或全状态观察中直接输出动作。但：\n问题 1：学习难度高（需要从高维图像中学全局策略）； 问题 2：泛化差（模型可能过拟合于训练视角或场景）； 问题 3：sample efficiency 差（训练数据需求量大）\n作者提出一个核心假设：很多 manipulation 任务其实是“局部决策驱动”的， 也就是说：只关注局部 patch（例如抓取点附近区域）即可决定动作。\n主要论点 提出 Local Policy Networks（LPN）： 将策略函数设计为一组 局部策略（local policy heads）； 每个 head 只负责“在自己 patch 上预测动作”； 用 heatmap 表示哪些 patch 是可行操作区域（如抓取点）； 最终策略通过对多个 local head 输出聚合（weighted sum）得到。\n模型流程图 简单来说，就是寻找关键点，预测关键点的移动，然后整合成动作\n实验 setting: 使用数据集：RT-1（Robotics Transformer 1）:\nGoogle Everyday Robot（移动底座 + 7-DoF机械臂 + gripper） 数据来源 真实机器人操作任务，由人类远程操作（teleoperation）或脚本演示收集 数据规模 ~130k 条实际机器人操作轨迹，覆盖 700+ 种任务 采样频率 每条轨迹包含约 50–100 帧关键帧（图像 + 动作） 场景 家庭式办公环境（桌面、水槽、地面） 物体 80+ 类常见物体（杯子、水瓶、纸巾、玩具、锅等） 语言指令 每个轨迹附有一条人类编写的自然语言 task 描述（用于多模态模型） 对于每一条指令：\nRGB 图像 来自机器人头部相机的视角（尺寸通常为 240×320） 深度图（可选） 当前状态 如 gripper pose（位置 + 朝向） 语言指令 例如 “pick up the red apple and place it in the bowl” 动作标签 6-DoF 末端动作（位置增量、旋转、夹爪开合） 时间戳 当前帧在轨迹中的位置 成功标志 是否完成任务（某些版本包含） 文章通过 “加热”在数据集中的抓取位置 来 train heatmap.\n在 heatmap 中取出关键点\n之后通过神经网络预测每一个关键点的移动，加权得到机械臂移动的方向。\n通过模仿学习来算 Loss, 然后训练。\nCoPa: General Robotic Manipulation through Spatial Constraints of Parts with Foundation Models 发表时间：13 Mar 2024\n动机 当前机器人 manipulation 研究大多集中在：\n高层任务规划（如使用 LLMs 推理“该做什么”）， 或低层控制（通过 imitation learning 或 RL 获取 end-effector 动作序列）。 然而，低层控制模块在真实世界中很难泛化，因为：\n缺乏对物体几何和功能部分的理解， 容易对新的任务和场景失效。 因此，本文希望结合 VLMs 的常识知识和几何建模能力，以“空间约束”的形式桥接语言与机器人执行之间的鸿沟，实现可泛化的低层 manipulation 能力。\n核心思想 Zero-shot! GPT-4V is all you need!\n模型流程图 首先分割场景，识别场景中有多少物体。\n简单来说就是：让 GPT 决定怎么操作这个物体。 比如说，要抓哪里，要怎么抓，物体的姿态是什么，…\n最后使用一个传统路径规划算法来达成上述所有条件 一旦条件达成，任务也就完成了\n结果 MQE: Unleashing the Power of Interaction with Multi-agent Quadruped Environment 发表时间: 24 Mar 2024\n动机 之前的模拟环境都太简单了，设计一个复杂的\n主要论点 设计了一个复杂的模拟环境:\n更多更复杂场景，更真实的物理引擎，更好的 Reward\nAny-point Trajectory Modeling for Policy Learning 发表时间：28 Dec 2023\n动机 数据不够用啦，我要从视频里学\n本文旨在从无动作标签的视频中提取出用于控制的轨迹，从而辅助策略学习\n主要论点 作者提出了 Any-point Trajectory Modeling (ATM) 框架：\n第一阶段：使用无动作标签的视频和现有视频追踪器，从视频中提取任意点的轨迹（即二维运动轨迹），训练一个轨迹预测模型（Track Transformer）。\n第二阶段：使用轨迹预测模型，在给定任务语言描述和当前图像的情况下预测未来的轨迹，并用这些轨迹作为中间目标（subgoal）指导策略学习，从少量动作演示中学习有效的策略。\n这不就是昨天的General Flow吗\n模型流程图 和昨天的那篇文章的区别在于:\n这篇不需要 Ground Truth 数据，只是视频就行，而那一篇需 如何做到的？答:用了一个 LLM Tracker 来跟踪 这篇文章是对\"运动最显著\"的 K(32) 个点算运动向量，那个是对每一个像素算运动向量 MENTOR: Mixture-of-Experts Network with Task-Oriented Perturbation for Visual Reinforcement Learning 发表时间: 19 Oct 2024\n动机 做 RL, 还是得泛化\n过去的 embedding 太 General 了。\n思路是：如果 embedding 不分任务注意所有细节, 反而做不好 这里的泛化能忽略掉任务无关的信息\n总之，这里使用了一个 MoE 网络来处理输入。\n模型流程图 至于这个 Perturbation.. 流程如下:\n[输入图像 I] ↓ [Encoder 输出特征 z] ↓ [策略网络 → 计算 loss] ↓ [反向传播：计算 ∇_z L] ↓ [构造 δ = ε · normalized gradient] ↓ [扰动特征 z + δ → 再送策略网络训练] ↓ [更新 encoder + expert 参数] 总之就是训练的时候把 z 往成功的方向“推一下” “引导视觉 encoder 学会放大那些能带来任务成功的区域”\n结果 模拟环境：\nDMC (DeepMind Control Suite) → 如：Walker、Cheetah、Finger、Cartpole 等控制任务 Meta-World → 多任务机器人操作环境（push、reach、pick-place 等） RLBench → 视觉+控制为主的仿真机械臂任务，如插电源、开抽屉等\n真实世界任务：\n在完成 Task 的时候会干扰一下不让它完成这个 Task.\n但是最后还是成功完成了。\nTake away MoE 是什么呢？其实就是多个动态加权平均的网络。 什么是动态加权平均呢？ 就是权重是通过 $SoftMax(MLP)$ 算出来的 这样每次每个网络加权平均的权重就会不同。\nDemoGen: Synthetic Demonstration Generation for Data-Efficient Visuomotor Policy Learning 动机 还是数据不够，希望能够数据生数据\n主要论点 用一个演示数据生成很多演示数据，用很多的演示数据 train 机器人\n模型流程图 思路是：机器人一共有两段动作\n一段是碰到物体前的动作\n一段是碰到物体后的动作\n没看懂，等会再看看\n",
-  "wordCount" : "371",
+  "articleBody": "Leveraging Locality to Boost Sample Efficiency in Robotic Manipulation 发表时间：15 Jun 2024\n动机 当前机器人操作策略（如模仿学习、RL）在训练时通常会学习一个全局策略函数 \\pi(o_t)，即从全图像或全状态观察中直接输出动作。但：\n问题 1：学习难度高（需要从高维图像中学全局策略）； 问题 2：泛化差（模型可能过拟合于训练视角或场景）； 问题 3：sample efficiency 差（训练数据需求量大）\n作者提出一个核心假设：很多 manipulation 任务其实是“局部决策驱动”的， 也就是说：只关注局部 patch（例如抓取点附近区域）即可决定动作。\n主要论点 提出 Local Policy Networks（LPN）： 将策略函数设计为一组 局部策略（local policy heads）； 每个 head 只负责“在自己 patch 上预测动作”； 用 heatmap 表示哪些 patch 是可行操作区域（如抓取点）； 最终策略通过对多个 local head 输出聚合（weighted sum）得到。\n模型流程图 简单来说，就是寻找关键点，预测关键点的移动，然后整合成动作\n实验 setting: 使用数据集：RT-1（Robotics Transformer 1）:\nGoogle Everyday Robot（移动底座 + 7-DoF机械臂 + gripper） 数据来源 真实机器人操作任务，由人类远程操作（teleoperation）或脚本演示收集 数据规模 ~130k 条实际机器人操作轨迹，覆盖 700+ 种任务 采样频率 每条轨迹包含约 50–100 帧关键帧（图像 + 动作） 场景 家庭式办公环境（桌面、水槽、地面） 物体 80+ 类常见物体（杯子、水瓶、纸巾、玩具、锅等） 语言指令 每个轨迹附有一条人类编写的自然语言 task 描述（用于多模态模型） 对于每一条指令：\nRGB 图像 来自机器人头部相机的视角（尺寸通常为 240×320） 深度图（可选） 当前状态 如 gripper pose（位置 + 朝向） 语言指令 例如 “pick up the red apple and place it in the bowl” 动作标签 6-DoF 末端动作（位置增量、旋转、夹爪开合） 时间戳 当前帧在轨迹中的位置 成功标志 是否完成任务（某些版本包含） 文章通过 “加热”在数据集中的抓取位置 来 train heatmap.\n在 heatmap 中取出关键点\n之后通过神经网络预测每一个关键点的移动，加权得到机械臂移动的方向。\n通过模仿学习来算 Loss, 然后训练。\nCoPa: General Robotic Manipulation through Spatial Constraints of Parts with Foundation Models 发表时间：13 Mar 2024\n动机 当前机器人 manipulation 研究大多集中在：\n高层任务规划（如使用 LLMs 推理“该做什么”）， 或低层控制（通过 imitation learning 或 RL 获取 end-effector 动作序列）。 然而，低层控制模块在真实世界中很难泛化，因为：\n缺乏对物体几何和功能部分的理解， 容易对新的任务和场景失效。 因此，本文希望结合 VLMs 的常识知识和几何建模能力，以“空间约束”的形式桥接语言与机器人执行之间的鸿沟，实现可泛化的低层 manipulation 能力。\n核心思想 Zero-shot! GPT-4V is all you need!\n模型流程图 首先分割场景，识别场景中有多少物体。\n简单来说就是：让 GPT 决定怎么操作这个物体。 比如说，要抓哪里，要怎么抓，物体的姿态是什么，…\n最后使用一个传统路径规划算法来达成上述所有条件 一旦条件达成，任务也就完成了\n结果 MQE: Unleashing the Power of Interaction with Multi-agent Quadruped Environment 发表时间: 24 Mar 2024\n动机 之前的模拟环境都太简单了，设计一个复杂的\n主要论点 设计了一个复杂的模拟环境:\n更多更复杂场景，更真实的物理引擎，更好的 Reward\nAny-point Trajectory Modeling for Policy Learning 发表时间：28 Dec 2023\n动机 数据不够用啦，我要从视频里学\n本文旨在从无动作标签的视频中提取出用于控制的轨迹，从而辅助策略学习\n主要论点 作者提出了 Any-point Trajectory Modeling (ATM) 框架：\n第一阶段：使用无动作标签的视频和现有视频追踪器，从视频中提取任意点的轨迹（即二维运动轨迹），训练一个轨迹预测模型（Track Transformer）。 第二阶段：使用轨迹预测模型，在给定任务语言描述和当前图像的情况下预测未来的轨迹，并用这些轨迹作为中间目标（subgoal）指导策略学习，从少量动作演示中学习有效的策略。 这不就是昨天的General Flow吗\n模型流程图 和昨天的那篇文章的区别在于:\n这篇不需要 Ground Truth 数据，只是视频就行，而那一篇需 如何做到的？答:用了一个 LLM Tracker 来跟踪 这篇文章是对\"运动最显著\"的 K(32) 个点算运动向量，那个是对每一个像素算运动向量 MENTOR: Mixture-of-Experts Network with Task-Oriented Perturbation for Visual Reinforcement Learning 发表时间: 19 Oct 2024\n动机 做 RL, 还是得泛化\n过去的 embedding 太 General 了。\n思路是：如果 embedding 不分任务注意所有细节, 反而做不好 这里的泛化能忽略掉任务无关的信息\n总之，这里使用了一个 MoE 网络来处理输入。\n模型流程图 至于这个 Perturbation.. 流程如下:\n[输入图像 I] ↓ [Encoder 输出特征 z] ↓ [策略网络 → 计算 loss] ↓ [反向传播：计算 ∇_z L] ↓ [构造 δ = ε · normalized gradient] ↓ [扰动特征 z + δ → 再送策略网络训练] ↓ [更新 encoder + expert 参数] 总之就是训练的时候把 z 往成功的方向“推一下” “引导视觉 encoder 学会放大那些能带来任务成功的区域”\n结果 模拟环境：\nDMC (DeepMind Control Suite) → 如：Walker、Cheetah、Finger、Cartpole 等控制任务 Meta-World → 多任务机器人操作环境（push、reach、pick-place 等） RLBench → 视觉+控制为主的仿真机械臂任务，如插电源、开抽屉等\n真实世界任务：\n在完成 Task 的时候会干扰一下不让它完成这个 Task.\n但是最后还是成功完成了。\nTake away MoE 是什么呢？其实就是多个动态加权平均的网络。 什么是动态加权平均呢？ 就是权重是通过 $SoftMax(MLP)$ 算出来的 这样每次每个网络加权平均的权重就会不同。\n",
+  "wordCount" : "351",
   "inLanguage": "en",
   "datePublished": "2025-06-04T11:16:31+08:00",
   "dateModified": "2025-06-04T11:16:31+08:00",
@@ -431,12 +431,8 @@ Google Everyday Robot（移动底座 &#43; 7-DoF机械臂 &#43; gripper）
 <h4 id="主要论点-2">主要论点<a hidden class="anchor" aria-hidden="true" href="#主要论点-2">#</a></h4>
 <p>作者提出了 Any-point Trajectory Modeling (ATM) 框架：</p>
 <ol>
-<li>
-<p>第一阶段：使用无动作标签的视频和现有视频追踪器，从视频中提取任意点的轨迹（即二维运动轨迹），训练一个轨迹预测模型（Track Transformer）。</p>
-</li>
-<li>
-<p>第二阶段：使用轨迹预测模型，在给定任务语言描述和当前图像的情况下预测未来的轨迹，并用这些轨迹作为中间目标（subgoal）指导策略学习，从少量动作演示中学习有效的策略。</p>
-</li>
+<li>第一阶段：使用无动作标签的视频和现有视频追踪器，从视频中提取任意点的轨迹（即二维运动轨迹），训练一个轨迹预测模型（Track Transformer）。</li>
+<li>第二阶段：使用轨迹预测模型，在给定任务语言描述和当前图像的情况下预测未来的轨迹，并用这些轨迹作为中间目标（subgoal）指导策略学习，从少量动作演示中学习有效的策略。</li>
 </ol>
 <p><img alt="1749019906911" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749019906911.png"></p>
 <p><del>这不就是昨天的<a href="https://arxiv.org/abs/2401.11439">General Flow</a>吗</del></p>
@@ -494,17 +490,6 @@ RLBench
 什么是动态加权平均呢？
 就是权重是通过 $SoftMax(MLP)$ 算出来的
 这样每次每个网络加权平均的权重就会不同。</p>
-<h2 id="demogen-synthetic-demonstration-generation-for-data-efficient-visuomotor-policy-learning">DemoGen: Synthetic Demonstration Generation for Data-Efficient Visuomotor Policy Learning<a hidden class="anchor" aria-hidden="true" href="#demogen-synthetic-demonstration-generation-for-data-efficient-visuomotor-policy-learning">#</a></h2>
-<h4 id="动机-5">动机<a hidden class="anchor" aria-hidden="true" href="#动机-5">#</a></h4>
-<p>还是数据不够，希望能够数据生数据</p>
-<h4 id="主要论点-3">主要论点<a hidden class="anchor" aria-hidden="true" href="#主要论点-3">#</a></h4>
-<p>用一个演示数据生成很多演示数据，用很多的演示数据 train 机器人</p>
-<h4 id="模型流程图-4">模型流程图<a hidden class="anchor" aria-hidden="true" href="#模型流程图-4">#</a></h4>
-<p><img alt="1749026226827" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749026226827.png"></p>
-<p>思路是：机器人一共有两段动作</p>
-<p>一段是碰到物体前的动作</p>
-<p>一段是碰到物体后的动作</p>
-<p><strong>没看懂，等会再看看</strong></p>
 
 
   </div>
