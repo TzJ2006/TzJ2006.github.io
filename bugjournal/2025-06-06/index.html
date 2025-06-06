@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2025-06-06 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Leveraging Locality to Boost Sample Efficiency in Robotic Manipulation
+发表时间：15 Jun 2024
+动机
+当前机器人操作策略（如模仿学习、RL）在训练时通常会学习一个全局策略函数 \pi(o_t)，即从全图像或全状态观察中直接输出动作。但：
+问题 1：学习难度高（需要从高维图像中学全局策略）；
+问题 2：泛化差（模型可能过拟合于训练视角或场景）；
+问题 3：sample efficiency 差（训练数据需求量大）
+作者提出一个核心假设：很多 manipulation 任务其实是“局部决策驱动”的，
+也就是说：只关注局部 patch（例如抓取点附近区域）即可决定动作。
+主要论点
+提出 Local Policy Networks（LPN）：
+将策略函数设计为一组 局部策略（local policy heads）；
+每个 head 只负责“在自己 patch 上预测动作”；
+用 heatmap 表示哪些 patch 是可行操作区域（如抓取点）；
+最终策略通过对多个 local head 输出聚合（weighted sum）得到。
+模型流程图
+
+简单来说，就是寻找关键点，预测关键点的移动，然后整合成动作
+实验 setting:
+使用数据集：RT-1（Robotics Transformer 1）:
+
+Google Everyday Robot（移动底座 &#43; 7-DoF机械臂 &#43; gripper）
+
+数据来源
+真实机器人操作任务，由人类远程操作（teleoperation）或脚本演示收集
+
+数据规模
+~130k 条实际机器人操作轨迹，覆盖 700&#43; 种任务
+
+采样频率
+每条轨迹包含约 50–100 帧关键帧（图像 &#43; 动作）
+
+场景
+家庭式办公环境（桌面、水槽、地面）
+
+物体
+80&#43; 类常见物体（杯子、水瓶、纸巾、玩具、锅等）
+
+语言指令
+每个轨迹附有一条人类编写的自然语言 task 描述（用于多模态模型）
+对于每一条指令：">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2025-06-06/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.af858c2feef42adc7846f815c3e21de9982d82f8fc4f65879451b2686859975a.css" integrity="sha256-r4WML&#43;70Ktx4RvgVw&#43;Id6Zgtgvj8T2WHlFGyaGhZl1o=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2025-06-06/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2025-06-06/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2025-06-06">
+  <meta property="og:description" content="Leveraging Locality to Boost Sample Efficiency in Robotic Manipulation 发表时间：15 Jun 2024
+动机 当前机器人操作策略（如模仿学习、RL）在训练时通常会学习一个全局策略函数 \pi(o_t)，即从全图像或全状态观察中直接输出动作。但：
+问题 1：学习难度高（需要从高维图像中学全局策略）； 问题 2：泛化差（模型可能过拟合于训练视角或场景）； 问题 3：sample efficiency 差（训练数据需求量大）
+作者提出一个核心假设：很多 manipulation 任务其实是“局部决策驱动”的， 也就是说：只关注局部 patch（例如抓取点附近区域）即可决定动作。
+主要论点 提出 Local Policy Networks（LPN）： 将策略函数设计为一组 局部策略（local policy heads）； 每个 head 只负责“在自己 patch 上预测动作”； 用 heatmap 表示哪些 patch 是可行操作区域（如抓取点）； 最终策略通过对多个 local head 输出聚合（weighted sum）得到。
+模型流程图 简单来说，就是寻找关键点，预测关键点的移动，然后整合成动作
+实验 setting: 使用数据集：RT-1（Robotics Transformer 1）:
+Google Everyday Robot（移动底座 &#43; 7-DoF机械臂 &#43; gripper） 数据来源 真实机器人操作任务，由人类远程操作（teleoperation）或脚本演示收集 数据规模 ~130k 条实际机器人操作轨迹，覆盖 700&#43; 种任务 采样频率 每条轨迹包含约 50–100 帧关键帧（图像 &#43; 动作） 场景 家庭式办公环境（桌面、水槽、地面） 物体 80&#43; 类常见物体（杯子、水瓶、纸巾、玩具、锅等） 语言指令 每个轨迹附有一条人类编写的自然语言 task 描述（用于多模态模型） 对于每一条指令：">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2025-06-06T10:08:22+08:00">
+    <meta property="article:modified_time" content="2025-06-06T10:08:22+08:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Bug Journal 2025-06-06">
+<meta name="twitter:description" content="Leveraging Locality to Boost Sample Efficiency in Robotic Manipulation
+发表时间：15 Jun 2024
+动机
+当前机器人操作策略（如模仿学习、RL）在训练时通常会学习一个全局策略函数 \pi(o_t)，即从全图像或全状态观察中直接输出动作。但：
+问题 1：学习难度高（需要从高维图像中学全局策略）；
+问题 2：泛化差（模型可能过拟合于训练视角或场景）；
+问题 3：sample efficiency 差（训练数据需求量大）
+作者提出一个核心假设：很多 manipulation 任务其实是“局部决策驱动”的，
+也就是说：只关注局部 patch（例如抓取点附近区域）即可决定动作。
+主要论点
+提出 Local Policy Networks（LPN）：
+将策略函数设计为一组 局部策略（local policy heads）；
+每个 head 只负责“在自己 patch 上预测动作”；
+用 heatmap 表示哪些 patch 是可行操作区域（如抓取点）；
+最终策略通过对多个 local head 输出聚合（weighted sum）得到。
+模型流程图
+
+简单来说，就是寻找关键点，预测关键点的移动，然后整合成动作
+实验 setting:
+使用数据集：RT-1（Robotics Transformer 1）:
+
+Google Everyday Robot（移动底座 &#43; 7-DoF机械臂 &#43; gripper）
+
+数据来源
+真实机器人操作任务，由人类远程操作（teleoperation）或脚本演示收集
+
+数据规模
+~130k 条实际机器人操作轨迹，覆盖 700&#43; 种任务
+
+采样频率
+每条轨迹包含约 50–100 帧关键帧（图像 &#43; 动作）
+
+场景
+家庭式办公环境（桌面、水槽、地面）
+
+物体
+80&#43; 类常见物体（杯子、水瓶、纸巾、玩具、锅等）
+
+语言指令
+每个轨迹附有一条人类编写的自然语言 task 描述（用于多模态模型）
+对于每一条指令：">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "BugJournals",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2025-06-06",
+      "item": "https://tzj2006.github.io/bugjournal/2025-06-06/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2025-06-06",
+  "name": "Bug Journal 2025-06-06",
+  "description": "Leveraging Locality to Boost Sample Efficiency in Robotic Manipulation 发表时间：15 Jun 2024\n动机 当前机器人操作策略（如模仿学习、RL）在训练时通常会学习一个全局策略函数 \\pi(o_t)，即从全图像或全状态观察中直接输出动作。但：\n问题 1：学习难度高（需要从高维图像中学全局策略）； 问题 2：泛化差（模型可能过拟合于训练视角或场景）； 问题 3：sample efficiency 差（训练数据需求量大）\n作者提出一个核心假设：很多 manipulation 任务其实是“局部决策驱动”的， 也就是说：只关注局部 patch（例如抓取点附近区域）即可决定动作。\n主要论点 提出 Local Policy Networks（LPN）： 将策略函数设计为一组 局部策略（local policy heads）； 每个 head 只负责“在自己 patch 上预测动作”； 用 heatmap 表示哪些 patch 是可行操作区域（如抓取点）； 最终策略通过对多个 local head 输出聚合（weighted sum）得到。\n模型流程图 简单来说，就是寻找关键点，预测关键点的移动，然后整合成动作\n实验 setting: 使用数据集：RT-1（Robotics Transformer 1）:\nGoogle Everyday Robot（移动底座 + 7-DoF机械臂 + gripper） 数据来源 真实机器人操作任务，由人类远程操作（teleoperation）或脚本演示收集 数据规模 ~130k 条实际机器人操作轨迹，覆盖 700+ 种任务 采样频率 每条轨迹包含约 50–100 帧关键帧（图像 + 动作） 场景 家庭式办公环境（桌面、水槽、地面） 物体 80+ 类常见物体（杯子、水瓶、纸巾、玩具、锅等） 语言指令 每个轨迹附有一条人类编写的自然语言 task 描述（用于多模态模型） 对于每一条指令：\n",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Leveraging Locality to Boost Sample Efficiency in Robotic Manipulation 发表时间：15 Jun 2024\n动机 当前机器人操作策略（如模仿学习、RL）在训练时通常会学习一个全局策略函数 \\pi(o_t)，即从全图像或全状态观察中直接输出动作。但：\n问题 1：学习难度高（需要从高维图像中学全局策略）； 问题 2：泛化差（模型可能过拟合于训练视角或场景）； 问题 3：sample efficiency 差（训练数据需求量大）\n作者提出一个核心假设：很多 manipulation 任务其实是“局部决策驱动”的， 也就是说：只关注局部 patch（例如抓取点附近区域）即可决定动作。\n主要论点 提出 Local Policy Networks（LPN）： 将策略函数设计为一组 局部策略（local policy heads）； 每个 head 只负责“在自己 patch 上预测动作”； 用 heatmap 表示哪些 patch 是可行操作区域（如抓取点）； 最终策略通过对多个 local head 输出聚合（weighted sum）得到。\n模型流程图 简单来说，就是寻找关键点，预测关键点的移动，然后整合成动作\n实验 setting: 使用数据集：RT-1（Robotics Transformer 1）:\nGoogle Everyday Robot（移动底座 + 7-DoF机械臂 + gripper） 数据来源 真实机器人操作任务，由人类远程操作（teleoperation）或脚本演示收集 数据规模 ~130k 条实际机器人操作轨迹，覆盖 700+ 种任务 采样频率 每条轨迹包含约 50–100 帧关键帧（图像 + 动作） 场景 家庭式办公环境（桌面、水槽、地面） 物体 80+ 类常见物体（杯子、水瓶、纸巾、玩具、锅等） 语言指令 每个轨迹附有一条人类编写的自然语言 task 描述（用于多模态模型） 对于每一条指令：\nRGB 图像 来自机器人头部相机的视角（尺寸通常为 240×320） 深度图（可选） 当前状态 如 gripper pose（位置 + 朝向） 语言指令 例如 “pick up the red apple and place it in the bowl” 动作标签 6-DoF 末端动作（位置增量、旋转、夹爪开合） 时间戳 当前帧在轨迹中的位置 成功标志 是否完成任务（某些版本包含） 文章通过 “加热”在数据集中的抓取位置 来 train heatmap.\n在 heatmap 中取出关键点\n之后通过神经网络预测每一个关键点的移动，加权得到机械臂移动的方向。\n通过模仿学习来算 Loss, 然后训练。\nCoPa: General Robotic Manipulation through Spatial Constraints of Parts with Foundation Models 发表时间：13 Mar 2024\n动机 当前机器人 manipulation 研究大多集中在：\n高层任务规划（如使用 LLMs 推理“该做什么”）， 或低层控制（通过 imitation learning 或 RL 获取 end-effector 动作序列）。 然而，低层控制模块在真实世界中很难泛化，因为：\n缺乏对物体几何和功能部分的理解， 容易对新的任务和场景失效。 因此，本文希望结合 VLMs 的常识知识和几何建模能力，以“空间约束”的形式桥接语言与机器人执行之间的鸿沟，实现可泛化的低层 manipulation 能力。\n核心思想 Zero-shot! GPT-4V is all you need!\n模型流程图 首先分割场景，识别场景中有多少物体。\n简单来说就是：让 GPT 决定怎么操作这个物体。 比如说，要抓哪里，要怎么抓，物体的姿态是什么，…\n最后使用一个传统路径规划算法来达成上述所有条件 一旦条件达成，任务也就完成了\n结果 MQE: Unleashing the Power of Interaction with Multi-agent Quadruped Environment 发表时间: 24 Mar 2024\n动机 之前的模拟环境都太简单了，设计一个复杂的\n主要论点 设计了一个复杂的模拟环境:\n更多更复杂场景，更真实的物理引擎，更好的 Reward\nAny-point Trajectory Modeling for Policy Learning 发表时间：28 Dec 2023\n动机 数据不够用啦，我要从视频里学\n本文旨在从无动作标签的视频中提取出用于控制的轨迹，从而辅助策略学习\n主要论点 作者提出了 Any-point Trajectory Modeling (ATM) 框架：\n第一阶段：使用无动作标签的视频和现有视频追踪器，从视频中提取任意点的轨迹（即二维运动轨迹），训练一个轨迹预测模型（Track Transformer）。 第二阶段：使用轨迹预测模型，在给定任务语言描述和当前图像的情况下预测未来的轨迹，并用这些轨迹作为中间目标（subgoal）指导策略学习，从少量动作演示中学习有效的策略。 这不就是昨天的General Flow吗\n模型流程图 和昨天的那篇文章的区别在于:\n这篇不需要 Ground Truth 数据，只是视频就行，而那一篇需 如何做到的？答:用了一个 LLM Tracker 来跟踪 这篇文章是对\"运动最显著\"的 K(32) 个点算运动向量，那个是对每一个像素算运动向量 MENTOR: Mixture-of-Experts Network with Task-Oriented Perturbation for Visual Reinforcement Learning 发表时间: 19 Oct 2024\n动机 做 RL, 还是得泛化\n过去的 embedding 太 General 了。\n思路是：如果 embedding 不分任务注意所有细节, 反而做不好 这里的泛化能忽略掉任务无关的信息\n总之，这里使用了一个 MoE 网络来处理输入。\n模型流程图 至于这个 Perturbation.. 流程如下:\n[输入图像 I] ↓ [Encoder 输出特征 z] ↓ [策略网络 → 计算 loss] ↓ [反向传播：计算 ∇_z L] ↓ [构造 δ = ε · normalized gradient] ↓ [扰动特征 z + δ → 再送策略网络训练] ↓ [更新 encoder + expert 参数] 总之就是训练的时候把 z 往成功的方向“推一下” “引导视觉 encoder 学会放大那些能带来任务成功的区域”\n结果 模拟环境：\nDMC (DeepMind Control Suite) → 如：Walker、Cheetah、Finger、Cartpole 等控制任务 Meta-World → 多任务机器人操作环境（push、reach、pick-place 等） RLBench → 视觉+控制为主的仿真机械臂任务，如插电源、开抽屉等\n真实世界任务：\n在完成 Task 的时候会干扰一下不让它完成这个 Task.\n但是最后还是成功完成了。\nTake away MoE 是什么呢？其实就是多个动态加权平均的网络。 什么是动态加权平均呢？ 就是权重是通过 $SoftMax(MLP)$ 算出来的 这样每次每个网络加权平均的权重就会不同。\nDemoGen: Synthetic Demonstration Generation for Data-Efficient Visuomotor Policy Learning 发表时间：24 Feb 2025\n动机 Robust，还得是Robust。\n为什么不加数据(ο´･д･)??\n过拟合严重，加数据要每个场景都测很多次，哪怕不用人测也要机器人测。\n那怎么办呢(ο´･д･)??\n很简单，纯计算模拟不就是了。\n主要论点 用一个演示数据生成很多演示数据，用很多的演示数据 train 机器人\n这样就不需要实际操作，但是可以直接获得大量数据。\n模型流程图 一言以蔽之：先算个大概，再看看这个“大概动作”能不能 work.\n思路是：一张 PPT 中的图片可以旋转放大缩小，路径也可以\n机器人一共有两段动作\n一段是碰到物体前的动作\n一段是碰到物体后的动作\n对于第一段，直接用一个变换矩阵变换\n对于第二段，直接规划一个新路径 (use RRT-Connect)\n现在我们通过模拟环境验证这个路径行不行 (会不会穿模，会不会碰撞)\n如果可以用的话\n然后通过模拟环境生成这个路径的图像\n实验设定 虚拟环境：1 条 GroundTruth\n真实环境: 1 条真人数据 + 2 次 Replay（机器人自己模拟一遍这个轨迹）\n一共模拟 10k 帧左右的数据 (收益递减，10k 属于一个平衡点)\n结果 V.S. RoboGround 方面 DemoGen RoboGround 目标问题 数据高效、空间泛化性差的视觉模仿学习 多任务泛化能力差、语义-空间信息连接弱 核心思想 从少量人类演示中合成大量视觉演示数据用于模仿学习 grounding mask（掩码）作为embedding增强泛化 数据生成方式 从 BEHAVIOR 数据库中采样演示 → 空间重定向 → 物理优化 → 点云合成图像 构建大量高复杂度场景 → 使用 LVLM（如 GLaMM）生成目标物体 + placement mask 人类演示 一条 在仿真中自动生成，无需真实 rollouts 任务表征形式 (图像帧, 末端动作)对 图像 + mask + 指令 + robot state 中间表示 None（直接预测动作） 掩码（mask）作为空间引导 依赖模型 Immitation Learning 利用 VLM + Grounded Perceiver 构建 mask-guided policy 泛化方式 利用空间重定向与图像合成覆盖更多初始状态 通过 grounding masks 和多样 instruction 提升语义-空间泛化 DOGlove: Dexterous Manipulation with a Low-Cost Open-Source Haptic Force Feedback Glove 一个这样的力反馈手套\n可以链接到灵巧手上，然后展示反馈物体的力\n盲抓分辨物体\n盲眼抓杯子\nReactive Diffusion Policy: Slow-Fast Visual-Tactile Policy Learning for Contact-Rich Manipulation 发表时间：23 Apr 2025\n动机 人有触觉，为什么机器人不行？\n所以我们为机器人加上了触觉。\n并且用触觉来优化模型.\n可以是，触觉数据怎么来呢？🤔\n在机器人手上加上触觉组件就好了\n模型流程 方法很简单：\nimage -\u003e 正常的 CV Encoder -\u003e Touch Encoder -\u003e (Action -\u003e Touch Encoder) * N -\u003e image2 …\n实现效果 Morpheus: A Neural-driven Animatronic Face with Hybrid Actuation and Diverse Emotion Control 发表时间：June 23 2025\n动机 现在机器人的表情不够生动，希望能生动一点\n用一段语音输入进机器人\n为什么选语音？\n因为语音有语气, 语气中可能有细微的表情差别\n“我没事…” “我没事！”和 “我?没事” 是有区别的\n这更适合模型生成表情.\n而现有机器人的表情做得不好，所以这个团队自己做了一个可以做更丰富表情的机器人脸\n实现方式 第一部分，有一个带有丰富语气的语音数据集 + 对应的 3D 人脸建模数据\n第二部分，为了训练模型 -\u003e 电机； 随机生成了 5000 个 3D 建模 让电机去拟合这个表情\n↑以上过程都是在虚拟环境中训练完，然后搬到真实环境做的。\nTwo by Two: Learning Multi-Task Pairwise Objects Assembly for Generalizable Robot Manipulation 发表时间: 9 Apr 2025\n动机 机器人泛化能力和精确对齐的能力不行\n一一对应的插入 task 做不好\n模型流程图 一言以蔽之：先找插座位置，再预测插件位置\n这里的位置是真正的位置，分别是 Tran(三位坐标系中的位置) \u0026 Rot (三个轴旋转的角度)\n这样就可以计算 loss 了\n之后第二部分就是把刚才得到的 embedding 和插件的 embedding 乘起来 之后还是 predict Tran \u0026 Rot 算 loss.\n注：所有训练都是在虚拟环境完成，真实环境仅有 validation.\n",
+  "wordCount" : "618",
+  "inLanguage": "en",
+  "datePublished": "2025-06-06T10:08:22+08:00",
+  "dateModified": "2025-06-06T10:08:22+08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2025-06-06/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2025-06-06
+    </h1>
+    <div class="post-meta"><span title='2025-06-06 10:08:22 +0800 CST'>June 6, 2025</span>&nbsp;·&nbsp;3 min
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h2 id="leveraging-locality-to-boost-sample-efficiency-in-robotic-manipulation">Leveraging Locality to Boost Sample Efficiency in Robotic Manipulation<a hidden class="anchor" aria-hidden="true" href="#leveraging-locality-to-boost-sample-efficiency-in-robotic-manipulation">#</a></h2>
+<p><a href="https://arxiv.org/abs/2406.10615">发表时间：15 Jun 2024</a></p>
+<h4 id="动机">动机<a hidden class="anchor" aria-hidden="true" href="#动机">#</a></h4>
+<p>当前机器人操作策略（如模仿学习、RL）在训练时通常会学习一个全局策略函数 \pi(o_t)，即从全图像或全状态观察中直接输出动作。但：</p>
+<p>问题 1：学习难度高（需要从高维图像中学全局策略）；
+问题 2：泛化差（模型可能过拟合于训练视角或场景）；
+问题 3：sample efficiency 差（训练数据需求量大）</p>
+<p>作者提出一个核心假设：很多 manipulation 任务其实是“局部决策驱动”的，
+也就是说：只关注局部 patch（例如抓取点附近区域）即可决定动作。</p>
+<h4 id="主要论点">主要论点<a hidden class="anchor" aria-hidden="true" href="#主要论点">#</a></h4>
+<p>提出 Local Policy Networks（LPN）：
+将策略函数设计为一组 局部策略（local policy heads）；
+每个 head 只负责“在自己 patch 上预测动作”；
+用 heatmap 表示哪些 patch 是可行操作区域（如抓取点）；
+最终策略通过对多个 local head 输出聚合（weighted sum）得到。</p>
+<h4 id="模型流程图">模型流程图<a hidden class="anchor" aria-hidden="true" href="#模型流程图">#</a></h4>
+<p><img alt="1749017331301" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749017331301.png"></p>
+<p>简单来说，就是寻找关键点，预测关键点的移动，然后整合成动作</p>
+<h4 id="实验-setting">实验 setting:<a hidden class="anchor" aria-hidden="true" href="#实验-setting">#</a></h4>
+<p>使用数据集：RT-1（Robotics Transformer 1）:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Google Everyday Robot（移动底座 + 7-DoF机械臂 + gripper）
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">数据来源
+</span></span><span class="line"><span class="cl">真实机器人操作任务，由人类远程操作（teleoperation）或脚本演示收集
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">数据规模
+</span></span><span class="line"><span class="cl">~130k 条实际机器人操作轨迹，覆盖 700+ 种任务
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">采样频率
+</span></span><span class="line"><span class="cl">每条轨迹包含约 50–100 帧关键帧（图像 + 动作）
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">场景
+</span></span><span class="line"><span class="cl">家庭式办公环境（桌面、水槽、地面）
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">物体
+</span></span><span class="line"><span class="cl">80+ 类常见物体（杯子、水瓶、纸巾、玩具、锅等）
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">语言指令
+</span></span><span class="line"><span class="cl">每个轨迹附有一条人类编写的自然语言 task 描述（用于多模态模型）
+</span></span></code></pre></div><p>对于每一条指令：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">RGB 图像
+</span></span><span class="line"><span class="cl">来自机器人头部相机的视角（尺寸通常为 240×320）
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">深度图（可选）
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">当前状态
+</span></span><span class="line"><span class="cl">如 gripper pose（位置 + 朝向）
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">语言指令
+</span></span><span class="line"><span class="cl">例如 “pick up the red apple and place it in the bowl”
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">动作标签
+</span></span><span class="line"><span class="cl">6-DoF 末端动作（位置增量、旋转、夹爪开合）
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">时间戳
+</span></span><span class="line"><span class="cl">当前帧在轨迹中的位置
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">成功标志
+</span></span><span class="line"><span class="cl">是否完成任务（某些版本包含）
+</span></span></code></pre></div><p>文章通过 “加热”在数据集中的抓取位置 来 train heatmap.</p>
+<p>在 heatmap 中取出关键点</p>
+<p>之后通过神经网络预测每一个关键点的移动，加权得到机械臂移动的方向。</p>
+<p>通过模仿学习来算 Loss, 然后训练。</p>
+<p><img alt="1749018111948" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749018111948.png"></p>
+<hr>
+<h2 id="copa-general-robotic-manipulation-through-spatial-constraints-of-parts-with-foundation-models">CoPa: General Robotic Manipulation through Spatial Constraints of Parts with Foundation Models<a hidden class="anchor" aria-hidden="true" href="#copa-general-robotic-manipulation-through-spatial-constraints-of-parts-with-foundation-models">#</a></h2>
+<p><a href="https://arxiv.org/pdf/2403.08248">发表时间：13 Mar 2024</a></p>
+<h4 id="动机-1">动机<a hidden class="anchor" aria-hidden="true" href="#动机-1">#</a></h4>
+<p>当前机器人 manipulation 研究大多集中在：</p>
+<ul>
+<li>高层任务规划（如使用 LLMs 推理“该做什么”），</li>
+<li>或低层控制（通过 imitation learning 或 RL 获取 end-effector 动作序列）。</li>
+</ul>
+<p>然而，低层控制模块在真实世界中很难泛化，因为：</p>
+<ul>
+<li>缺乏对物体几何和功能部分的理解，</li>
+<li>容易对新的任务和场景失效。</li>
+</ul>
+<p>因此，本文希望结合 VLMs 的常识知识和几何建模能力，以“空间约束”的形式桥接语言与机器人执行之间的鸿沟，实现可泛化的低层 manipulation 能力。</p>
+<h4 id="核心思想">核心思想<a hidden class="anchor" aria-hidden="true" href="#核心思想">#</a></h4>
+<p>Zero-shot! GPT-4V is all you need!</p>
+<h4 id="模型流程图-1">模型流程图<a hidden class="anchor" aria-hidden="true" href="#模型流程图-1">#</a></h4>
+<p><img alt="1749018718910" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749018718910.png"></p>
+<p>首先分割场景，识别场景中有多少物体。</p>
+<p><img alt="1749018776388" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749018776388.png"></p>
+<p>简单来说就是：让 GPT 决定怎么操作这个物体。
+比如说，要抓哪里，要怎么抓，物体的姿态是什么，&hellip;</p>
+<p><img alt="1749018759968" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749018759968.png"></p>
+<p>最后使用一个传统路径规划算法来达成上述所有条件
+一旦条件达成，任务也就完成了</p>
+<h4 id="结果">结果<a hidden class="anchor" aria-hidden="true" href="#结果">#</a></h4>
+<p><img alt="1749019244120" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749019244120.png"></p>
+<p><img alt="1749019265573" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749019265573.png"></p>
+<hr>
+<h2 id="mqe-unleashing-the-power-of-interaction-with-multi-agent-quadruped-environment">MQE: Unleashing the Power of Interaction with Multi-agent Quadruped Environment<a hidden class="anchor" aria-hidden="true" href="#mqe-unleashing-the-power-of-interaction-with-multi-agent-quadruped-environment">#</a></h2>
+<p><a href="https://arxiv.org/abs/2403.16015">发表时间: 24 Mar 2024</a></p>
+<h4 id="动机-2">动机<a hidden class="anchor" aria-hidden="true" href="#动机-2">#</a></h4>
+<p>之前的模拟环境都太简单了，设计一个复杂的</p>
+<h4 id="主要论点-1">主要论点<a hidden class="anchor" aria-hidden="true" href="#主要论点-1">#</a></h4>
+<p>设计了一个复杂的模拟环境:</p>
+<p><img alt="1749019506119" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749019506119.png"></p>
+<p>更多更复杂场景，更真实的物理引擎，更好的 Reward</p>
+<hr>
+<h2 id="any-point-trajectory-modeling-for-policy-learning">Any-point Trajectory Modeling for Policy Learning<a hidden class="anchor" aria-hidden="true" href="#any-point-trajectory-modeling-for-policy-learning">#</a></h2>
+<p><a href="https://arxiv.org/abs/2401.00025">发表时间：28 Dec 2023</a></p>
+<h4 id="动机-3">动机<a hidden class="anchor" aria-hidden="true" href="#动机-3">#</a></h4>
+<p>数据不够用啦，我要从视频里学</p>
+<p>本文旨在从无动作标签的视频中提取出用于控制的轨迹，从而辅助策略学习</p>
+<h4 id="主要论点-2">主要论点<a hidden class="anchor" aria-hidden="true" href="#主要论点-2">#</a></h4>
+<p>作者提出了 Any-point Trajectory Modeling (ATM) 框架：</p>
+<ol>
+<li>第一阶段：使用无动作标签的视频和现有视频追踪器，从视频中提取任意点的轨迹（即二维运动轨迹），训练一个轨迹预测模型（Track Transformer）。</li>
+<li>第二阶段：使用轨迹预测模型，在给定任务语言描述和当前图像的情况下预测未来的轨迹，并用这些轨迹作为中间目标（subgoal）指导策略学习，从少量动作演示中学习有效的策略。</li>
+</ol>
+<p><img alt="1749019906911" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749019906911.png"></p>
+<p><del>这不就是昨天的<a href="https://arxiv.org/abs/2401.11439">General Flow</a>吗</del></p>
+<h4 id="模型流程图-2">模型流程图<a hidden class="anchor" aria-hidden="true" href="#模型流程图-2">#</a></h4>
+<p><img alt="1749019993719" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749019993719.png"></p>
+<p>和昨天的那篇文章的区别在于:</p>
+<ol>
+<li>这篇不需要 Ground Truth 数据，只是视频就行，而那一篇需
+如何做到的？答:用了一个 LLM Tracker 来跟踪</li>
+<li>这篇文章是对&quot;运动最显著&quot;的 K(32) 个点算运动向量，那个是对每一个像素算运动向量</li>
+</ol>
+<p><img alt="1749020610905" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749020610905.png"></p>
+<hr>
+<h2 id="mentor-mixture-of-experts-network-with-task-oriented-perturbation-for-visual-reinforcement-learning">MENTOR: Mixture-of-Experts Network with Task-Oriented Perturbation for Visual Reinforcement Learning<a hidden class="anchor" aria-hidden="true" href="#mentor-mixture-of-experts-network-with-task-oriented-perturbation-for-visual-reinforcement-learning">#</a></h2>
+<p><a href="https://arxiv.org/abs/2410.14972">发表时间: 19 Oct 2024</a></p>
+<h4 id="动机-4">动机<a hidden class="anchor" aria-hidden="true" href="#动机-4">#</a></h4>
+<p>做 RL, 还是得泛化</p>
+<p>过去的 embedding 太 General 了。</p>
+<p>思路是：如果 embedding 不分任务注意所有细节, 反而做不好
+这里的泛化能忽略掉<strong>任务无关的信息</strong></p>
+<p>总之，这里使用了一个 MoE 网络来处理输入。</p>
+<h4 id="模型流程图-3">模型流程图<a hidden class="anchor" aria-hidden="true" href="#模型流程图-3">#</a></h4>
+<p><img alt="1749022628844" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749022628844.png"></p>
+<p>至于这个 Perturbation.. 流程如下:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl">[输入图像 I]
+</span></span><span class="line"><span class="cl">     ↓
+</span></span><span class="line"><span class="cl">[Encoder 输出特征 z]
+</span></span><span class="line"><span class="cl">     ↓
+</span></span><span class="line"><span class="cl">[策略网络 → 计算 loss]
+</span></span><span class="line"><span class="cl">     ↓
+</span></span><span class="line"><span class="cl">[反向传播：计算 ∇_z L]
+</span></span><span class="line"><span class="cl">     ↓
+</span></span><span class="line"><span class="cl">[构造 δ = ε · normalized gradient]
+</span></span><span class="line"><span class="cl">     ↓
+</span></span><span class="line"><span class="cl">[扰动特征 z + δ → 再送策略网络训练]
+</span></span><span class="line"><span class="cl">     ↓
+</span></span><span class="line"><span class="cl">[更新 encoder + expert 参数]
+</span></span></code></pre></div><p>总之就是训练的时候把 z 往成功的方向“推一下”
+“引导视觉 encoder 学会放大那些能带来任务成功的区域”</p>
+<h4 id="结果-1">结果<a hidden class="anchor" aria-hidden="true" href="#结果-1">#</a></h4>
+<p>模拟环境：</p>
+<p>DMC (DeepMind Control Suite)
+→ 如：Walker、Cheetah、Finger、Cartpole 等控制任务
+Meta-World
+→ 多任务机器人操作环境（push、reach、pick-place 等）
+RLBench
+→ 视觉+控制为主的仿真机械臂任务，如插电源、开抽屉等</p>
+<p><img alt="1749022903533" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749022903533.png"></p>
+<p>真实世界任务：</p>
+<p>在完成 Task 的时候会干扰一下不让它完成这个 Task.</p>
+<p><img alt="1749022944147" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749022944147.png"></p>
+<p>但是最后还是成功完成了。</p>
+<h4 id="take-away">Take away<a hidden class="anchor" aria-hidden="true" href="#take-away">#</a></h4>
+<p>MoE 是什么呢？其实就是多个动态加权平均的网络。
+什么是动态加权平均呢？
+就是权重是通过 $SoftMax(MLP)$ 算出来的
+这样每次每个网络加权平均的权重就会不同。</p>
+<hr>
+<h2 id="demogen-synthetic-demonstration-generation-for-data-efficient-visuomotor-policy-learning">DemoGen: Synthetic Demonstration Generation for Data-Efficient Visuomotor Policy Learning<a hidden class="anchor" aria-hidden="true" href="#demogen-synthetic-demonstration-generation-for-data-efficient-visuomotor-policy-learning">#</a></h2>
+<p><a href="https://arxiv.org/abs/2502.16932">发表时间：24 Feb 2025</a></p>
+<h4 id="动机-5">动机<a hidden class="anchor" aria-hidden="true" href="#动机-5">#</a></h4>
+<p>Robust，还得是Robust。</p>
+<p>为什么不加数据(ο´･д･)??</p>
+<p>过拟合严重，加数据要每个场景都测很多次，哪怕不用人测也要机器人测。</p>
+<p>那怎么办呢(ο´･д･)??</p>
+<p>很简单，纯计算模拟不就是了。</p>
+<h4 id="主要论点-3">主要论点<a hidden class="anchor" aria-hidden="true" href="#主要论点-3">#</a></h4>
+<p>用一个演示数据生成很多演示数据，用很多的演示数据 train 机器人</p>
+<p>这样就不需要实际操作，但是可以直接获得大量数据。</p>
+<h4 id="模型流程图-4">模型流程图<a hidden class="anchor" aria-hidden="true" href="#模型流程图-4">#</a></h4>
+<p><img alt="1749026226827" loading="lazy" src="https://tzj2006.github.io/images/2025-06-04/1749026226827.png"></p>
+<p>一言以蔽之：先算个大概，再看看这个“大概动作”能不能 work.</p>
+<p>思路是：一张 PPT 中的图片可以旋转放大缩小，路径也可以</p>
+<p>机器人一共有两段动作</p>
+<p>一段是碰到物体前的动作</p>
+<p>一段是碰到物体后的动作</p>
+<p>对于第一段，直接用一个变换矩阵变换</p>
+<p>对于第二段，直接规划一个新路径 (use RRT-Connect)</p>
+<p>现在我们通过模拟环境验证这个路径行不行 (会不会穿模，会不会碰撞)</p>
+<p>如果可以用的话</p>
+<p>然后通过模拟环境生成这个路径的图像</p>
+<h4 id="实验设定">实验设定<a hidden class="anchor" aria-hidden="true" href="#实验设定">#</a></h4>
+<p>虚拟环境：1 条 GroundTruth</p>
+<p>真实环境: 1 条真人数据 + 2 次 Replay（机器人自己模拟一遍这个轨迹）</p>
+<p>一共模拟 10k 帧左右的数据 (收益递减，10k 属于一个平衡点)</p>
+<h4 id="结果-2">结果<a hidden class="anchor" aria-hidden="true" href="#结果-2">#</a></h4>
+<p><img alt="1749093303146" loading="lazy" src="https://tzj2006.github.io/images/2025-06-05/1749093303146.png"></p>
+<p><img alt="1749093327428" loading="lazy" src="https://tzj2006.github.io/images/2025-06-05/1749093327428.png"></p>
+<h4 id="vs-roboground">V.S. RoboGround<a hidden class="anchor" aria-hidden="true" href="#vs-roboground">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th><strong>方面</strong></th>
+          <th><strong>DemoGen</strong></th>
+          <th><strong>RoboGround</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>目标问题</strong></td>
+          <td>数据高效、空间泛化性差的视觉模仿学习</td>
+          <td>多任务泛化能力差、语义-空间信息连接弱</td>
+      </tr>
+      <tr>
+          <td><strong>核心思想</strong></td>
+          <td>从少量人类演示中<strong>合成大量视觉演示数据</strong>用于模仿学习</td>
+          <td>grounding mask（掩码）作为embedding增强泛化</td>
+      </tr>
+      <tr>
+          <td><strong>数据生成方式</strong></td>
+          <td>从 BEHAVIOR 数据库中采样演示 → 空间重定向 → 物理优化 → 点云合成图像</td>
+          <td>构建大量高复杂度场景 → 使用 LVLM（如 GLaMM）生成目标物体 + placement mask</td>
+      </tr>
+      <tr>
+          <td><strong>人类演示</strong></td>
+          <td>一条</td>
+          <td>在仿真中自动生成，无需真实 rollouts</td>
+      </tr>
+      <tr>
+          <td><strong>任务表征形式</strong></td>
+          <td>(图像帧, 末端动作)<strong>对</strong></td>
+          <td>图像 + mask + 指令 + robot state</td>
+      </tr>
+      <tr>
+          <td><strong>中间表示</strong></td>
+          <td>None（直接预测动作）</td>
+          <td>掩码（mask）作为空间引导</td>
+      </tr>
+      <tr>
+          <td><strong>依赖模型</strong></td>
+          <td>Immitation Learning</td>
+          <td>利用 VLM + Grounded Perceiver 构建 mask-guided policy</td>
+      </tr>
+      <tr>
+          <td><strong>泛化方式</strong></td>
+          <td>利用空间重定向与图像合成覆盖更多初始状态</td>
+          <td>通过 grounding masks 和多样 instruction 提升语义-空间泛化</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h1 id="doglove-dexterous-manipulation-with-a-low-cost-open-source-haptic-force-feedback-glove">DOGlove: Dexterous Manipulation with a Low-Cost Open-Source Haptic Force Feedback Glove<a hidden class="anchor" aria-hidden="true" href="#doglove-dexterous-manipulation-with-a-low-cost-open-source-haptic-force-feedback-glove">#</a></h1>
+<p><img alt="1749095773362" loading="lazy" src="https://tzj2006.github.io/images/2025-06-05/1749095773362.png"></p>
+<p>一个这样的力反馈手套</p>
+<p><img alt="1749095795246" loading="lazy" src="https://tzj2006.github.io/images/2025-06-05/1749095795246.png"></p>
+<p>可以链接到灵巧手上，然后展示反馈物体的力</p>
+<p><img alt="1749095840431" loading="lazy" src="https://tzj2006.github.io/images/2025-06-05/1749095840431.png"></p>
+<p>盲抓分辨物体</p>
+<p><img alt="1749096044706" loading="lazy" src="https://tzj2006.github.io/images/2025-06-05/1749096044706.png"></p>
+<p>盲眼抓杯子</p>
+<p><img alt="1749095932041" loading="lazy" src="https://tzj2006.github.io/images/2025-06-05/1749095932041.png"></p>
+<hr>
+<h2 id="reactive-diffusion-policy-slow-fast-visual-tactile-policy-learning-for-contact-rich-manipulation">Reactive Diffusion Policy: Slow-Fast Visual-Tactile Policy Learning for Contact-Rich Manipulation<a hidden class="anchor" aria-hidden="true" href="#reactive-diffusion-policy-slow-fast-visual-tactile-policy-learning-for-contact-rich-manipulation">#</a></h2>
+<p><a href="https://arxiv.org/abs/2503.02881">发表时间：23 Apr 2025</a></p>
+<h4 id="动机-6">动机<a hidden class="anchor" aria-hidden="true" href="#动机-6">#</a></h4>
+<p>人有触觉，为什么机器人不行？</p>
+<p>所以我们为机器人加上了触觉。</p>
+<p>并且用触觉来优化模型.</p>
+<p>可以是，触觉数据怎么来呢？🤔</p>
+<p>在机器人手上加上触觉组件就好了</p>
+<h4 id="模型流程">模型流程<a hidden class="anchor" aria-hidden="true" href="#模型流程">#</a></h4>
+<p><img alt="1749103232421" loading="lazy" src="https://tzj2006.github.io/images/2025-06-05/1749103232421.png"></p>
+<p>方法很简单：</p>
+<p>image -&gt; 正常的 CV Encoder -&gt; Touch Encoder -&gt; (Action -&gt; Touch Encoder) * N -&gt; image2 &hellip;</p>
+<h4 id="实现效果">实现效果<a hidden class="anchor" aria-hidden="true" href="#实现效果">#</a></h4>
+<p><img alt="result" loading="lazy" src="http://hxu.rocks/images/pub-pic/rdp.gif"></p>
+<hr>
+<h2 id="morpheus-a-neural-driven-animatronic-face-with-hybrid-actuation-and-diverse-emotion-control">Morpheus: A Neural-driven Animatronic Face with Hybrid Actuation and Diverse Emotion Control<a hidden class="anchor" aria-hidden="true" href="#morpheus-a-neural-driven-animatronic-face-with-hybrid-actuation-and-diverse-emotion-control">#</a></h2>
+<p><a href="https://roboticsconference.org/program/papers/80/">发表时间：June 23 2025</a></p>
+<h4 id="动机-7">动机<a hidden class="anchor" aria-hidden="true" href="#动机-7">#</a></h4>
+<p>现在机器人的表情不够生动，希望能生动一点</p>
+<p><img alt="1749106962036" loading="lazy" src="https://tzj2006.github.io/images/2025-06-05/1749106962036.png"></p>
+<p>用一段语音输入进机器人</p>
+<p>为什么选语音？</p>
+<p>因为语音有语气, 语气中可能有细微的表情差别</p>
+<p><del>“我没事&hellip;” “我没事！”和 “我?没事” 是有区别的</del></p>
+<p>这更适合模型生成表情.</p>
+<p>而现有机器人的表情做得不好，所以这个团队自己做了一个可以做更丰富表情的机器人脸</p>
+<h4 id="实现方式">实现方式<a hidden class="anchor" aria-hidden="true" href="#实现方式">#</a></h4>
+<p><img alt="1749107044660" loading="lazy" src="https://tzj2006.github.io/images/2025-06-05/1749107044660.png"></p>
+<p>第一部分，有一个带有丰富语气的语音数据集 + 对应的 3D 人脸建模数据</p>
+<p>第二部分，为了训练模型 -&gt; 电机； 随机生成了 5000 个 3D 建模 让电机去拟合这个表情</p>
+<p>↑以上过程都是在虚拟环境中训练完，然后搬到真实环境做的。</p>
+<hr>
+<h2 id="two-by-two-learning-multi-task-pairwise-objects-assembly-for-generalizable-robot-manipulation">Two by Two: Learning Multi-Task Pairwise Objects Assembly for Generalizable Robot Manipulation<a hidden class="anchor" aria-hidden="true" href="#two-by-two-learning-multi-task-pairwise-objects-assembly-for-generalizable-robot-manipulation">#</a></h2>
+<p><a href="https://arxiv.org/abs/2504.06961">发表时间: 9 Apr 2025</a></p>
+<h4 id="动机-8">动机<a hidden class="anchor" aria-hidden="true" href="#动机-8">#</a></h4>
+<p>机器人泛化能力和精确对齐的能力不行</p>
+<p>一一对应的插入 task 做不好</p>
+<h4 id="模型流程图-5">模型流程图<a hidden class="anchor" aria-hidden="true" href="#模型流程图-5">#</a></h4>
+<p><img alt="1749179563119" loading="lazy" src="https://tzj2006.github.io/images/2025-06-06/1749179563119.png"></p>
+<p>一言以蔽之：先找插座位置，再预测插件位置</p>
+<p>这里的位置是<strong>真正的位置</strong>，分别是 Tran(三位坐标系中的位置) &amp; Rot (三个轴旋转的角度)</p>
+<p>这样就可以计算 loss 了</p>
+<p>之后第二部分就是把刚才得到的 embedding 和插件的 embedding 乘起来
+之后还是 predict Tran &amp; Rot 算 loss.</p>
+<p>注：所有训练都是在虚拟环境完成，真实环境仅有 validation.</p>
+<hr>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
