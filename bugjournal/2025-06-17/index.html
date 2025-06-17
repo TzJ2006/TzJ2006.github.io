@@ -128,8 +128,8 @@ document.addEventListener("DOMContentLoaded", function() {
   "keywords": [
     "Bug Journal", "VLA", "Robotics", "Continue Learning", "Life-long Learning"
   ],
-  "articleBody": "LOTUs: Continual lmitation Learning for Robot Manipulation Through Unsupervised Skil Discovery(已开源.\nM2distill: Multi-modal distillation for lifelong imitation learning。\nFew-Shot Vision-Language Action-Incremental Policy Learning.Dynamic Mixture of Progressive Parameter-Efficient Expert Library for Lifelong Robot Learning.\nSPECl: Skill Prompts based Hierarchical Continual lmitation Learning for Robot Manipulation\nIn Praise of Stubbornness: The Case for Cognitive-Dissonance Aware Continual Update of Knowledge in LLM\nJoint Flashback Adaptation for Forgetting-Resistant Instruction Tuning\nIncremental Learning of Retrievable Skills for Efficient Continual Task Adaptation\nYou Only Teach Once: Learn One-Shot Bimanual Robotic Manipulation from Video Demonstrations(已开源)Libero: Benchmarking knowledge transfer for lifelong robot\nlearning (已开源)\n",
-  "wordCount" : "96",
+  "articleBody": "对于这些任务，以下是所有任务都必须面对的问题：“灾难性遗忘” 简单来说，就是如何让模型学得又快又好？\n在这里，快是指：如何只用很少的样例 / 数据就可以让模型学到某一个任务\n好是指：如何让模型不会在学习新任务的时候忘掉旧任务\n那为什么会忘掉旧任务呢？\n其实是因为 SGD 太强了，毕竟在初始化的时候模型是一个随机化的值 而经过训练，模型就能“学会”这些动作。\n所以在学习新的任务的时候不刻意保留原本的值， 就会如同从随机模型学到一个新的动作一样，直接“遗忘掉”过去学到的知识， 变成只会新动作的机器人了\n而下面的大部分办法都是为了解决这个问题而存在的。\nLOTUs: Continual lmitation Learning for Robot Manipulation Through Unsupervised Skil Discovery 目标： 灾难性遗忘：神经网络在新的数据分布上训练时，往往会覆盖先前学习的知识，导致早期任务的性能下降。\n样本效率：真实世界的机器人学习受到数据收集高成本的限制，这使得需要大量数据的方法变得不切实际。\n任务复杂性：基于视觉的操作任务涉及复杂的感知和控制挑战，使得单片学习方法尤其困难。\n知识转移：在任务之间高效地转移知识（无论是向前还是向后）对于有效的持续学习至关重要，但难以实现。\n方法： 构建一个技能库，这个技能库是这个模型能够学习的新技能的上限 然后每次在获得一个新的数据的时候，模型会自动判断应该是更新旧的技能还是学习新的技能 最后通过模仿学习更新这个技能 那如何识别这个技能是旧的技能还是新的技能呢？\n答案是判断这个任务和之前的某个任务是否有 Sematic 上的相似\n这里是设定了一个阈值 $\\tau$, 如果这个新的数据的任务在经过一个 DinoV2 之后 和某一个技能的聚类的相似度超过 $\\tau$, 那就更新这个技能\n问题：如果多个任务相似性都超过了这个阈值，那么就更新一个相似度最高的任务\n结果 M2distill: Multi-modal distillation for lifelong imitation learning 目标 想要解决这些问题：\n潜在表征漂移：随着模型按顺序学习新任务，它们内部对先前学习任务的特征表征会逐渐变形。这意味着机器人对熟悉物体、空间关系和任务上下文的理解会随时间扭曲。\n动作分布不一致性：随着策略参数的更新以适应新技能，机器人对先前学习任务产生适当动作的能力会下降。\n方法 蒸馏\n啥是蒸馏?_?\n其实就是最小化 embedding 的差\n和谁蒸馏呢？\n其实就是和上一步做蒸馏\n啥意思呢。\n就是说：\n我保存了上一个任务训出来的参数，然后也保存了这个任务的参数 我希望在学习到这个新任务的基础上，这个参数的变化越小越好。\n结果 比上一篇Lutos好点\nFew-Shot Vision-Language Action-Incremental Policy Learning 目标 在少数据的情况下不遗忘之前学过的旧数据\n方法 引入了两个特殊的机制来解决这个问题：\n任务特定提示（TSP）：可学习的提示向量，与多模态输入数据交互，以从有限的演示中提取任务特定信息 持续演化策略（CES）：一种构建和利用任务关系图以在任务之间传递知识并减轻灾难性遗忘的机制 什么是任务特定提示呢？\n任务特定提示就是： $$ Z_p = \\text{MVTransformer}([Z_v, Z_l, P]) $$\n其中，$Z_v$表示视觉 tokens，$Z_l$表示语言 tokens，$P$表示任务 prompt。\n就是增加训练了这么一个 encoder 就可以提高 15%-17% 的成功率\n那什么是持续演化策略呢？\n持续演化策略就是： 首先，训练一个 base network, 这个 base network 在训练的时候会有 multi-task 这样的话，这个模型就可以有一个还不错的通用性能 然后，建立一个方法库，对于每一个新任务放入一个新的方法库中 对于每次训练的时候可以把之前学过的旧任务的权重加权平均，融入新策略中 这个权重是根据旧任务和新任务之间的相似性来的。 注：这里的任务库中的任务非常大 包含了一个完整的 action head.\n结果 Dynamic Mixture of Progressive Parameter-Efficient Expert Library for Lifelong Robot Learning 问题背景与动机 当前的终身学习方法主要分为三类，每类都存在显著局限性：\n重放方法存储并重训练旧数据，表现良好但需要过多的内存和计算资源。对于涉及高维视觉数据的机器人操作任务，这种方法成本高得令人望而却步。\n正则化方法，如弹性权重整合（EWC），通过限制参数更新来保留旧知识，但在长任务序列中难以平衡可塑性-稳定性。\n架构方法，包括参数高效微调（PEFT）技术，创建任务特定模块，但面临两个关键问题：\n在测试时依赖预言机任务标识符，这在实际部署中不切实际 任务之间的知识隔离，阻碍了有效的前向迁移 DMPEL通过将PEFT的效率与动态专家选择和知识共享机制相结合，解决了这些局限性。\n方法 动态的专家模型: 这个保证了在只需要微调的基础上新学习到知识，同时不会忘记旧知识(因为之前学习到的参数没有变) 一个 novel 经验回放的方法: 文中的经验回放不是把之前的场景回放一遍，只回放了\"如何选取专家\"的权重。这样既做到了\"回放\"的效果，算力开销也不算大 上下文感知专家路由器：一个轻量级神经网络，它以多模态上下文（视觉、语言、本体感受）作为输入，并生成专家组合的系数，从而无需预言机任务标识符。 其他细节：\nEncoder 用的是 CLIP ViT-B/16 amazing\n对于每个新任务，DMPEL：\n使用正交初始化方式初始化一个新的低秩专家，以最大程度地减少干扰 在当前任务上训练该专家，同时冻结基础策略 任务完成后，将训练好的专家添加到专家库中 更新专家路由器，将新专家纳入动态组合中\n结果 在 FWT 上稍逊于 M2 Distill, 但是 AUC 远高于 M2 Distill, 差距 \u003e 10%\nSPECl: Skill Prompts based Hierarchical Continual lmitation Learning for Robot Manipulation 目标 希望机器人能够持续学习并且适应新任务\n方法 SPECI 框架对机器人学习领域做出了几项重要贡献：\n新型分层 CIL 框架：SPECI 将多模态感知和融合、上下文感知技能推断和低级动作执行统一到一个有凝聚力的流程中。\n动态技能获取：可扩展的技能代码本支持隐式持续技能获取，无需手动技能抽象，从而促进有效的技能级别知识转移。\n增强的知识转移：模式近似通过使用特定任务和任务共享知识丰富策略来增强任务级别的知识转移。\n同样的可扩展的技能代码本：对于每个新任务，都会分配一个新的技能向量子集，而现有的技能向量则被冻结。这种方法允许持续扩展技能库。\n同样的注意力驱动的技能选择：一种机制根据技能向量与当前状态的相似性，选择前 C 个相关的技能向量，并通过加权求和将它们组合起来，从而形成合成的潜在技能。\n同样的时间 Transformer 架构：此组件旨在推断随时间的逻辑技能，从而捕获技能执行过程中的时间依赖性。\n区别是，这里不再用 LoRA,而是使用 $W = W_0 + ΔU * V^T$ 去微调\n结果 效果都比 DMPEL 差，特别是 LIBERO-GOAL 和 LIBERO-LONG\n图中其他模型效果和 DMPEL 中有些偏差\n推测是 DMPEL中的 ER 效果更好\n可惜 DMPEL 并没有测试没有 ER 的效果。\nIn Praise of Stubbornness: The Case for Cognitive-Dissonance Aware Continual Update of Knowledge in LLM 目标 如何让LLM避免“灾难性遗忘”\n方法 结果 Joint Flashback Adaptation for Forgetting-Resistant Instruction Tuning Incremental Learning of Retrievable Skills for Efficient Continual Task Adaptation You Only Teach Once: Learn One-Shot Bimanual Robotic Manipulation from Video Demonstrations Libero: Benchmarking knowledge transfer for lifelong robot learning Please visit this file\n",
+  "wordCount" : "292",
   "inLanguage": "en",
   "datePublished": "2025-06-17T08:00:00+08:00",
   "dateModified": "2025-06-17T08:00:00+08:00",
@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <h1 class="post-title entry-hint-parent">
       Bug Journal 2025-06-17
     </h1>
-    <div class="post-meta"><span title='2025-06-17 08:00:00 +0800 CST'>June 17, 2025</span>&nbsp;·&nbsp;1 min
+    <div class="post-meta"><span title='2025-06-17 08:00:00 +0800 CST'>June 17, 2025</span>&nbsp;·&nbsp;2 min
 
 
       
@@ -232,23 +232,172 @@ document.addEventListener("DOMContentLoaded", function() {
 
     </div>
   </header> 
-  <div class="post-content"><p>LOTUs: Continual lmitation Learning for Robot Manipulation
-Through Unsupervised Skil Discovery(已开源.</p>
-<p>M2distill: Multi-modal distillation for lifelong imitation learning。</p>
-<p>Few-Shot Vision-Language Action-Incremental Policy
-Learning.Dynamic Mixture of Progressive Parameter-Efficient Expert Library for
-Lifelong Robot Learning.</p>
-<p>SPECl: Skill Prompts based Hierarchical Continual lmitation
-Learning for Robot Manipulation</p>
-<p>In Praise of Stubbornness: The Case for Cognitive-Dissonance
-Aware Continual Update of Knowledge in LLM</p>
-<p>Joint Flashback Adaptation for Forgetting-Resistant
-Instruction Tuning</p>
-<p>Incremental Learning of Retrievable Skills for Efficient
-Continual Task Adaptation</p>
-<p>You Only Teach Once: Learn One-Shot Bimanual Robotic
-Manipulation from Video Demonstrations(已开源)Libero: Benchmarking knowledge transfer for lifelong robot</p>
-<p>learning (已开源)</p>
+  <div class="post-content"><h2 id="对于这些任务以下是所有任务都必须面对的问题灾难性遗忘">对于这些任务，以下是所有任务都必须面对的问题：“灾难性遗忘”<a hidden class="anchor" aria-hidden="true" href="#对于这些任务以下是所有任务都必须面对的问题灾难性遗忘">#</a></h2>
+<p>简单来说，就是如何让模型学得又快又好？</p>
+<p>在这里，快是指：如何只用很少的样例 / 数据就可以让模型学到某一个任务</p>
+<p>好是指：如何让模型不会在学习新任务的时候忘掉旧任务</p>
+<p>那为什么会忘掉旧任务呢？</p>
+<p>其实是因为 SGD 太强了，毕竟在初始化的时候模型是一个随机化的值
+而经过训练，模型就能“学会”这些动作。</p>
+<p>所以在学习新的任务的时候不刻意保留原本的值，
+就会如同从随机模型学到一个新的动作一样，直接“遗忘掉”过去学到的知识，
+变成只会新动作的机器人了</p>
+<p>而下面的大部分办法都是为了解决这个问题而存在的。</p>
+<h2 id="lotus-continual-lmitation-learning-for-robot-manipulation-through-unsupervised-skil-discovery">LOTUs: Continual lmitation Learning for Robot Manipulation Through Unsupervised Skil Discovery<a hidden class="anchor" aria-hidden="true" href="#lotus-continual-lmitation-learning-for-robot-manipulation-through-unsupervised-skil-discovery">#</a></h2>
+<h4 id="目标">目标：<a hidden class="anchor" aria-hidden="true" href="#目标">#</a></h4>
+<ol>
+<li>
+<p>灾难性遗忘：神经网络在新的数据分布上训练时，往往会覆盖先前学习的知识，导致早期任务的性能下降。</p>
+</li>
+<li>
+<p>样本效率：真实世界的机器人学习受到数据收集高成本的限制，这使得需要大量数据的方法变得不切实际。</p>
+</li>
+<li>
+<p>任务复杂性：基于视觉的操作任务涉及复杂的感知和控制挑战，使得单片学习方法尤其困难。</p>
+</li>
+<li>
+<p>知识转移：在任务之间高效地转移知识（无论是向前还是向后）对于有效的持续学习至关重要，但难以实现。</p>
+</li>
+</ol>
+<h4 id="方法">方法：<a hidden class="anchor" aria-hidden="true" href="#方法">#</a></h4>
+<p><img alt="1750145657781" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750145657781.png"></p>
+<ol>
+<li>构建一个技能库，这个技能库是这个模型能够学习的新技能的上限</li>
+<li>然后每次在获得一个新的数据的时候，模型会自动判断应该是更新旧的技能还是学习新的技能</li>
+<li>最后通过模仿学习更新这个技能</li>
+</ol>
+<p>那如何识别这个技能是旧的技能还是新的技能呢？</p>
+<p>答案是判断这个任务和之前的某个任务是否有 Sematic 上的相似</p>
+<p>这里是设定了一个阈值 $\tau$, 如果这个新的数据的任务在经过一个 DinoV2 之后
+和某一个技能的聚类的相似度超过 $\tau$, 那就更新这个技能</p>
+<p>问题：如果多个任务相似性都超过了这个阈值，那么就更新一个相似度最高的任务</p>
+<h4 id="结果">结果<a hidden class="anchor" aria-hidden="true" href="#结果">#</a></h4>
+<p><img alt="1750145306207" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750145306207.png"></p>
+<hr>
+<h2 id="m2distill-multi-modal-distillation-for-lifelong-imitation-learning">M2distill: Multi-modal distillation for lifelong imitation learning<a hidden class="anchor" aria-hidden="true" href="#m2distill-multi-modal-distillation-for-lifelong-imitation-learning">#</a></h2>
+<h4 id="目标-1">目标<a hidden class="anchor" aria-hidden="true" href="#目标-1">#</a></h4>
+<p>想要解决这些问题：</p>
+<p>潜在表征漂移：随着模型按顺序学习新任务，它们内部对先前学习任务的特征表征会逐渐变形。这意味着机器人对熟悉物体、空间关系和任务上下文的理解会随时间扭曲。</p>
+<p>动作分布不一致性：随着策略参数的更新以适应新技能，机器人对先前学习任务产生适当动作的能力会下降。</p>
+<h4 id="方法-1">方法<a hidden class="anchor" aria-hidden="true" href="#方法-1">#</a></h4>
+<p><img alt="1750145678786" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750145678786.png"></p>
+<p>蒸馏</p>
+<p>啥是蒸馏?_?</p>
+<p>其实就是最小化 embedding 的差</p>
+<p>和谁蒸馏呢？</p>
+<p>其实就是和上一步做蒸馏</p>
+<p>啥意思呢。</p>
+<p>就是说：</p>
+<p>我保存了上一个任务训出来的参数，然后也保存了这个任务的参数
+我希望在学习到这个新任务的基础上，这个参数的变化越小越好。</p>
+<h4 id="结果-1">结果<a hidden class="anchor" aria-hidden="true" href="#结果-1">#</a></h4>
+<p><img alt="1750145629714" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750145629714.png"></p>
+<p>比上一篇Lutos好点</p>
+<hr>
+<h2 id="few-shot-vision-language-action-incremental-policy-learning">Few-Shot Vision-Language Action-Incremental Policy Learning<a hidden class="anchor" aria-hidden="true" href="#few-shot-vision-language-action-incremental-policy-learning">#</a></h2>
+<h4 id="目标-2">目标<a hidden class="anchor" aria-hidden="true" href="#目标-2">#</a></h4>
+<p>在少数据的情况下不遗忘之前学过的旧数据</p>
+<h4 id="方法-2">方法<a hidden class="anchor" aria-hidden="true" href="#方法-2">#</a></h4>
+<p><img alt="1750145785403" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750145785403.png"></p>
+<p>引入了两个特殊的机制来解决这个问题：</p>
+<ol>
+<li>任务特定提示（TSP）：可学习的提示向量，与多模态输入数据交互，以从有限的演示中提取任务特定信息</li>
+<li>持续演化策略（CES）：一种构建和利用任务关系图以在任务之间传递知识并减轻灾难性遗忘的机制</li>
+</ol>
+<p>什么是任务特定提示呢？</p>
+<ul>
+<li>任务特定提示就是：</li>
+</ul>
+<p>$$
+Z_p = \text{MVTransformer}([Z_v, Z_l, P])
+$$</p>
+<p>其中，$Z_v$表示视觉 tokens，$Z_l$表示语言 tokens，$P$表示任务 prompt。</p>
+<p><img alt="1750146083544" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750146083544.png"></p>
+<p>就是增加训练了这么一个 encoder 就可以提高 15%-17% 的成功率</p>
+<p>那什么是持续演化策略呢？</p>
+<ul>
+<li>持续演化策略就是：</li>
+</ul>
+<ol>
+<li>首先，训练一个 base network, 这个 base network 在训练的时候会有 multi-task
+这样的话，这个模型就可以有一个还不错的通用性能</li>
+<li>然后，建立一个方法库，对于每一个新任务放入一个新的方法库中</li>
+<li>对于每次训练的时候可以把之前学过的旧任务的权重加权平均，融入新策略中
+这个权重是根据旧任务和新任务之间的相似性来的。</li>
+</ol>
+<p><em>注：这里的任务库中的任务非常大</em>
+包含了一个<strong>完整</strong>的 action head.</p>
+<h4 id="结果-2">结果<a hidden class="anchor" aria-hidden="true" href="#结果-2">#</a></h4>
+<p><img alt="1750147236047" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750147236047.png">
+<img alt="1750147244808" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750147244808.png"></p>
+<hr>
+<h2 id="dynamic-mixture-of-progressive-parameter-efficient-expert-library-for-lifelong-robot-learning">Dynamic Mixture of Progressive Parameter-Efficient Expert Library for Lifelong Robot Learning<a hidden class="anchor" aria-hidden="true" href="#dynamic-mixture-of-progressive-parameter-efficient-expert-library-for-lifelong-robot-learning">#</a></h2>
+<h4 id="问题背景与动机">问题背景与动机<a hidden class="anchor" aria-hidden="true" href="#问题背景与动机">#</a></h4>
+<p>当前的终身学习方法主要分为三类，每类都存在显著局限性：</p>
+<p>重放方法存储并重训练旧数据，表现良好但需要过多的内存和计算资源。对于涉及高维视觉数据的机器人操作任务，这种方法成本高得令人望而却步。</p>
+<p>正则化方法，如弹性权重整合（EWC），通过限制参数更新来保留旧知识，但在长任务序列中难以平衡可塑性-稳定性。</p>
+<p>架构方法，包括参数高效微调（PEFT）技术，创建任务特定模块，但面临两个关键问题：</p>
+<p>在测试时依赖预言机任务标识符，这在实际部署中不切实际
+任务之间的知识隔离，阻碍了有效的前向迁移
+DMPEL通过将PEFT的效率与动态专家选择和知识共享机制相结合，解决了这些局限性。</p>
+<h4 id="方法-3">方法<a hidden class="anchor" aria-hidden="true" href="#方法-3">#</a></h4>
+<p><img alt="1750147368061" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750147368061.png"></p>
+<ol>
+<li>动态的专家模型: 这个保证了在只需要微调的基础上新学习到知识，同时不会忘记旧知识(因为之前学习到的参数没有变)</li>
+<li>一个 novel 经验回放的方法: 文中的经验回放不是把之前的场景回放一遍，只回放了&quot;如何选取专家&quot;的权重。这样既做到了&quot;回放&quot;的效果，算力开销也不算大</li>
+<li>上下文感知专家路由器：一个轻量级神经网络，它以多模态上下文（视觉、语言、本体感受）作为输入，并生成专家组合的系数，从而无需预言机任务标识符。</li>
+</ol>
+<p>其他细节：</p>
+<p>Encoder 用的是 CLIP ViT-B/16 amazing</p>
+<p>对于每个新任务，DMPEL：</p>
+<p>使用正交初始化方式初始化一个新的低秩专家，以最大程度地减少干扰
+在当前任务上训练该专家，同时冻结基础策略
+任务完成后，将训练好的专家添加到专家库中
+更新专家路由器，将新专家纳入动态组合中</p>
+<h4 id="结果-3">结果<a hidden class="anchor" aria-hidden="true" href="#结果-3">#</a></h4>
+<p><img alt="1750147734844" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750147734844.png"></p>
+<p>在 FWT 上稍逊于 M2 Distill, 但是 AUC 远高于 M2 Distill, 差距 &gt; 10%</p>
+<hr>
+<h2 id="specl-skill-prompts-based-hierarchical-continual-lmitation-learning-for-robot-manipulation">SPECl: Skill Prompts based Hierarchical Continual lmitation Learning for Robot Manipulation<a hidden class="anchor" aria-hidden="true" href="#specl-skill-prompts-based-hierarchical-continual-lmitation-learning-for-robot-manipulation">#</a></h2>
+<h4 id="目标-3">目标<a hidden class="anchor" aria-hidden="true" href="#目标-3">#</a></h4>
+<p>希望机器人能够持续学习并且适应新任务</p>
+<h4 id="方法-4">方法<a hidden class="anchor" aria-hidden="true" href="#方法-4">#</a></h4>
+<p><img alt="1750148231971" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750148231971.png"></p>
+<p>SPECI 框架对机器人学习领域做出了几项重要贡献：</p>
+<ol>
+<li>
+<p>新型分层 CIL 框架：SPECI 将多模态感知和融合、上下文感知技能推断和低级动作执行统一到一个有凝聚力的流程中。</p>
+</li>
+<li>
+<p>动态技能获取：可扩展的技能代码本支持隐式持续技能获取，无需手动技能抽象，从而促进有效的技能级别知识转移。</p>
+</li>
+<li>
+<p>增强的知识转移：模式近似通过使用特定任务和任务共享知识丰富策略来增强任务级别的知识转移。</p>
+</li>
+</ol>
+<p><img alt="1750148285897" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750148285897.png"></p>
+<p>同样的可扩展的技能代码本：对于每个新任务，都会分配一个新的技能向量子集，而现有的技能向量则被冻结。这种方法允许持续扩展技能库。</p>
+<p>同样的注意力驱动的技能选择：一种机制根据技能向量与当前状态的相似性，选择前 C 个相关的技能向量，并通过加权求和将它们组合起来，从而形成合成的潜在技能。</p>
+<p>同样的时间 Transformer 架构：此组件旨在推断随时间的逻辑技能，从而捕获技能执行过程中的时间依赖性。</p>
+<p>区别是，这里不再用 LoRA,而是使用 $W = W_0 + ΔU * V^T$ 去微调</p>
+<h4 id="结果-4">结果<a hidden class="anchor" aria-hidden="true" href="#结果-4">#</a></h4>
+<p><img alt="1750148567067" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750148567067.png"></p>
+<p>效果都比 DMPEL 差，特别是 LIBERO-GOAL 和 LIBERO-LONG</p>
+<p>图中其他模型效果和 DMPEL 中有些偏差</p>
+<p>推测是 DMPEL中的 ER 效果更好</p>
+<p>可惜 DMPEL 并没有测试没有 ER 的效果。</p>
+<hr>
+<h2 id="in-praise-of-stubbornness-the-case-for-cognitive-dissonance-aware-continual-update-of-knowledge-in-llm">In Praise of Stubbornness: The Case for Cognitive-Dissonance Aware Continual Update of Knowledge in LLM<a hidden class="anchor" aria-hidden="true" href="#in-praise-of-stubbornness-the-case-for-cognitive-dissonance-aware-continual-update-of-knowledge-in-llm">#</a></h2>
+<h4 id="目标-4">目标<a hidden class="anchor" aria-hidden="true" href="#目标-4">#</a></h4>
+<p>如何让LLM避免“灾难性遗忘”</p>
+<h4 id="方法-5">方法<a hidden class="anchor" aria-hidden="true" href="#方法-5">#</a></h4>
+<h4 id="结果-5">结果<a hidden class="anchor" aria-hidden="true" href="#结果-5">#</a></h4>
+<hr>
+<h2 id="joint-flashback-adaptation-for-forgetting-resistant-instruction-tuning">Joint Flashback Adaptation for Forgetting-Resistant Instruction Tuning<a hidden class="anchor" aria-hidden="true" href="#joint-flashback-adaptation-for-forgetting-resistant-instruction-tuning">#</a></h2>
+<h2 id="incremental-learning-of-retrievable-skills-for-efficient-continual-task-adaptation">Incremental Learning of Retrievable Skills for Efficient Continual Task Adaptation<a hidden class="anchor" aria-hidden="true" href="#incremental-learning-of-retrievable-skills-for-efficient-continual-task-adaptation">#</a></h2>
+<h2 id="you-only-teach-once-learn-one-shot-bimanual-robotic-manipulation-from-video-demonstrations">You Only Teach Once: Learn One-Shot Bimanual Robotic Manipulation from Video Demonstrations<a hidden class="anchor" aria-hidden="true" href="#you-only-teach-once-learn-one-shot-bimanual-robotic-manipulation-from-video-demonstrations">#</a></h2>
+<h2 id="libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning">Libero: Benchmarking knowledge transfer for lifelong robot learning<a hidden class="anchor" aria-hidden="true" href="#libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning">#</a></h2>
+<p><a href="https://tzj2006.github.io/pdfs/Libero-Lifelong-robot-learning-benchmark.pdf">Please visit this file</a></p>
 
 
   </div>
