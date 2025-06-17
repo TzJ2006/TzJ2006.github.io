@@ -128,8 +128,8 @@ document.addEventListener("DOMContentLoaded", function() {
   "keywords": [
     "Bug Journal", "VLA", "Robotics", "Continue Learning", "Life-long Learning"
   ],
-  "articleBody": "对于这些任务，以下是所有任务都必须面对的问题：“灾难性遗忘” 简单来说，就是如何让模型学得又快又好？\n在这里，快是指：如何只用很少的样例 / 数据就可以让模型学到某一个任务\n好是指：如何让模型不会在学习新任务的时候忘掉旧任务\n那为什么会忘掉旧任务呢？\n其实是因为 SGD 太强了，毕竟在初始化的时候模型是一个随机化的值 而经过训练，模型就能“学会”这些动作。\n所以在学习新的任务的时候不刻意保留原本的值， 就会如同从随机模型学到一个新的动作一样，直接“遗忘掉”过去学到的知识， 变成只会新动作的机器人了\n而下面的大部分办法都是为了解决这个问题而存在的。\nLOTUs: Continual lmitation Learning for Robot Manipulation Through Unsupervised Skil Discovery 目标： 灾难性遗忘：神经网络在新的数据分布上训练时，往往会覆盖先前学习的知识，导致早期任务的性能下降。\n样本效率：真实世界的机器人学习受到数据收集高成本的限制，这使得需要大量数据的方法变得不切实际。\n任务复杂性：基于视觉的操作任务涉及复杂的感知和控制挑战，使得单片学习方法尤其困难。\n知识转移：在任务之间高效地转移知识（无论是向前还是向后）对于有效的持续学习至关重要，但难以实现。\n方法： 构建一个技能库，这个技能库是这个模型能够学习的新技能的上限 然后每次在获得一个新的数据的时候，模型会自动判断应该是更新旧的技能还是学习新的技能 最后通过模仿学习更新这个技能 那如何识别这个技能是旧的技能还是新的技能呢？\n答案是判断这个任务和之前的某个任务是否有 Sematic 上的相似\n这里是设定了一个阈值 $\\tau$, 如果这个新的数据的任务在经过一个 DinoV2 之后 和某一个技能的聚类的相似度超过 $\\tau$, 那就更新这个技能\n问题：如果多个任务相似性都超过了这个阈值，那么就更新一个相似度最高的任务\n结果 M2distill: Multi-modal distillation for lifelong imitation learning 目标 想要解决这些问题：\n潜在表征漂移：随着模型按顺序学习新任务，它们内部对先前学习任务的特征表征会逐渐变形。这意味着机器人对熟悉物体、空间关系和任务上下文的理解会随时间扭曲。\n动作分布不一致性：随着策略参数的更新以适应新技能，机器人对先前学习任务产生适当动作的能力会下降。\n方法 蒸馏\n啥是蒸馏?_?\n其实就是最小化 embedding 的差\n和谁蒸馏呢？\n其实就是和上一步做蒸馏\n啥意思呢。\n就是说：\n我保存了上一个任务训出来的参数，然后也保存了这个任务的参数 我希望在学习到这个新任务的基础上，这个参数的变化越小越好。\n结果 比上一篇Lutos好点\nFew-Shot Vision-Language Action-Incremental Policy Learning 目标 在少数据的情况下不遗忘之前学过的旧数据\n方法 引入了两个特殊的机制来解决这个问题：\n任务特定提示（TSP）：可学习的提示向量，与多模态输入数据交互，以从有限的演示中提取任务特定信息 持续演化策略（CES）：一种构建和利用任务关系图以在任务之间传递知识并减轻灾难性遗忘的机制 什么是任务特定提示呢？\n任务特定提示就是： $$ Z_p = \\text{MVTransformer}([Z_v, Z_l, P]) $$\n其中，$Z_v$表示视觉 tokens，$Z_l$表示语言 tokens，$P$表示任务 prompt。\n就是增加训练了这么一个 encoder 就可以提高 15%-17% 的成功率\n那什么是持续演化策略呢？\n持续演化策略就是： 首先，训练一个 base network, 这个 base network 在训练的时候会有 multi-task 这样的话，这个模型就可以有一个还不错的通用性能 然后，建立一个方法库，对于每一个新任务放入一个新的方法库中 对于每次训练的时候可以把之前学过的旧任务的权重加权平均，融入新策略中 这个权重是根据旧任务和新任务之间的相似性来的。 注：这里的任务库中的任务非常大 包含了一个完整的 action head.\n结果 Dynamic Mixture of Progressive Parameter-Efficient Expert Library for Lifelong Robot Learning 问题背景与动机 当前的终身学习方法主要分为三类，每类都存在显著局限性：\n重放方法存储并重训练旧数据，表现良好但需要过多的内存和计算资源。对于涉及高维视觉数据的机器人操作任务，这种方法成本高得令人望而却步。\n正则化方法，如弹性权重整合（EWC），通过限制参数更新来保留旧知识，但在长任务序列中难以平衡可塑性-稳定性。\n架构方法，包括参数高效微调（PEFT）技术，创建任务特定模块，但面临两个关键问题：\n在测试时依赖预言机任务标识符，这在实际部署中不切实际 任务之间的知识隔离，阻碍了有效的前向迁移 DMPEL通过将PEFT的效率与动态专家选择和知识共享机制相结合，解决了这些局限性。\n方法 动态的专家模型: 这个保证了在只需要微调的基础上新学习到知识，同时不会忘记旧知识(因为之前学习到的参数没有变) 一个 novel 经验回放的方法: 文中的经验回放不是把之前的场景回放一遍，只回放了\"如何选取专家\"的权重。这样既做到了\"回放\"的效果，算力开销也不算大 上下文感知专家路由器：一个轻量级神经网络，它以多模态上下文（视觉、语言、本体感受）作为输入，并生成专家组合的系数，从而无需预言机任务标识符。 其他细节：\nEncoder 用的是 CLIP ViT-B/16 amazing\n对于每个新任务，DMPEL：\n使用正交初始化方式初始化一个新的低秩专家，以最大程度地减少干扰 在当前任务上训练该专家，同时冻结基础策略 任务完成后，将训练好的专家添加到专家库中 更新专家路由器，将新专家纳入动态组合中\n结果 在 FWT 上稍逊于 M2 Distill, 但是 AUC 远高于 M2 Distill, 差距 \u003e 10%\nSPECl: Skill Prompts based Hierarchical Continual lmitation Learning for Robot Manipulation 目标 希望机器人能够持续学习并且适应新任务\n方法 SPECI 框架对机器人学习领域做出了几项重要贡献：\n新型分层 CIL 框架：SPECI 将多模态感知和融合、上下文感知技能推断和低级动作执行统一到一个有凝聚力的流程中。\n动态技能获取：可扩展的技能代码本支持隐式持续技能获取，无需手动技能抽象，从而促进有效的技能级别知识转移。\n增强的知识转移：模式近似通过使用特定任务和任务共享知识丰富策略来增强任务级别的知识转移。\n同样的可扩展的技能代码本：对于每个新任务，都会分配一个新的技能向量子集，而现有的技能向量则被冻结。这种方法允许持续扩展技能库。\n同样的注意力驱动的技能选择：一种机制根据技能向量与当前状态的相似性，选择前 C 个相关的技能向量，并通过加权求和将它们组合起来，从而形成合成的潜在技能。\n同样的时间 Transformer 架构：此组件旨在推断随时间的逻辑技能，从而捕获技能执行过程中的时间依赖性。\n区别是，这里不再用 LoRA,而是使用 $W = W_0 + ΔU * V^T$ 去微调\n结果 效果都比 DMPEL 差，特别是 LIBERO-GOAL 和 LIBERO-LONG\n图中其他模型效果和 DMPEL 中有些偏差\n推测是 DMPEL中的 ER 效果更好\n可惜 DMPEL 并没有测试没有 ER 的效果。\nIn Praise of Stubbornness: The Case for Cognitive-Dissonance Aware Continual Update of Knowledge in LLM 目标 如何让LLM避免“灾难性遗忘”\n方法 结果 Joint Flashback Adaptation for Forgetting-Resistant Instruction Tuning Incremental Learning of Retrievable Skills for Efficient Continual Task Adaptation You Only Teach Once: Learn One-Shot Bimanual Robotic Manipulation from Video Demonstrations Libero: Benchmarking knowledge transfer for lifelong robot learning Please visit this file\n",
-  "wordCount" : "292",
+  "articleBody": "对于这些任务，以下是所有任务都必须面对的问题：“灾难性遗忘” 简单来说，就是如何让模型学得又快又好？\n在这里，快是指：如何只用很少的样例 / 数据就可以让模型学到某一个任务\n好是指：如何让模型不会在学习新任务的时候忘掉旧任务\n那为什么会忘掉旧任务呢？\n其实是因为 SGD 太强了，毕竟在初始化的时候模型是一个随机化的值 而经过训练，模型就能“学会”这些动作。\n所以在学习新的任务的时候不刻意保留原本的值， 就会如同从随机模型学到一个新的动作一样，直接“遗忘掉”过去学到的知识， 变成只会新动作的机器人了\n而下面的大部分办法都是为了解决这个问题而存在的。\nLOTUs: Continual lmitation Learning for Robot Manipulation Through Unsupervised Skil Discovery 目标： 灾难性遗忘：神经网络在新的数据分布上训练时，往往会覆盖先前学习的知识，导致早期任务的性能下降。\n样本效率：真实世界的机器人学习受到数据收集高成本的限制，这使得需要大量数据的方法变得不切实际。\n任务复杂性：基于视觉的操作任务涉及复杂的感知和控制挑战，使得单片学习方法尤其困难。\n知识转移：在任务之间高效地转移知识（无论是向前还是向后）对于有效的持续学习至关重要，但难以实现。\n方法： 构建一个技能库，这个技能库是这个模型能够学习的新技能的上限 然后每次在获得一个新的数据的时候，模型会自动判断应该是更新旧的技能还是学习新的技能 最后通过模仿学习更新这个技能 那如何识别这个技能是旧的技能还是新的技能呢？\n答案是判断这个任务和之前的某个任务是否有 Sematic 上的相似\n这里是设定了一个阈值 $\\tau$, 如果这个新的数据的任务在经过一个 DinoV2 之后 和某一个技能的聚类的相似度超过 $\\tau$, 那就更新这个技能\n问题：如果多个任务相似性都超过了这个阈值，那么就更新一个相似度最高的任务\n结果 M2distill: Multi-modal distillation for lifelong imitation learning 目标 想要解决这些问题：\n潜在表征漂移：随着模型按顺序学习新任务，它们内部对先前学习任务的特征表征会逐渐变形。这意味着机器人对熟悉物体、空间关系和任务上下文的理解会随时间扭曲。\n动作分布不一致性：随着策略参数的更新以适应新技能，机器人对先前学习任务产生适当动作的能力会下降。\n方法 蒸馏\n啥是蒸馏?_?\n其实就是最小化 embedding 的差\n和谁蒸馏呢？\n其实就是和上一步做蒸馏\n啥意思呢。\n就是说：\n我保存了上一个任务训出来的参数，然后也保存了这个任务的参数 我希望在学习到这个新任务的基础上，这个参数的变化越小越好。\n结果 比上一篇Lutos好点\nFew-Shot Vision-Language Action-Incremental Policy Learning 目标 在少数据的情况下不遗忘之前学过的旧数据\n方法 引入了两个特殊的机制来解决这个问题：\n任务特定提示（TSP）：可学习的提示向量，与多模态输入数据交互，以从有限的演示中提取任务特定信息 持续演化策略（CES）：一种构建和利用任务关系图以在任务之间传递知识并减轻灾难性遗忘的机制 什么是任务特定提示呢？\n任务特定提示就是： $$ Z_p = \\text{MVTransformer}([Z_v, Z_l, P]) $$\n其中，$Z_v$表示视觉 tokens，$Z_l$表示语言 tokens，$P$表示任务 prompt。\n就是增加训练了这么一个 encoder 就可以提高 15%-17% 的成功率\n那什么是持续演化策略呢？\n持续演化策略就是： 首先，训练一个 base network, 这个 base network 在训练的时候会有 multi-task 这样的话，这个模型就可以有一个还不错的通用性能 然后，建立一个方法库，对于每一个新任务放入一个新的方法库中 对于每次训练的时候可以把之前学过的旧任务的权重加权平均，融入新策略中 这个权重是根据旧任务和新任务之间的相似性来的。 注：这里的任务库中的任务非常大 包含了一个完整的 action head.\n结果 Dynamic Mixture of Progressive Parameter-Efficient Expert Library for Lifelong Robot Learning 问题背景与动机 当前的终身学习方法主要分为三类，每类都存在显著局限性：\n重放方法存储并重训练旧数据，表现良好但需要过多的内存和计算资源。对于涉及高维视觉数据的机器人操作任务，这种方法成本高得令人望而却步。\n正则化方法，如弹性权重整合（EWC），通过限制参数更新来保留旧知识，但在长任务序列中难以平衡可塑性-稳定性。\n架构方法，包括参数高效微调（PEFT）技术，创建任务特定模块，但面临两个关键问题：\n在测试时依赖预言机任务标识符，这在实际部署中不切实际 任务之间的知识隔离，阻碍了有效的前向迁移 DMPEL通过将PEFT的效率与动态专家选择和知识共享机制相结合，解决了这些局限性。\n方法 动态的专家模型: 这个保证了在只需要微调的基础上新学习到知识，同时不会忘记旧知识(因为之前学习到的参数没有变) 一个 novel 经验回放的方法: 文中的经验回放不是把之前的场景回放一遍，只回放了\"如何选取专家\"的权重。这样既做到了\"回放\"的效果，算力开销也不算大 上下文感知专家路由器：一个轻量级神经网络，它以多模态上下文（视觉、语言、本体感受）作为输入，并生成专家组合的系数，从而无需预言机任务标识符。 其他细节：\nEncoder 用的是 CLIP ViT-B/16 amazing\n对于每个新任务，DMPEL：\n使用正交初始化方式初始化一个新的低秩专家，以最大程度地减少干扰 在当前任务上训练该专家，同时冻结基础策略 任务完成后，将训练好的专家添加到专家库中 更新专家路由器，将新专家纳入动态组合中\n结果 在 FWT 上稍逊于 M2 Distill, 但是 AUC 远高于 M2 Distill, 差距 \u003e 10%\nSPECl: Skill Prompts based Hierarchical Continual lmitation Learning for Robot Manipulation 目标 希望机器人能够持续学习并且适应新任务\n方法 SPECI 框架对机器人学习领域做出了几项重要贡献：\n新型分层 CIL 框架：SPECI 将多模态感知和融合、上下文感知技能推断和低级动作执行统一到一个有凝聚力的流程中。\n动态技能获取：可扩展的技能代码本支持隐式持续技能获取，无需手动技能抽象，从而促进有效的技能级别知识转移。\n增强的知识转移：模式近似通过使用特定任务和任务共享知识丰富策略来增强任务级别的知识转移。\n同样的可扩展的技能代码本：对于每个新任务，都会分配一个新的技能向量子集，而现有的技能向量则被冻结。这种方法允许持续扩展技能库。\n同样的注意力驱动的技能选择：一种机制根据技能向量与当前状态的相似性，选择前 C 个相关的技能向量，并通过加权求和将它们组合起来，从而形成合成的潜在技能。\n同样的时间 Transformer 架构：此组件旨在推断随时间的逻辑技能，从而捕获技能执行过程中的时间依赖性。\n区别是，这里不再用 LoRA,而是使用 $W = W_0 + ΔU * V^T$ 去微调\n结果 效果都比 DMPEL 差，特别是 LIBERO-GOAL 和 LIBERO-LONG\n图中其他模型效果和 DMPEL 中有些偏差\n推测是 DMPEL中的 ER 效果更好\n可惜 DMPEL 并没有测试没有 ER 的效果。\nIncremental Learning of Retrievable Skills for Efficient Continual Task Adaptation 目标 and 动机 IsCiL 的动机源于认识到终身代理，特别是家用机器人，必须在以下环境中运行：\n完整的专家演示昂贵且难以获取 任务频繁变化，没有明确的边界 隐私问题需要能够“遗忘”特定行为 不同任务之间的通用技能应被利用以提高效率 解决了三个主要挑战：\n收集全面专家演示要很高成本 在非平稳环境中进行鲁棒适应的需求 隐私问题 方法 当在新任务演示中遇到一个新技能时，做以下事情：\n原型初始化：系统在新技能数据处理时识别出最常检索到的现有技能原型。 适配器初始化：新技能的适配器参数通过复制最相似的现有技能适配器进行初始化。 适配器更新：使用模仿损失在新技能的演示上对初始化的适配器进行微调。 系统更新：新的技能原型及其适配器映射被添加到系统中。 结果 You Only Teach Once: Learn One-Shot Bimanual Robotic Manipulation from Video Demonstrations 目标 双臂协作机器人训练\n该框架解决了当前双臂机器人学习方法中的根本局限。传统方法要么依赖预定义的动作分类法，限制了通用性；要么需要大量耗时且易受噪声影响的远程操作数据收集。YOTO通过从人类演示中提取丰富的时空信息，并将这个单一的教学实例快速增殖为适合现代模仿学习算法的多样化训练数据，从而弥补了这一差距。\n方法 手部运动提取与注入 提取模块通过几个复杂的处理步骤，将原始人类视频转换为机器人可执行的动作。\n3D手部轨迹处理：YOTO并未依赖可能不稳定的直接3D手部网格重建，而是采用了两阶段方法。系统首先使用WiLoR检测手部边界框并估计3D手部形状，然后将这些3D点投影到2D图像平面上，再通过立体匹配将其提升回3D。这种投影-提升策略显著提高了轨迹的稳定性和一致性。\n基于关键帧的动作表示：系统并未建模可能包含噪声和冗余的连续轨迹，而是提取对应于重要运动事件的稀疏关键帧——例如抓取器状态变化、速度极值或轨迹拐点。这使得动作空间维度从可能数百个连续帧减少到一组可管理的离散关键姿态。\n运动掩码生成：一个关键创新是运动掩码的推导，它编码了协调策略。这些二值掩码指示在每个关键帧时，每只手臂是应该移动还是保持，有效地捕获了双手任务的时间协调模式。这解决了双手操作中的一个核心挑战——学习手臂何时应该协作以及何时应该独立操作。\n演示增殖策略 增殖模块通过两种互补的方法解决了单次学习中的基本数据稀缺问题。\n自动回放验证：提取的关键帧具有高度可解释性和可编辑性，允许系统地修改物体姿态和属性。通过调整关键帧参数（例如物体的6自由度姿态或用相似类别的物体替换）并在真实机器人上执行这些修改，系统能够快速生成多样化、经过验证的演示。这种方法比传统的远程操作显著更快，同时保持了高数据质量。\n几何变换增强：系统对被操作物体的3D点云执行受控的几何变换——在机器人可达工作空间内的旋转和平移。这些变换自动生成关键帧动作的相应更新，创建了理论上无限的合成变体，而无需额外的机器人执行。\n这些策略的结合使得从单个真人演示中生成数百个多样化的训练示例成为可能，有效地弥补了单次示教与现代深度学习方法所需数据之间的差距。\n双手扩散策略 BiDP（双手扩散策略）代表了扩散模型在双手操作任务中的专门适应。\n以物体为中心的观察：BiDP并非处理完整的场景点云或RGB图像，而是专门关注任务相关物体的3D点云。这种设计选择减少了视觉噪声，加速了训练收敛，并通过移除不相关的环境变化提高了泛化能力。\n关键姿态预测：该策略预测离散的关键姿态而非连续动作序列，显著降低了扩散空间的维度并简化了学习问题。这种方法与提取阶段基于关键帧的动作表示自然契合。\n运动遮罩整合：运动遮罩在统一动作空间表示方面起着至关重要的作用。对于异步任务，遮罩能够将双手动作重组为时间有序的单臂动作序列，有效消除冗余的“保持”状态。对于同步任务，两只手臂始终保持活动。这种统一的表示允许单一的策略架构处理两种协调模式。\n底层扩散模型使用基于PointNet的修改编码器，具有SIM(3)等变性，用于处理点云观测，使其对尺度和位置变化具有鲁棒性。FiLM层提供条件机制，而卷积U-Net处理动作预测。\n结果 比较性能：BiDP在所有任务中取得了76.8%的平均成功率，显著优于包括ACT (5.7%)、标准扩散策略 (15.8%)、3D扩散策略 (19.4%) 和 EquiBot (23.4%) 在内的强大基线。这种性能差距证明了双手操作专门设计选择的有效性。\n消融研究：系统的消融实验验证了每个组件的贡献。从完整场景到仅对象观测的转变将成功率从24.1%提高到48.1%。稀疏关键帧表示进一步提高到51.9%。运动遮罩机制带来了额外的增益，而几何数据增殖显示出最显著的影响，将性能从61.1%提升至77.8%。\n泛化能力：对新颖、未见过对象的域外测试显示了BiDP卓越的泛化能力。尽管基线方法在分布外设置中表现出显著的性能下降，但BiDP保持了相对强大的性能（平均成功率为35.0%，而次优基线为8.8%），展示了强大的迁移能力。\nIn Praise of Stubbornness: The Case for Cognitive-Dissonance Aware Continual Update of Knowledge in LLM 目标 LLM是怎么出现“灾难性遗忘”的\n方法 和 结果 首先，检测大模型中是否出现了“不一致行为”\n什么是不一致行为呢\n就是说：大模型中有些行为是“新”的，有些是“收悉”的，而有些是“不一致”的。\n什么意思呢？就是说，在训练的时候我们可以从大模型的中间状态来判断：\n这个完全没学过，这个曾经学过，还是这个新学的和之前学的不一样。\n分析表明，结合激活值和梯度特征始终优于单独使用任何一种特征集。基于梯度的特征在微调模型中表现出更强的判别性，这可能是因为过拟合为熟悉信息与不熟悉信息创建了清晰的梯度信号。对于预训练模型，激活值和梯度都做出了显著贡献，这表明内部表示和学习动态对于区分信息类型都很重要。\n这篇文章指出：只要没有矛盾，LLM 就是稳定的\n否则，LLM 就会很不稳定\nJoint Flashback Adaptation for Forgetting-Resistant Instruction Tuning 目标 如何使用指令微调让LLM避免“灾难性遗忘”\n方法 核心创新在于在训练新任务期间引入有限数量的“闪回”——来自先前学习任务的提示。该框架通过几个关键机制运行：\n新任务学习：模型在新的任务数据上进行标准的监督微调，使用交叉熵损失（$L_{SFT}$），保持任务无关操作，无需显式任务识别。\n闪回整合：一小部分来自旧任务的提示作为“闪回”，无需其对应的标签即可使用。这些提示可以从验证集中采样、手动制作或由LLM合成。\n散度损失预防：一个关键组件通过散度损失（$L_{DIV}$）来防止遗忘，该损失衡量当前模型输出与参考模型在闪回提示上的输出之间的偏差。该方法采用双向KL散度来惩罚生成令牌分布的差异：\n$L_{DIV} = \\sum [KL(P_{ref} || P_{current}) + KL(P_{current} || P_{ref})]$\n组合优化：最终目标结合了两种损失：$L = L_{SFT} + \\alpha * L_{DIV}$，其中 $\\alpha$ 平衡了新任务学习与旧任务保留。PCGrad（投影冲突梯度）在优化过程中解决了竞争目标之间的冲突。\n为了解决闪回数据稀疏性并促进知识共享，JFA通过潜在任务表示整合了联合任务学习：\n潜在任务表示：系统维护潜在任务作为元组 ($e_j$, $\\Delta \\theta_j$)，其中 $e_j$ 表示任务编码，$\\Delta \\theta_j$ 包含通过LoRA实现的相应权重增量，以提高参数效率。\n动态知识检索：对于每个输入，系统使用预训练编码器（例如 RoBERTa）对其进行编码，并根据与冻结的正交潜在任务键的余弦相似度检索 k 最近邻潜在任务。\n参数重参数化：模型不是直接更新参数，而是通过添加检索到的潜在任务增量的加权平均值来动态重参数化有效参数：$\\theta’$ = $\\theta_{base}$ + $\\Delta \\theta_i$。\n联合优化：系统同时优化基础模型参数和潜在任务权重增量，从而实现跨不同输入和任务的共享知识的持续改进。\n结果 新任务性能：在SNI上，JFA在两种模型的所有指标上都取得了最高分。对于Llama3.1-8B，JFA得分43.72 (BLEU) 和51.45 (ROUGE-1)，显著优于SFT (41.50, 50.18) 和其他基线。\n旧任务保留：JFA在旧任务上始终提供顶级的性能。对于Llama3.1-8B，它在GSM-8K (83.09%) 和SVAMP (84.40%) 上取得了最高准确率，甚至超过了那些能够访问大量旧任务数据的方法。\n灾难性遗忘示例：简单的SFT在旧任务上表现出显著的性能下降（例如，Llama3.1-8B在GSM-8K上的准确率从82.79%下降到8.95%），清楚地表明了灾难性遗忘的严重性，并凸显了JFA的有效性。\nLibero: Benchmarking knowledge transfer for lifelong robot learning Please visit this file\n",
+  "wordCount" : "414",
   "inLanguage": "en",
   "datePublished": "2025-06-17T08:00:00+08:00",
   "dateModified": "2025-06-17T08:00:00+08:00",
@@ -387,15 +387,98 @@ DMPEL通过将PEFT的效率与动态专家选择和知识共享机制相结合�
 <p>推测是 DMPEL中的 ER 效果更好</p>
 <p>可惜 DMPEL 并没有测试没有 ER 的效果。</p>
 <hr>
-<h2 id="in-praise-of-stubbornness-the-case-for-cognitive-dissonance-aware-continual-update-of-knowledge-in-llm">In Praise of Stubbornness: The Case for Cognitive-Dissonance Aware Continual Update of Knowledge in LLM<a hidden class="anchor" aria-hidden="true" href="#in-praise-of-stubbornness-the-case-for-cognitive-dissonance-aware-continual-update-of-knowledge-in-llm">#</a></h2>
-<h4 id="目标-4">目标<a hidden class="anchor" aria-hidden="true" href="#目标-4">#</a></h4>
-<p>如何让LLM避免“灾难性遗忘”</p>
+<h2 id="incremental-learning-of-retrievable-skills-for-efficient-continual-task-adaptation">Incremental Learning of Retrievable Skills for Efficient Continual Task Adaptation<a hidden class="anchor" aria-hidden="true" href="#incremental-learning-of-retrievable-skills-for-efficient-continual-task-adaptation">#</a></h2>
+<h4 id="目标-and-动机">目标 and 动机<a hidden class="anchor" aria-hidden="true" href="#目标-and-动机">#</a></h4>
+<p>IsCiL 的动机源于认识到终身代理，特别是家用机器人，必须在以下环境中运行：</p>
+<pre><code>完整的专家演示昂贵且难以获取
+任务频繁变化，没有明确的边界
+隐私问题需要能够“遗忘”特定行为
+不同任务之间的通用技能应被利用以提高效率
+</code></pre>
+<p>解决了三个主要挑战：</p>
+<ol>
+<li>收集全面专家演示要很高成本</li>
+<li>在非平稳环境中进行鲁棒适应的需求</li>
+<li>隐私问题</li>
+</ol>
 <h4 id="方法-5">方法<a hidden class="anchor" aria-hidden="true" href="#方法-5">#</a></h4>
+<p><img alt="1750152759566" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750152759566.png"></p>
+<p><img alt="1750152816624" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750152816624.png"></p>
+<p>当在新任务演示中遇到一个新技能时，做以下事情：</p>
+<ol>
+<li>原型初始化：系统在新技能数据处理时识别出最常检索到的现有技能原型。</li>
+<li>适配器初始化：新技能的适配器参数通过复制最相似的现有技能适配器进行初始化。</li>
+<li>适配器更新：使用模仿损失在新技能的演示上对初始化的适配器进行微调。</li>
+<li>系统更新：新的技能原型及其适配器映射被添加到系统中。</li>
+</ol>
 <h4 id="结果-5">结果<a hidden class="anchor" aria-hidden="true" href="#结果-5">#</a></h4>
+<p><img alt="1750152838632" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750152838632.png">
+<img alt="1750152847517" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750152847517.png"></p>
+<hr>
+<h2 id="you-only-teach-once-learn-one-shot-bimanual-robotic-manipulation-from-video-demonstrations">You Only Teach Once: Learn One-Shot Bimanual Robotic Manipulation from Video Demonstrations<a hidden class="anchor" aria-hidden="true" href="#you-only-teach-once-learn-one-shot-bimanual-robotic-manipulation-from-video-demonstrations">#</a></h2>
+<h4 id="目标-4">目标<a hidden class="anchor" aria-hidden="true" href="#目标-4">#</a></h4>
+<p>双臂协作机器人训练</p>
+<p>该框架解决了当前双臂机器人学习方法中的根本局限。传统方法要么依赖预定义的动作分类法，限制了通用性；要么需要大量耗时且易受噪声影响的远程操作数据收集。YOTO通过从人类演示中提取丰富的时空信息，并将这个单一的教学实例快速增殖为适合现代模仿学习算法的多样化训练数据，从而弥补了这一差距。</p>
+<h4 id="方法-6">方法<a hidden class="anchor" aria-hidden="true" href="#方法-6">#</a></h4>
+<p><img alt="1750153829355" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750153829355.png"></p>
+<p>手部运动提取与注入
+提取模块通过几个复杂的处理步骤，将原始人类视频转换为机器人可执行的动作。</p>
+<p>3D手部轨迹处理：YOTO并未依赖可能不稳定的直接3D手部网格重建，而是采用了两阶段方法。系统首先使用WiLoR检测手部边界框并估计3D手部形状，然后将这些3D点投影到2D图像平面上，再通过立体匹配将其提升回3D。这种投影-提升策略显著提高了轨迹的稳定性和一致性。</p>
+<p>基于关键帧的动作表示：系统并未建模可能包含噪声和冗余的连续轨迹，而是提取对应于重要运动事件的稀疏关键帧——例如抓取器状态变化、速度极值或轨迹拐点。这使得动作空间维度从可能数百个连续帧减少到一组可管理的离散关键姿态。</p>
+<p>运动掩码生成：一个关键创新是运动掩码的推导，它编码了协调策略。这些二值掩码指示在每个关键帧时，每只手臂是应该移动还是保持，有效地捕获了双手任务的时间协调模式。这解决了双手操作中的一个核心挑战——学习手臂何时应该协作以及何时应该独立操作。</p>
+<p>演示增殖策略
+增殖模块通过两种互补的方法解决了单次学习中的基本数据稀缺问题。</p>
+<p>自动回放验证：提取的关键帧具有高度可解释性和可编辑性，允许系统地修改物体姿态和属性。通过调整关键帧参数（例如物体的6自由度姿态或用相似类别的物体替换）并在真实机器人上执行这些修改，系统能够快速生成多样化、经过验证的演示。这种方法比传统的远程操作显著更快，同时保持了高数据质量。</p>
+<p>几何变换增强：系统对被操作物体的3D点云执行受控的几何变换——在机器人可达工作空间内的旋转和平移。这些变换自动生成关键帧动作的相应更新，创建了理论上无限的合成变体，而无需额外的机器人执行。</p>
+<p>这些策略的结合使得从单个真人演示中生成数百个多样化的训练示例成为可能，有效地弥补了单次示教与现代深度学习方法所需数据之间的差距。</p>
+<p>双手扩散策略
+BiDP（双手扩散策略）代表了扩散模型在双手操作任务中的专门适应。</p>
+<p>以物体为中心的观察：BiDP并非处理完整的场景点云或RGB图像，而是专门关注任务相关物体的3D点云。这种设计选择减少了视觉噪声，加速了训练收敛，并通过移除不相关的环境变化提高了泛化能力。</p>
+<p>关键姿态预测：该策略预测离散的关键姿态而非连续动作序列，显著降低了扩散空间的维度并简化了学习问题。这种方法与提取阶段基于关键帧的动作表示自然契合。</p>
+<p>运动遮罩整合：运动遮罩在统一动作空间表示方面起着至关重要的作用。对于异步任务，遮罩能够将双手动作重组为时间有序的单臂动作序列，有效消除冗余的“保持”状态。对于同步任务，两只手臂始终保持活动。这种统一的表示允许单一的策略架构处理两种协调模式。</p>
+<p>底层扩散模型使用基于PointNet的修改编码器，具有SIM(3)等变性，用于处理点云观测，使其对尺度和位置变化具有鲁棒性。FiLM层提供条件机制，而卷积U-Net处理动作预测。</p>
+<h4 id="结果-6">结果<a hidden class="anchor" aria-hidden="true" href="#结果-6">#</a></h4>
+<p>比较性能：BiDP在所有任务中取得了76.8%的平均成功率，显著优于包括ACT (5.7%)、标准扩散策略 (15.8%)、3D扩散策略 (19.4%) 和 EquiBot (23.4%) 在内的强大基线。这种性能差距证明了双手操作专门设计选择的有效性。</p>
+<p>消融研究：系统的消融实验验证了每个组件的贡献。从完整场景到仅对象观测的转变将成功率从24.1%提高到48.1%。稀疏关键帧表示进一步提高到51.9%。运动遮罩机制带来了额外的增益，而几何数据增殖显示出最显著的影响，将性能从61.1%提升至77.8%。</p>
+<p>泛化能力：对新颖、未见过对象的域外测试显示了BiDP卓越的泛化能力。尽管基线方法在分布外设置中表现出显著的性能下降，但BiDP保持了相对强大的性能（平均成功率为35.0%，而次优基线为8.8%），展示了强大的迁移能力。</p>
+<hr>
+<h2 id="in-praise-of-stubbornness-the-case-for-cognitive-dissonance-aware-continual-update-of-knowledge-in-llm">In Praise of Stubbornness: The Case for Cognitive-Dissonance Aware Continual Update of Knowledge in LLM<a hidden class="anchor" aria-hidden="true" href="#in-praise-of-stubbornness-the-case-for-cognitive-dissonance-aware-continual-update-of-knowledge-in-llm">#</a></h2>
+<h4 id="目标-5">目标<a hidden class="anchor" aria-hidden="true" href="#目标-5">#</a></h4>
+<p>LLM是怎么出现“灾难性遗忘”的</p>
+<h4 id="方法-和-结果">方法 和 结果<a hidden class="anchor" aria-hidden="true" href="#方法-和-结果">#</a></h4>
+<p>首先，检测大模型中是否出现了“不一致行为”</p>
+<p>什么是不一致行为呢</p>
+<p>就是说：大模型中有些行为是“新”的，有些是“收悉”的，而有些是“不一致”的。</p>
+<p>什么意思呢？就是说，在训练的时候我们可以从大模型的中间状态来判断：</p>
+<p>这个完全没学过，这个曾经学过，还是这个新学的和之前学的不一样。</p>
+<p><img alt="1750151944497" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750151944497.png"></p>
+<p>分析表明，结合激活值和梯度特征始终优于单独使用任何一种特征集。基于梯度的特征在微调模型中表现出更强的判别性，这可能是因为过拟合为熟悉信息与不熟悉信息创建了清晰的梯度信号。对于预训练模型，激活值和梯度都做出了显著贡献，这表明内部表示和学习动态对于区分信息类型都很重要。</p>
+<p><img alt="1750152132734" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750152132734.png"></p>
+<p>这篇文章指出：只要没有矛盾，LLM 就是稳定的</p>
+<p><img alt="1750152153342" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750152153342.png"></p>
+<p>否则，LLM 就会很不稳定</p>
 <hr>
 <h2 id="joint-flashback-adaptation-for-forgetting-resistant-instruction-tuning">Joint Flashback Adaptation for Forgetting-Resistant Instruction Tuning<a hidden class="anchor" aria-hidden="true" href="#joint-flashback-adaptation-for-forgetting-resistant-instruction-tuning">#</a></h2>
-<h2 id="incremental-learning-of-retrievable-skills-for-efficient-continual-task-adaptation">Incremental Learning of Retrievable Skills for Efficient Continual Task Adaptation<a hidden class="anchor" aria-hidden="true" href="#incremental-learning-of-retrievable-skills-for-efficient-continual-task-adaptation">#</a></h2>
-<h2 id="you-only-teach-once-learn-one-shot-bimanual-robotic-manipulation-from-video-demonstrations">You Only Teach Once: Learn One-Shot Bimanual Robotic Manipulation from Video Demonstrations<a hidden class="anchor" aria-hidden="true" href="#you-only-teach-once-learn-one-shot-bimanual-robotic-manipulation-from-video-demonstrations">#</a></h2>
+<h4 id="目标-6">目标<a hidden class="anchor" aria-hidden="true" href="#目标-6">#</a></h4>
+<p>如何使用指令微调让LLM避免“灾难性遗忘”</p>
+<h4 id="方法-7">方法<a hidden class="anchor" aria-hidden="true" href="#方法-7">#</a></h4>
+<p><img alt="1750152282480" loading="lazy" src="https://tzj2006.github.io/images/2025-06-17/1750152282480.png"></p>
+<p>核心创新在于在训练新任务期间引入有限数量的“闪回”——来自先前学习任务的提示。该框架通过几个关键机制运行：</p>
+<p>新任务学习：模型在新的任务数据上进行标准的监督微调，使用交叉熵损失（$L_{SFT}$），保持任务无关操作，无需显式任务识别。</p>
+<p>闪回整合：一小部分来自旧任务的提示作为“闪回”，无需其对应的标签即可使用。这些提示可以从验证集中采样、手动制作或由LLM合成。</p>
+<p>散度损失预防：一个关键组件通过散度损失（$L_{DIV}$）来防止遗忘，该损失衡量当前模型输出与参考模型在闪回提示上的输出之间的偏差。该方法采用双向KL散度来惩罚生成令牌分布的差异：</p>
+<p>$L_{DIV} = \sum [KL(P_{ref} || P_{current}) + KL(P_{current} || P_{ref})]$</p>
+<p>组合优化：最终目标结合了两种损失：$L = L_{SFT} + \alpha * L_{DIV}$，其中 $\alpha$ 平衡了新任务学习与旧任务保留。PCGrad（投影冲突梯度）在优化过程中解决了竞争目标之间的冲突。</p>
+<p>为了解决闪回数据稀疏性并促进知识共享，JFA通过潜在任务表示整合了联合任务学习：</p>
+<p>潜在任务表示：系统维护潜在任务作为元组 ($e_j$, $\Delta \theta_j$)，其中 $e_j$ 表示任务编码，$\Delta \theta_j$ 包含通过LoRA实现的相应权重增量，以提高参数效率。</p>
+<p>动态知识检索：对于每个输入，系统使用预训练编码器（例如 RoBERTa）对其进行编码，并根据与冻结的正交潜在任务键的余弦相似度检索 k 最近邻潜在任务。</p>
+<p>参数重参数化：模型不是直接更新参数，而是通过添加检索到的潜在任务增量的加权平均值来动态重参数化有效参数：$\theta&rsquo;$ = $\theta_{base}$ + $\Delta \theta_i$。</p>
+<p>联合优化：系统同时优化基础模型参数和潜在任务权重增量，从而实现跨不同输入和任务的共享知识的持续改进。</p>
+<h4 id="结果-7">结果<a hidden class="anchor" aria-hidden="true" href="#结果-7">#</a></h4>
+<p>新任务性能：在SNI上，JFA在两种模型的所有指标上都取得了最高分。对于Llama3.1-8B，JFA得分43.72 (BLEU) 和51.45 (ROUGE-1)，显著优于SFT (41.50, 50.18) 和其他基线。</p>
+<p>旧任务保留：JFA在旧任务上始终提供顶级的性能。对于Llama3.1-8B，它在GSM-8K (83.09%) 和SVAMP (84.40%) 上取得了最高准确率，甚至超过了那些能够访问大量旧任务数据的方法。</p>
+<p>灾难性遗忘示例：简单的SFT在旧任务上表现出显著的性能下降（例如，Llama3.1-8B在GSM-8K上的准确率从82.79%下降到8.95%），清楚地表明了灾难性遗忘的严重性，并凸显了JFA的有效性。</p>
+<hr>
 <h2 id="libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning">Libero: Benchmarking knowledge transfer for lifelong robot learning<a hidden class="anchor" aria-hidden="true" href="#libero-benchmarking-knowledge-transfer-for-lifelong-robot-learning">#</a></h2>
 <p><a href="https://tzj2006.github.io/pdfs/Libero-Lifelong-robot-learning-benchmark.pdf">Please visit this file</a></p>
 
