@@ -128,8 +128,8 @@ document.addEventListener("DOMContentLoaded", function() {
   "keywords": [
     "Bug Journal", "Random Things", "Settings"
   ],
-  "articleBody": "今天折腾了一天的数据下载，踩了一些坑，这里记录一下。\n这是一篇不错的笔记\n首先是从Hugging Face下载数据，目前看起来最稳定的最简单方式就是Git LFS clone.\n所以我们先来介绍一下Git LFS\n方法1：Git LFS 但是GIT LFS有时候会丢失一部分数据，不知道为什么\n比如我现在正在下载libero dataset, 但是他的 Git LFS clone 就只会下载 Libero 10, Libero Spatial, Libero Object, 和 Libero Goal, 并不会下载 Libero 100\n我认为是仓库的设置有点问题，因为 Git LFS clone 下来的数据格式和hugging face上下下来的格式有点不同。\n但是 Git LFS真的是最简单轻松的下载方式了\n只需要点击这里然后跟着操作做就完事了。\n下载的速度也比较快，基本跑满了这个服务器的代理网络。\n听说Github不能断点续传，但是实测下来几乎没有断点，真的是最稳定的那个服务了。\n方法2： hugging_face CLI huggingface-cli 是 Hugging Face 官方提供的命令行工具，自带完善的下载功能。\n但是实际用起来体验很差，经常莫名其妙就 Internet Error\n无论是使用代理还是镜像体验都不是很好。\n使用方法：\n代理：\npip install -U huggingface_hub pip install -U hf_transfer # 先下载 huggingface-cli 本体和 hf_transfer 加速插件 # hf_transfer插件真的很快，特别是在境外的服务器速度真的很快 export HF_HUB_ENABLE_HF_TRANSFER=1 # 打开 hf_transfer huggingface-cli download --local-dir /path/to/your/folder # 下载模型请使用类似这样的命令 huggingface-cli download --repo-type dataset --local-dir /path/to/your/folder # 下载数据集请用类似的命令 镜像：\npip install -U huggingface_hub # 还是先安装这个 huggingface-cli export HF_ENDPOINT=https://hf-mirror.com # 这里以 hf-mirror.com 为例 # 剩下的都一样的 huggingface-cli download --local-dir /path/to/your/folder # 下载模型请使用类似这样的命令 huggingface-cli download --repo-type dataset --local-dir /path/to/your/folder # 下载数据集请用类似的命令 方法3：snapshot_download 同样是 hugging face 出品，同样的容易崩溃\n区别是这个可以在 python 中使用\n使用也很简单：\nfrom huggingface_hub import snapshot_download snapshot_download( # repo_type='dataset', # 这一条就看你是不是下数据的时候选择加还是不加了 repo_id=repo_id, local_dir=local_dir, local_dir_use_symlinks=False, # 加上这一条可以所见即所得 # 不会出现最后是个指针文件的情况 ) 方法4: hf-mirror 镜像站下载 hf-mirror镜像站 推出了 hfd 一个 huggingface 专用下载工具，基于成熟工具 aria2，可以做到稳定高速下载不断线。\n这是 hf-mirror 网站给出的 tutorial, 方法清晰简单\n1. 下载hfd\nwget https://hf-mirror.com/hfd/hfd.sh chmod a+x hfd.shCopy 2. 设置环境变量 Linux\nexport HF_ENDPOINT=https://hf-mirror.comCopy Windows Powershell\n$env:HF_ENDPOINT = \"https://hf-mirror.com\"Copy 3.1 下载模型\n./hfd.sh gpt2Copy 3.2 下载数据集\n./hfd.sh wikitext --dataset 根据实测，速度也不赖\n就是他的这个Copy有点问题，要一行一行的Copy才可以正常运行\n方法5: 手动下载 当然，最后的最后还可以再网站上手动下载。\n但是对于这个分了1629个断点的数据集来说，手动下载太痛苦了。\n所以此处暂且按下不表。\n",
-  "wordCount" : "200",
+  "articleBody": "今天折腾了一天的数据下载，踩了一些坑，这里记录一下。\n这是一篇不错的笔记\n首先是从Hugging Face下载数据，目前看起来最稳定的最简单方式就是Git LFS clone.\n所以我们先来介绍一下Git LFS\n方法1：Git LFS 但是GIT LFS有时候会丢失一部分数据，不知道为什么\n比如我现在正在下载libero dataset, 但是他的 Git LFS clone 就只会下载 Libero 10, Libero Spatial, Libero Object, 和 Libero Goal, 并不会下载 Libero 100\n我认为是仓库的设置有点问题，因为 Git LFS clone 下来的数据格式和hugging face上下下来的格式有点不同。\n但是 Git LFS真的是最简单轻松的下载方式了\n只需要点击这里然后跟着操作做就完事了。\n下载的速度也比较快，基本跑满了这个服务器的代理网络。\n听说Github不能断点续传，但是实测下来几乎没有断点，真的是最稳定的那个服务了。\n方法2： hugging_face CLI huggingface-cli 是 Hugging Face 官方提供的命令行工具，自带完善的下载功能。\n但是实际用起来体验很差，经常莫名其妙就 Internet Error\n无论是使用代理还是镜像体验都不是很好。\n使用方法：\n代理：\npip install -U huggingface_hub pip install -U hf_transfer # 先下载 huggingface-cli 本体和 hf_transfer 加速插件 # hf_transfer插件真的很快，特别是在境外的服务器速度真的很快 export HF_HUB_ENABLE_HF_TRANSFER=1 # 打开 hf_transfer huggingface-cli download --local-dir /path/to/your/folder # 下载模型请使用类似这样的命令 huggingface-cli download --repo-type dataset --local-dir /path/to/your/folder # 下载数据集请用类似的命令 镜像：\npip install -U huggingface_hub # 还是先安装这个 huggingface-cli export HF_ENDPOINT=https://hf-mirror.com # 这里以 hf-mirror.com 为例 # 剩下的都一样的 huggingface-cli download --local-dir /path/to/your/folder # 下载模型请使用类似这样的命令 huggingface-cli download --repo-type dataset --local-dir /path/to/your/folder # 下载数据集请用类似的命令 方法3：snapshot_download 同样是 hugging face 出品，同样的容易崩溃\n区别是这个可以在 python 中使用\n使用也很简单：\nfrom huggingface_hub import snapshot_download snapshot_download( # repo_type='dataset', # 这一条就看你是不是下数据的时候选择加还是不加了 repo_id=repo_id, local_dir=local_dir, local_dir_use_symlinks=False, # 加上这一条可以所见即所得 # 不会出现最后是个指针文件的情况 ) 方法4: hf-mirror 镜像站下载 hf-mirror镜像站 推出了 hfd, 一个 huggingface 专用下载工具，基于成熟工具 aria2，可以做到稳定高速下载不断线。\n这是 hf-mirror 网站给出的 tutorial, 方法清晰简单: 1. 下载hfd\nwget https://hf-mirror.com/hfd/hfd.sh chmod a+x hfd.sh 2. 设置环境变量\n# Linux export HF_ENDPOINT=https://hf-mirror.com or\n# Windows Powershell $env:HF_ENDPOINT = \"https://hf-mirror.com\" 3.1 下载模型\n./hfd.sh gpt2 3.2 下载数据集\n./hfd.sh wikitext --dataset 根据实测，速度也不赖\n就是他的这个 Copy 有点问题，要一行一行的 Copy 才可以正常运行\n或者直接从我这里copy也行\n方法5: 手动下载 当然，最后的最后还可以再网站上手动下载。\n但是对于这个分了1629个断点的数据集来说，手动下载太痛苦了。\n所以此处暂且按下不表。\nAppendix 代理开启和关闭命令：\n开启：\nexport http_proxy=\"http://127.0.0.1:10808\" export https_proxy=\"http://127.0.0.1:10808\" export HTTP_PROXY=\"http://127.0.0.1:10808\" export HTTPS_PROXY=\"http://127.0.0.1:10808\" 关闭：\nunset http_proxy unset https_proxy unset HTTP_PROXY unset HTTPS_PROXY ",
+  "wordCount" : "228",
   "inLanguage": "en",
   "datePublished": "2025-06-18T12:00:00+08:00",
   "dateModified": "2025-06-18T12:00:00+08:00",
@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <h1 class="post-title entry-hint-parent">
       Bug Journal 2025-06-18
     </h1>
-    <div class="post-meta"><span title='2025-06-18 12:00:00 +0800 CST'>June 18, 2025</span>&nbsp;·&nbsp;1 min
+    <div class="post-meta"><span title='2025-06-18 12:00:00 +0800 CST'>June 18, 2025</span>&nbsp;·&nbsp;2 min
 
 
       
@@ -292,28 +292,42 @@ document.addEventListener("DOMContentLoaded", function() {
 </span></span><span class="line"><span class="cl">    <span class="c1"># 不会出现最后是个指针文件的情况</span>
 </span></span><span class="line"><span class="cl"><span class="p">)</span>
 </span></span></code></pre></div><h2 id="方法4-hf-mirror-镜像站下载">方法4: hf-mirror 镜像站下载<a hidden class="anchor" aria-hidden="true" href="#方法4-hf-mirror-镜像站下载">#</a></h2>
-<p><a href="https://hf-mirror.com/">hf-mirror镜像站</a> 推出了 <a href="https://gist.github.com/padeoe/697678ab8e528b85a2a7bddafea1fa4f">hfd</a> 一个 huggingface 专用下载工具，基于成熟工具 aria2，可以做到稳定高速下载不断线。</p>
-<p>这是 hf-mirror 网站给出的 tutorial, 方法清晰简单</p>
-<p><strong>1. 下载hfd</strong></p>
+<p><a href="https://hf-mirror.com/">hf-mirror镜像站</a> 推出了 <a href="https://gist.github.com/padeoe/697678ab8e528b85a2a7bddafea1fa4f">hfd</a>, 一个 huggingface 专用下载工具，基于成熟工具 aria2，可以做到稳定高速下载不断线。</p>
+<p>这是 hf-mirror 网站给出的 tutorial, 方法清晰简单:
+<strong>1. 下载hfd</strong></p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wget https://hf-mirror.com/hfd/hfd.sh
-</span></span><span class="line"><span class="cl">chmod a+x hfd.shCopy
-</span></span></code></pre></div><p><strong>2. 设置环境变量</strong>
-<em>Linux</em></p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="k">export</span> <span class="n">HF_ENDPOINT</span><span class="o">=</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">hf</span><span class="o">-</span><span class="n">mirror</span><span class="o">.</span><span class="n">comCopy</span>
-</span></span></code></pre></div><p><em>Windows Powershell</em></p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$env:HF_ENDPOINT = &#34;https://hf-mirror.com&#34;Copy
+</span></span><span class="line"><span class="cl">chmod a+x hfd.sh
+</span></span></code></pre></div><p><strong>2. 设置环境变量</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="c1"># Linux</span>
+</span></span><span class="line"><span class="cl"><span class="k">export</span> <span class="n">HF_ENDPOINT</span><span class="o">=</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">hf</span><span class="o">-</span><span class="n">mirror</span><span class="o">.</span><span class="n">com</span>
+</span></span></code></pre></div><p>or</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># Windows Powershell
+</span></span><span class="line"><span class="cl">$env:HF_ENDPOINT = &#34;https://hf-mirror.com&#34;
 </span></span></code></pre></div><p><strong>3.1 下载模型</strong></p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">./hfd.sh gpt2Copy
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">./hfd.sh gpt2
 </span></span></code></pre></div><p><strong>3.2 下载数据集</strong></p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">./hfd.sh wikitext --dataset
 </span></span></code></pre></div><p>根据实测，速度也不赖</p>
-<p>就是他的这个Copy有点问题，要一行一行的Copy才可以正常运行</p>
+<p>就是他的这个 Copy 有点问题，要一行一行的 Copy 才可以正常运行</p>
+<p><del>或者直接从我这里copy也行</del></p>
 <h2 id="方法5-手动下载">方法5: 手动下载<a hidden class="anchor" aria-hidden="true" href="#方法5-手动下载">#</a></h2>
 <p>当然，最后的最后还可以再网站上手动下载。</p>
 <p>但是对于这个分了1629个断点的数据集来说，手动下载太痛苦了。</p>
 <p>所以此处暂且按下不表。</p>
 <p><img alt="1750303298689" loading="lazy" src="https://tzj2006.github.io/images/2025-06-18/1750303298689.png"></p>
-
+<h2 id="appendix">Appendix<a hidden class="anchor" aria-hidden="true" href="#appendix">#</a></h2>
+<p>代理开启和关闭命令：</p>
+<p>开启：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">http_proxy</span><span class="o">=</span><span class="s2">&#34;http://127.0.0.1:10808&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">https_proxy</span><span class="o">=</span><span class="s2">&#34;http://127.0.0.1:10808&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">HTTP_PROXY</span><span class="o">=</span><span class="s2">&#34;http://127.0.0.1:10808&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">HTTPS_PROXY</span><span class="o">=</span><span class="s2">&#34;http://127.0.0.1:10808&#34;</span>
+</span></span></code></pre></div><p>关闭：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="nb">unset</span> http_proxy
+</span></span><span class="line"><span class="cl"><span class="nb">unset</span> https_proxy
+</span></span><span class="line"><span class="cl"><span class="nb">unset</span> HTTP_PROXY
+</span></span><span class="line"><span class="cl"><span class="nb">unset</span> HTTPS_PROXY
+</span></span></code></pre></div>
 
   </div>
 
