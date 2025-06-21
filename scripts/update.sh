@@ -88,18 +88,15 @@ fi
 
 echo
 echo "─────────────────────────────────────────────────"
-echo "▶ Step 3/6：清理 public/（保留 .git 目录）…"
+echo "▶ Step 3/6：清理 public/（保留 .git 及其全部内容）…"
+
 if [ -d "$PUBLIC_DIR" ]; then
-  # 删除除 .git 以外的所有条目（包括隐藏文件）
-  find "$PUBLIC_DIR" -mindepth 1 -exec bash -c '
-    for path; do
-      [ "$(basename "$path")" = ".git" ] || rm -rf "$path"
-    done
-  ' _ {} +
-  echo "✔ public/ 已清空（仅保留 .git）。"
+  find "$PUBLIC_DIR" -mindepth 1 \( -path "$PUBLIC_DIR/.git" -o -path "$PUBLIC_DIR/.git/*" \) -prune -o -exec rm -rf {} +
+  echo "✔ public/ 已清空（仅保留 .git 目录及其内容）。"
 else
   mkdir -p "$PUBLIC_DIR"
 fi
+
 
 echo
 echo "─────────────────────────────────────────────────"
