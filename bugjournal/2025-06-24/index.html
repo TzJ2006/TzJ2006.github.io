@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2025-06-24 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal, DMPEL, Results">
+<meta name="description" content="这两天做了啥：
+Basically, 做了这些事情：
+Hi DMPEL team, thanks for releasing the code! I’ve managed to run the full lifelong-learning pipeline on the libero_goal benchmark, but the success rates I obtain are lower than those reported in the paper. I’d like to confirm whether I’m missing any important tricks or recommended hyper-parameter settings.
+Reproduction details
+Command:
+bash exp_scripts/lifelong_scripts/dmpel.sh:
+torchrun --standalone --nproc_per_node=gpu libero/lifelong/main.py seed=100 benchmark_name=libero_goal \
+        policy=bc_foundation_dmpel_policy lifelong=dmpel \
+        exp=/work/DMPEL/checkpoints/lifelong/dmpel/goal \
+        pretrain_model_path=/work/DMPEL/checkpoints/multitask_model_ep10.pth
+GPU: 1 x A100
+CUDA / Driver: CUDA12.0, Driver Version 525.147.05
+python: 3.8.13
+package: same as requirements.txt
+seed: 100">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2025-06-24/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.af858c2feef42adc7846f815c3e21de9982d82f8fc4f65879451b2686859975a.css" integrity="sha256-r4WML&#43;70Ktx4RvgVw&#43;Id6Zgtgvj8T2WHlFGyaGhZl1o=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2025-06-24/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2025-06-24/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2025-06-24">
+  <meta property="og:description" content="这两天做了啥：
+Basically, 做了这些事情：
+Hi DMPEL team, thanks for releasing the code! I’ve managed to run the full lifelong-learning pipeline on the libero_goal benchmark, but the success rates I obtain are lower than those reported in the paper. I’d like to confirm whether I’m missing any important tricks or recommended hyper-parameter settings.
+Reproduction details
+Command: bash exp_scripts/lifelong_scripts/dmpel.sh:
+torchrun --standalone --nproc_per_node=gpu libero/lifelong/main.py seed=100 benchmark_name=libero_goal \ policy=bc_foundation_dmpel_policy lifelong=dmpel \ exp=/work/DMPEL/checkpoints/lifelong/dmpel/goal \ pretrain_model_path=/work/DMPEL/checkpoints/multitask_model_ep10.pth GPU: 1 x A100 CUDA / Driver: CUDA12.0, Driver Version 525.147.05 python: 3.8.13 package: same as requirements.txt seed: 100">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2025-06-24T12:00:00+08:00">
+    <meta property="article:modified_time" content="2025-06-24T12:00:00+08:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Bug Journal 2025-06-24">
+<meta name="twitter:description" content="这两天做了啥：
+Basically, 做了这些事情：
+Hi DMPEL team, thanks for releasing the code! I’ve managed to run the full lifelong-learning pipeline on the libero_goal benchmark, but the success rates I obtain are lower than those reported in the paper. I’d like to confirm whether I’m missing any important tricks or recommended hyper-parameter settings.
+Reproduction details
+Command:
+bash exp_scripts/lifelong_scripts/dmpel.sh:
+torchrun --standalone --nproc_per_node=gpu libero/lifelong/main.py seed=100 benchmark_name=libero_goal \
+        policy=bc_foundation_dmpel_policy lifelong=dmpel \
+        exp=/work/DMPEL/checkpoints/lifelong/dmpel/goal \
+        pretrain_model_path=/work/DMPEL/checkpoints/multitask_model_ep10.pth
+GPU: 1 x A100
+CUDA / Driver: CUDA12.0, Driver Version 525.147.05
+python: 3.8.13
+package: same as requirements.txt
+seed: 100">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "BugJournals",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2025-06-24",
+      "item": "https://tzj2006.github.io/bugjournal/2025-06-24/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2025-06-24",
+  "name": "Bug Journal 2025-06-24",
+  "description": "这两天做了啥：\nBasically, 做了这些事情：\nHi DMPEL team, thanks for releasing the code! I’ve managed to run the full lifelong-learning pipeline on the libero_goal benchmark, but the success rates I obtain are lower than those reported in the paper. I’d like to confirm whether I’m missing any important tricks or recommended hyper-parameter settings.\nReproduction details\nCommand: bash exp_scripts/lifelong_scripts/dmpel.sh:\ntorchrun --standalone --nproc_per_node=gpu libero/lifelong/main.py seed=100 benchmark_name=libero_goal \\ policy=bc_foundation_dmpel_policy lifelong=dmpel \\ exp=/work/DMPEL/checkpoints/lifelong/dmpel/goal \\ pretrain_model_path=/work/DMPEL/checkpoints/multitask_model_ep10.pth GPU: 1 x A100 CUDA / Driver: CUDA12.0, Driver Version 525.147.05 python: 3.8.13 package: same as requirements.txt seed: 100\n",
+  "keywords": [
+    "Bug Journal", "DMPEL", "Results"
+  ],
+  "articleBody": "这两天做了啥：\nBasically, 做了这些事情：\nHi DMPEL team, thanks for releasing the code! I’ve managed to run the full lifelong-learning pipeline on the libero_goal benchmark, but the success rates I obtain are lower than those reported in the paper. I’d like to confirm whether I’m missing any important tricks or recommended hyper-parameter settings.\nReproduction details\nCommand: bash exp_scripts/lifelong_scripts/dmpel.sh:\ntorchrun --standalone --nproc_per_node=gpu libero/lifelong/main.py seed=100 benchmark_name=libero_goal \\ policy=bc_foundation_dmpel_policy lifelong=dmpel \\ exp=/work/DMPEL/checkpoints/lifelong/dmpel/goal \\ pretrain_model_path=/work/DMPEL/checkpoints/multitask_model_ep10.pth GPU: 1 x A100 CUDA / Driver: CUDA12.0, Driver Version 525.147.05 python: 3.8.13 package: same as requirements.txt seed: 100\nMy Results\nMethod Paper’s success rate (LIBERO-Goal, 10 tasks) Re-run success rate DMPEL ≈ 28 % (Figure 5, “Lifelong” column) \u003c 5 % ISCIL ≈ 23 % (same figure) \u003c 5 % Additional findings\nPre-trained checkpoint sanity-check The provided multitask checkpoint matches the paper on its pre-training tasks (good success rate, most of them over 85%). Questions\nIs there a specific environment configuration (e.g., in MuJoCo or Robosuite) that significantly impacts performance? Do specific seeds, task-order curriculum strategies, or “hidden” hyperparameters (beyond what’s documented) affect performance in a meaningful way? Could you advise on recommended approaches or tools for visualizing results (e.g., exporting the robot move to .mp4 files) to diagnose where the pipeline may be underperforming? 更详细地说，我测试了一下 DMPEL 的结果\n首先，要运行他们的pipeline, 有几个地方的 code 是一定要改的：\n一个是 libero/libero/main.py 69 行 for i inrange(n_manip_tasks): 这个 for 循环里面\n要把 try 中的 get_dataset 函数的 demos parameter 删除或者注释掉\n之后在下面 90 行左右有个 manip_datasets.append(task_i_dataset) 也要移动到 try 里面去\n不然的话这个 try except 根本就没有作用，该报错还是报错\n同样，在 libero/libero/dataset.py 这个文件中的 get_dataset 函数的 demos 参数也要删除/注释掉\n因为 robomimic.utils.dataset.SequenceDataset 里面根本就没有 demos 参数。\n这样的话，这份代码就可以正常跑起来了\nP.S. 运行用的代码是这一条：\nbash exp_scripts/lifelong_scripts/dmpel.sh: i.e. torchrun --standalone --nproc_per_node=gpu libero/lifelong/main.py seed=100 benchmark_name=libero_goal \\ policy=bc_foundation_dmpel_policy lifelong=dmpel \\ exp=/work/DMPEL/checkpoints/lifelong/dmpel/goal \\ pretrain_model_path=/work/DMPEL/checkpoints/multitask_model_ep10.pth 我发现，诶，怎么结果这么差？\n然后我思考了一下🤔\n认为可能是 pretrain checkpoint 有问题\n所以我就去试了一下 pretrain checkpoint\n验证方式也非常简单，就是直接拿 pretrain checkpoint 去做 Libero_90, 也就是 pretrain checkpoint 训练的时候用的数据集\n这要怎么做呢？\n很简单，只要稍微改变一下运行的命令就可以了：\ntorchrun --standalone --nproc_per_node=gpu libero/lifelong/main.py seed=100 benchmark_name=libero_90 \\ policy=bc_foundation_dmpel_policy lifelong=dmpel \\ exp=/work/DMPEL/checkpoints/lifelong/dmpel/90 \\ pretrain_model_path=/work/DMPEL/checkpoints/multitask_model_ep10.pth 没毛病吧，一下就从 Libero_goal 变回 Libero 90 了\n结果非常的 Amazing 啊，发现这个算出来还挺正常的，绝大部分的成功率都在 80% 以上\n注：其实很多点都重合在一起了，能看到的都是 outliers 🤦‍♂️\n那就说明问题一定是出在 lifelong learning 这一步了\n所以我就测试了一下 其他的 lifelong learning methods.\n结果发现，除了 ER 有一点起色之外，其他 lifelong learning methods 都是 0% 成功率\n这就表明一定是某处的设定有问题了，但是我找了一天也没发现到底是哪里有问题\n所以我就写了上面那个 issue 给 DMPEL 的团队\n最后发现竟然是 train.epoch 被设置成了 0\n所以最后的结果就是 Pretrain model 在做 zero-shot!\n在此之前，我其实做了一个实验：如果我执意让 Pretrain model 做 Zero-shot, 确实得到了一个非常相近的结果\n但是我没有怀疑到 epoch = 0 上面来，因为在测试的时候有一个点干扰了我的判断：\n在 Pretrain model Zero shot test 中, GPU 是基本没有占用的\n但是在之前的 test 中, 哪怕 train.epoch = 0 也仍然是有一个训练的 epoch 的\n只不过那个训练出来的结果并没有被拿出来 validate\n或者说就算拿出来 validate 了效果也不算好\n因此这个点干扰了我的判断。\n最终，我得到了一个和论文中相近的结果：\n在这个lifelong learning训练过程中, 显存占用不超过 20GB, 所以只要是 3090 + 级别的显卡都能运行\n最终，这两天我终于成功跑通了 DMPEL 的代码\n下一步我准备可视化他们的代码，看看哪里做得好，哪里做得不好，所以我得去研究一下 Libero 数据集了。\n",
+  "wordCount" : "403",
+  "inLanguage": "en",
+  "datePublished": "2025-06-24T12:00:00+08:00",
+  "dateModified": "2025-06-24T12:00:00+08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2025-06-24/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2025-06-24
+    </h1>
+    <div class="post-meta"><span title='2025-06-24 12:00:00 +0800 CST'>June 24, 2025</span>&nbsp;·&nbsp;2 min
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><p>这两天做了啥：</p>
+<p>Basically, 做了这些事情：</p>
+<p>Hi DMPEL team, thanks for releasing the code! I’ve managed to run the full lifelong-learning pipeline on the <code>libero_goal</code> benchmark, but the success rates I obtain are lower than those reported in the paper. I’d like to confirm whether I’m missing any important tricks or recommended hyper-parameter settings.</p>
+<p><strong>Reproduction details</strong></p>
+<p>Command:
+bash exp_scripts/lifelong_scripts/dmpel.sh:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">torchrun --standalone --nproc_per_node=gpu libero/lifelong/main.py seed=100 benchmark_name=libero_goal \
+</span></span><span class="line"><span class="cl">        policy=bc_foundation_dmpel_policy lifelong=dmpel \
+</span></span><span class="line"><span class="cl">        exp=/work/DMPEL/checkpoints/lifelong/dmpel/goal \
+</span></span><span class="line"><span class="cl">        pretrain_model_path=/work/DMPEL/checkpoints/multitask_model_ep10.pth
+</span></span></code></pre></div><p>GPU: 1 x A100
+CUDA / Driver: CUDA12.0, Driver Version 525.147.05
+python: 3.8.13
+package: same as requirements.txt
+seed: 100</p>
+<p><strong>My Results</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>Method</th>
+          <th>Paper’s success rate (LIBERO-Goal, 10 tasks)</th>
+          <th>Re-run success rate</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DMPEL</td>
+          <td><em>≈ 28 %</em> (Figure 5, “Lifelong” column)</td>
+          <td>&lt; 5 %</td>
+      </tr>
+      <tr>
+          <td>ISCIL</td>
+          <td><em>≈ 23 %</em> (same figure)</td>
+          <td>&lt; 5 %</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Additional findings</strong></p>
+<ul>
+<li>Pre-trained checkpoint sanity-check
+The provided multitask checkpoint matches the paper on its pre-training tasks (good success rate, most of them over 85%).</li>
+</ul>
+<p><strong>Questions</strong></p>
+<ul>
+<li>Is there a specific environment configuration (e.g., in MuJoCo or Robosuite) that significantly impacts performance?</li>
+<li>Do specific seeds, task-order curriculum strategies, or “hidden” hyperparameters (beyond what’s documented) affect performance in a meaningful way?</li>
+<li>Could you advise on recommended approaches or tools for visualizing results (e.g., exporting the robot move to .mp4 files) to diagnose where the pipeline may be underperforming?</li>
+</ul>
+<p>更详细地说，我测试了一下 DMPEL 的结果</p>
+<p>首先，要运行他们的pipeline, 有几个地方的 code 是一定要改的：</p>
+<p>一个是 <code>libero/libero/main.py</code> 69 行 <code>for i inrange(n_manip_tasks):</code> 这个 for 循环里面</p>
+<p>要把 try 中的 get_dataset 函数的 demos parameter 删除或者注释掉</p>
+<p>之后在下面 90 行左右有个 <code>manip_datasets.append(task_i_dataset)</code> 也要移动到 try 里面去</p>
+<p>不然的话这个 <code>try except</code> 根本就没有作用，该报错还是报错</p>
+<p>同样，在 <code>libero/libero/dataset.py</code> 这个文件中的 get_dataset 函数的 demos 参数也要删除/注释掉</p>
+<p>因为 <code>robomimic.utils.dataset.SequenceDataset</code> 里面根本就没有 demos 参数。</p>
+<p>这样的话，这份代码就可以正常跑起来了</p>
+<p>P.S. 运行用的代码是这一条：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bash exp_scripts/lifelong_scripts/dmpel.sh:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">i.e.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">torchrun --standalone --nproc_per_node=gpu libero/lifelong/main.py seed=100 benchmark_name=libero_goal \
+</span></span><span class="line"><span class="cl">        policy=bc_foundation_dmpel_policy lifelong=dmpel \
+</span></span><span class="line"><span class="cl">        exp=/work/DMPEL/checkpoints/lifelong/dmpel/goal \
+</span></span><span class="line"><span class="cl">        pretrain_model_path=/work/DMPEL/checkpoints/multitask_model_ep10.pth
+</span></span></code></pre></div><p>我发现，诶，怎么结果这么差？</p>
+<p><img alt="1750830379984" loading="lazy" src="https://tzj2006.github.io/images/2025-06-24/1750830379984.png"></p>
+<p>然后我思考了一下🤔</p>
+<p>认为可能是 pretrain checkpoint 有问题</p>
+<p>所以我就去试了一下 pretrain checkpoint</p>
+<p>验证方式也非常简单，就是直接拿 pretrain checkpoint 去做 Libero_90,
+也就是 pretrain checkpoint 训练的时候用的数据集</p>
+<p>这要怎么做呢？</p>
+<p>很简单，只要稍微改变一下运行的命令就可以了：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">torchrun --standalone --nproc_per_node=gpu libero/lifelong/main.py seed=100 benchmark_name=libero_90 \
+</span></span><span class="line"><span class="cl">        policy=bc_foundation_dmpel_policy lifelong=dmpel \
+</span></span><span class="line"><span class="cl">        exp=/work/DMPEL/checkpoints/lifelong/dmpel/90 \
+</span></span><span class="line"><span class="cl">        pretrain_model_path=/work/DMPEL/checkpoints/multitask_model_ep10.pth
+</span></span></code></pre></div><p>没毛病吧，一下就从 Libero_goal 变回 Libero 90 了</p>
+<p><img alt="1750830594381" loading="lazy" src="https://tzj2006.github.io/images/2025-06-24/1750830594381.png"></p>
+<p>结果非常的 Amazing 啊，发现这个算出来还挺正常的，绝大部分的成功率都在 80% 以上</p>
+<p><em>注：其实很多点都重合在一起了，能看到的都是 outliers 🤦‍♂️</em></p>
+<p>那就说明问题一定是出在 lifelong learning 这一步了</p>
+<p>所以我就测试了一下 其他的 lifelong learning methods.</p>
+<p>结果发现，除了 ER 有一点起色之外，其他 lifelong learning methods 都是 0% 成功率</p>
+<p>这就表明一定是某处的设定有问题了，但是我找了一天也没发现到底是哪里有问题</p>
+<p>所以我就写了上面那个 issue 给 DMPEL 的团队</p>
+<p>最后发现竟然是 train.epoch 被设置成了 0</p>
+<p>所以最后的结果就是 Pretrain model 在做 zero-shot!</p>
+<p>在此之前，我其实做了一个实验：如果我执意让 Pretrain model 做 Zero-shot,
+确实得到了一个非常相近的结果</p>
+<p>但是我没有怀疑到 epoch = 0 上面来，因为在测试的时候有一个点干扰了我的判断：</p>
+<p>在 Pretrain model Zero shot test 中, GPU 是基本没有占用的</p>
+<p>但是在之前的 test 中, 哪怕 train.epoch = 0 也仍然是有一个训练的 epoch 的</p>
+<p>只不过那个训练出来的结果并没有被拿出来 validate</p>
+<p>或者说就算拿出来 validate 了效果也不算好</p>
+<p>因此这个点干扰了我的判断。</p>
+<p>最终，我得到了一个和论文中相近的结果：</p>
+<p><img alt="1750831337522" loading="lazy" src="https://tzj2006.github.io/images/2025-06-24/1750831337522.png"></p>
+<p>在这个lifelong learning训练过程中, 显存占用不超过 20GB,
+所以只要是 3090 + 级别的显卡都能运行</p>
+<p><img alt="1750831277143" loading="lazy" src="https://tzj2006.github.io/images/2025-06-24/1750831277143.png"></p>
+<p>最终，这两天我终于成功跑通了 DMPEL 的代码</p>
+<p>下一步我准备可视化他们的代码，看看哪里做得好，哪里做得不好，所以我得去研究一下 Libero 数据集了。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
