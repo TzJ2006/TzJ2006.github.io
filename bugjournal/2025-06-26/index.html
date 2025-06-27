@@ -128,8 +128,8 @@ document.addEventListener("DOMContentLoaded", function() {
   "keywords": [
     "Bug Journal", "DMPEL", "Libero"
   ],
-  "articleBody": "DMPEL \u0026 Libero 环境的总结和疑惑 在 DMPEL 模型 和 Libero 模拟环境的设定下，他们是这样设定他们的训练和验证集的：\n训练 train：\n首先，他们会在一个 90 条数据的大数据集上先做预训练，得到他们的 backbone 模型 然后对于4个 各 10 条数据的小数据集，他们会在这 4 个数据集上分别做训练，作为 lifelong learning training\n验证 validation：\n之后他们会对他们的训练做验证，验证方式如下： 对于第 x 个 lifelong learning task, 他们会计算训练这个 task 的时候的 10 个 epoch 的平均成功率，作为他们的成功指标 1 （希望模型学得越快越好） 他们还会计算前 x 个 task 的平均成功率，作为他们的成功指标 2 （防止模型遗忘）\n但是在这里我就产生了一个疑问🤔： 我认为这种设置并不非常合理\n他们没有对预训练的那 90 个 task 去做遗忘测试\n他们的 task 的定义似乎有点太窄了，比如：都是对于“打开盒子的第一个盖子”， 盒子放在环境的左上角和左下角就算是两个 task,感觉泛化能力也不太行\n在预训练的时候那 90 个 task 在设定的时候会比 lifelong task 复杂 (训练的时候一般有 3 个步骤， 但是 lifelong task 只有 1 个，比如“把碗放进抽屉并合上” VS “打开抽屉”)， 但是他们的模型在 Zero-shot lifelong task 的时候表现也很差，很少有成功的例子\n在可视化结果的时候，我发现其实模型并没有理解要做什么，而是顺着之前的 task 做。 比如，上一个 task 做的是“抓起一个碗”，下一个是“打开柜子”，在一开始，机械臂会一直想去抓碗而不是开柜子\n感觉 Libero 这个数据集的数据量也不是很大，难度也不是很高，(1-2 epoch 就可以让成功率 \u003e 90%) 导致了像上面那样的 overfit 的情况\n",
-  "wordCount" : "103",
+  "articleBody": "DMPEL \u0026 Libero 环境的总结和疑惑 在 DMPEL 模型 和 Libero 模拟环境的设定下，他们是这样设定他们的训练和验证集的：\n训练 train：\n首先，他们会在一个 90 条数据的大数据集上先做预训练，得到他们的 backbone 模型 然后对于4个 各 10 条数据的小数据集，他们会在这 4 个数据集上分别做训练，作为 lifelong learning training\n验证 validation：\n之后他们会对他们的训练做验证，验证方式如下： 对于第 x 个 lifelong learning task, 他们会计算训练这个 task 的时候的 10 个 epoch 的平均成功率，作为他们的成功指标 1 （希望模型学得越快越好） 他们还会计算前 x 个 task 的平均成功率，作为他们的成功指标 2 （防止模型遗忘）\n但是在这里我就产生了一个疑问🤔： 我认为这种设置并不非常合理\n他们没有对预训练的那 90 个 task 去做遗忘测试 他们的 task 的定义似乎有点太窄了，比如：都是对于“打开盒子的第一个盖子”， 盒子放在环境的左上角和左下角就算是两个 task,感觉泛化能力也不太行 在预训练的时候那 90 个 task 在设定的时候会比 lifelong task 复杂 (训练的时候一般有 3 个步骤， 但是 lifelong task 只有 1 个，比如“把碗放进抽屉并合上” VS “打开抽屉”)， 但是他们的模型在 Zero-shot lifelong task 的时候表现也很差，很少有成功的例子 在可视化结果的时候，我发现其实模型并没有理解要做什么，而是顺着之前的 task 做。 比如，上一个 task 做的是“抓起一个碗”，下一个是“打开柜子”，在一开始，机械臂会一直想去抓碗而不是开柜子 感觉 Libero 这个数据集的数据量也不是很大，难度也不是很高，(1-2 epoch 就可以让成功率 \u003e 90%) 导致了像上面那样的 overfit 的情况 测试 于是我做了更多的测试：\n现在这是一个 Libero_long 的测试，任务难度会比之前更高\n目前这个任务是：“打开炉子并且把烧水壶放在炉子上”\n您的浏览器不支持 video 标签。 但是我们看到了：\n您的浏览器不支持 video 标签。 直接拿锅的机械臂\n您的浏览器不支持 video 标签。 没开炉子的机械臂\n您的浏览器不支持 video 标签。 摔倒了之后不知所措的机械臂\n之后我们再来看看所谓成功的 task\n您的浏览器不支持 video 标签。 放上去就是成功（\n最后，是真正成功的 task\n您的浏览器不支持 video 标签。 接下来该做的方向：\n首先，我认为 Libero 的设定不太合理\n所以我们不去刷 Libero 的榜\n我猜测已有模型的泛化能力不行，benchmark设置的不合理\n所以我要通过实验依据作证清楚，然后提出更合理的设置和新的评估benchmark\n最后在此基础上研究我的新方法\n那现在有这些方向可以走：\n如果我把任务分解和lifelong结合起来，分解primitive，直接跳出现在这些paper， 那就是很好的paper\n总结：\n这是我现在要做的事情：\n首先先研究 benchmark 设置，看看怎么样的设置能够把上面说的方向结合进来\n然后再看看现有的 method 在这些 setting 下表现如何\n最后看看我的方法比起这些方案有多少进步\n",
+  "wordCount" : "160",
   "inLanguage": "en",
   "datePublished": "2025-06-26T16:51:16+08:00",
   "dateModified": "2025-06-26T16:51:16+08:00",
@@ -245,27 +245,97 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>但是在这里我就产生了一个疑问🤔：
 我认为这种设置并不非常合理</p>
 <ol>
-<li>
-<p>他们没有对预训练的那 90 个 task 去做遗忘测试</p>
-</li>
-<li>
-<p>他们的 task 的定义似乎有点太窄了，比如：都是对于“打开盒子的第一个盖子”，
-盒子放在环境的左上角和左下角就算是两个 task,感觉泛化能力也不太行</p>
-</li>
-<li>
-<p>在预训练的时候那 90 个 task 在设定的时候会比 lifelong task 复杂 (训练的时候一般有 3 个步骤，
+<li>他们没有对预训练的那 90 个 task 去做遗忘测试</li>
+<li>他们的 task 的定义似乎有点太窄了，比如：都是对于“打开盒子的第一个盖子”，
+盒子放在环境的左上角和左下角就算是两个 task,感觉泛化能力也不太行</li>
+<li>在预训练的时候那 90 个 task 在设定的时候会比 lifelong task 复杂 (训练的时候一般有 3 个步骤，
 但是 lifelong task 只有 1 个，比如“把碗放进抽屉并合上” VS &ldquo;打开抽屉&rdquo;)，
-但是他们的模型在 Zero-shot lifelong task 的时候表现也很差，很少有成功的例子</p>
-</li>
-<li>
-<p>在可视化结果的时候，我发现其实模型并没有理解要做什么，而是顺着之前的 task 做。
-比如，上一个 task 做的是“抓起一个碗”，下一个是“打开柜子”，在一开始，机械臂会一直想去抓碗而不是开柜子</p>
-</li>
-<li>
-<p>感觉 Libero 这个数据集的数据量也不是很大，难度也不是很高，(1-2 epoch 就可以让成功率 &gt; 90%)
-导致了像上面那样的 overfit 的情况</p>
-</li>
+但是他们的模型在 Zero-shot lifelong task 的时候表现也很差，很少有成功的例子</li>
+<li>在可视化结果的时候，我发现其实模型并没有理解要做什么，而是顺着之前的 task 做。
+比如，上一个 task 做的是“抓起一个碗”，下一个是“打开柜子”，在一开始，机械臂会一直想去抓碗而不是开柜子</li>
+<li>感觉 Libero 这个数据集的数据量也不是很大，难度也不是很高，(1-2 epoch 就可以让成功率 &gt; 90%)
+导致了像上面那样的 overfit 的情况</li>
 </ol>
+<h2 id="测试">测试<a hidden class="anchor" aria-hidden="true" href="#测试">#</a></h2>
+<p>于是我做了更多的测试：</p>
+<p>现在这是一个 Libero_long 的测试，任务难度会比之前更高</p>
+<p>目前这个任务是：“打开炉子并且把烧水壶放在炉子上”</p>
+<video class="video-shortcode"
+       width="360"
+       height=""
+       preload="auto"
+       controls>
+  <source src="https://tzj2006.github.io/videos/2025-06-26/best_success_KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it_k2_p2_env13.mp4" type="video/mp4">
+  您的浏览器不支持 video 标签。
+</video>
+
+<p>但是我们看到了：</p>
+<video class="video-shortcode"
+       width="360"
+       height=""
+       preload="auto"
+       controls>
+  <source src="https://tzj2006.github.io/videos/2025-06-26/fail_KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it__env1.mp4" type="video/mp4">
+  您的浏览器不支持 video 标签。
+</video>
+
+<p>直接拿锅的机械臂</p>
+<video class="video-shortcode"
+       width="360"
+       height=""
+       preload="auto"
+       controls>
+  <source src="https://tzj2006.github.io/videos/2025-06-26/fail_KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it__env2.mp4" type="video/mp4">
+  您的浏览器不支持 video 标签。
+</video>
+
+<p>没开炉子的机械臂</p>
+<video class="video-shortcode"
+       width="360"
+       height=""
+       preload="auto"
+       controls>
+  <source src="https://tzj2006.github.io/videos/2025-06-26/fail_KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it__env17.mp4" type="video/mp4">
+  您的浏览器不支持 video 标签。
+</video>
+
+<p>摔倒了之后不知所措的机械臂</p>
+<p>之后我们再来看看所谓成功的 task</p>
+<video class="video-shortcode"
+       width="360"
+       height=""
+       preload="auto"
+       controls>
+  <source src="https://tzj2006.github.io/videos/2025-06-26/success_KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it_k2_p2_env7.mp4" type="video/mp4">
+  您的浏览器不支持 video 标签。
+</video>
+
+<p>放上去就是成功（</p>
+<p>最后，是真正成功的 task</p>
+<video class="video-shortcode"
+       width="360"
+       height=""
+       preload="auto"
+       controls>
+  <source src="https://tzj2006.github.io/videos/2025-06-26/success_KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it_k2_p2_env6.mp4" type="video/mp4">
+  您的浏览器不支持 video 标签。
+</video>
+
+<hr>
+<p>接下来该做的方向：</p>
+<p>首先，我认为 Libero 的设定不太合理</p>
+<p>所以我们不去刷 Libero 的榜</p>
+<p>我猜测已有模型的泛化能力不行，benchmark设置的不合理</p>
+<p>所以我要通过实验依据作证清楚，然后提出更合理的设置和新的评估benchmark</p>
+<p>最后在此基础上研究我的新方法</p>
+<p>那现在有这些方向可以走：</p>
+<p>如果我把任务分解和lifelong结合起来，分解primitive，直接跳出现在这些paper，
+那就是很好的paper</p>
+<p>总结：</p>
+<p>这是我现在要做的事情：</p>
+<p>首先先研究 benchmark 设置，看看怎么样的设置能够把上面说的方向结合进来</p>
+<p>然后再看看现有的 method 在这些 setting 下表现如何</p>
+<p>最后看看我的方法比起这些方案有多少进步</p>
 
 
   </div>
