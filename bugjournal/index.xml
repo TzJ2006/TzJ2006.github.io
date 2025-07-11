@@ -6,7 +6,7 @@
     <description>Recent content in BugJournals on TzJ&#39;s Net</description>
     <generator>Hugo -- 0.142.0</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 08 Jul 2025 10:47:40 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 10 Jul 2025 10:00:00 +0800</lastBuildDate>
     <atom:link href="https://tzj2006.github.io/bugjournal/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Command Dictionary</title>
@@ -16,10 +16,85 @@
       <description>All the usefull commands</description>
     </item>
     <item>
+      <title>Bug Journal 2025-07-09</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-07-09/</link>
+      <pubDate>Thu, 10 Jul 2025 10:00:00 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-07-09/</guid>
+      <description>&lt;h2 id=&#34;huggingface-dataset-使用说明&#34;&gt;Huggingface Dataset 使用说明&lt;/h2&gt;
+&lt;h3 id=&#34;load_dataset-函数&#34;&gt;load_dataset 函数&lt;/h3&gt;
+&lt;p&gt;详情请见：&lt;a href=&#34;https://huggingface.co/docs/datasets/v4.0.0/loading#slice-splits&#34;&gt;Hugging Face 页面&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;split参数&#34;&gt;Split参数&lt;/h4&gt;
+&lt;p&gt;Hugging Face 的 &lt;code&gt;load_dataset(..., split=...)&lt;/code&gt; 参数非常强大，下面是详细说明：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;split=&amp;quot;train&amp;quot;&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;加载整个训练集。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;split=[&amp;quot;train&amp;quot;,&amp;quot;test&amp;quot;]&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;返回一个元组&lt;/strong&gt; &lt;code&gt;(train_ds, test_ds)&lt;/code&gt;，分别为训练集和测试集。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;split=&amp;quot;train+test&amp;quot;&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;将训练集和测试集合并为一个数据集。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;切片（slice）支持&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;你可以对拆分集按行号或百分比进行切片：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;行号切片&lt;/strong&gt; ：&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;split=&amp;quot;train[10:20]&amp;quot;&lt;/code&gt; → 加载训练集第 10 至 19 条记录（10 包含，20 不包含）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;百分比切片&lt;/strong&gt; ：&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;split=&amp;quot;train[:10%]&amp;quot;&lt;/code&gt; → 前 10% 数据&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;split=&amp;quot;train[-20%:]&amp;quot;&lt;/code&gt; → 最后 20% 数据&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;split=&amp;quot;train[10%:20%]&amp;quot;&lt;/code&gt; → 从第 10% 开始到第 20% 结束&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;组合切片&lt;/strong&gt; ：&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;split=&amp;quot;train[:10%]+train[-80%:]&amp;quot;&lt;/code&gt; → 取前 10% 和最后 80% 数据拼接&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;高级用法：交叉验证切片&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;splits&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;train[{k}%:{k+10}%]&amp;#34;&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;range&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;100&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;datasets&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;load_dataset&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;bookcorpus&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;split&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;splits&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;生成 10 个 10% 验证切片，方便交叉验证&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-07-10</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-07-10/</link>
+      <pubDate>Thu, 10 Jul 2025 10:00:00 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-07-10/</guid>
+      <description>&lt;h2 id=&#34;huggingface-transformers-使用说明&#34;&gt;Huggingface Transformers 使用说明&lt;/h2&gt;
+&lt;p&gt;详情请见：&lt;a href=&#34;https://huggingface.co/docs/transformers&#34;&gt;Hugging Face 页面&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
       <title>Bug Journal 2025-07-08</title>
       <link>https://tzj2006.github.io/bugjournal/2025-07-08/</link>
       <pubDate>Tue, 08 Jul 2025 10:47:40 +0800</pubDate>
       <guid>https://tzj2006.github.io/bugjournal/2025-07-08/</guid>
+      <description>&lt;h2 id=&#34;torchvision-使用说明&#34;&gt;Torchvision 使用说明&lt;/h2&gt;
+&lt;p&gt;详情请见：&lt;a href=&#34;https://docs.pytorch.org/vision/main/auto_examples/index.html&#34;&gt;Torchvision 页面&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;torchvisiontransforms&#34;&gt;torchvision.transforms&lt;/h3&gt;
+&lt;h4 id=&#34;compose&#34;&gt;Compose&lt;/h4&gt;
+&lt;p&gt;这个函数的作用就是把几个 transforms 连到一起，有点像 nn.Sequential 那样&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-07-07</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-07-07/</link>
+      <pubDate>Mon, 07 Jul 2025 10:00:00 +0800</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-07-07/</guid>
       <description>&lt;p&gt;我现在的思路是这样的：
 之前我们发现了 Libero 作为 benchmark 的一些可能的不合理的点&lt;/p&gt;
 &lt;ol&gt;

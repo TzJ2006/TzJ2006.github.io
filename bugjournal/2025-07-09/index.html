@@ -5,15 +5,60 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>Bug Journal 2025-07-08 | TzJ&#39;s Net</title>
-<meta name="keywords" content="Bug Journal">
-<meta name="description" content="Torchvision 使用说明
-详情请见：Torchvision 页面
-torchvision.transforms
-Compose
-这个函数的作用就是把几个 transforms 连到一起，有点像 nn.Sequential 那样">
+<title>Bug Journal 2025-07-09 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal, LoRA, Dataset 技巧">
+<meta name="description" content="Huggingface Dataset 使用说明
+load_dataset 函数
+详情请见：Hugging Face 页面
+Split参数
+Hugging Face 的 load_dataset(..., split=...) 参数非常强大，下面是详细说明：
+
+
+split=&quot;train&quot;
+加载整个训练集。
+
+
+split=[&quot;train&quot;,&quot;test&quot;]
+返回一个元组 (train_ds, test_ds)，分别为训练集和测试集。
+
+
+split=&quot;train&#43;test&quot;
+将训练集和测试集合并为一个数据集。
+
+
+切片（slice）支持
+你可以对拆分集按行号或百分比进行切片：
+
+
+行号切片 ：
+split=&quot;train[10:20]&quot; → 加载训练集第 10 至 19 条记录（10 包含，20 不包含）。
+
+
+百分比切片 ：
+
+
+split=&quot;train[:10%]&quot; → 前 10% 数据
+
+
+split=&quot;train[-20%:]&quot; → 最后 20% 数据
+
+
+split=&quot;train[10%:20%]&quot; → 从第 10% 开始到第 20% 结束
+
+
+组合切片 ：
+split=&quot;train[:10%]&#43;train[-80%:]&quot; → 取前 10% 和最后 80% 数据拼接
+
+
+
+高级用法：交叉验证切片
+splits = [
+    f&#34;train[{k}%:{k&#43;10}%]&#34; for k in range(0,100,10)
+]
+datasets = load_dataset(&#39;bookcorpus&#39;, split=splits)
+生成 10 个 10% 验证切片，方便交叉验证">
 <meta name="author" content="">
-<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2025-07-08/">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2025-07-09/">
 
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
   <meta name="referrer" content="no-referrer-when-downgrade">
@@ -25,7 +70,7 @@ Compose
 <link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2025-07-08/">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2025-07-09/">
 <noscript>
     <style>
         #theme-toggle,
@@ -88,23 +133,86 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 </script>
-<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2025-07-08/">
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2025-07-09/">
   <meta property="og:site_name" content="TzJ&#39;s Net">
-  <meta property="og:title" content="Bug Journal 2025-07-08">
-  <meta property="og:description" content="Torchvision 使用说明 详情请见：Torchvision 页面
-torchvision.transforms Compose 这个函数的作用就是把几个 transforms 连到一起，有点像 nn.Sequential 那样">
+  <meta property="og:title" content="Bug Journal 2025-07-09">
+  <meta property="og:description" content="Huggingface Dataset 使用说明 load_dataset 函数 详情请见：Hugging Face 页面
+Split参数 Hugging Face 的 load_dataset(..., split=...) 参数非常强大，下面是详细说明：
+split=&#34;train&#34;
+加载整个训练集。
+split=[&#34;train&#34;,&#34;test&#34;]
+返回一个元组 (train_ds, test_ds)，分别为训练集和测试集。
+split=&#34;train&#43;test&#34;
+将训练集和测试集合并为一个数据集。
+切片（slice）支持
+你可以对拆分集按行号或百分比进行切片：
+行号切片 ：
+split=&#34;train[10:20]&#34; → 加载训练集第 10 至 19 条记录（10 包含，20 不包含）。
+百分比切片 ：
+split=&#34;train[:10%]&#34; → 前 10% 数据
+split=&#34;train[-20%:]&#34; → 最后 20% 数据
+split=&#34;train[10%:20%]&#34; → 从第 10% 开始到第 20% 结束
+组合切片 ：
+split=&#34;train[:10%]&#43;train[-80%:]&#34; → 取前 10% 和最后 80% 数据拼接
+高级用法：交叉验证切片
+splits = [ f&#34;train[{k}%:{k&#43;10}%]&#34; for k in range(0,100,10) ] datasets = load_dataset(&#39;bookcorpus&#39;, split=splits) 生成 10 个 10% 验证切片，方便交叉验证">
   <meta property="og:locale" content="en-us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="bugjournal">
-    <meta property="article:published_time" content="2025-07-08T10:47:40+08:00">
-    <meta property="article:modified_time" content="2025-07-08T10:47:40+08:00">
+    <meta property="article:published_time" content="2025-07-10T10:00:00+08:00">
+    <meta property="article:modified_time" content="2025-07-10T10:00:00+08:00">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Bug Journal 2025-07-08">
-<meta name="twitter:description" content="Torchvision 使用说明
-详情请见：Torchvision 页面
-torchvision.transforms
-Compose
-这个函数的作用就是把几个 transforms 连到一起，有点像 nn.Sequential 那样">
+<meta name="twitter:title" content="Bug Journal 2025-07-09">
+<meta name="twitter:description" content="Huggingface Dataset 使用说明
+load_dataset 函数
+详情请见：Hugging Face 页面
+Split参数
+Hugging Face 的 load_dataset(..., split=...) 参数非常强大，下面是详细说明：
+
+
+split=&quot;train&quot;
+加载整个训练集。
+
+
+split=[&quot;train&quot;,&quot;test&quot;]
+返回一个元组 (train_ds, test_ds)，分别为训练集和测试集。
+
+
+split=&quot;train&#43;test&quot;
+将训练集和测试集合并为一个数据集。
+
+
+切片（slice）支持
+你可以对拆分集按行号或百分比进行切片：
+
+
+行号切片 ：
+split=&quot;train[10:20]&quot; → 加载训练集第 10 至 19 条记录（10 包含，20 不包含）。
+
+
+百分比切片 ：
+
+
+split=&quot;train[:10%]&quot; → 前 10% 数据
+
+
+split=&quot;train[-20%:]&quot; → 最后 20% 数据
+
+
+split=&quot;train[10%:20%]&quot; → 从第 10% 开始到第 20% 结束
+
+
+组合切片 ：
+split=&quot;train[:10%]&#43;train[-80%:]&quot; → 取前 10% 和最后 80% 数据拼接
+
+
+
+高级用法：交叉验证切片
+splits = [
+    f&#34;train[{k}%:{k&#43;10}%]&#34; for k in range(0,100,10)
+]
+datasets = load_dataset(&#39;bookcorpus&#39;, split=splits)
+生成 10 个 10% 验证切片，方便交叉验证">
 
 
 <script type="application/ld+json">
@@ -121,8 +229,8 @@ Compose
     {
       "@type": "ListItem",
       "position":  2 ,
-      "name": "Bug Journal 2025-07-08",
-      "item": "https://tzj2006.github.io/bugjournal/2025-07-08/"
+      "name": "Bug Journal 2025-07-09",
+      "item": "https://tzj2006.github.io/bugjournal/2025-07-09/"
     }
   ]
 }
@@ -131,20 +239,20 @@ Compose
 {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Bug Journal 2025-07-08",
-  "name": "Bug Journal 2025-07-08",
-  "description": "Torchvision 使用说明 详情请见：Torchvision 页面\ntorchvision.transforms Compose 这个函数的作用就是把几个 transforms 连到一起，有点像 nn.Sequential 那样\n",
+  "headline": "Bug Journal 2025-07-09",
+  "name": "Bug Journal 2025-07-09",
+  "description": "Huggingface Dataset 使用说明 load_dataset 函数 详情请见：Hugging Face 页面\nSplit参数 Hugging Face 的 load_dataset(..., split=...) 参数非常强大，下面是详细说明：\nsplit=\u0026quot;train\u0026quot;\n加载整个训练集。\nsplit=[\u0026quot;train\u0026quot;,\u0026quot;test\u0026quot;]\n返回一个元组 (train_ds, test_ds)，分别为训练集和测试集。\nsplit=\u0026quot;train+test\u0026quot;\n将训练集和测试集合并为一个数据集。\n切片（slice）支持\n你可以对拆分集按行号或百分比进行切片：\n行号切片 ：\nsplit=\u0026quot;train[10:20]\u0026quot; → 加载训练集第 10 至 19 条记录（10 包含，20 不包含）。\n百分比切片 ：\nsplit=\u0026quot;train[:10%]\u0026quot; → 前 10% 数据\nsplit=\u0026quot;train[-20%:]\u0026quot; → 最后 20% 数据\nsplit=\u0026quot;train[10%:20%]\u0026quot; → 从第 10% 开始到第 20% 结束\n组合切片 ：\nsplit=\u0026quot;train[:10%]+train[-80%:]\u0026quot; → 取前 10% 和最后 80% 数据拼接\n高级用法：交叉验证切片\nsplits = [ f\u0026#34;train[{k}%:{k+10}%]\u0026#34; for k in range(0,100,10) ] datasets = load_dataset(\u0026#39;bookcorpus\u0026#39;, split=splits) 生成 10 个 10% 验证切片，方便交叉验证\n",
   "keywords": [
-    "Bug Journal"
+    "Bug Journal", "LoRA", "Dataset 技巧"
   ],
-  "articleBody": "Torchvision 使用说明 详情请见：Torchvision 页面\ntorchvision.transforms Compose 这个函数的作用就是把几个 transforms 连到一起，有点像 nn.Sequential 那样\n",
-  "wordCount" : "11",
+  "articleBody": "Huggingface Dataset 使用说明 load_dataset 函数 详情请见：Hugging Face 页面\nSplit参数 Hugging Face 的 load_dataset(..., split=...) 参数非常强大，下面是详细说明：\nsplit=\"train\"\n加载整个训练集。\nsplit=[\"train\",\"test\"]\n返回一个元组 (train_ds, test_ds)，分别为训练集和测试集。\nsplit=\"train+test\"\n将训练集和测试集合并为一个数据集。\n切片（slice）支持\n你可以对拆分集按行号或百分比进行切片：\n行号切片 ：\nsplit=\"train[10:20]\" → 加载训练集第 10 至 19 条记录（10 包含，20 不包含）。\n百分比切片 ：\nsplit=\"train[:10%]\" → 前 10% 数据\nsplit=\"train[-20%:]\" → 最后 20% 数据\nsplit=\"train[10%:20%]\" → 从第 10% 开始到第 20% 结束\n组合切片 ：\nsplit=\"train[:10%]+train[-80%:]\" → 取前 10% 和最后 80% 数据拼接\n高级用法：交叉验证切片\nsplits = [ f\"train[{k}%:{k+10}%]\" for k in range(0,100,10) ] datasets = load_dataset('bookcorpus', split=splits) 生成 10 个 10% 验证切片，方便交叉验证\n更加高级的用法：ReadInstruction API\n更结构化方式定义切片，用于程序化构建：\nsplits = [ f\"train[{k}%:{k+10}%]\" for k in range(0,100,10) ] datasets = load_dataset('bookcorpus', split=splits) 类似作用，但写法更灵活。\n",
+  "wordCount" : "100",
   "inLanguage": "en",
-  "datePublished": "2025-07-08T10:47:40+08:00",
-  "dateModified": "2025-07-08T10:47:40+08:00",
+  "datePublished": "2025-07-10T10:00:00+08:00",
+  "dateModified": "2025-07-10T10:00:00+08:00",
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://tzj2006.github.io/bugjournal/2025-07-08/"
+    "@id": "https://tzj2006.github.io/bugjournal/2025-07-09/"
   },
   "publisher": {
     "@type": "Organization",
@@ -227,9 +335,9 @@ Compose
   <header class="post-header">
     <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
     <h1 class="post-title entry-hint-parent">
-      Bug Journal 2025-07-08
+      Bug Journal 2025-07-09
     </h1>
-    <div class="post-meta"><span title='2025-07-08 10:47:40 +0800 CST'>July 8, 2025</span>&nbsp;·&nbsp;1 min
+    <div class="post-meta"><span title='2025-07-10 10:00:00 +0800 CST'>July 10, 2025</span>&nbsp;·&nbsp;1 min
 
 
       
@@ -241,11 +349,64 @@ Compose
 
     </div>
   </header> 
-  <div class="post-content"><h2 id="torchvision-使用说明">Torchvision 使用说明<a hidden class="anchor" aria-hidden="true" href="#torchvision-使用说明">#</a></h2>
-<p>详情请见：<a href="https://docs.pytorch.org/vision/main/auto_examples/index.html">Torchvision 页面</a></p>
-<h3 id="torchvisiontransforms">torchvision.transforms<a hidden class="anchor" aria-hidden="true" href="#torchvisiontransforms">#</a></h3>
-<h4 id="compose">Compose<a hidden class="anchor" aria-hidden="true" href="#compose">#</a></h4>
-<p>这个函数的作用就是把几个 transforms 连到一起，有点像 nn.Sequential 那样</p>
+  <div class="post-content"><h2 id="huggingface-dataset-使用说明">Huggingface Dataset 使用说明<a hidden class="anchor" aria-hidden="true" href="#huggingface-dataset-使用说明">#</a></h2>
+<h3 id="load_dataset-函数">load_dataset 函数<a hidden class="anchor" aria-hidden="true" href="#load_dataset-函数">#</a></h3>
+<p>详情请见：<a href="https://huggingface.co/docs/datasets/v4.0.0/loading#slice-splits">Hugging Face 页面</a></p>
+<h4 id="split参数">Split参数<a hidden class="anchor" aria-hidden="true" href="#split参数">#</a></h4>
+<p>Hugging Face 的 <code>load_dataset(..., split=...)</code> 参数非常强大，下面是详细说明：</p>
+<ul>
+<li>
+<p><strong><code>split=&quot;train&quot;</code></strong></p>
+<p>加载整个训练集。</p>
+</li>
+<li>
+<p><strong><code>split=[&quot;train&quot;,&quot;test&quot;]</code></strong></p>
+<p><strong>返回一个元组</strong> <code>(train_ds, test_ds)</code>，分别为训练集和测试集。</p>
+</li>
+<li>
+<p><strong><code>split=&quot;train+test&quot;</code></strong></p>
+<p>将训练集和测试集合并为一个数据集。</p>
+</li>
+</ul>
+<p><strong>切片（slice）支持</strong></p>
+<p>你可以对拆分集按行号或百分比进行切片：</p>
+<ul>
+<li>
+<p><strong>行号切片</strong> ：</p>
+<p><code>split=&quot;train[10:20]&quot;</code> → 加载训练集第 10 至 19 条记录（10 包含，20 不包含）。</p>
+</li>
+<li>
+<p><strong>百分比切片</strong> ：</p>
+</li>
+<li>
+<p><code>split=&quot;train[:10%]&quot;</code> → 前 10% 数据</p>
+</li>
+<li>
+<p><code>split=&quot;train[-20%:]&quot;</code> → 最后 20% 数据</p>
+</li>
+<li>
+<p><code>split=&quot;train[10%:20%]&quot;</code> → 从第 10% 开始到第 20% 结束</p>
+</li>
+<li>
+<p><strong>组合切片</strong> ：</p>
+<p><code>split=&quot;train[:10%]+train[-80%:]&quot;</code> → 取前 10% 和最后 80% 数据拼接</p>
+</li>
+</ul>
+<hr>
+<p><strong>高级用法：交叉验证切片</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">splits</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="n">f</span><span class="s2">&#34;train[{k}%:{k+10}%]&#34;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">datasets</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;bookcorpus&#39;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="n">splits</span><span class="p">)</span>
+</span></span></code></pre></div><p><strong>生成 10 个 10% 验证切片，方便交叉验证</strong></p>
+<hr>
+<p><strong>更加高级的用法：<code>ReadInstruction</code> API</strong></p>
+<p>更结构化方式定义切片，用于程序化构建：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">splits</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="n">f</span><span class="s2">&#34;train[{k}%:{k+10}%]&#34;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">datasets</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;bookcorpus&#39;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="n">splits</span><span class="p">)</span>
+</span></span></code></pre></div><p>类似作用，但写法更灵活。</p>
 
 
   </div>
