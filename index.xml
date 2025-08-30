@@ -6,7 +6,7 @@
     <description>Recent content on TzJ&#39;s Net</description>
     <generator>Hugo -- 0.142.0</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 25 Aug 2025 22:37:11 -0400</lastBuildDate>
+    <lastBuildDate>Fri, 29 Aug 2025 21:09:52 -0400</lastBuildDate>
     <atom:link href="https://tzj2006.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Command Dictionary</title>
@@ -14,6 +14,81 @@
       <pubDate>Fri, 11 Nov 2011 11:11:11 +1111</pubDate>
       <guid>https://tzj2006.github.io/bugjournal/commanddictionary/</guid>
       <description>All the usefull commands</description>
+    </item>
+    <item>
+      <title>Bug Journal 2025-08-29</title>
+      <link>https://tzj2006.github.io/bugjournal/2025-08-29/</link>
+      <pubDate>Fri, 29 Aug 2025 21:09:52 -0400</pubDate>
+      <guid>https://tzj2006.github.io/bugjournal/2025-08-29/</guid>
+      <description>&lt;h3 id=&#34;fast-efficient-action-tokenization-for-vision-language-action-models&#34;&gt;FAST: Efficient Action Tokenization for Vision-Language-Action Models&lt;/h3&gt;
+&lt;p&gt;RSS 2025 By Physical Intelligence&lt;/p&gt;
+&lt;p&gt;当前方法局限：都是离散数据，没有办法获取高频机器人控制数据的时间相关性&lt;/p&gt;
+&lt;p&gt;因此使用一种名字叫做DCT的压缩算法，可以把连续信号转移到频率域(一种离散域)&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;1756516611535&#34; loading=&#34;lazy&#34; src=&#34;https://tzj2006.github.io/images/2025-08-29/1756516611535.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;(话虽如此，但是真的需要用到这么高的频率吗？)&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;1756516932637&#34; loading=&#34;lazy&#34; src=&#34;https://tzj2006.github.io/images/2025-08-29/1756516932637.png&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;问题&lt;/strong&gt; ：传统的朴素分箱方案在处理高频连续动作时，由于动作变化小，会导致许多连续时间步的动作被离散化为相同或高度相似的标记。这意味着每个新标记带来的“边际信息”（即在已知之前标记的情况下，新标记所包含的额外信息）非常低。&lt;/li&gt;
+&lt;li&gt;朴素分箱方案独立地处理每个时间步和每个维度，完全忽略了连续动作序列中固有的时间相关性（例如，机器手臂的移动通常是平滑且连续的）。这使得模型难以学习到动作的动态模式。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;unified-world-models-coupling-video-and-action-diffusion-for-pretraining-on-large-robotic-datasets&#34;&gt;Unified World Models: Coupling Video and Action Diffusion for Pretraining on Large Robotic Datasets&lt;/h3&gt;
+&lt;p&gt;UW + Toyota&lt;/p&gt;
+&lt;p&gt;读前问题：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;这个模型有什么优势？&lt;/li&gt;
+&lt;li&gt;这个模型是如何实现“视频无标签学习&amp;quot;的？&lt;/li&gt;
+&lt;li&gt;什么叫&amp;quot;naturally facilitate video learning&amp;quot;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;觉得有意思的点：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Imitation learning do not explicitly capture temporal dynamics that are naturally present in demonstration trajectories or videos (Page 1, Introduction)&lt;/li&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;一个 Diffusion Model：&lt;/strong&gt; UWM 使用一个单一的 Diffusion Transformer 模型来处理所有的输入和输出。它不是为每种任务（策略、正向动力学、逆向动力学、视频预测）训练一个单独的模型。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Tokenization 和输入：&lt;/strong&gt; 就像您说的，无论是当前的观测（图片）、动作、还是未来的观测，它们都会被“tokennize”成模型能够理解的表示形式（例如，图片通过编码器转换成图像特征，动作也被编码）。这些 token 以及动作和未来观测的独立扩散时间步长 &lt;code&gt;t_a&lt;/code&gt; 和 &lt;code&gt;t_o&#39;&lt;/code&gt; 会一起输入到 Diffusion Transformer 中。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;灵活的输出：&lt;/strong&gt; 通过巧妙地控制这些扩散时间步长 &lt;code&gt;t_a&lt;/code&gt; 和 &lt;code&gt;t_o&#39;&lt;/code&gt;，UWM 可以在推理时灵活地得到您想要的结果。例如：
+&lt;ul&gt;
+&lt;li&gt;如果想得到 &lt;strong&gt;策略（Policy）&lt;/strong&gt; ，就将未来观测的时间步长 &lt;code&gt;t_o&#39;&lt;/code&gt; 设置为最大值 T（表示未来观测完全被噪声掩盖，模型只关注动作），然后模型会输出动作。&lt;/li&gt;
+&lt;li&gt;如果想得到 &lt;strong&gt;正向动力学（Forward Dynamics）&lt;/strong&gt; ，就将动作时间步长 &lt;code&gt;t_a&lt;/code&gt; 设置为 0（表示给定明确的动作输入），然后模型会输出未来观测。&lt;/li&gt;
+&lt;li&gt;如果想得到 &lt;strong&gt;逆向动力学（Inverse Dynamics）&lt;/strong&gt; ，就将未来观测时间步长 &lt;code&gt;t_o&#39;&lt;/code&gt; 设置为 0（表示给定明确的未来观测输入），然后模型会输出动作。&lt;/li&gt;
+&lt;li&gt;如果想得到 &lt;strong&gt;视频预测（Video Prediction）&lt;/strong&gt; ，就将动作时间步长 &lt;code&gt;t_a&lt;/code&gt; 设置为最大值 T（表示动作完全被噪声掩盖，模型只关注视频），然后模型会输出未来观测。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;模态独立的扩散时间步长 (Modality-Specific Diffusion Timesteps)：&lt;/strong&gt; 这是 UWM 最核心的设计之一。传统的多模态扩散模型可能使用一个共享的时间步长来对所有模态进行加噪和去噪。然而，UWM 引入了两个独立的扩散时间步长：&lt;code&gt;t_a&lt;/code&gt; 用于动作 (actions)，&lt;code&gt;t_o&#39;&lt;/code&gt; 用于未来观测 (future observations)。
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;原因：&lt;/strong&gt; 这种分离使得模型能够独立控制每种模态的噪声水平。通过在推理时灵活地设置这些时间步长（例如，将某个时间步长设为 T 表示完全加噪以“掩蔽”该模态，设为 0 表示完全去噪以“条件化”该模态），UWM 可以实现前文提到的策略、正向动力学、逆向动力学和视频预测等多种推理模式。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;效果：&lt;/strong&gt; 它使得一个单一的模型能够充当多种角色，极大地提高了模型的通用性和灵活性，同时增强了模型对模态间因果关系的理解。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;统一的 Transformer 架构 (Unified Transformer Architecture)：&lt;/strong&gt; UWM 采用单一的 Transformer 骨干网络来处理所有模态的输入（当前观测、动作、未来观测）并预测其噪声。Transformer 以编码后的图像特征、动作 token 以及独立的扩散时间步长作为输入。
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;原因：&lt;/strong&gt; 这种统一的架构促进了不同模态之间的特征共享。在 Transformer 内部，动作和图像信息可以相互交流和融合，从而使模型能够学习到更丰富、更全面的表征，并捕获它们之间的潜在因果关系。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;效果：&lt;/strong&gt; 避免了为每个任务设计独立模型的复杂性，简化了模型结构，并可能提高学习效率。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;寄存器令牌 (Register Tokens)：&lt;/strong&gt; UWM 在 Transformer 的输入序列中加入了随机初始化的“寄存器令牌”。
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;原因：&lt;/strong&gt; 经验性研究发现，这些冗余令牌有助于提高模型性能，尤其是在多模态数据上。研究人员推测，动作和潜在图像块是不同的模态，寄存器可以作为一个中间媒介，存储来自任一模态的信息，并在后续 Transformer 层中被检索，从而促进模态间的信息交换和更好的多模态特征共享。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;效果：&lt;/strong&gt; 尽管这些令牌最终会被丢弃，但它们在中间层起到了重要的信息桥梁作用，提升了模型的表现力。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Adaptive Layer Normalization (AdaLN) 条件化：&lt;/strong&gt; UWM 使用 AdaLN [33] 来将扩散时间步长（以及图像特征）条件化到 Transformer 的每个块中。
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;原因：&lt;/strong&gt; AdaLN 是一种有效的条件化机制，它通过调整层归一化 (Layer Normalization) 的参数（缩放和偏移）来注入条件信息。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;效果：&lt;/strong&gt; 这种方式允许模型以一种非侵入性且高效的方式将时间步长信息融入到 Transformer 的处理流程中，有助于模型更好地理解噪声水平和生成过程。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;潜在扩散范式 (Latent Diffusion Paradigm)：&lt;/strong&gt; 对于图像扩散，UWM 采用了潜在扩散范式。它使用一个冻结的预训练 VAE (Variational AutoEncoder)（例如来自 Stable Diffusion XL [34]）将原始高分辨率图像压缩到低维的潜在空间中进行加噪和去噪，最后再解码回全尺寸图像。
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;原因：&lt;/strong&gt; 直接在高分辨率像素空间进行扩散通常计算成本高昂且效率低下。潜在扩散可以在更小的潜在空间中操作，显著减少计算量。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;效果：&lt;/strong&gt; 提高了图像处理的效率，同时保持了高质量的图像生成能力。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这些特殊设计共同使得 UWM 能够有效地应对多模态机器人学习的挑战，实现了一个能够从大规模异构数据中学习并灵活执行多种推理任务的强大模型。&lt;/p&gt;</description>
     </item>
     <item>
       <title>Bug Journal 2025-08-25</title>

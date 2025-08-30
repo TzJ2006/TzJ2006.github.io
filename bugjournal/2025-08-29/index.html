@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2025-08-29 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="FAST: Efficient Action Tokenization for Vision-Language-Action Models
+RSS 2025 By Physical Intelligence
+当前方法局限：都是离散数据，没有办法获取高频机器人控制数据的时间相关性
+因此使用一种名字叫做DCT的压缩算法，可以把连续信号转移到频率域(一种离散域)
+
+(话虽如此，但是真的需要用到这么高的频率吗？)
+
+
+问题 ：传统的朴素分箱方案在处理高频连续动作时，由于动作变化小，会导致许多连续时间步的动作被离散化为相同或高度相似的标记。这意味着每个新标记带来的“边际信息”（即在已知之前标记的情况下，新标记所包含的额外信息）非常低。
+朴素分箱方案独立地处理每个时间步和每个维度，完全忽略了连续动作序列中固有的时间相关性（例如，机器手臂的移动通常是平滑且连续的）。这使得模型难以学习到动作的动态模式。
+
+Unified World Models: Coupling Video and Action Diffusion for Pretraining on Large Robotic Datasets
+UW &#43; Toyota
+读前问题：
+
+这个模型有什么优势？
+这个模型是如何实现“视频无标签学习&quot;的？
+什么叫&quot;naturally facilitate video learning&quot;
+
+觉得有意思的点：
+
+Imitation learning do not explicitly capture temporal dynamics that are naturally present in demonstration trajectories or videos (Page 1, Introduction)
+
+
+
+一个 Diffusion Model： UWM 使用一个单一的 Diffusion Transformer 模型来处理所有的输入和输出。它不是为每种任务（策略、正向动力学、逆向动力学、视频预测）训练一个单独的模型。
+Tokenization 和输入： 就像您说的，无论是当前的观测（图片）、动作、还是未来的观测，它们都会被“tokennize”成模型能够理解的表示形式（例如，图片通过编码器转换成图像特征，动作也被编码）。这些 token 以及动作和未来观测的独立扩散时间步长 t_a 和 t_o&#39; 会一起输入到 Diffusion Transformer 中。
+灵活的输出： 通过巧妙地控制这些扩散时间步长 t_a 和 t_o&#39;，UWM 可以在推理时灵活地得到您想要的结果。例如：
+
+如果想得到 策略（Policy） ，就将未来观测的时间步长 t_o&#39; 设置为最大值 T（表示未来观测完全被噪声掩盖，模型只关注动作），然后模型会输出动作。
+如果想得到 正向动力学（Forward Dynamics） ，就将动作时间步长 t_a 设置为 0（表示给定明确的动作输入），然后模型会输出未来观测。
+如果想得到 逆向动力学（Inverse Dynamics） ，就将未来观测时间步长 t_o&#39; 设置为 0（表示给定明确的未来观测输入），然后模型会输出动作。
+如果想得到 视频预测（Video Prediction） ，就将动作时间步长 t_a 设置为最大值 T（表示动作完全被噪声掩盖，模型只关注视频），然后模型会输出未来观测。
+
+
+
+
+模态独立的扩散时间步长 (Modality-Specific Diffusion Timesteps)： 这是 UWM 最核心的设计之一。传统的多模态扩散模型可能使用一个共享的时间步长来对所有模态进行加噪和去噪。然而，UWM 引入了两个独立的扩散时间步长：t_a 用于动作 (actions)，t_o&#39; 用于未来观测 (future observations)。
+
+原因： 这种分离使得模型能够独立控制每种模态的噪声水平。通过在推理时灵活地设置这些时间步长（例如，将某个时间步长设为 T 表示完全加噪以“掩蔽”该模态，设为 0 表示完全去噪以“条件化”该模态），UWM 可以实现前文提到的策略、正向动力学、逆向动力学和视频预测等多种推理模式。
+效果： 它使得一个单一的模型能够充当多种角色，极大地提高了模型的通用性和灵活性，同时增强了模型对模态间因果关系的理解。
+
+
+统一的 Transformer 架构 (Unified Transformer Architecture)： UWM 采用单一的 Transformer 骨干网络来处理所有模态的输入（当前观测、动作、未来观测）并预测其噪声。Transformer 以编码后的图像特征、动作 token 以及独立的扩散时间步长作为输入。
+
+原因： 这种统一的架构促进了不同模态之间的特征共享。在 Transformer 内部，动作和图像信息可以相互交流和融合，从而使模型能够学习到更丰富、更全面的表征，并捕获它们之间的潜在因果关系。
+效果： 避免了为每个任务设计独立模型的复杂性，简化了模型结构，并可能提高学习效率。
+
+
+寄存器令牌 (Register Tokens)： UWM 在 Transformer 的输入序列中加入了随机初始化的“寄存器令牌”。
+
+原因： 经验性研究发现，这些冗余令牌有助于提高模型性能，尤其是在多模态数据上。研究人员推测，动作和潜在图像块是不同的模态，寄存器可以作为一个中间媒介，存储来自任一模态的信息，并在后续 Transformer 层中被检索，从而促进模态间的信息交换和更好的多模态特征共享。
+效果： 尽管这些令牌最终会被丢弃，但它们在中间层起到了重要的信息桥梁作用，提升了模型的表现力。
+
+
+Adaptive Layer Normalization (AdaLN) 条件化： UWM 使用 AdaLN [33] 来将扩散时间步长（以及图像特征）条件化到 Transformer 的每个块中。
+
+原因： AdaLN 是一种有效的条件化机制，它通过调整层归一化 (Layer Normalization) 的参数（缩放和偏移）来注入条件信息。
+效果： 这种方式允许模型以一种非侵入性且高效的方式将时间步长信息融入到 Transformer 的处理流程中，有助于模型更好地理解噪声水平和生成过程。
+
+
+潜在扩散范式 (Latent Diffusion Paradigm)： 对于图像扩散，UWM 采用了潜在扩散范式。它使用一个冻结的预训练 VAE (Variational AutoEncoder)（例如来自 Stable Diffusion XL [34]）将原始高分辨率图像压缩到低维的潜在空间中进行加噪和去噪，最后再解码回全尺寸图像。
+
+原因： 直接在高分辨率像素空间进行扩散通常计算成本高昂且效率低下。潜在扩散可以在更小的潜在空间中操作，显著减少计算量。
+效果： 提高了图像处理的效率，同时保持了高质量的图像生成能力。
+
+
+
+这些特殊设计共同使得 UWM 能够有效地应对多模态机器人学习的挑战，实现了一个能够从大规模异构数据中学习并灵活执行多种推理任务的强大模型。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2025-08-29/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.af858c2feef42adc7846f815c3e21de9982d82f8fc4f65879451b2686859975a.css" integrity="sha256-r4WML&#43;70Ktx4RvgVw&#43;Id6Zgtgvj8T2WHlFGyaGhZl1o=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2025-08-29/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2025-08-29/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2025-08-29">
+  <meta property="og:description" content="FAST: Efficient Action Tokenization for Vision-Language-Action Models RSS 2025 By Physical Intelligence
+当前方法局限：都是离散数据，没有办法获取高频机器人控制数据的时间相关性
+因此使用一种名字叫做DCT的压缩算法，可以把连续信号转移到频率域(一种离散域)
+(话虽如此，但是真的需要用到这么高的频率吗？)
+问题 ：传统的朴素分箱方案在处理高频连续动作时，由于动作变化小，会导致许多连续时间步的动作被离散化为相同或高度相似的标记。这意味着每个新标记带来的“边际信息”（即在已知之前标记的情况下，新标记所包含的额外信息）非常低。 朴素分箱方案独立地处理每个时间步和每个维度，完全忽略了连续动作序列中固有的时间相关性（例如，机器手臂的移动通常是平滑且连续的）。这使得模型难以学习到动作的动态模式。 Unified World Models: Coupling Video and Action Diffusion for Pretraining on Large Robotic Datasets UW &#43; Toyota
+读前问题：
+这个模型有什么优势？ 这个模型是如何实现“视频无标签学习&#34;的？ 什么叫&#34;naturally facilitate video learning&#34; 觉得有意思的点：
+Imitation learning do not explicitly capture temporal dynamics that are naturally present in demonstration trajectories or videos (Page 1, Introduction) 一个 Diffusion Model： UWM 使用一个单一的 Diffusion Transformer 模型来处理所有的输入和输出。它不是为每种任务（策略、正向动力学、逆向动力学、视频预测）训练一个单独的模型。 Tokenization 和输入： 就像您说的，无论是当前的观测（图片）、动作、还是未来的观测，它们都会被“tokennize”成模型能够理解的表示形式（例如，图片通过编码器转换成图像特征，动作也被编码）。这些 token 以及动作和未来观测的独立扩散时间步长 t_a 和 t_o&#39; 会一起输入到 Diffusion Transformer 中。 灵活的输出： 通过巧妙地控制这些扩散时间步长 t_a 和 t_o&#39;，UWM 可以在推理时灵活地得到您想要的结果。例如： 如果想得到 策略（Policy） ，就将未来观测的时间步长 t_o&#39; 设置为最大值 T（表示未来观测完全被噪声掩盖，模型只关注动作），然后模型会输出动作。 如果想得到 正向动力学（Forward Dynamics） ，就将动作时间步长 t_a 设置为 0（表示给定明确的动作输入），然后模型会输出未来观测。 如果想得到 逆向动力学（Inverse Dynamics） ，就将未来观测时间步长 t_o&#39; 设置为 0（表示给定明确的未来观测输入），然后模型会输出动作。 如果想得到 视频预测（Video Prediction） ，就将动作时间步长 t_a 设置为最大值 T（表示动作完全被噪声掩盖，模型只关注视频），然后模型会输出未来观测。 模态独立的扩散时间步长 (Modality-Specific Diffusion Timesteps)： 这是 UWM 最核心的设计之一。传统的多模态扩散模型可能使用一个共享的时间步长来对所有模态进行加噪和去噪。然而，UWM 引入了两个独立的扩散时间步长：t_a 用于动作 (actions)，t_o&#39; 用于未来观测 (future observations)。 原因： 这种分离使得模型能够独立控制每种模态的噪声水平。通过在推理时灵活地设置这些时间步长（例如，将某个时间步长设为 T 表示完全加噪以“掩蔽”该模态，设为 0 表示完全去噪以“条件化”该模态），UWM 可以实现前文提到的策略、正向动力学、逆向动力学和视频预测等多种推理模式。 效果： 它使得一个单一的模型能够充当多种角色，极大地提高了模型的通用性和灵活性，同时增强了模型对模态间因果关系的理解。 统一的 Transformer 架构 (Unified Transformer Architecture)： UWM 采用单一的 Transformer 骨干网络来处理所有模态的输入（当前观测、动作、未来观测）并预测其噪声。Transformer 以编码后的图像特征、动作 token 以及独立的扩散时间步长作为输入。 原因： 这种统一的架构促进了不同模态之间的特征共享。在 Transformer 内部，动作和图像信息可以相互交流和融合，从而使模型能够学习到更丰富、更全面的表征，并捕获它们之间的潜在因果关系。 效果： 避免了为每个任务设计独立模型的复杂性，简化了模型结构，并可能提高学习效率。 寄存器令牌 (Register Tokens)： UWM 在 Transformer 的输入序列中加入了随机初始化的“寄存器令牌”。 原因： 经验性研究发现，这些冗余令牌有助于提高模型性能，尤其是在多模态数据上。研究人员推测，动作和潜在图像块是不同的模态，寄存器可以作为一个中间媒介，存储来自任一模态的信息，并在后续 Transformer 层中被检索，从而促进模态间的信息交换和更好的多模态特征共享。 效果： 尽管这些令牌最终会被丢弃，但它们在中间层起到了重要的信息桥梁作用，提升了模型的表现力。 Adaptive Layer Normalization (AdaLN) 条件化： UWM 使用 AdaLN [33] 来将扩散时间步长（以及图像特征）条件化到 Transformer 的每个块中。 原因： AdaLN 是一种有效的条件化机制，它通过调整层归一化 (Layer Normalization) 的参数（缩放和偏移）来注入条件信息。 效果： 这种方式允许模型以一种非侵入性且高效的方式将时间步长信息融入到 Transformer 的处理流程中，有助于模型更好地理解噪声水平和生成过程。 潜在扩散范式 (Latent Diffusion Paradigm)： 对于图像扩散，UWM 采用了潜在扩散范式。它使用一个冻结的预训练 VAE (Variational AutoEncoder)（例如来自 Stable Diffusion XL [34]）将原始高分辨率图像压缩到低维的潜在空间中进行加噪和去噪，最后再解码回全尺寸图像。 原因： 直接在高分辨率像素空间进行扩散通常计算成本高昂且效率低下。潜在扩散可以在更小的潜在空间中操作，显著减少计算量。 效果： 提高了图像处理的效率，同时保持了高质量的图像生成能力。 这些特殊设计共同使得 UWM 能够有效地应对多模态机器人学习的挑战，实现了一个能够从大规模异构数据中学习并灵活执行多种推理任务的强大模型。">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2025-08-29T21:09:52-04:00">
+    <meta property="article:modified_time" content="2025-08-29T21:09:52-04:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Bug Journal 2025-08-29">
+<meta name="twitter:description" content="FAST: Efficient Action Tokenization for Vision-Language-Action Models
+RSS 2025 By Physical Intelligence
+当前方法局限：都是离散数据，没有办法获取高频机器人控制数据的时间相关性
+因此使用一种名字叫做DCT的压缩算法，可以把连续信号转移到频率域(一种离散域)
+
+(话虽如此，但是真的需要用到这么高的频率吗？)
+
+
+问题 ：传统的朴素分箱方案在处理高频连续动作时，由于动作变化小，会导致许多连续时间步的动作被离散化为相同或高度相似的标记。这意味着每个新标记带来的“边际信息”（即在已知之前标记的情况下，新标记所包含的额外信息）非常低。
+朴素分箱方案独立地处理每个时间步和每个维度，完全忽略了连续动作序列中固有的时间相关性（例如，机器手臂的移动通常是平滑且连续的）。这使得模型难以学习到动作的动态模式。
+
+Unified World Models: Coupling Video and Action Diffusion for Pretraining on Large Robotic Datasets
+UW &#43; Toyota
+读前问题：
+
+这个模型有什么优势？
+这个模型是如何实现“视频无标签学习&quot;的？
+什么叫&quot;naturally facilitate video learning&quot;
+
+觉得有意思的点：
+
+Imitation learning do not explicitly capture temporal dynamics that are naturally present in demonstration trajectories or videos (Page 1, Introduction)
+
+
+
+一个 Diffusion Model： UWM 使用一个单一的 Diffusion Transformer 模型来处理所有的输入和输出。它不是为每种任务（策略、正向动力学、逆向动力学、视频预测）训练一个单独的模型。
+Tokenization 和输入： 就像您说的，无论是当前的观测（图片）、动作、还是未来的观测，它们都会被“tokennize”成模型能够理解的表示形式（例如，图片通过编码器转换成图像特征，动作也被编码）。这些 token 以及动作和未来观测的独立扩散时间步长 t_a 和 t_o&#39; 会一起输入到 Diffusion Transformer 中。
+灵活的输出： 通过巧妙地控制这些扩散时间步长 t_a 和 t_o&#39;，UWM 可以在推理时灵活地得到您想要的结果。例如：
+
+如果想得到 策略（Policy） ，就将未来观测的时间步长 t_o&#39; 设置为最大值 T（表示未来观测完全被噪声掩盖，模型只关注动作），然后模型会输出动作。
+如果想得到 正向动力学（Forward Dynamics） ，就将动作时间步长 t_a 设置为 0（表示给定明确的动作输入），然后模型会输出未来观测。
+如果想得到 逆向动力学（Inverse Dynamics） ，就将未来观测时间步长 t_o&#39; 设置为 0（表示给定明确的未来观测输入），然后模型会输出动作。
+如果想得到 视频预测（Video Prediction） ，就将动作时间步长 t_a 设置为最大值 T（表示动作完全被噪声掩盖，模型只关注视频），然后模型会输出未来观测。
+
+
+
+
+模态独立的扩散时间步长 (Modality-Specific Diffusion Timesteps)： 这是 UWM 最核心的设计之一。传统的多模态扩散模型可能使用一个共享的时间步长来对所有模态进行加噪和去噪。然而，UWM 引入了两个独立的扩散时间步长：t_a 用于动作 (actions)，t_o&#39; 用于未来观测 (future observations)。
+
+原因： 这种分离使得模型能够独立控制每种模态的噪声水平。通过在推理时灵活地设置这些时间步长（例如，将某个时间步长设为 T 表示完全加噪以“掩蔽”该模态，设为 0 表示完全去噪以“条件化”该模态），UWM 可以实现前文提到的策略、正向动力学、逆向动力学和视频预测等多种推理模式。
+效果： 它使得一个单一的模型能够充当多种角色，极大地提高了模型的通用性和灵活性，同时增强了模型对模态间因果关系的理解。
+
+
+统一的 Transformer 架构 (Unified Transformer Architecture)： UWM 采用单一的 Transformer 骨干网络来处理所有模态的输入（当前观测、动作、未来观测）并预测其噪声。Transformer 以编码后的图像特征、动作 token 以及独立的扩散时间步长作为输入。
+
+原因： 这种统一的架构促进了不同模态之间的特征共享。在 Transformer 内部，动作和图像信息可以相互交流和融合，从而使模型能够学习到更丰富、更全面的表征，并捕获它们之间的潜在因果关系。
+效果： 避免了为每个任务设计独立模型的复杂性，简化了模型结构，并可能提高学习效率。
+
+
+寄存器令牌 (Register Tokens)： UWM 在 Transformer 的输入序列中加入了随机初始化的“寄存器令牌”。
+
+原因： 经验性研究发现，这些冗余令牌有助于提高模型性能，尤其是在多模态数据上。研究人员推测，动作和潜在图像块是不同的模态，寄存器可以作为一个中间媒介，存储来自任一模态的信息，并在后续 Transformer 层中被检索，从而促进模态间的信息交换和更好的多模态特征共享。
+效果： 尽管这些令牌最终会被丢弃，但它们在中间层起到了重要的信息桥梁作用，提升了模型的表现力。
+
+
+Adaptive Layer Normalization (AdaLN) 条件化： UWM 使用 AdaLN [33] 来将扩散时间步长（以及图像特征）条件化到 Transformer 的每个块中。
+
+原因： AdaLN 是一种有效的条件化机制，它通过调整层归一化 (Layer Normalization) 的参数（缩放和偏移）来注入条件信息。
+效果： 这种方式允许模型以一种非侵入性且高效的方式将时间步长信息融入到 Transformer 的处理流程中，有助于模型更好地理解噪声水平和生成过程。
+
+
+潜在扩散范式 (Latent Diffusion Paradigm)： 对于图像扩散，UWM 采用了潜在扩散范式。它使用一个冻结的预训练 VAE (Variational AutoEncoder)（例如来自 Stable Diffusion XL [34]）将原始高分辨率图像压缩到低维的潜在空间中进行加噪和去噪，最后再解码回全尺寸图像。
+
+原因： 直接在高分辨率像素空间进行扩散通常计算成本高昂且效率低下。潜在扩散可以在更小的潜在空间中操作，显著减少计算量。
+效果： 提高了图像处理的效率，同时保持了高质量的图像生成能力。
+
+
+
+这些特殊设计共同使得 UWM 能够有效地应对多模态机器人学习的挑战，实现了一个能够从大规模异构数据中学习并灵活执行多种推理任务的强大模型。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "BugJournals",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2025-08-29",
+      "item": "https://tzj2006.github.io/bugjournal/2025-08-29/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2025-08-29",
+  "name": "Bug Journal 2025-08-29",
+  "description": "FAST: Efficient Action Tokenization for Vision-Language-Action Models RSS 2025 By Physical Intelligence\n当前方法局限：都是离散数据，没有办法获取高频机器人控制数据的时间相关性\n因此使用一种名字叫做DCT的压缩算法，可以把连续信号转移到频率域(一种离散域)\n(话虽如此，但是真的需要用到这么高的频率吗？)\n问题 ：传统的朴素分箱方案在处理高频连续动作时，由于动作变化小，会导致许多连续时间步的动作被离散化为相同或高度相似的标记。这意味着每个新标记带来的“边际信息”（即在已知之前标记的情况下，新标记所包含的额外信息）非常低。 朴素分箱方案独立地处理每个时间步和每个维度，完全忽略了连续动作序列中固有的时间相关性（例如，机器手臂的移动通常是平滑且连续的）。这使得模型难以学习到动作的动态模式。 Unified World Models: Coupling Video and Action Diffusion for Pretraining on Large Robotic Datasets UW + Toyota\n读前问题：\n这个模型有什么优势？ 这个模型是如何实现“视频无标签学习\u0026quot;的？ 什么叫\u0026quot;naturally facilitate video learning\u0026quot; 觉得有意思的点：\nImitation learning do not explicitly capture temporal dynamics that are naturally present in demonstration trajectories or videos (Page 1, Introduction) 一个 Diffusion Model： UWM 使用一个单一的 Diffusion Transformer 模型来处理所有的输入和输出。它不是为每种任务（策略、正向动力学、逆向动力学、视频预测）训练一个单独的模型。 Tokenization 和输入： 就像您说的，无论是当前的观测（图片）、动作、还是未来的观测，它们都会被“tokennize”成模型能够理解的表示形式（例如，图片通过编码器转换成图像特征，动作也被编码）。这些 token 以及动作和未来观测的独立扩散时间步长 t_a 和 t_o' 会一起输入到 Diffusion Transformer 中。 灵活的输出： 通过巧妙地控制这些扩散时间步长 t_a 和 t_o'，UWM 可以在推理时灵活地得到您想要的结果。例如： 如果想得到 策略（Policy） ，就将未来观测的时间步长 t_o' 设置为最大值 T（表示未来观测完全被噪声掩盖，模型只关注动作），然后模型会输出动作。 如果想得到 正向动力学（Forward Dynamics） ，就将动作时间步长 t_a 设置为 0（表示给定明确的动作输入），然后模型会输出未来观测。 如果想得到 逆向动力学（Inverse Dynamics） ，就将未来观测时间步长 t_o' 设置为 0（表示给定明确的未来观测输入），然后模型会输出动作。 如果想得到 视频预测（Video Prediction） ，就将动作时间步长 t_a 设置为最大值 T（表示动作完全被噪声掩盖，模型只关注视频），然后模型会输出未来观测。 模态独立的扩散时间步长 (Modality-Specific Diffusion Timesteps)： 这是 UWM 最核心的设计之一。传统的多模态扩散模型可能使用一个共享的时间步长来对所有模态进行加噪和去噪。然而，UWM 引入了两个独立的扩散时间步长：t_a 用于动作 (actions)，t_o' 用于未来观测 (future observations)。 原因： 这种分离使得模型能够独立控制每种模态的噪声水平。通过在推理时灵活地设置这些时间步长（例如，将某个时间步长设为 T 表示完全加噪以“掩蔽”该模态，设为 0 表示完全去噪以“条件化”该模态），UWM 可以实现前文提到的策略、正向动力学、逆向动力学和视频预测等多种推理模式。 效果： 它使得一个单一的模型能够充当多种角色，极大地提高了模型的通用性和灵活性，同时增强了模型对模态间因果关系的理解。 统一的 Transformer 架构 (Unified Transformer Architecture)： UWM 采用单一的 Transformer 骨干网络来处理所有模态的输入（当前观测、动作、未来观测）并预测其噪声。Transformer 以编码后的图像特征、动作 token 以及独立的扩散时间步长作为输入。 原因： 这种统一的架构促进了不同模态之间的特征共享。在 Transformer 内部，动作和图像信息可以相互交流和融合，从而使模型能够学习到更丰富、更全面的表征，并捕获它们之间的潜在因果关系。 效果： 避免了为每个任务设计独立模型的复杂性，简化了模型结构，并可能提高学习效率。 寄存器令牌 (Register Tokens)： UWM 在 Transformer 的输入序列中加入了随机初始化的“寄存器令牌”。 原因： 经验性研究发现，这些冗余令牌有助于提高模型性能，尤其是在多模态数据上。研究人员推测，动作和潜在图像块是不同的模态，寄存器可以作为一个中间媒介，存储来自任一模态的信息，并在后续 Transformer 层中被检索，从而促进模态间的信息交换和更好的多模态特征共享。 效果： 尽管这些令牌最终会被丢弃，但它们在中间层起到了重要的信息桥梁作用，提升了模型的表现力。 Adaptive Layer Normalization (AdaLN) 条件化： UWM 使用 AdaLN [33] 来将扩散时间步长（以及图像特征）条件化到 Transformer 的每个块中。 原因： AdaLN 是一种有效的条件化机制，它通过调整层归一化 (Layer Normalization) 的参数（缩放和偏移）来注入条件信息。 效果： 这种方式允许模型以一种非侵入性且高效的方式将时间步长信息融入到 Transformer 的处理流程中，有助于模型更好地理解噪声水平和生成过程。 潜在扩散范式 (Latent Diffusion Paradigm)： 对于图像扩散，UWM 采用了潜在扩散范式。它使用一个冻结的预训练 VAE (Variational AutoEncoder)（例如来自 Stable Diffusion XL [34]）将原始高分辨率图像压缩到低维的潜在空间中进行加噪和去噪，最后再解码回全尺寸图像。 原因： 直接在高分辨率像素空间进行扩散通常计算成本高昂且效率低下。潜在扩散可以在更小的潜在空间中操作，显著减少计算量。 效果： 提高了图像处理的效率，同时保持了高质量的图像生成能力。 这些特殊设计共同使得 UWM 能够有效地应对多模态机器人学习的挑战，实现了一个能够从大规模异构数据中学习并灵活执行多种推理任务的强大模型。\n",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "FAST: Efficient Action Tokenization for Vision-Language-Action Models RSS 2025 By Physical Intelligence\n当前方法局限：都是离散数据，没有办法获取高频机器人控制数据的时间相关性\n因此使用一种名字叫做DCT的压缩算法，可以把连续信号转移到频率域(一种离散域)\n(话虽如此，但是真的需要用到这么高的频率吗？)\n问题 ：传统的朴素分箱方案在处理高频连续动作时，由于动作变化小，会导致许多连续时间步的动作被离散化为相同或高度相似的标记。这意味着每个新标记带来的“边际信息”（即在已知之前标记的情况下，新标记所包含的额外信息）非常低。 朴素分箱方案独立地处理每个时间步和每个维度，完全忽略了连续动作序列中固有的时间相关性（例如，机器手臂的移动通常是平滑且连续的）。这使得模型难以学习到动作的动态模式。 Unified World Models: Coupling Video and Action Diffusion for Pretraining on Large Robotic Datasets UW + Toyota\n读前问题：\n这个模型有什么优势？ 这个模型是如何实现“视频无标签学习\"的？ 什么叫\"naturally facilitate video learning\" 觉得有意思的点：\nImitation learning do not explicitly capture temporal dynamics that are naturally present in demonstration trajectories or videos (Page 1, Introduction) 一个 Diffusion Model： UWM 使用一个单一的 Diffusion Transformer 模型来处理所有的输入和输出。它不是为每种任务（策略、正向动力学、逆向动力学、视频预测）训练一个单独的模型。 Tokenization 和输入： 就像您说的，无论是当前的观测（图片）、动作、还是未来的观测，它们都会被“tokennize”成模型能够理解的表示形式（例如，图片通过编码器转换成图像特征，动作也被编码）。这些 token 以及动作和未来观测的独立扩散时间步长 t_a 和 t_o' 会一起输入到 Diffusion Transformer 中。 灵活的输出： 通过巧妙地控制这些扩散时间步长 t_a 和 t_o'，UWM 可以在推理时灵活地得到您想要的结果。例如： 如果想得到 策略（Policy） ，就将未来观测的时间步长 t_o' 设置为最大值 T（表示未来观测完全被噪声掩盖，模型只关注动作），然后模型会输出动作。 如果想得到 正向动力学（Forward Dynamics） ，就将动作时间步长 t_a 设置为 0（表示给定明确的动作输入），然后模型会输出未来观测。 如果想得到 逆向动力学（Inverse Dynamics） ，就将未来观测时间步长 t_o' 设置为 0（表示给定明确的未来观测输入），然后模型会输出动作。 如果想得到 视频预测（Video Prediction） ，就将动作时间步长 t_a 设置为最大值 T（表示动作完全被噪声掩盖，模型只关注视频），然后模型会输出未来观测。 模态独立的扩散时间步长 (Modality-Specific Diffusion Timesteps)： 这是 UWM 最核心的设计之一。传统的多模态扩散模型可能使用一个共享的时间步长来对所有模态进行加噪和去噪。然而，UWM 引入了两个独立的扩散时间步长：t_a 用于动作 (actions)，t_o' 用于未来观测 (future observations)。 原因： 这种分离使得模型能够独立控制每种模态的噪声水平。通过在推理时灵活地设置这些时间步长（例如，将某个时间步长设为 T 表示完全加噪以“掩蔽”该模态，设为 0 表示完全去噪以“条件化”该模态），UWM 可以实现前文提到的策略、正向动力学、逆向动力学和视频预测等多种推理模式。 效果： 它使得一个单一的模型能够充当多种角色，极大地提高了模型的通用性和灵活性，同时增强了模型对模态间因果关系的理解。 统一的 Transformer 架构 (Unified Transformer Architecture)： UWM 采用单一的 Transformer 骨干网络来处理所有模态的输入（当前观测、动作、未来观测）并预测其噪声。Transformer 以编码后的图像特征、动作 token 以及独立的扩散时间步长作为输入。 原因： 这种统一的架构促进了不同模态之间的特征共享。在 Transformer 内部，动作和图像信息可以相互交流和融合，从而使模型能够学习到更丰富、更全面的表征，并捕获它们之间的潜在因果关系。 效果： 避免了为每个任务设计独立模型的复杂性，简化了模型结构，并可能提高学习效率。 寄存器令牌 (Register Tokens)： UWM 在 Transformer 的输入序列中加入了随机初始化的“寄存器令牌”。 原因： 经验性研究发现，这些冗余令牌有助于提高模型性能，尤其是在多模态数据上。研究人员推测，动作和潜在图像块是不同的模态，寄存器可以作为一个中间媒介，存储来自任一模态的信息，并在后续 Transformer 层中被检索，从而促进模态间的信息交换和更好的多模态特征共享。 效果： 尽管这些令牌最终会被丢弃，但它们在中间层起到了重要的信息桥梁作用，提升了模型的表现力。 Adaptive Layer Normalization (AdaLN) 条件化： UWM 使用 AdaLN [33] 来将扩散时间步长（以及图像特征）条件化到 Transformer 的每个块中。 原因： AdaLN 是一种有效的条件化机制，它通过调整层归一化 (Layer Normalization) 的参数（缩放和偏移）来注入条件信息。 效果： 这种方式允许模型以一种非侵入性且高效的方式将时间步长信息融入到 Transformer 的处理流程中，有助于模型更好地理解噪声水平和生成过程。 潜在扩散范式 (Latent Diffusion Paradigm)： 对于图像扩散，UWM 采用了潜在扩散范式。它使用一个冻结的预训练 VAE (Variational AutoEncoder)（例如来自 Stable Diffusion XL [34]）将原始高分辨率图像压缩到低维的潜在空间中进行加噪和去噪，最后再解码回全尺寸图像。 原因： 直接在高分辨率像素空间进行扩散通常计算成本高昂且效率低下。潜在扩散可以在更小的潜在空间中操作，显著减少计算量。 效果： 提高了图像处理的效率，同时保持了高质量的图像生成能力。 这些特殊设计共同使得 UWM 能够有效地应对多模态机器人学习的挑战，实现了一个能够从大规模异构数据中学习并灵活执行多种推理任务的强大模型。\nVILA: On Pre-training for Visual Language Models https://www.alphaxiv.org/overview/2312.07533v4\nby Nvidia \u0026 MIT\n更新大型语言模型 (LLM) 是必要的 ：研究发现，在预训练过程中解冻并更新 LLM 对于获得良好的上下文学习（ICL）能力至关重要。仅仅进行提示调整（prompt tuning）虽然在零样本（0-shot）准确率上表现尚可，但在上下文学习能力方面却不足。使用一个简单的线性投影层而不是 Transformer 块作为投影器，可以促使 LLM 更好地学习处理视觉输入，从而带来更好的泛化能力。 交错式视觉语言语料库有助于预训练 ：预训练时，交错式的图像-文本数据集（如 MMC4）比单纯的图像-文本对（如 COYO）更有益。交错式数据有助于保持 LLM 的文本处理能力，并提供了更准确的梯度更新。与仅使用图像-文本对相比，使用交错式数据进行预训练能显著提高视觉语言任务的准确性，并减少文本能力退化。 通过联合监督微调（SFT）恢复 LLM 性能退化 ：尽管交错式数据有助于保持文本能力，但仍存在一定的准确率下降。通过在 SFT 阶段混入文本指令数据，可以同时恢复文本处理能力的退化，并提高视觉语言任务的准确性。这表明，文本指令数据有助于提升模型的指令遵循能力。 扩大 VLM 预训练的规模 ：模型在以下几个方面进行了扩展以形成最终模型： 更高的图像分辨率 ：将图像分辨率从 224×224224×224 提高到 336×336336×336，从而能够包含更多视觉细节，这对于需要精细细节的任务（如 TextVQA）非常有帮助。 更大的 LLM ：将 LLM 主干模型从 Llama-2 7B 扩展到 Llama-2 13B，以进一步提高性能。 预训练数据 ：同时使用交错式图像-文本数据和图像-文本对进行预训练，以提高数据多样性，尽管预训练语料库的总规模为 50M 图像，小于十亿规模的数据集，但仍取得了显著的性能提升。 SFT 数据 ：包含了 LLaVA-1.5 中更高质量、更多样化的 SFT 数据，进一步提升了下游评估指标。 ",
+  "wordCount" : "278",
+  "inLanguage": "en",
+  "datePublished": "2025-08-29T21:09:52-04:00",
+  "dateModified": "2025-08-29T21:09:52-04:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2025-08-29/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2025-08-29
+    </h1>
+    <div class="post-meta"><span title='2025-08-29 21:09:52 -0400 EDT'>August 29, 2025</span>&nbsp;·&nbsp;2 min
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h3 id="fast-efficient-action-tokenization-for-vision-language-action-models">FAST: Efficient Action Tokenization for Vision-Language-Action Models<a hidden class="anchor" aria-hidden="true" href="#fast-efficient-action-tokenization-for-vision-language-action-models">#</a></h3>
+<p>RSS 2025 By Physical Intelligence</p>
+<p>当前方法局限：都是离散数据，没有办法获取高频机器人控制数据的时间相关性</p>
+<p>因此使用一种名字叫做DCT的压缩算法，可以把连续信号转移到频率域(一种离散域)</p>
+<p><img alt="1756516611535" loading="lazy" src="https://tzj2006.github.io/images/2025-08-29/1756516611535.png"></p>
+<p>(话虽如此，但是真的需要用到这么高的频率吗？)</p>
+<p><img alt="1756516932637" loading="lazy" src="https://tzj2006.github.io/images/2025-08-29/1756516932637.png"></p>
+<ul>
+<li><strong>问题</strong> ：传统的朴素分箱方案在处理高频连续动作时，由于动作变化小，会导致许多连续时间步的动作被离散化为相同或高度相似的标记。这意味着每个新标记带来的“边际信息”（即在已知之前标记的情况下，新标记所包含的额外信息）非常低。</li>
+<li>朴素分箱方案独立地处理每个时间步和每个维度，完全忽略了连续动作序列中固有的时间相关性（例如，机器手臂的移动通常是平滑且连续的）。这使得模型难以学习到动作的动态模式。</li>
+</ul>
+<h3 id="unified-world-models-coupling-video-and-action-diffusion-for-pretraining-on-large-robotic-datasets">Unified World Models: Coupling Video and Action Diffusion for Pretraining on Large Robotic Datasets<a hidden class="anchor" aria-hidden="true" href="#unified-world-models-coupling-video-and-action-diffusion-for-pretraining-on-large-robotic-datasets">#</a></h3>
+<p>UW + Toyota</p>
+<p>读前问题：</p>
+<ol>
+<li>这个模型有什么优势？</li>
+<li>这个模型是如何实现“视频无标签学习&quot;的？</li>
+<li>什么叫&quot;naturally facilitate video learning&quot;</li>
+</ol>
+<p>觉得有意思的点：</p>
+<ol>
+<li>Imitation learning do not explicitly capture temporal dynamics that are naturally present in demonstration trajectories or videos (Page 1, Introduction)</li>
+<li></li>
+</ol>
+<ul>
+<li><strong>一个 Diffusion Model：</strong> UWM 使用一个单一的 Diffusion Transformer 模型来处理所有的输入和输出。它不是为每种任务（策略、正向动力学、逆向动力学、视频预测）训练一个单独的模型。</li>
+<li><strong>Tokenization 和输入：</strong> 就像您说的，无论是当前的观测（图片）、动作、还是未来的观测，它们都会被“tokennize”成模型能够理解的表示形式（例如，图片通过编码器转换成图像特征，动作也被编码）。这些 token 以及动作和未来观测的独立扩散时间步长 <code>t_a</code> 和 <code>t_o'</code> 会一起输入到 Diffusion Transformer 中。</li>
+<li><strong>灵活的输出：</strong> 通过巧妙地控制这些扩散时间步长 <code>t_a</code> 和 <code>t_o'</code>，UWM 可以在推理时灵活地得到您想要的结果。例如：
+<ul>
+<li>如果想得到 <strong>策略（Policy）</strong> ，就将未来观测的时间步长 <code>t_o'</code> 设置为最大值 T（表示未来观测完全被噪声掩盖，模型只关注动作），然后模型会输出动作。</li>
+<li>如果想得到 <strong>正向动力学（Forward Dynamics）</strong> ，就将动作时间步长 <code>t_a</code> 设置为 0（表示给定明确的动作输入），然后模型会输出未来观测。</li>
+<li>如果想得到 <strong>逆向动力学（Inverse Dynamics）</strong> ，就将未来观测时间步长 <code>t_o'</code> 设置为 0（表示给定明确的未来观测输入），然后模型会输出动作。</li>
+<li>如果想得到 <strong>视频预测（Video Prediction）</strong> ，就将动作时间步长 <code>t_a</code> 设置为最大值 T（表示动作完全被噪声掩盖，模型只关注视频），然后模型会输出未来观测。</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li><strong>模态独立的扩散时间步长 (Modality-Specific Diffusion Timesteps)：</strong> 这是 UWM 最核心的设计之一。传统的多模态扩散模型可能使用一个共享的时间步长来对所有模态进行加噪和去噪。然而，UWM 引入了两个独立的扩散时间步长：<code>t_a</code> 用于动作 (actions)，<code>t_o'</code> 用于未来观测 (future observations)。
+<ul>
+<li><strong>原因：</strong> 这种分离使得模型能够独立控制每种模态的噪声水平。通过在推理时灵活地设置这些时间步长（例如，将某个时间步长设为 T 表示完全加噪以“掩蔽”该模态，设为 0 表示完全去噪以“条件化”该模态），UWM 可以实现前文提到的策略、正向动力学、逆向动力学和视频预测等多种推理模式。</li>
+<li><strong>效果：</strong> 它使得一个单一的模型能够充当多种角色，极大地提高了模型的通用性和灵活性，同时增强了模型对模态间因果关系的理解。</li>
+</ul>
+</li>
+<li><strong>统一的 Transformer 架构 (Unified Transformer Architecture)：</strong> UWM 采用单一的 Transformer 骨干网络来处理所有模态的输入（当前观测、动作、未来观测）并预测其噪声。Transformer 以编码后的图像特征、动作 token 以及独立的扩散时间步长作为输入。
+<ul>
+<li><strong>原因：</strong> 这种统一的架构促进了不同模态之间的特征共享。在 Transformer 内部，动作和图像信息可以相互交流和融合，从而使模型能够学习到更丰富、更全面的表征，并捕获它们之间的潜在因果关系。</li>
+<li><strong>效果：</strong> 避免了为每个任务设计独立模型的复杂性，简化了模型结构，并可能提高学习效率。</li>
+</ul>
+</li>
+<li><strong>寄存器令牌 (Register Tokens)：</strong> UWM 在 Transformer 的输入序列中加入了随机初始化的“寄存器令牌”。
+<ul>
+<li><strong>原因：</strong> 经验性研究发现，这些冗余令牌有助于提高模型性能，尤其是在多模态数据上。研究人员推测，动作和潜在图像块是不同的模态，寄存器可以作为一个中间媒介，存储来自任一模态的信息，并在后续 Transformer 层中被检索，从而促进模态间的信息交换和更好的多模态特征共享。</li>
+<li><strong>效果：</strong> 尽管这些令牌最终会被丢弃，但它们在中间层起到了重要的信息桥梁作用，提升了模型的表现力。</li>
+</ul>
+</li>
+<li><strong>Adaptive Layer Normalization (AdaLN) 条件化：</strong> UWM 使用 AdaLN [33] 来将扩散时间步长（以及图像特征）条件化到 Transformer 的每个块中。
+<ul>
+<li><strong>原因：</strong> AdaLN 是一种有效的条件化机制，它通过调整层归一化 (Layer Normalization) 的参数（缩放和偏移）来注入条件信息。</li>
+<li><strong>效果：</strong> 这种方式允许模型以一种非侵入性且高效的方式将时间步长信息融入到 Transformer 的处理流程中，有助于模型更好地理解噪声水平和生成过程。</li>
+</ul>
+</li>
+<li><strong>潜在扩散范式 (Latent Diffusion Paradigm)：</strong> 对于图像扩散，UWM 采用了潜在扩散范式。它使用一个冻结的预训练 VAE (Variational AutoEncoder)（例如来自 Stable Diffusion XL [34]）将原始高分辨率图像压缩到低维的潜在空间中进行加噪和去噪，最后再解码回全尺寸图像。
+<ul>
+<li><strong>原因：</strong> 直接在高分辨率像素空间进行扩散通常计算成本高昂且效率低下。潜在扩散可以在更小的潜在空间中操作，显著减少计算量。</li>
+<li><strong>效果：</strong> 提高了图像处理的效率，同时保持了高质量的图像生成能力。</li>
+</ul>
+</li>
+</ol>
+<p>这些特殊设计共同使得 UWM 能够有效地应对多模态机器人学习的挑战，实现了一个能够从大规模异构数据中学习并灵活执行多种推理任务的强大模型。</p>
+<h3 id="vila-on-pre-training-for-visual-language-models">VILA: On Pre-training for Visual Language Models<a hidden class="anchor" aria-hidden="true" href="#vila-on-pre-training-for-visual-language-models">#</a></h3>
+<p><a href="https://www.alphaxiv.org/overview/2312.07533v4">https://www.alphaxiv.org/overview/2312.07533v4</a></p>
+<p>by Nvidia &amp; MIT</p>
+<p><img alt="1756519819033" loading="lazy" src="https://tzj2006.github.io/images/2025-08-29/1756519819033.png"></p>
+<ul>
+<li><strong>更新大型语言模型 (LLM) 是必要的</strong> ：研究发现，在预训练过程中解冻并更新 LLM 对于获得良好的上下文学习（ICL）能力至关重要。仅仅进行提示调整（prompt tuning）虽然在零样本（0-shot）准确率上表现尚可，但在上下文学习能力方面却不足。使用一个简单的线性投影层而不是 Transformer 块作为投影器，可以促使 LLM 更好地学习处理视觉输入，从而带来更好的泛化能力。</li>
+<li><strong>交错式视觉语言语料库有助于预训练</strong> ：预训练时，交错式的图像-文本数据集（如 MMC4）比单纯的图像-文本对（如 COYO）更有益。交错式数据有助于保持 LLM 的文本处理能力，并提供了更准确的梯度更新。与仅使用图像-文本对相比，使用交错式数据进行预训练能显著提高视觉语言任务的准确性，并减少文本能力退化。</li>
+<li><strong>通过联合监督微调（SFT）恢复 LLM 性能退化</strong> ：尽管交错式数据有助于保持文本能力，但仍存在一定的准确率下降。通过在 SFT 阶段混入文本指令数据，可以同时恢复文本处理能力的退化，并提高视觉语言任务的准确性。这表明，文本指令数据有助于提升模型的指令遵循能力。</li>
+<li><strong>扩大 VLM 预训练的规模</strong> ：模型在以下几个方面进行了扩展以形成最终模型：</li>
+<li><strong>更高的图像分辨率</strong> ：将图像分辨率从 224×224<strong>224</strong>×<strong>224</strong> 提高到 336×336<strong>336</strong>×<strong>336</strong>，从而能够包含更多视觉细节，这对于需要精细细节的任务（如 TextVQA）非常有帮助。</li>
+<li><strong>更大的 LLM</strong> ：将 LLM 主干模型从 Llama-2 7B 扩展到 Llama-2 13B，以进一步提高性能。</li>
+<li><strong>预训练数据</strong> ：同时使用交错式图像-文本数据和图像-文本对进行预训练，以提高数据多样性，尽管预训练语料库的总规模为 50M 图像，小于十亿规模的数据集，但仍取得了显著的性能提升。</li>
+<li><strong>SFT 数据</strong> ：包含了 LLaVA-1.5 中更高质量、更多样化的 SFT 数据，进一步提升了下游评估指标。</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
