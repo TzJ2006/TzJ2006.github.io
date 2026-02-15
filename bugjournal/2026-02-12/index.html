@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-12 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="为 MIHD 空间转录组项目设计多模态融合增强方案，包含归一化、Q-Former、QueST 集成和配置重构">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-02-12/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.af858c2feef42adc7846f815c3e21de9982d82f8fc4f65879451b2686859975a.css" integrity="sha256-r4WML&#43;70Ktx4RvgVw&#43;Id6Zgtgvj8T2WHlFGyaGhZl1o=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-02-12/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-02-12/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-12">
+  <meta property="og:description" content="为 MIHD 空间转录组项目设计多模态融合增强方案，包含归一化、Q-Former、QueST 集成和配置重构">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-12T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-12T00:00:00-05:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Bug Journal 2026-02-12">
+<meta name="twitter:description" content="为 MIHD 空间转录组项目设计多模态融合增强方案，包含归一化、Q-Former、QueST 集成和配置重构">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "BugJournals",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-12",
+      "item": "https://tzj2006.github.io/bugjournal/2026-02-12/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-12",
+  "name": "Bug Journal 2026-02-12",
+  "description": "为 MIHD 空间转录组项目设计多模态融合增强方案，包含归一化、Q-Former、QueST 集成和配置重构",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-12 为 MIHD 空间转录组项目设计多模态融合增强方案，包含归一化、Q-Former、QueST 集成和配置重构\n今日任务 ✅ 优化 CLAUDE.md 文档 — 重构项目指导文档，从 579 行精简至 188 行（减少 67%），添加缺失的 GCN 编码器、basic_contrastive/staig_fusion_e2e 融合策略、utils 模块概览、测试运行指令等内容，移除冗余的文件组织说明和冗长的代码示例 ✅ 调研当前嵌入归一化机制 — 系统分析 MIHD 的编码器输出维度和归一化策略：发现 UNI2(1536d)/scGPT(512d) 已做 L2 归一化，但 HIPT(384d)/ResNet50(2048d)/MLP/GCN 未归一化；ConcatFusion 在拼接前做 L2 归一化，但其他融合策略（MeanFusion/AttentionFusion/STAIG）无归一化 ✅ 调研 QueST 项目架构 — 深入分析 QueST 代码库：定位关键模块包括 BatchDiscriminator（对抗训练）、GINLayers（图神经网络）、k-hop 邻域池化、TLS 相似度查询机制、基于 MLP 判别器的批次效应校正方法 ✅ 调研 Q-Former 架构 — 研究 BLIP-2 的 Q-Former（可学习查询 + 交叉注意力 + 自注意力）和 LLaVA 的简化 MLP 连接器（2 层投影），理解其在多模态融合中的应用机制 ✅ 需求澄清 — 通过 AskUserQuestion 确认三个关键决策：(1) 同时实现 Q-Former 和 LLaVA MLP 两种融合方法；(2) 将 QueST 的特性集成到 MIHD 中；(3) 配置驱动的全流程超参数搜索 ✅ 设计 7 阶段增强方案 — 编写完整实现计划（预计 ~8 个新文件、~5 个修改文件、~2850 行代码），覆盖 6 个目标：(1) 配置基础重构；(2) 三点归一化（编码器后/融合前/融合后）；(3) UNI2+scGPT 实验配置；(4) Q-Former + LLaVA MLP 融合策略；(5) QueST 式 niche 查询；(6) 对抗批次校正 ❌ 准备实施 — 用户在 ExitPlanMode 时中断执行，要求先将计划写入文件后再开始实施 问题与解决方案 1. MIHD 的嵌入归一化不一致导致融合效果受限 解决方案: 设计三点归一化策略（post-encoder/pre-fusion/post-fusion），创建 utils/normalization.py 提供 L2/StandardScaler/None 三种方法，所有节点可配置\n关键洞察: UNI2/scGPT 已 L2 归一化但 HIPT/ResNet50 未归一化，且仅 ConcatFusion 做预处理归一化，其他融合策略（MeanFusion/AttentionFusion）完全无归一化\n2. QueST 的 TLS 查询和批次校正机制如何应用到 MIHD 解决方案: 提取三个核心组件：(1) k-hop 子图池化（utils/niche_utils.py）；(2) 基于余弦相似度的 niche 查询（scripts/run_niche_query.py）；(3) MLP 判别器对抗训练（models/BatchCorrection.py）\n关键洞察: QueST 的批次校正使用简单的 MLP 判别器（非 GNN），损失函数为判别器损失 - λ*生成器损失，可直接作为 MIHD 融合后的插件\n3. Q-Former 架构复杂且有多种实现版本 解决方案: 同时实现两种方案：(1) BLIP-2 完整 Q-Former（可学习查询 + 交叉注意力 + 自注意力）；(2) LLaVA 简化 MLP（GELU + 2 层线性投影）。Q-Former 使用空间邻域作为上下文 token\n关键洞察: LLaVA 实际上使用的是简化的 MLP 连接器而非完整 Q-Former，应同时实现以便对比性能差异\n人类思路 vs AI 思路 计划实施的流程控制 角色 思路 人类 发现 AI 准备直接实施后，主动中断并要求先将计划写入文件 AI 调研完成后直接进入 ExitPlanMode 准备实施 差异分析: 人类更重视计划的持久化和可审查性，AI 倾向于快速进入执行阶段\nQ-Former 架构选择 角色 思路 人类 明确要求同时实现 BLIP-2 Q-Former 和 LLaVA MLP 两种方案 AI AI 调研时发现 LLaVA 实际用 MLP 连接器而非完整 Q-Former，但默认提供单选题让用户选择其一 差异分析: 人类希望保留两种方案以便对比实验，而非过早优化选择单一方案\nQueST 特性集成方式 角色 思路 人类 要求将 QueST 的关键特性（niche 查询、批次校正）实现到 MIHD 中 AI AI 默认倾向于纯研究性任务（理解 QueST 如何工作），需用户明确指定实施意图 差异分析: 人类直接将调研与实施绑定，AI 倾向于分离调研和实施阶段\n配置系统重构范围 角色 思路 人类 要求全流程（Full pipeline）的超参数都可配置驱动 AI AI 提供三档选项（Essential only / Key components / Full pipeline）供选择 差异分析: 人类追求更彻底的工程化（所有超参可配），AI 提供保守和激进的多个选项\nAI 局限性 AI 在处理多版本架构（Q-Former vs LLaVA MLP）时默认倾向于二选一，而未主动建议同时实现以便实验对比 AI 在读取 QueST 代码库时虽然定位到关键文件，但未主动读取 BatchDiscriminator 和 GINLayers 的完整实现细节（需用户后续追问） AI 准备实施时直接调用 ExitPlanMode，未先确认用户是否需要查看或修改计划文件 AI 在优化 CLAUDE.md 时删除了 STAIG 的 Issues #1-4 实施历史，但这可能是有价值的上下文信息（虽然减少冗余是正确的） 今日收获 空间转录组多模态融合的关键瓶颈：不同编码器输出的嵌入空间不一致，需要系统化的归一化策略（三点归一化：编码器后/融合前/融合后） QueST 的批次校正方法（MLP 判别器对抗训练）可以作为 MIHD 融合后的即插即用模块，无需修改核心融合逻辑 Q-Former 的两种实现路径：完整版（BLIP-2，复杂但灵活）vs 简化版（LLaVA MLP，轻量但有效），需实验验证性能差异 k-hop 子图池化（QueST 的 niche 定义方式）可结合 MIHD 的空间图结构实现跨样本的 TLS 相似度查询 大型科研代码库的配置管理应分层设计：全局配置（config.yaml）、实验配置（benchmark_config.yaml）、专用配置（staig_alignment_config.yaml） 文档优化的核心原则：移除冗余、补充缺失、压缩易发现的内容（如文件列表）、保留不易发现的内容（如跨文件架构设计） Token 用量 总览 指标 数值 总 Token 5,459,892 输入 Token 45,436 输出 Token 1,231 Cache 创建 543,037 Cache 读取 4,870,188 Cache 命中率 90.0% 总费用 (USD) $4.1489 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 66 1,150 311,998 3,370,495 $3.6643 88.3% claude-haiku-4-5-20251001 45,370 81 231,039 1,499,693 $0.4845 11.7% ",
+  "wordCount" : "366",
+  "inLanguage": "en",
+  "datePublished": "2026-02-12T00:00:00-05:00",
+  "dateModified": "2026-02-12T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-02-12/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-12
+    </h1>
+    <div class="post-meta"><span title='2026-02-12 00:00:00 -0500 EST'>February 12, 2026</span>&nbsp;·&nbsp;2 min
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-12">日报 — 2026-02-12<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-12">#</a></h1>
+<blockquote>
+<p>为 MIHD 空间转录组项目设计多模态融合增强方案，包含归一化、Q-Former、QueST 集成和配置重构</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<ul>
+<li>✅ <strong>优化 CLAUDE.md 文档</strong> — 重构项目指导文档，从 579 行精简至 188 行（减少 67%），添加缺失的 GCN 编码器、basic_contrastive/staig_fusion_e2e 融合策略、utils 模块概览、测试运行指令等内容，移除冗余的文件组织说明和冗长的代码示例</li>
+<li>✅ <strong>调研当前嵌入归一化机制</strong> — 系统分析 MIHD 的编码器输出维度和归一化策略：发现 UNI2(1536d)/scGPT(512d) 已做 L2 归一化，但 HIPT(384d)/ResNet50(2048d)/MLP/GCN 未归一化；ConcatFusion 在拼接前做 L2 归一化，但其他融合策略（MeanFusion/AttentionFusion/STAIG）无归一化</li>
+<li>✅ <strong>调研 QueST 项目架构</strong> — 深入分析 QueST 代码库：定位关键模块包括 BatchDiscriminator（对抗训练）、GINLayers（图神经网络）、k-hop 邻域池化、TLS 相似度查询机制、基于 MLP 判别器的批次效应校正方法</li>
+<li>✅ <strong>调研 Q-Former 架构</strong> — 研究 BLIP-2 的 Q-Former（可学习查询 + 交叉注意力 + 自注意力）和 LLaVA 的简化 MLP 连接器（2 层投影），理解其在多模态融合中的应用机制</li>
+<li>✅ <strong>需求澄清</strong> — 通过 AskUserQuestion 确认三个关键决策：(1) 同时实现 Q-Former 和 LLaVA MLP 两种融合方法；(2) 将 QueST 的特性集成到 MIHD 中；(3) 配置驱动的全流程超参数搜索</li>
+<li>✅ <strong>设计 7 阶段增强方案</strong> — 编写完整实现计划（预计 ~8 个新文件、~5 个修改文件、~2850 行代码），覆盖 6 个目标：(1) 配置基础重构；(2) 三点归一化（编码器后/融合前/融合后）；(3) UNI2+scGPT 实验配置；(4) Q-Former + LLaVA MLP 融合策略；(5) QueST 式 niche 查询；(6) 对抗批次校正</li>
+<li>❌ <strong>准备实施</strong> — 用户在 ExitPlanMode 时中断执行，要求先将计划写入文件后再开始实施</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="1-mihd-的嵌入归一化不一致导致融合效果受限">1. MIHD 的嵌入归一化不一致导致融合效果受限<a hidden class="anchor" aria-hidden="true" href="#1-mihd-的嵌入归一化不一致导致融合效果受限">#</a></h3>
+<p><strong>解决方案:</strong> 设计三点归一化策略（post-encoder/pre-fusion/post-fusion），创建 utils/normalization.py 提供 L2/StandardScaler/None 三种方法，所有节点可配置</p>
+<p><strong>关键洞察:</strong> UNI2/scGPT 已 L2 归一化但 HIPT/ResNet50 未归一化，且仅 ConcatFusion 做预处理归一化，其他融合策略（MeanFusion/AttentionFusion）完全无归一化</p>
+<h3 id="2-quest-的-tls-查询和批次校正机制如何应用到-mihd">2. QueST 的 TLS 查询和批次校正机制如何应用到 MIHD<a hidden class="anchor" aria-hidden="true" href="#2-quest-的-tls-查询和批次校正机制如何应用到-mihd">#</a></h3>
+<p><strong>解决方案:</strong> 提取三个核心组件：(1) k-hop 子图池化（utils/niche_utils.py）；(2) 基于余弦相似度的 niche 查询（scripts/run_niche_query.py）；(3) MLP 判别器对抗训练（models/BatchCorrection.py）</p>
+<p><strong>关键洞察:</strong> QueST 的批次校正使用简单的 MLP 判别器（非 GNN），损失函数为判别器损失 - λ*生成器损失，可直接作为 MIHD 融合后的插件</p>
+<h3 id="3-q-former-架构复杂且有多种实现版本">3. Q-Former 架构复杂且有多种实现版本<a hidden class="anchor" aria-hidden="true" href="#3-q-former-架构复杂且有多种实现版本">#</a></h3>
+<p><strong>解决方案:</strong> 同时实现两种方案：(1) BLIP-2 完整 Q-Former（可学习查询 + 交叉注意力 + 自注意力）；(2) LLaVA 简化 MLP（GELU + 2 层线性投影）。Q-Former 使用空间邻域作为上下文 token</p>
+<p><strong>关键洞察:</strong> LLaVA 实际上使用的是简化的 MLP 连接器而非完整 Q-Former，应同时实现以便对比性能差异</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="计划实施的流程控制">计划实施的流程控制<a hidden class="anchor" aria-hidden="true" href="#计划实施的流程控制">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>发现 AI 准备直接实施后，主动中断并要求先将计划写入文件</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>调研完成后直接进入 ExitPlanMode 准备实施</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类更重视计划的持久化和可审查性，AI 倾向于快速进入执行阶段</p>
+<h3 id="q-former-架构选择">Q-Former 架构选择<a hidden class="anchor" aria-hidden="true" href="#q-former-架构选择">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>明确要求同时实现 BLIP-2 Q-Former 和 LLaVA MLP 两种方案</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 调研时发现 LLaVA 实际用 MLP 连接器而非完整 Q-Former，但默认提供单选题让用户选择其一</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类希望保留两种方案以便对比实验，而非过早优化选择单一方案</p>
+<h3 id="quest-特性集成方式">QueST 特性集成方式<a hidden class="anchor" aria-hidden="true" href="#quest-特性集成方式">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>要求将 QueST 的关键特性（niche 查询、批次校正）实现到 MIHD 中</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 默认倾向于纯研究性任务（理解 QueST 如何工作），需用户明确指定实施意图</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类直接将调研与实施绑定，AI 倾向于分离调研和实施阶段</p>
+<h3 id="配置系统重构范围">配置系统重构范围<a hidden class="anchor" aria-hidden="true" href="#配置系统重构范围">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>要求全流程（Full pipeline）的超参数都可配置驱动</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 提供三档选项（Essential only / Key components / Full pipeline）供选择</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类追求更彻底的工程化（所有超参可配），AI 提供保守和激进的多个选项</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<ul>
+<li>AI 在处理多版本架构（Q-Former vs LLaVA MLP）时默认倾向于二选一，而未主动建议同时实现以便实验对比</li>
+<li>AI 在读取 QueST 代码库时虽然定位到关键文件，但未主动读取 BatchDiscriminator 和 GINLayers 的完整实现细节（需用户后续追问）</li>
+<li>AI 准备实施时直接调用 ExitPlanMode，未先确认用户是否需要查看或修改计划文件</li>
+<li>AI 在优化 CLAUDE.md 时删除了 STAIG 的 Issues #1-4 实施历史，但这可能是有价值的上下文信息（虽然减少冗余是正确的）</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<ul>
+<li>空间转录组多模态融合的关键瓶颈：不同编码器输出的嵌入空间不一致，需要系统化的归一化策略（三点归一化：编码器后/融合前/融合后）</li>
+<li>QueST 的批次校正方法（MLP 判别器对抗训练）可以作为 MIHD 融合后的即插即用模块，无需修改核心融合逻辑</li>
+<li>Q-Former 的两种实现路径：完整版（BLIP-2，复杂但灵活）vs 简化版（LLaVA MLP，轻量但有效），需实验验证性能差异</li>
+<li>k-hop 子图池化（QueST 的 niche 定义方式）可结合 MIHD 的空间图结构实现跨样本的 TLS 相似度查询</li>
+<li>大型科研代码库的配置管理应分层设计：全局配置（config.yaml）、实验配置（benchmark_config.yaml）、专用配置（staig_alignment_config.yaml）</li>
+<li>文档优化的核心原则：移除冗余、补充缺失、压缩易发现的内容（如文件列表）、保留不易发现的内容（如跨文件架构设计）</li>
+</ul>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>5,459,892</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>45,436</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>1,231</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>543,037</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>4,870,188</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>90.0%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$4.1489</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>66</td>
+          <td>1,150</td>
+          <td>311,998</td>
+          <td>3,370,495</td>
+          <td>$3.6643</td>
+          <td>88.3%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>45,370</td>
+          <td>81</td>
+          <td>231,039</td>
+          <td>1,499,693</td>
+          <td>$0.4845</td>
+          <td>11.7%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

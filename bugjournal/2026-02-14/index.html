@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-14 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="实现 MIHD 两阶段 Pipeline 架构和 CalendarPro OAuth 修复">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-02-14/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.af858c2feef42adc7846f815c3e21de9982d82f8fc4f65879451b2686859975a.css" integrity="sha256-r4WML&#43;70Ktx4RvgVw&#43;Id6Zgtgvj8T2WHlFGyaGhZl1o=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-02-14/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-02-14/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-14">
+  <meta property="og:description" content="实现 MIHD 两阶段 Pipeline 架构和 CalendarPro OAuth 修复">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-14T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-14T00:00:00-05:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Bug Journal 2026-02-14">
+<meta name="twitter:description" content="实现 MIHD 两阶段 Pipeline 架构和 CalendarPro OAuth 修复">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "BugJournals",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-14",
+      "item": "https://tzj2006.github.io/bugjournal/2026-02-14/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-14",
+  "name": "Bug Journal 2026-02-14",
+  "description": "实现 MIHD 两阶段 Pipeline 架构和 CalendarPro OAuth 修复",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-14 实现 MIHD 两阶段 Pipeline 架构和 CalendarPro OAuth 修复\n今日任务 ✅ MIHD benchmark 测试和超时调整 — 完成 pca+uni2 系列实验，发现 basic_contrastive 超时问题并调整超时时间从 1 小时到 2 小时；staig_fusion_e2e 被移除 ✅ MIHD 两阶段 Pipeline 架构设计与实现 — 创建了 pipeline 包含 8 个核心模块（cache_manager、data_preparer、extraction/evaluation_planner、gene/vision_extractor、runner）和 3 个入口脚本，将 embedding 提取和 fusion 评估分为两个独立阶段，实现去重和缓存复用 ✅ Pipeline 端到端测试（151508） — 测试了 gene_only、core_multimodal、pca+uni2 多种组合，修复了 ExperimentLogger、mclust fallback 等 bug，验证了缓存机制正常工作 ✅ Vision encoding 耗时分析 — 分析了 vision encoding 的性能瓶颈：Patch 提取串行循环、GPU 推理频繁调用 empty_cache、模型加载等阶段；设计了三项优化方案（encoder 级缓存、patch 提取并行化、GPU 推理优化） ✅ CalendarPro Google Calendar 403 错误修复 — 修复了 get_user_timezone() 使用 calendarList API 导致的权限不足问题，改用 settings().get(setting=‘timezone’) API ✅ Gadgets 工具集文档更新 — 更新 CLAUDE.md 和 README.md，移除已删除的 Video/Audio/Image/Papers/OCR 等工具，保留 summarize 和 test 两个核心工具 问题与解决方案 1. basic_contrastive fusion 超时（3600s 限制） 解决方案: 将超时时间从 1 小时增加到 2 小时，因为训练型 fusion（basic_contrastive、staig_fusion）每个 section 需要 30-80 分钟\n关键洞察: 训练型 fusion（550 epochs）本质上需要更长时间，不能简单减少 epoch 否则影响结果质量\n2. Q-Former 每个 section 需要约 5.7 小时（200 epochs × ~100s/epoch） 解决方案: User 选择将 epochs 从 200 减少到 50（加速 4 倍），通过修改 pipeline_config.yaml 的 extra_config.qformer.epochs\n关键洞察: 不同 fusion 策略的计算开销差异巨大：concat/mean/attention 秒级，staig/llava/qformer 分钟到小时级\n3. ExperimentLogger 没有 save_comparison_csv() 方法导致 pipeline 崩溃 解决方案: 移除调用，ExperimentLogger 在 log_experiment 内部自动调用 _update_comparison_csv()\n关键洞察: CSV 汇总是自动的，不需要手动触发\n4. mclust 聚类失败（rpy2 未安装导致 ImportError） 解决方案: 在 runner.py 中添加 ImportError 捕获（原本只捕获 ValueError），fallback 到 KMeans\n关键洞察: staig_fusion 的 mclust 依赖 R 和 rpy2，General 环境不一定有，需要 robust fallback\n5. 每次切换 fusion 策略都重新计算相同的 encoder embedding，UNI2 被算 55+ 次 解决方案: 设计两阶段架构：Phase 1 提取并缓存所有 encoder embedding（每个 encoder×section 只算一次），Phase 2 从缓存加载执行 fusion+聚类+评估\n关键洞察: 缓存粒度应该在 encoder 级别，而不是最终的 fusion 结果级别\n6. CalendarPro get_user_timezone() 使用 calendarList API 导致 403 insufficientPermissions 解决方案: 改用 settings().get(setting=‘timezone’)，该 API 在 calendar.events scope 下可用\n关键洞察: Google Calendar API 不同端点的权限要求不同，settings API 比 calendarList 权限要求更宽松\n人类思路 vs AI 思路 Pipeline 架构设计 角色 思路 人类 User 提出核心思路：每个 slide 先提取所有 encoder embedding 并缓存到文件，然后对相同 embedding 做不同 fusion，避免重复计算 AI AI 扩展设计为完整的两阶段架构，包含 8 个模块、去重逻辑、环境切换、scGPT subprocess 调用、版本控制等工程细节 差异分析: User 抓住了核心瓶颈（重复编码），AI 负责工程化和边界情况处理（scGPT 环境、STAIG 严格模式、缓存版本等）\nQ-Former epochs 处理 角色 思路 人类 面对 Q-Former 耗时过长（5.7h/section），User 选择减少 epochs 到 50 而不是跳过或单独运行 AI AI 提供了三个选项（跳过、减少 epochs、继续），让 User 决策 差异分析: User 在时间和结果质量之间做了务实的权衡\nPipeline 重写范围 角色 思路 人类 User 要求「完全重写 pipeline」而非增量改进 AI AI 设计时仍保留了向后兼容性（不修改旧版 run_benchmark.py），创建全新 pipeline/ 包 差异分析: AI 在「完全重写」和「保持兼容性」之间找到了平衡，避免破坏现有工作流\nAI 局限性 初次实现 pipeline 时调用了不存在的 save_comparison_csv() 方法，说明对 ExperimentLogger 内部实现细节理解不够深入 mclust fallback 最初只捕获 ValueError 而忘记 ImportError，对 Python 异常层级处理不够全面 对 Google Calendar API 不同端点的权限要求不熟悉，需要通过错误日志才能定位到 calendarList vs settings 的差异 今日收获 两阶段架构的核心价值：将数据提取（重）和计算逻辑（轻）分离，通过缓存避免重复工作 缓存设计要点：版本控制、完整性验证、去重逻辑、环境隔离（scGPT 需要 subprocess） STAIG 系列 fusion 的特殊性：需要 staig_strict 模式的 vision embedding（256px、频域滤波、无 ImageNet 归一化）和额外的 staig_gene_feat Google Calendar API scope 限制：calendar.events 可以访问 settings 端点但不能访问 calendarList，需要选择合适的 API 端点 性能优化的多维度思考：去重（减少计算次数）、并行化（提高单次效率）、缓存（复用结果） Token 用量 总览 指标 数值 总 Token 117,931,338 输入 Token 37,503 输出 Token 110,846 Cache 创建 5,792,721 Cache 读取 111,990,268 Cache 命中率 95.1% 总费用 (USD) $45.6846 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 19,425 108,564 3,875,710 98,575,697 $40.3948 88.4% claude-haiku-4-5-20251001 9,712 1,788 1,412,273 12,219,193 $3.0059 6.6% claude-sonnet-4-5-20250929 8,366 494 504,738 1,195,378 $2.2839 5.0% 各设备用量 设备 总 Token 输入 输出 费用 DCC 20,264,782 9,756 35,824 $14.5508 MacBook 51,452 3 2 $0.1314 TzJsDesktop 38,104,868 5,123 29,850 $27.8588 tianhe 59,510,236 22,621 45,170 $3.1435 ",
+  "wordCount" : "454",
+  "inLanguage": "en",
+  "datePublished": "2026-02-14T00:00:00-05:00",
+  "dateModified": "2026-02-14T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-02-14/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-14
+    </h1>
+    <div class="post-meta"><span title='2026-02-14 00:00:00 -0500 EST'>February 14, 2026</span>&nbsp;·&nbsp;3 min
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-14">日报 — 2026-02-14<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-14">#</a></h1>
+<blockquote>
+<p>实现 MIHD 两阶段 Pipeline 架构和 CalendarPro OAuth 修复</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<ul>
+<li>✅ <strong>MIHD benchmark 测试和超时调整</strong> — 完成 pca+uni2 系列实验，发现 basic_contrastive 超时问题并调整超时时间从 1 小时到 2 小时；staig_fusion_e2e 被移除</li>
+<li>✅ <strong>MIHD 两阶段 Pipeline 架构设计与实现</strong> — 创建了 pipeline 包含 8 个核心模块（cache_manager、data_preparer、extraction/evaluation_planner、gene/vision_extractor、runner）和 3 个入口脚本，将 embedding 提取和 fusion 评估分为两个独立阶段，实现去重和缓存复用</li>
+<li>✅ <strong>Pipeline 端到端测试（151508）</strong> — 测试了 gene_only、core_multimodal、pca+uni2 多种组合，修复了 ExperimentLogger、mclust fallback 等 bug，验证了缓存机制正常工作</li>
+<li>✅ <strong>Vision encoding 耗时分析</strong> — 分析了 vision encoding 的性能瓶颈：Patch 提取串行循环、GPU 推理频繁调用 empty_cache、模型加载等阶段；设计了三项优化方案（encoder 级缓存、patch 提取并行化、GPU 推理优化）</li>
+<li>✅ <strong>CalendarPro Google Calendar 403 错误修复</strong> — 修复了 get_user_timezone() 使用 calendarList API 导致的权限不足问题，改用 settings().get(setting=&lsquo;timezone&rsquo;) API</li>
+<li>✅ <strong>Gadgets 工具集文档更新</strong> — 更新 CLAUDE.md 和 README.md，移除已删除的 Video/Audio/Image/Papers/OCR 等工具，保留 summarize 和 test 两个核心工具</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="1-basic_contrastive-fusion-超时3600s-限制">1. basic_contrastive fusion 超时（3600s 限制）<a hidden class="anchor" aria-hidden="true" href="#1-basic_contrastive-fusion-超时3600s-限制">#</a></h3>
+<p><strong>解决方案:</strong> 将超时时间从 1 小时增加到 2 小时，因为训练型 fusion（basic_contrastive、staig_fusion）每个 section 需要 30-80 分钟</p>
+<p><strong>关键洞察:</strong> 训练型 fusion（550 epochs）本质上需要更长时间，不能简单减少 epoch 否则影响结果质量</p>
+<h3 id="2-q-former-每个-section-需要约-57-小时200-epochs--100sepoch">2. Q-Former 每个 section 需要约 5.7 小时（200 epochs × ~100s/epoch）<a hidden class="anchor" aria-hidden="true" href="#2-q-former-每个-section-需要约-57-小时200-epochs--100sepoch">#</a></h3>
+<p><strong>解决方案:</strong> User 选择将 epochs 从 200 减少到 50（加速 4 倍），通过修改 pipeline_config.yaml 的 extra_config.qformer.epochs</p>
+<p><strong>关键洞察:</strong> 不同 fusion 策略的计算开销差异巨大：concat/mean/attention 秒级，staig/llava/qformer 分钟到小时级</p>
+<h3 id="3-experimentlogger-没有-save_comparison_csv-方法导致-pipeline-崩溃">3. ExperimentLogger 没有 save_comparison_csv() 方法导致 pipeline 崩溃<a hidden class="anchor" aria-hidden="true" href="#3-experimentlogger-没有-save_comparison_csv-方法导致-pipeline-崩溃">#</a></h3>
+<p><strong>解决方案:</strong> 移除调用，ExperimentLogger 在 log_experiment 内部自动调用 _update_comparison_csv()</p>
+<p><strong>关键洞察:</strong> CSV 汇总是自动的，不需要手动触发</p>
+<h3 id="4-mclust-聚类失败rpy2-未安装导致-importerror">4. mclust 聚类失败（rpy2 未安装导致 ImportError）<a hidden class="anchor" aria-hidden="true" href="#4-mclust-聚类失败rpy2-未安装导致-importerror">#</a></h3>
+<p><strong>解决方案:</strong> 在 runner.py 中添加 ImportError 捕获（原本只捕获 ValueError），fallback 到 KMeans</p>
+<p><strong>关键洞察:</strong> staig_fusion 的 mclust 依赖 R 和 rpy2，General 环境不一定有，需要 robust fallback</p>
+<h3 id="5-每次切换-fusion-策略都重新计算相同的-encoder-embeddinguni2-被算-55-次">5. 每次切换 fusion 策略都重新计算相同的 encoder embedding，UNI2 被算 55+ 次<a hidden class="anchor" aria-hidden="true" href="#5-每次切换-fusion-策略都重新计算相同的-encoder-embeddinguni2-被算-55-次">#</a></h3>
+<p><strong>解决方案:</strong> 设计两阶段架构：Phase 1 提取并缓存所有 encoder embedding（每个 encoder×section 只算一次），Phase 2 从缓存加载执行 fusion+聚类+评估</p>
+<p><strong>关键洞察:</strong> 缓存粒度应该在 encoder 级别，而不是最终的 fusion 结果级别</p>
+<h3 id="6-calendarpro-get_user_timezone-使用-calendarlist-api-导致-403-insufficientpermissions">6. CalendarPro get_user_timezone() 使用 calendarList API 导致 403 insufficientPermissions<a hidden class="anchor" aria-hidden="true" href="#6-calendarpro-get_user_timezone-使用-calendarlist-api-导致-403-insufficientpermissions">#</a></h3>
+<p><strong>解决方案:</strong> 改用 settings().get(setting=&lsquo;timezone&rsquo;)，该 API 在 calendar.events scope 下可用</p>
+<p><strong>关键洞察:</strong> Google Calendar API 不同端点的权限要求不同，settings API 比 calendarList 权限要求更宽松</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="pipeline-架构设计">Pipeline 架构设计<a hidden class="anchor" aria-hidden="true" href="#pipeline-架构设计">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>User 提出核心思路：每个 slide 先提取所有 encoder embedding 并缓存到文件，然后对相同 embedding 做不同 fusion，避免重复计算</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 扩展设计为完整的两阶段架构，包含 8 个模块、去重逻辑、环境切换、scGPT subprocess 调用、版本控制等工程细节</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> User 抓住了核心瓶颈（重复编码），AI 负责工程化和边界情况处理（scGPT 环境、STAIG 严格模式、缓存版本等）</p>
+<h3 id="q-former-epochs-处理">Q-Former epochs 处理<a hidden class="anchor" aria-hidden="true" href="#q-former-epochs-处理">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>面对 Q-Former 耗时过长（5.7h/section），User 选择减少 epochs 到 50 而不是跳过或单独运行</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 提供了三个选项（跳过、减少 epochs、继续），让 User 决策</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> User 在时间和结果质量之间做了务实的权衡</p>
+<h3 id="pipeline-重写范围">Pipeline 重写范围<a hidden class="anchor" aria-hidden="true" href="#pipeline-重写范围">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>User 要求「完全重写 pipeline」而非增量改进</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 设计时仍保留了向后兼容性（不修改旧版 run_benchmark.py），创建全新 pipeline/ 包</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI 在「完全重写」和「保持兼容性」之间找到了平衡，避免破坏现有工作流</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<ul>
+<li>初次实现 pipeline 时调用了不存在的 save_comparison_csv() 方法，说明对 ExperimentLogger 内部实现细节理解不够深入</li>
+<li>mclust fallback 最初只捕获 ValueError 而忘记 ImportError，对 Python 异常层级处理不够全面</li>
+<li>对 Google Calendar API 不同端点的权限要求不熟悉，需要通过错误日志才能定位到 calendarList vs settings 的差异</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<ul>
+<li>两阶段架构的核心价值：将数据提取（重）和计算逻辑（轻）分离，通过缓存避免重复工作</li>
+<li>缓存设计要点：版本控制、完整性验证、去重逻辑、环境隔离（scGPT 需要 subprocess）</li>
+<li>STAIG 系列 fusion 的特殊性：需要 staig_strict 模式的 vision embedding（256px、频域滤波、无 ImageNet 归一化）和额外的 staig_gene_feat</li>
+<li>Google Calendar API scope 限制：calendar.events 可以访问 settings 端点但不能访问 calendarList，需要选择合适的 API 端点</li>
+<li>性能优化的多维度思考：去重（减少计算次数）、并行化（提高单次效率）、缓存（复用结果）</li>
+</ul>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>117,931,338</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>37,503</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>110,846</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>5,792,721</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>111,990,268</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>95.1%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$45.6846</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>19,425</td>
+          <td>108,564</td>
+          <td>3,875,710</td>
+          <td>98,575,697</td>
+          <td>$40.3948</td>
+          <td>88.4%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>9,712</td>
+          <td>1,788</td>
+          <td>1,412,273</td>
+          <td>12,219,193</td>
+          <td>$3.0059</td>
+          <td>6.6%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-5-20250929</td>
+          <td>8,366</td>
+          <td>494</td>
+          <td>504,738</td>
+          <td>1,195,378</td>
+          <td>$2.2839</td>
+          <td>5.0%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>20,264,782</td>
+          <td>9,756</td>
+          <td>35,824</td>
+          <td>$14.5508</td>
+      </tr>
+      <tr>
+          <td>MacBook</td>
+          <td>51,452</td>
+          <td>3</td>
+          <td>2</td>
+          <td>$0.1314</td>
+      </tr>
+      <tr>
+          <td>TzJsDesktop</td>
+          <td>38,104,868</td>
+          <td>5,123</td>
+          <td>29,850</td>
+          <td>$27.8588</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>59,510,236</td>
+          <td>22,621</td>
+          <td>45,170</td>
+          <td>$3.1435</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
