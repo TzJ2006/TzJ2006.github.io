@@ -7,7 +7,7 @@
 <meta name="robots" content="index, follow">
 <title>Bug Journal 2026-02-14 | TzJ&#39;s Net</title>
 <meta name="keywords" content="Bug Journal">
-<meta name="description" content="实现 MIHD 两阶段 Pipeline 架构和 CalendarPro OAuth 修复">
+<meta name="description" content="横跨三个项目的密集开发日：在HPC集群上完成MIHD多模态空间转录组两阶段Pipeline架构重写并通过端到端测试；修复机器人错误恢复基准框架中力注入机制的多层系统性Bug（EEF定位错误、持续力缺失、PreGrasp检测器五层级联Bug）；同时大幅改进gadget/summarize工具（Claude CLI后端、ccusage计费修复、rclone云盘同步、export合并、Windows兼容性），并推进CalendarPro Discord Bot的批量删除功能与代码质量修复。">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-02-14/">
 
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-02-14/">
   <meta property="og:site_name" content="TzJ&#39;s Net">
   <meta property="og:title" content="Bug Journal 2026-02-14">
-  <meta property="og:description" content="实现 MIHD 两阶段 Pipeline 架构和 CalendarPro OAuth 修复">
+  <meta property="og:description" content="横跨三个项目的密集开发日：在HPC集群上完成MIHD多模态空间转录组两阶段Pipeline架构重写并通过端到端测试；修复机器人错误恢复基准框架中力注入机制的多层系统性Bug（EEF定位错误、持续力缺失、PreGrasp检测器五层级联Bug）；同时大幅改进gadget/summarize工具（Claude CLI后端、ccusage计费修复、rclone云盘同步、export合并、Windows兼容性），并推进CalendarPro Discord Bot的批量删除功能与代码质量修复。">
   <meta property="og:locale" content="en-us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="bugjournal">
@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <meta property="article:modified_time" content="2026-02-14T00:00:00-05:00">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Bug Journal 2026-02-14">
-<meta name="twitter:description" content="实现 MIHD 两阶段 Pipeline 架构和 CalendarPro OAuth 修复">
+<meta name="twitter:description" content="横跨三个项目的密集开发日：在HPC集群上完成MIHD多模态空间转录组两阶段Pipeline架构重写并通过端到端测试；修复机器人错误恢复基准框架中力注入机制的多层系统性Bug（EEF定位错误、持续力缺失、PreGrasp检测器五层级联Bug）；同时大幅改进gadget/summarize工具（Claude CLI后端、ccusage计费修复、rclone云盘同步、export合并、Windows兼容性），并推进CalendarPro Discord Bot的批量删除功能与代码质量修复。">
 
 
 <script type="application/ld+json">
@@ -124,12 +124,12 @@ document.addEventListener("DOMContentLoaded", function() {
   "@type": "BlogPosting",
   "headline": "Bug Journal 2026-02-14",
   "name": "Bug Journal 2026-02-14",
-  "description": "实现 MIHD 两阶段 Pipeline 架构和 CalendarPro OAuth 修复",
+  "description": "横跨三个项目的密集开发日：在HPC集群上完成MIHD多模态空间转录组两阶段Pipeline架构重写并通过端到端测试；修复机器人错误恢复基准框架中力注入机制的多层系统性Bug（EEF定位错误、持续力缺失、PreGrasp检测器五层级联Bug）；同时大幅改进gadget/summarize工具（Claude CLI后端、ccusage计费修复、rclone云盘同步、export合并、Windows兼容性），并推进CalendarPro Discord Bot的批量删除功能与代码质量修复。",
   "keywords": [
     "Bug Journal"
   ],
-  "articleBody": "日报 — 2026-02-14 实现 MIHD 两阶段 Pipeline 架构和 CalendarPro OAuth 修复\n今日任务 ✅ MIHD benchmark 测试和超时调整 — 完成 pca+uni2 系列实验，发现 basic_contrastive 超时问题并调整超时时间从 1 小时到 2 小时；staig_fusion_e2e 被移除 ✅ MIHD 两阶段 Pipeline 架构设计与实现 — 创建了 pipeline 包含 8 个核心模块（cache_manager、data_preparer、extraction/evaluation_planner、gene/vision_extractor、runner）和 3 个入口脚本，将 embedding 提取和 fusion 评估分为两个独立阶段，实现去重和缓存复用 ✅ Pipeline 端到端测试（151508） — 测试了 gene_only、core_multimodal、pca+uni2 多种组合，修复了 ExperimentLogger、mclust fallback 等 bug，验证了缓存机制正常工作 ✅ Vision encoding 耗时分析 — 分析了 vision encoding 的性能瓶颈：Patch 提取串行循环、GPU 推理频繁调用 empty_cache、模型加载等阶段；设计了三项优化方案（encoder 级缓存、patch 提取并行化、GPU 推理优化） ✅ CalendarPro Google Calendar 403 错误修复 — 修复了 get_user_timezone() 使用 calendarList API 导致的权限不足问题，改用 settings().get(setting=‘timezone’) API ✅ Gadgets 工具集文档更新 — 更新 CLAUDE.md 和 README.md，移除已删除的 Video/Audio/Image/Papers/OCR 等工具，保留 summarize 和 test 两个核心工具 问题与解决方案 1. basic_contrastive fusion 超时（3600s 限制） 解决方案: 将超时时间从 1 小时增加到 2 小时，因为训练型 fusion（basic_contrastive、staig_fusion）每个 section 需要 30-80 分钟\n关键洞察: 训练型 fusion（550 epochs）本质上需要更长时间，不能简单减少 epoch 否则影响结果质量\n2. Q-Former 每个 section 需要约 5.7 小时（200 epochs × ~100s/epoch） 解决方案: User 选择将 epochs 从 200 减少到 50（加速 4 倍），通过修改 pipeline_config.yaml 的 extra_config.qformer.epochs\n关键洞察: 不同 fusion 策略的计算开销差异巨大：concat/mean/attention 秒级，staig/llava/qformer 分钟到小时级\n3. ExperimentLogger 没有 save_comparison_csv() 方法导致 pipeline 崩溃 解决方案: 移除调用，ExperimentLogger 在 log_experiment 内部自动调用 _update_comparison_csv()\n关键洞察: CSV 汇总是自动的，不需要手动触发\n4. mclust 聚类失败（rpy2 未安装导致 ImportError） 解决方案: 在 runner.py 中添加 ImportError 捕获（原本只捕获 ValueError），fallback 到 KMeans\n关键洞察: staig_fusion 的 mclust 依赖 R 和 rpy2，General 环境不一定有，需要 robust fallback\n5. 每次切换 fusion 策略都重新计算相同的 encoder embedding，UNI2 被算 55+ 次 解决方案: 设计两阶段架构：Phase 1 提取并缓存所有 encoder embedding（每个 encoder×section 只算一次），Phase 2 从缓存加载执行 fusion+聚类+评估\n关键洞察: 缓存粒度应该在 encoder 级别，而不是最终的 fusion 结果级别\n6. CalendarPro get_user_timezone() 使用 calendarList API 导致 403 insufficientPermissions 解决方案: 改用 settings().get(setting=‘timezone’)，该 API 在 calendar.events scope 下可用\n关键洞察: Google Calendar API 不同端点的权限要求不同，settings API 比 calendarList 权限要求更宽松\n人类思路 vs AI 思路 Pipeline 架构设计 角色 思路 人类 User 提出核心思路：每个 slide 先提取所有 encoder embedding 并缓存到文件，然后对相同 embedding 做不同 fusion，避免重复计算 AI AI 扩展设计为完整的两阶段架构，包含 8 个模块、去重逻辑、环境切换、scGPT subprocess 调用、版本控制等工程细节 差异分析: User 抓住了核心瓶颈（重复编码），AI 负责工程化和边界情况处理（scGPT 环境、STAIG 严格模式、缓存版本等）\nQ-Former epochs 处理 角色 思路 人类 面对 Q-Former 耗时过长（5.7h/section），User 选择减少 epochs 到 50 而不是跳过或单独运行 AI AI 提供了三个选项（跳过、减少 epochs、继续），让 User 决策 差异分析: User 在时间和结果质量之间做了务实的权衡\nPipeline 重写范围 角色 思路 人类 User 要求「完全重写 pipeline」而非增量改进 AI AI 设计时仍保留了向后兼容性（不修改旧版 run_benchmark.py），创建全新 pipeline/ 包 差异分析: AI 在「完全重写」和「保持兼容性」之间找到了平衡，避免破坏现有工作流\nAI 局限性 初次实现 pipeline 时调用了不存在的 save_comparison_csv() 方法，说明对 ExperimentLogger 内部实现细节理解不够深入 mclust fallback 最初只捕获 ValueError 而忘记 ImportError，对 Python 异常层级处理不够全面 对 Google Calendar API 不同端点的权限要求不熟悉，需要通过错误日志才能定位到 calendarList vs settings 的差异 今日收获 两阶段架构的核心价值：将数据提取（重）和计算逻辑（轻）分离，通过缓存避免重复工作 缓存设计要点：版本控制、完整性验证、去重逻辑、环境隔离（scGPT 需要 subprocess） STAIG 系列 fusion 的特殊性：需要 staig_strict 模式的 vision embedding（256px、频域滤波、无 ImageNet 归一化）和额外的 staig_gene_feat Google Calendar API scope 限制：calendar.events 可以访问 settings 端点但不能访问 calendarList，需要选择合适的 API 端点 性能优化的多维度思考：去重（减少计算次数）、并行化（提高单次效率）、缓存（复用结果） Token 用量 总览 指标 数值 总 Token 117,931,338 输入 Token 37,503 输出 Token 110,846 Cache 创建 5,792,721 Cache 读取 111,990,268 Cache 命中率 95.1% 总费用 (USD) $45.6846 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 19,425 108,564 3,875,710 98,575,697 $40.3948 88.4% claude-haiku-4-5-20251001 9,712 1,788 1,412,273 12,219,193 $3.0059 6.6% claude-sonnet-4-5-20250929 8,366 494 504,738 1,195,378 $2.2839 5.0% 各设备用量 设备 总 Token 输入 输出 费用 DCC 20,264,782 9,756 35,824 $14.5508 MacBook 51,452 3 2 $0.1314 TzJsDesktop 38,104,868 5,123 29,850 $27.8588 tianhe 59,510,236 22,621 45,170 $3.1435 ",
-  "wordCount" : "454",
+  "articleBody": "日报 — 2026-02-14 横跨三个项目的密集开发日：在HPC集群上完成MIHD多模态空间转录组两阶段Pipeline架构重写并通过端到端测试；修复机器人错误恢复基准框架中力注入机制的多层系统性Bug（EEF定位错误、持续力缺失、PreGrasp检测器五层级联Bug）；同时大幅改进gadget/summarize工具（Claude CLI后端、ccusage计费修复、rclone云盘同步、export合并、Windows兼容性），并推进CalendarPro Discord Bot的批量删除功能与代码质量修复。\n今日任务 架构与策略 ✅ 两阶段Pipeline架构设计与实现 — 将现有每次重复计算embedding的低效pipeline完全重写为两阶段架构：Phase 1提取并缓存所有encoder embedding（每个encoder×section只算一次），Phase 2从缓存加载embedding执行fusion+聚类+评估。创建了12个新文件，修改了CLAUDE.md ✅ 修复EEF body定位错误 — 发现_get_eef_body_name()方法的possible_names列表缺少’gripper0_eef’，导致fallback到bin2（垃圾箱），力被施加到错误位置 ✅ 修复PreGrasp检测器的lookahead逻辑 — _check_will_close_soon()使用全零中性动作仿真，夹爪永远不会闭合。改为通过state_info传入future_demo_actions，基于真实demo动作判断夹爪是否即将闭合 ✅ summarize工具：添加配置文件+rclone云盘同步支持 — 新增~/.config/summarize/config.json支持，含device_name/logs_dir/reports_dir/rclone_remote/rclone_path字段；实现配置读写、rclone上传工具函数；添加config –show/–init子命令；新增Claude CLI后端（summarize_with_claude_cli） ✅ 实现持续力注入机制 — 修改collect_rollout_stats()函数，添加error_spec和injector参数，在验证rollout过程中循环重施加力，修复duration_steps不生效的系统性bug ✅ 新建PreGrasp检测器 — 实现pre_grasp.py，检测夹爪即将闭合前的时刻（当前gripper 0.0-0.3，10步后\u003e0.3），在夹爪开合前施加持续力让物体偏移 ✅ 修复get_task_phase()始终返回unknown — 将get_task_phase()改为使用已实现的get_task_completion_stages()，删除永远返回False的stub方法_check_phase_condition() ✅ 修复全局冷却时间阻断PreGrasp触发 — 将单一全局cooldown_counter改为按检测器独立追踪冷却时间，避免proximity检测器的冷却覆盖pre_grasp触发窗口 🔄 实现批量删除日历事件功能 — 扩展DeleteData模型（date_from/date_until/batch字段）、更新LLM prompt、扩展search_events时间范围参数、重写_handle_delete支持批量操作、新增BatchDeleteApprovalView Discord确认按钮。修复了LLM超时fallback（正则提取）和空消息崩溃问题。Discord回复详情优化仍在进行 ✅ summarize工具：修复ccusage Opus计费为$0的问题 — 发现–offline模式下Opus 4.6定价缺失，去掉–offline参数改为在线获取最新定价，Opus费用从$0恢复为正确的$19.11 ✅ summarize工具：修复Windows下npx/claude CLI调用失败 — ccusage调用加shell=True修复Windows下npx.cmd找不到问题；claude CLI调用时从环境变量中删除CLAUDECODE/CLAUDE_CODE_ENTRY避免嵌套会话检测 ✅ 修复近距离门控阻断PreGrasp — 全局max_eef_object_distance=0.05m门控阻断所有检测器，但pre_grasp工作范围是0.05-0.1m。改为让pre_grasp/grasp_precond等有内置距离检查的检测器绕过该门控 🔄 增大注入力使机械臂扰动可见 — 将力从3N增至30N，force_range改为[15,45]N，但视频中机械臂仍无可见运动。正在尝试inf大小的力以诊断根因 ✅ summarize工具：export时检测并合并已有日志 — 当同名log文件已存在时，以(source, project, timestamp)三元组去重后合并新旧会话，避免覆盖或丢失之前的记录 ✅ summarize工具：修复JSON解析健壮性 — 重写_parse_json_response：三步尝试（直接解析→提取代码块→提取第一个{}区间），修复LLM在JSON前后加解释文字导致解析失败的问题 实现与修复 ✅ 修复PreGrasp目标体名称错误 — 检测器将任务配置中的对象名（Milk）作为MuJoCo body名传给injector，导致Body not found错误。改为使用{’eef’: True}作为目标 ✅ 可视化脚本Phase 3改用demo actions — 修改2_visualize_scene.py，Phase 3注入后不再静止，而是继续执行demo轨迹，展示错误如何影响任务完成；并实现duration_steps后清除xfrc_applied ✅ Pipeline端到端测试与bug修复 — 在section 151508上测试了新pipeline，修复了两个bug：ExperimentLogger不存在save_comparison_csv方法、mclust环境缺少rpy2时未捕获ImportError。测试了concat/mean/attention/staig_fusion四种fusion策略，全部通过 🔄 RTX 5000 Ada新GPU的benchmark启动 — 切换到RTX 5000 Ada（32GB）后重新启动pipeline，Phase 1高效完成UNI2、HIPT、ResNet50、UNI-STAIG等视觉embedding提取，Phase 2完成127/190个评估实验。Q-Former因每个section约5.7h过慢，将epochs从200减至50 ✅ 清理database.py中的死代码 — 删除从未被调用的add_rejected_candidate()、get_rejected_candidates()、analyze_rejected()方法，以及DatabaseMeta中的total_rejected和rejection_stats字段 ✅ 验证pre_grasp场景生成 — 重新生成场景后确认pregrasp检测器触发（2个场景），task_phase不再是unknown ✅ 修复Google Calendar 403 insufficientPermissions — 将get_user_timezone()从calendarList().get() API改为settings().get() API，消除每次用户发消息时触发的403 WARNING日志 🔄 MIHD Benchmark 实验监控与调优 — 在DCC集群上持续运行207个benchmark实验组合（pca × uni2 × 多种fusion × 11 sections），处理了basic_contrastive超时问题（从1h调整到2h），移除了staig_fusion_e2e实验组，从264个实验减少到242个 ✅ CalendarPro代码质量修复 — dual_verify.py补充4个新intent的默认回复；executor.py裸except改为except (ValueError, TypeError)；periodic_checker.py将Scheduler实例提到循环外复用 ✅ summarize工具：切换Claude CLI为Sonnet模型 — 将claude –print改为claude –print –model sonnet，降低调用成本 ✅ summarize工具：完善文档 — 新增requirements.txt，更新tutorial.md添加三种后端对比、rclone无sudo安装说明、配置文件字段说明，更新README.md同步信息 ✅ 更新Gadgets仓库README和CLAUDE.md — 删除Video、audio、image、papers、git、png2text.py等多个不再使用的工具，更新README.md和CLAUDE.md以反映当前只剩summarize/和test/两个活跃工具的状态 ❌ summarize工具：生成当日日报 — 尝试用daily_summary.py –date 2026-02-14生成日报，但Claude CLI在嵌套Claude Code环境中返回空内容导致RuntimeError。需要在Claude Code会话外独立运行 问题与解决方案 关键问题 1. 30N力施加后视频中机械臂看不到任何运动 解决方案: 调试发现力被施加到bin2（垃圾箱）而非EEF；修复_get_eef_body_name()在possible_names中添加’gripper0_eef’等正确名称\n关键洞察: 第一个包含’ee’字符串的geom是robot0_screen_collision，属于bin2，字符串匹配fallback极其危险\n2. 现有benchmark架构低效：同一UNI2 embedding被重复计算77次（7 fusions × 11 sections） 解决方案: 完全重写pipeline为两阶段架构，Phase 1去重提取，Phase 2复用缓存\n关键洞察: 关键洞察是：缓存键不应包含fusion策略名——encoder embedding和fusion是正交的两个维度\n3. MuJoCo每步后自动清除xfrc_applied，duration_steps配置完全不生效 解决方案: 在验证rollout循环中循环重施加力：for t in range(steps): if t \u003c duration_steps: injector.apply(env, spec)\n关键洞察: xfrc_applied是MuJoCo的持久字段但被每次mj_step清零，需要在外层循环持续重置\n4. PreGrasp检测器注册后从未触发——多层Bug叠加：phase始终unknown→lookahead始终False→近距离门控阻断→冷却时间覆盖→body名错误 解决方案: 逐层诊断并修复：1)用get_task_completion_stages()替换stub；2)用future_demo_actions替换零动作仿真；3)全局门控改为按检测器绕过；4)全局冷却改为按检测器独立冷却；5)target改为eef\n关键洞察: 一个功能看似’已实现’但实际不可触发，往往是多个独立bug的叠加效果。需要逐步调试而非一次性假设\n5. ccusage –offline模式下Opus 4.6计费为$0，导致总费用严重偏低（$0.33 vs实际$19.44） 解决方案: 去掉–offline参数，改为在线获取最新模型定价\n关键洞察: 离线模式的定价表不包含最新模型，对于经常使用新模型的场景必须在线获取定价\n6. Claude CLI在嵌套Claude Code会话中拒绝执行（CLAUDECODE环境变量触发保护） 解决方案: 在调用subprocess前从环境变量中删除CLAUDECODE和CLAUDE_CODE_ENTRY\n关键洞察: Claude Code会将会话标识注入环境变量，子进程继承后被识别为嵌套会话；清除这两个变量即可绕过\n7. impulse.py的_check_will_close_soon()用全零动作仿真，夹爪在OSC控制下对零动作响应是保持位置而非闭合 解决方案: 在rollout_generator中将future_demo_actions注入state_info，pre_grasp检测器通过检查未来动作的夹爪分量判断是否即将闭合\n关键洞察: 离线场景生成时有demo actions可以直接检查，无需仿真预测\n8. 批量删除时LLM在嵌套Claude Code环境中超时，导致intent.data为空请求被拒绝 解决方案: 将原始用户输入通过_raw_input传给handler，用正则从中提取搜索关键词、日期范围、batch标志作为fallback\n关键洞察: SR-only fallback路径需要独立的信息提取能力，不能完全依赖LLM生成结构化data；嵌套AI环境是重要运行约束\n9. Q-Former fusion极慢：每个epoch约100秒，200 epochs × 11 sections = 63小时 解决方案: 将epochs从200减至50，通过pipeline_config.yaml中的extra_config.qformer.epochs传参\n关键洞察: 训练型fusion的epoch数需要根据计算预算动态调整，配置文件要支持per-fusion超参数覆盖\n10. semantic router将「请帮我安排这两天的睡眠和吃饭」误分类为update_energy，LLM超时无法纠正 解决方案: 通过unset CLAUDECODE环境变量重启应用，让LLM可以正常运行\n关键洞察: 嵌套Claude Code环境是调试过程中的根本障碍，解决它比修复单个分类错误更重要\n11. Windows下Python subprocess调用npx报FileNotFoundError（npx实际是npx.cmd） 解决方案: ccusage调用改为shell=True，让Windows命令解析器处理.cmd文件扩展名\n关键洞察: Windows上npm全局命令是.cmd文件，在Unix-like shell(Git Bash)中可用，但Python subprocess默认不走shell解析\n12. LLM返回的JSON前后有解释文字，直接json.loads失败 解决方案: 三步解析策略：直接解析→正则提取代码块→找首尾{}区间\n关键洞察: LLM输出不可信为纯JSON，健壮解析器需要多重回退策略\n一般问题 13. force_clip参数被嵌套在injectors.impulse下，但__init__从顶层读取导致始终用默认值 解决方案: 修正配置路径，使force_clip从正确的嵌套路径读取\n关键洞察: 配置路径不匹配是静默bug的常见来源\n14. Google Calendar calendarList API返回403 insufficientPermissions，每次用户发消息都触发 解决方案: 改用settings().get(setting=‘timezone’) API，该API只需calendar.events scope\n关键洞察: Google Calendar不同端点需要不同OAuth scope，settings API权限需求低于calendarList API\n15. BatchDeleteApprovalView发送确认消息后返回空字符串，主循环尝试channel.send(\"\")导致Discord API报错 解决方案: 在主消息循环中添加if response:检查，空响应不发送\n关键洞察: 双重发送模式（handler直接发+主循环再发）需要明确的「已处理」信号约定\n16. basic_contrastive fusion超时：在1h限制下无法完成（平均需要77分钟/section） 解决方案: 将run_all_benchmarks.py中的超时从3600s增加到7200s（2小时）\n关键洞察: 训练型fusion（basic_contrastive、staig_fusion）比简单fusion慢10-20倍，需要区分对待\n17. mclust聚类在General环境下报ImportError（rpy2未安装），但只catch了ValueError 解决方案: 在runner.py的mclust fallback块中同时捕获ImportError，自动降级到KMeans\n关键洞察: 缺少rpy2时抛出的是ImportError而非ValueError，需要宽泛的异常处理策略\n18. SSH远程命令中无法使用cd切换工作目录，导致反复命令失败 解决方案: 使用绝对路径或在ssh命令字符串中显式拼接cd命令；最终通过写shell wrapper脚本解决。另认识到当前节点已直接连接GPU，无需SSH转跳\n关键洞察: 运行nvidia-smi先检测是否已在GPU节点上，避免不必要的SSH跳转；AI需要额外确认工具调用参数是否真的包含了计划的内容\n19. Claude CLI在嵌套Claude Code环境中生成日报时返回空内容 解决方案: 未解决（需要在Claude Code会话外运行）\n关键洞察: 日报生成脚本不能在Claude Code内部调用，需要独立终端或调度任务\n20. ExperimentLogger不存在save_comparison_csv()方法导致pipeline崩溃 解决方案: 移除错误的外部调用（ExperimentLogger在log_experiment内部自动调用_update_comparison_csv）\n关键洞察: API文档缺失时需要通过grep函数名来确认实际接口\n21. conda run输出缓冲问题：启动的pipeline进程没有实时输出 解决方案: 改用直接调用conda环境的Python二进制（/hpc/group/…/bin/python -u），配合输出重定向到日志文件\n关键洞察: conda run在后台任务中会缓冲输出；直接调用Python二进制+PYTHONUNBUFFERED=1是更可靠的方案\n人类思路 vs AI 思路 战略层面 PreGrasp触发失败的根因诊断 角色 思路 人类 用户提供了完整的计划，已预先分析出get_task_phase()是stub、total_rejected是死代码两个根因 AI AI在实施过程中发现了计划未预料到的额外3个bug：lookahead使用零动作、全局冷却覆盖触发窗口、全局近距离门控阻断 差异分析: 用户的计划正确但不完整，AI在实际运行调试中发现了更深层的问题并逐步修复\n两阶段Pipeline架构的核心理念 角色 思路 人类 用户直接指出了问题的本质：encoder embedding和fusion是正交的，应该先批量提取所有embedding存文件，再复用做fusion。这是一个架构级洞察，非常简洁明确 AI AI首先进行了大量代码探索和分析，提出了三种渐进方案，然后在用户选择后设计了详细的模块化架构 差异分析: 用户直接看到了根本问题（encoder与fusion正交），AI的分析路径更长但更全面；架构核心理念来自用户，模块化实现细节来自AI\n力注入机制调试策略 角色 思路 人类 提出检验假设：先用inf力验证机制是否工作，再逐步缩小范围找问题 AI 先从理论计算所需力大小（OSC刚度kp=150），推导25-45N应足够产生3cm位移 差异分析: 人类采用工程直觉的二分法调试，AI依赖理论推导；最终调试日志揭示问题根本不是力大小，而是施力位置错误\n嵌套Claude Code环境的识别 角色 思路 人类 用户观察到LLM一直超时，提示「你能告诉我有什么办法能够优化这一块吗」 AI AI在日志中发现CLAUDECODE环境变量阻止了嵌套调用，通过unset解决 差异分析: 人类提出问题，AI找到了根本原因并给出解决方案；但AI未在一开始就提示这个环境约束\nheadless server云盘同步方案 角色 思路 人类 主动提出headless server场景的特殊性（无法装云盘app），要求调研CLI上传方案 AI 调研了rclone/gdrive/onedrive等工具，推荐rclone并说明headless认证流程 差异分析: 人类识别到了边缘场景（headless server），AI才进行针对性调研；如果不提醒，AI可能只给出桌面云盘app方案\nVision encoding耗时瓶颈分析 角色 思路 人类 用户主动提出分析vision encoding耗时，说明用户对性能瓶颈有直觉认识 AI AI通过代码探索识别出三个具体瓶颈：patch提取串行循环、每批推理后empty_cache()、模型首次加载 差异分析: 用户提出问题方向，AI提供了具体量化的瓶颈定位和修复方案\nPreGrasp触发逻辑设计 角色 思路 人类 用户指出：夹爪是跳变过程（0→1），只需检测当前开启、N步后是否变化即可，不需要复杂的’正在接近’逻辑 AI AI设计了需要连续2帧距离递减的复杂接近检测逻辑 差异分析: 人类对任务物理特性的直觉理解比AI的通用设计更简洁有效；AI的过度工程化增加了不必要的约束条件\nrejection log分析思路 角色 思路 人类 用户直接问：‘如果根本没有写rejection logging，那请把这个部分删除掉’；提出问题本质是接受率vs拒绝率的问题 AI AI绕道分析各种可能的rejection原因，没有直接检验rejection logging是否真的生效 差异分析: 人类能快速识别分析框架是否有效，AI容易在无效框架下做无谓分析\n批量删除的触发条件设计 角色 思路 人类 用户明确指出问题：说「取消这些日程」时Bot一直要求「specify which event」，希望能理解批量意图 AI AI设计了batch布尔字段由LLM判断是否批量，并给出「显示列表+确认按钮」的UX方案 差异分析: 人类发现的是UX问题，AI提供了技术实现方案；但AI未预见到LLM超时的边缘情况，需要人类通过测试发现后再次纠正\nccusage计费问题定位 角色 思路 人类 直接指出手动运行npx ccusage daily –json数据正常，但脚本输出不对，怀疑是–offline的问题 AI 从代码逻辑出发，对比有无–offline的输出差异，发现offline模式Opus的cost字段为0 差异分析: 人类凭使用经验快速定位到嫌疑点；AI通过系统性对比验证假设。两者互补\nexport日志合并需求 角色 思路 人类 提出「如果检测到已有日志，尝试合并」的需求，考虑到多次export的数据不应丢失 AI 设计了(source, project, timestamp)三元组去重+新旧会话合并的具体实现方案 差异分析: 人类提出业务需求，AI设计技术方案；去重键的选择（三元组）是AI提出的\n实现层面 Q-Former过慢的处理策略 角色 思路 人类 用户选择减少epochs（200→50），这是在质量和速度之间的工程权衡 AI AI提出了三个选项并指出了时间影响（63小时），量化分析后供用户决策 差异分析: AI提供了量化分析和选项，用户做出了最终的工程判断\nAI 局限性 重要局限 SSH命令中忘记包含cd的错误重复10次以上，无法从错误中学习调整；需要用绕道方案（shell wrapper）才解决 在调试’力无效’问题时，AI先理论推导力大小，而非先验证力是否施加到正确位置；根本问题（body定位错误）被绕过 未预见嵌套Claude Code环境会阻断LLM调用，导致批量删除实现后立即因LLM超时失效，需要人类通过实际测试才能发现 设计PreGrasp检测器时过度工程化，添加了任务阶段检查、接近度检测等多个条件；每个额外条件都增加了触发失败的可能性 计划中未预料到PreGrasp还有lookahead逻辑用零动作、全局冷却、全局门控三个额外bug，需要在实际运行后才能发现 在设计pipeline_config.yaml时，未能主动提出extra_config.qformer.epochs的配置方案，而是等用户反馈Q-Former过慢后才被动调整 调用get_task_completion_stages()等已有功能而不知情，重复造轮子；代码库中已有完整的阶段判断逻辑却没被发现 subagent探索报告了多个「确认的bug」，部分（如TimeoutError处理器不可达、ROUTE_TO_INTENT大写值问题）经AI主体手动验证属于误报 对Windows平台特性（.cmd文件、npx解析）不够敏感，需要运行失败后才发现并修复 Claude CLI嵌套会话检测的解决方案（清除CLAUDECODE环境变量）是在实际运行报错后才找到的，未能提前预判 一般局限 Discord回复信息量不足这一UX问题未被AI主动发现，需要人类明确反馈后才着手改进 盲目复制proxy设置命令，未思考当前任务是否需要网络访问 批量删除的正则日期提取（_extract_delete_query）仅支持中文格式「N月N号」，英文日期格式未覆盖 未能预见rpy2/mclust在不同conda环境下的ImportError，只处理了ValueError，导致第一次staig_fusion测试失败 对ExperimentLogger的API不熟悉，错误地调用了不存在的save_comparison_csv()方法，需要人工触发测试才能发现 conda run的输出缓冲问题需要多次尝试才能找到可靠的解决方案（–no-banner不支持、直接shell缓冲等），花费了不必要的时间 Grep工具在daily_summary.py上多次超时，需要退化到Bash grep命令，说明对大文件的正则搜索存在性能问题 今日收获 核心收获 两阶段Pipeline架构（提取缓存→复用评估）是benchmark系统的关键设计模式，核心原则是：encoder embedding与fusion策略正交，缓存键不应包含fusion名称 MuJoCo的xfrc_applied在每次mj_step后被清零，持续力注入必须在外层python循环中每步重新设置 调试’已实现但不触发’的功能时，要假设存在多层bug叠加。单独测试每一层（phase→lookahead→gate→cooldown→body name），每层独立验证 Claude Code通过CLAUDECODE/CLAUDE_CODE_ENTRY环境变量检测嵌套会话，清除这两个变量即可在脚本内调用claude CLI robosuite PickPlace环境中EEF body名称是’gripper0_eef’（body_id=21），不在常见列表中；字符串匹配fallback很危险（‘screen’包含’ee’会误匹配） 调试策略：先验证机制是否工作（inf力测试），再验证力施加位置（调试日志），最后才考虑参数调整；跳过任何一步都会延误定位 离线生成阶段有真实demo actions可用，不需要靠零动作仿真预测未来。将future_demo_actions注入state_info是更可靠的方法 全局门控和全局冷却是常见的架构陷阱：一个检测器的触发会阻断所有其他检测器，应设计为按检测器独立管理 双重AI验证系统（SR+LLM）中，LLM fallback不可用时，SR-only路径的intent.data为空。需要为每个intent handler设计基于原始用户输入的fallback信息提取逻辑 ccusage的–offline模式定价表不会自动更新新模型，生产环境应去掉–offline以获取准确计费 训练型fusion（basic_contrastive=77min/section, staig_fusion=50min, Q-Former=5.7h）与非训练型（concat/mean/attention\u003c1min）速度差异极大，benchmark调度需要分类处理 框架中存在STUB方法（永远返回False的_check_phase_condition()），这类死代码会导致依赖它的检测器静默失败而难以调试 Windows上npm全局命令是.cmd文件，Python subprocess需要shell=True才能找到；Unix-like环境（Git Bash）中则无此问题 rclone是跨平台云盘CLI同步的最佳选择，支持70+云盘，headless server可通过token copy方式认证 LLM输出解析器需要多重回退策略（直接解析→提取代码块→找{}区间），不能假设输出是纯JSON 实践收获 force_clip参数被嵌套在injectors.impulse下，但__init__从顶层读取导致始终用默认值。配置路径不匹配是静默bug的常见来源 Discord确认按钮（discord.ui.View）与主消息循环之间需要明确的「已直接发送」约定。handler返回空字符串时主循环不应再次发送，需要添加if response:检查 conda环境中直接调用Python二进制（/path/to/conda/env/bin/python -u）比conda run更适合后台长时任务，避免输出缓冲问题 robosuite OSC控制器kp=150（N/m），Sawyer EEF等效质量约5-10kg，稳态位移=F/（Λ·kp），3cm位移需要约25-45N持续力 在集群上：先用nvidia-smi -L检查当前节点是否已有GPU，有则直接用；SSH到新节点时需要cd到项目目录并激活conda环境 Google Calendar不同API端点需要不同OAuth scope。calendarList需要calendar.readonly，而settings只需calendar.events。设计时应仔细核对所有使用的API端点 STAIG的mclust聚类依赖rpy2，在非STAIG环境下会抛出ImportError而非ValueError，需要宽泛的except (ImportError, ValueError)来确保KMeans fallback生效 会话摘要 MIHD Benchmark (DCC) ✅ 两阶段Pipeline架构完整实现：12个模块创建与端到端测试 20:47:13.055 | claude_code 基于用户提出的两阶段架构理念（embedding提取与fusion评估分离），AI完整实现了pipeline/模块包（cache_manager, data_preparer, extraction_planner, gene_extractor, vision_extractor, evaluation_planner, runner）及入口脚本。在section 151508上进行端到端测试，修复了两个bug（save_comparison_csv API错误、mclust ImportError未捕获），四种fusion策略（concat/mean/attention/staig_fusion）全部测试通过，ARI范围0.14-0.42。\n🔍 Vision Encoding性能分析：瓶颈识别与三项优化方案设计 00:51:22.137 | claude_code 用户请求分析vision encoding耗时瓶颈。AI识别出三个主要瓶颈：patch提取串行循环（CPU）、每批推理后empty_cache()（约116次）、encoder级无缓存导致重复计算。用户选择同时实施三项优化（添加encoder级缓存、并行化patch提取、优化GPU推理）。这直接引出了完全重写pipeline的需求，实现计划已完成但因用户操作被打断而推迟实施。\n🔄 RTX 5000 Ada新GPU上运行完整Benchmark：Pipeline监控与Q-Former调优 21:52:14.896 | claude_code 用户切换到RTX 5000 Ada（32GB GPU）后，使用新的两阶段pipeline启动完整benchmark。Phase 1高效完成所有encoder提取（UNI2/HIPT/ResNet50/UNI-STAIG），Phase 2完成127/190个实验。发现Q-Former每section需要约5.7小时（200 epochs × 100s），用户决定将epochs减至50。修复了conda run输出缓冲问题，改用直接调用Python二进制。\n🔄 MIHD Benchmark超时处理与实验恢复：basic_contrastive调优 00:07:35.904 | claude_code 在DCC集群上监控benchmark进度时发现basic_contrastive fusion超时（1h限制不足，实际需要77min/section）。将超时上限从3600s改为7200s，同时根据用户要求移除了staig_fusion_e2e实验组（删除相关代码和已有结果），最终重启benchmark调度器继续运行176个待完成实验。\nGadgets (MacBook) ✅ 删除废弃工具后更新README和CLAUDE.md 00:58:36.238 | claude_code 用户删除了Gadgets仓库中不再使用的多个工具（Video、audio、image、papers、git、png2text.py等）。AI检查了git状态确认删除范围，更新了README.md（移除废弃工具表格项）和CLAUDE.md（移除对应命令和架构说明），同时更正了test/子模块的命令（从旧的testAll.py更新为新的python -m benchmark.cli）。\nErrorRecoveryBenchmark ✅ 调试力注入机制：发现EEF body定位错误并修复 21:27:34.381 | claude_code 实施调试计划：添加–force_override和–duration_override参数，在impulse.py添加详细日志。关键发现：力被施加到bin2（垃圾箱）而非gripper0_eef，原因是_get_eef_body_name()的possible_names缺少正确名称导致fallback匹配到’robot0_screen_collision’（含’ee’字符串）。修复后inf力测试显示机械臂明显移动，验证机制正常。随后用户提出新需求：1秒持续力+抓取前触发。\n🔍 根因分析：get_task_phase()是STUB导致所有相位相关检测器失效 22:49:50.381 | claude_code 深入分析PreGrasp不触发的根因：get_task_phase()调用了永远返回False的_check_phase_condition()存根方法，始终返回’unknown’，而PreGrasp和GraspPrecond都要求task_phase为’reach’或’grasp’。另外total_rejected永远为0说明rejection logging存在bug。用户指出这两个问题本质相同（死代码），要求制定修复plan，但plan未被批准执行。\n✅ 修复PreGrasp检测器不触发：get_task_phase stub + 死代码清理 22:56:34.002 | claude_code 用户提供计划要求修复PreGrasp永远不触发的问题。AI读取代码后实施了两个计划内修复（get_task_phase重写、database死代码清理），并在运行场景生成验证时发现额外三个bug（lookahead零动作、全局冷却阻断、近距离门控），逐一修复后pregrasp成功触发生成2个场景。所有41个单元测试通过。\n🔄 实现持续力注入机制和PreGrasp检测器 22:05:14.381 | claude_code 实施三阶段计划：(1)修复collect_rollout_stats()支持duration_steps循环重施加力；(2)新建pre_grasp.py检测器，按用户建议简化为检测’当前开启+10步后闭合’逻辑；(3)更新配置文件。测试发现PreGrasp检测器从未触发，通过夹爪轨迹分析发现demo_1有36步满足条件但检测器仍未触发。\n🔄 增大注入力使视频中机械臂扰动可见 00:38:54.892 | claude_code 用户发现视频中机械臂没有明显运动，与AI讨论后确定原因是力太小（3N对OSC控制的Sawyer臂约产生2-4mm位移）。AI实施了力放大方案（force_range [15,45]N，force_clip 60N，–force_override参数，Phase 3改用demo actions，实现duration_steps后清零xfrc_applied），但30N后视频仍无可见运动。用户提出用inf大小力进行诊断性测试，该测试在会话结束时被中断。\n🔄 可视化Phase 3改为继续执行demo actions而非静止 00:45:39.241 | claude_code 用户要求修改2_visualize_scene.py，让Phase 3注入错误后机械臂继续执行demo轨迹。AI读取文件后修改了Phase 3循环体，并在an49上成功生成视频（193帧）。通过EGL headless渲染验证，日志显示'533 remaining demo actions’确认逻辑正确。随后用户发现视频中机械臂完全没有受到扰动，开始深入调试。\nCalendarPro 🔄 实现批量删除日历事件功能与修复衍生bug 20:08:24.708 | claude_code 用户通过plan要求实现批量删除功能。AI修改了5个文件：扩展数据模型、更新LLM prompt、扩展search_events参数、重写delete handler、新增BatchDeleteApprovalView。测试时发现LLM因嵌套Claude Code环境超时导致intent.data为空，AI添加了_extract_delete_query fallback。随后发现空消息崩溃和Discord回复详情不足，分别修复。最终通过unset CLAUDECODE重启应用解决根本问题。\n🔄 修复Google Calendar 403权限错误并讨论其他代码问题 00:47:55.337 | claude_code 用户通过plan要求修复calendarList API 403错误，AI将get_user_timezone()改为使用settings API。随后AI主动通过多个subagent探索代码库中的其他问题，发现了dual_verify缺少默认回复、裸except等问题，但subagent报告的部分bug属于误报（经主体验证否定）。计划制定了3项代码质量修复，但ExitPlanMode被用户拒绝。\n✅ 代码质量修复：dual_verify默认回复、裸except、Scheduler实例化优化 01:42:23.755 | claude_code 用户通过plan要求实现3项代码质量修复。AI在dual_verify.py添加了4个新intent的默认回复，修复了executor.py的裸except，并优化了periodic_checker.py中Scheduler的重复实例化。所有82个核心测试通过。\ngadget (summarize) ✅ 添加配置文件、机器标识与rclone云盘同步 22:14:06.675 | claude_code 用户需要多设备日志自动同步到云盘而不推送GitHub。AI实现了~/.config/summarize/config.json配置体系，支持device_name、logs_dir、reports_dir、rclone_remote字段，并集成rclone自动上传功能。新增了config –show和config –init子命令，更新了tutorial.md和README.md。\n✅ 为summarize工具添加Claude CLI后端 21:29:22.461 | claude_code 用户请求将summarize工具从Anthropic API切换到Claude Code CLI。AI新增了summarize_with_claude_cli函数，将prompt通过stdin传给claude –print，并将默认后端从anthropic改为claude_cli。同时更新了tutorial.md、requirements.txt，并记录了三种后端的对比。\n✅ 修复ccusage计费、JSON解析与rclone上传结构 22:51:43.654 | claude_code 发现三个问题：ccusage –offline导致Opus计费为$0，rclone上传分了logs/reports子目录不便管理，JSON解析遇到LLM在JSON前后加文字时失败。AI修复了全部三个问题：去掉–offline、统一上传目录、重写解析器为三步回退策略。\n🔍 调试Claude CLI嵌套环境下返回空内容的问题 22:31:02.666 | claude_code 用户报告summarize脚本调用Claude CLI返回空stdout导致JSON解析失败。AI检查了subprocess调用代码，发现已有unset CLAUDECODE逻辑，问题可能是Claude CLI将输出写入stderr而非stdout，或者新版CLI在嵌套会话中的行为变化。会话在诊断过程中中断，问题未完全解决。\n✅ 切换Claude CLI模型为Sonnet + 完善export合并逻辑 23:26:16.145 | claude_code 用户要求将claude CLI调用切换为Sonnet模型，AI添加了–model sonnet参数。随后发现ccusage Opus计费问题并修复。用户提出export时若日志已存在应合并而非覆盖，AI实现了基于三元组去重的合并逻辑。\n🔄 summarize工具添加配置文件与rclone云盘同步支持 21:55:40.143 | claude_code 用户通过plan要求为daily_summary.py添加配置文件和rclone同步功能。AI实现了config.json读写、device_name自动检测、rclone上传和config –show/–init子命令。随后用户尝试实际运行生成日报，但Claude CLI在嵌套环境中返回空内容导致失败，未能成功生成。\n✅ 旧版summarize日报（含2026-02-13 CalendarPro记录） 23:24:58.955 | claude_code 这是一个日报分析会话，用户提交了2026-02-13 CalendarPro代码库整理的对话记录，AI以旧版日报格式（无level/importance字段）生成了结构化日报JSON。该会话本身不涉及代码修改。\n✅ 旧版summarize日报（含CalendarPro 2026-02-14记录） 23:51:07.975 | claude_code 旧版日报分析会话，用户提交了CalendarPro 2026-02-14的Bug修复记录，AI生成了结构化日报。该会话本身不涉及代码修改，是summarize工具的一次实际使用。\n✅ 旧版summarize日报（含2026-02-13 CalendarPro记录，第二次） 23:47:19.175 | claude_code 又一个旧版日报分析会话，内容与23:24的会话基本相同，是同一天内重复运行的产物。无代码修改。\nToken 用量 总览 指标 数值 总 Token 118,217,669 输入 Token 37,508 输出 Token 110,857 Cache 创建 5,794,068 Cache 读取 112,275,236 Cache 命中率 95.1% 总费用 (USD) $45.8358 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 19,430 108,575 3,877,057 98,860,665 $40.5460 88.5% claude-haiku-4-5-20251001 9,712 1,788 1,412,273 12,219,193 $3.0059 6.6% claude-sonnet-4-5-20250929 8,366 494 504,738 1,195,378 $2.2839 5.0% 各设备用量 设备 总 Token 输入 输出 费用 DCC 20,264,782 9,756 35,824 $14.5508 MacBook 51,452 3 2 $0.1314 tianhe 59,510,236 22,621 45,170 $3.1435 TzJsDesktop 38,391,199 5,128 29,861 $28.0100 ",
+  "wordCount" : "887",
   "inLanguage": "en",
   "datePublished": "2026-02-14T00:00:00-05:00",
   "dateModified": "2026-02-14T00:00:00-05:00",
@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <h1 class="post-title entry-hint-parent">
       Bug Journal 2026-02-14
     </h1>
-    <div class="post-meta"><span title='2026-02-14 00:00:00 -0500 EST'>February 14, 2026</span>&nbsp;·&nbsp;3 min
+    <div class="post-meta"><span title='2026-02-14 00:00:00 -0500 EST'>February 14, 2026</span>&nbsp;·&nbsp;5 min
 
 
       
@@ -234,38 +234,112 @@ document.addEventListener("DOMContentLoaded", function() {
   </header> 
   <div class="post-content"><h1 id="日报--2026-02-14">日报 — 2026-02-14<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-14">#</a></h1>
 <blockquote>
-<p>实现 MIHD 两阶段 Pipeline 架构和 CalendarPro OAuth 修复</p>
+<p>横跨三个项目的密集开发日：在HPC集群上完成MIHD多模态空间转录组两阶段Pipeline架构重写并通过端到端测试；修复机器人错误恢复基准框架中力注入机制的多层系统性Bug（EEF定位错误、持续力缺失、PreGrasp检测器五层级联Bug）；同时大幅改进gadget/summarize工具（Claude CLI后端、ccusage计费修复、rclone云盘同步、export合并、Windows兼容性），并推进CalendarPro Discord Bot的批量删除功能与代码质量修复。</p>
 </blockquote>
 <h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
 <ul>
-<li>✅ <strong>MIHD benchmark 测试和超时调整</strong> — 完成 pca+uni2 系列实验，发现 basic_contrastive 超时问题并调整超时时间从 1 小时到 2 小时；staig_fusion_e2e 被移除</li>
-<li>✅ <strong>MIHD 两阶段 Pipeline 架构设计与实现</strong> — 创建了 pipeline 包含 8 个核心模块（cache_manager、data_preparer、extraction/evaluation_planner、gene/vision_extractor、runner）和 3 个入口脚本，将 embedding 提取和 fusion 评估分为两个独立阶段，实现去重和缓存复用</li>
-<li>✅ <strong>Pipeline 端到端测试（151508）</strong> — 测试了 gene_only、core_multimodal、pca+uni2 多种组合，修复了 ExperimentLogger、mclust fallback 等 bug，验证了缓存机制正常工作</li>
-<li>✅ <strong>Vision encoding 耗时分析</strong> — 分析了 vision encoding 的性能瓶颈：Patch 提取串行循环、GPU 推理频繁调用 empty_cache、模型加载等阶段；设计了三项优化方案（encoder 级缓存、patch 提取并行化、GPU 推理优化）</li>
-<li>✅ <strong>CalendarPro Google Calendar 403 错误修复</strong> — 修复了 get_user_timezone() 使用 calendarList API 导致的权限不足问题，改用 settings().get(setting=&lsquo;timezone&rsquo;) API</li>
-<li>✅ <strong>Gadgets 工具集文档更新</strong> — 更新 CLAUDE.md 和 README.md，移除已删除的 Video/Audio/Image/Papers/OCR 等工具，保留 summarize 和 test 两个核心工具</li>
+<li>✅ <strong>两阶段Pipeline架构设计与实现</strong> — 将现有每次重复计算embedding的低效pipeline完全重写为两阶段架构：Phase 1提取并缓存所有encoder embedding（每个encoder×section只算一次），Phase 2从缓存加载embedding执行fusion+聚类+评估。创建了12个新文件，修改了CLAUDE.md</li>
+<li>✅ <strong>修复EEF body定位错误</strong> — 发现_get_eef_body_name()方法的possible_names列表缺少&rsquo;gripper0_eef&rsquo;，导致fallback到bin2（垃圾箱），力被施加到错误位置</li>
+<li>✅ <strong>修复PreGrasp检测器的lookahead逻辑</strong> — _check_will_close_soon()使用全零中性动作仿真，夹爪永远不会闭合。改为通过state_info传入future_demo_actions，基于真实demo动作判断夹爪是否即将闭合</li>
+<li>✅ <strong>summarize工具：添加配置文件+rclone云盘同步支持</strong> — 新增~/.config/summarize/config.json支持，含device_name/logs_dir/reports_dir/rclone_remote/rclone_path字段；实现配置读写、rclone上传工具函数；添加config &ndash;show/&ndash;init子命令；新增Claude CLI后端（summarize_with_claude_cli）</li>
+<li>✅ <strong>实现持续力注入机制</strong> — 修改collect_rollout_stats()函数，添加error_spec和injector参数，在验证rollout过程中循环重施加力，修复duration_steps不生效的系统性bug</li>
+<li>✅ <strong>新建PreGrasp检测器</strong> — 实现pre_grasp.py，检测夹爪即将闭合前的时刻（当前gripper 0.0-0.3，10步后&gt;0.3），在夹爪开合前施加持续力让物体偏移</li>
+<li>✅ <strong>修复get_task_phase()始终返回unknown</strong> — 将get_task_phase()改为使用已实现的get_task_completion_stages()，删除永远返回False的stub方法_check_phase_condition()</li>
+<li>✅ <strong>修复全局冷却时间阻断PreGrasp触发</strong> — 将单一全局cooldown_counter改为按检测器独立追踪冷却时间，避免proximity检测器的冷却覆盖pre_grasp触发窗口</li>
+<li>🔄 <strong>实现批量删除日历事件功能</strong> — 扩展DeleteData模型（date_from/date_until/batch字段）、更新LLM prompt、扩展search_events时间范围参数、重写_handle_delete支持批量操作、新增BatchDeleteApprovalView Discord确认按钮。修复了LLM超时fallback（正则提取）和空消息崩溃问题。Discord回复详情优化仍在进行</li>
+<li>✅ <strong>summarize工具：修复ccusage Opus计费为$0的问题</strong> — 发现&ndash;offline模式下Opus 4.6定价缺失，去掉&ndash;offline参数改为在线获取最新定价，Opus费用从$0恢复为正确的$19.11</li>
+<li>✅ <strong>summarize工具：修复Windows下npx/claude CLI调用失败</strong> — ccusage调用加shell=True修复Windows下npx.cmd找不到问题；claude CLI调用时从环境变量中删除CLAUDECODE/CLAUDE_CODE_ENTRY避免嵌套会话检测</li>
+<li>✅ <strong>修复近距离门控阻断PreGrasp</strong> — 全局max_eef_object_distance=0.05m门控阻断所有检测器，但pre_grasp工作范围是0.05-0.1m。改为让pre_grasp/grasp_precond等有内置距离检查的检测器绕过该门控</li>
+<li>🔄 <strong>增大注入力使机械臂扰动可见</strong> — 将力从3N增至30N，force_range改为[15,45]N，但视频中机械臂仍无可见运动。正在尝试inf大小的力以诊断根因</li>
+<li>✅ <strong>summarize工具：export时检测并合并已有日志</strong> — 当同名log文件已存在时，以(source, project, timestamp)三元组去重后合并新旧会话，避免覆盖或丢失之前的记录</li>
+<li>✅ <strong>summarize工具：修复JSON解析健壮性</strong> — 重写_parse_json_response：三步尝试（直接解析→提取代码块→提取第一个{}区间），修复LLM在JSON前后加解释文字导致解析失败的问题</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>修复PreGrasp目标体名称错误</strong> — 检测器将任务配置中的对象名（Milk）作为MuJoCo body名传给injector，导致Body not found错误。改为使用{&rsquo;eef&rsquo;: True}作为目标</li>
+<li>✅ <strong>可视化脚本Phase 3改用demo actions</strong> — 修改2_visualize_scene.py，Phase 3注入后不再静止，而是继续执行demo轨迹，展示错误如何影响任务完成；并实现duration_steps后清除xfrc_applied</li>
+<li>✅ <strong>Pipeline端到端测试与bug修复</strong> — 在section 151508上测试了新pipeline，修复了两个bug：ExperimentLogger不存在save_comparison_csv方法、mclust环境缺少rpy2时未捕获ImportError。测试了concat/mean/attention/staig_fusion四种fusion策略，全部通过</li>
+<li>🔄 <strong>RTX 5000 Ada新GPU的benchmark启动</strong> — 切换到RTX 5000 Ada（32GB）后重新启动pipeline，Phase 1高效完成UNI2、HIPT、ResNet50、UNI-STAIG等视觉embedding提取，Phase 2完成127/190个评估实验。Q-Former因每个section约5.7h过慢，将epochs从200减至50</li>
+<li>✅ <strong>清理database.py中的死代码</strong> — 删除从未被调用的add_rejected_candidate()、get_rejected_candidates()、analyze_rejected()方法，以及DatabaseMeta中的total_rejected和rejection_stats字段</li>
+<li>✅ <strong>验证pre_grasp场景生成</strong> — 重新生成场景后确认pregrasp检测器触发（2个场景），task_phase不再是unknown</li>
+<li>✅ <strong>修复Google Calendar 403 insufficientPermissions</strong> — 将get_user_timezone()从calendarList().get() API改为settings().get() API，消除每次用户发消息时触发的403 WARNING日志</li>
+<li>🔄 <strong>MIHD Benchmark 实验监控与调优</strong> — 在DCC集群上持续运行207个benchmark实验组合（pca × uni2 × 多种fusion × 11 sections），处理了basic_contrastive超时问题（从1h调整到2h），移除了staig_fusion_e2e实验组，从264个实验减少到242个</li>
+<li>✅ <strong>CalendarPro代码质量修复</strong> — dual_verify.py补充4个新intent的默认回复；executor.py裸except改为except (ValueError, TypeError)；periodic_checker.py将Scheduler实例提到循环外复用</li>
+<li>✅ <strong>summarize工具：切换Claude CLI为Sonnet模型</strong> — 将claude &ndash;print改为claude &ndash;print &ndash;model sonnet，降低调用成本</li>
+<li>✅ <strong>summarize工具：完善文档</strong> — 新增requirements.txt，更新tutorial.md添加三种后端对比、rclone无sudo安装说明、配置文件字段说明，更新README.md同步信息</li>
+<li>✅ <strong>更新Gadgets仓库README和CLAUDE.md</strong> — 删除Video、audio、image、papers、git、png2text.py等多个不再使用的工具，更新README.md和CLAUDE.md以反映当前只剩summarize/和test/两个活跃工具的状态</li>
+<li>❌ <strong>summarize工具：生成当日日报</strong> — 尝试用daily_summary.py &ndash;date 2026-02-14生成日报，但Claude CLI在嵌套Claude Code环境中返回空内容导致RuntimeError。需要在Claude Code会话外独立运行</li>
 </ul>
 <h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
-<h3 id="1-basic_contrastive-fusion-超时3600s-限制">1. basic_contrastive fusion 超时（3600s 限制）<a hidden class="anchor" aria-hidden="true" href="#1-basic_contrastive-fusion-超时3600s-限制">#</a></h3>
-<p><strong>解决方案:</strong> 将超时时间从 1 小时增加到 2 小时，因为训练型 fusion（basic_contrastive、staig_fusion）每个 section 需要 30-80 分钟</p>
-<p><strong>关键洞察:</strong> 训练型 fusion（550 epochs）本质上需要更长时间，不能简单减少 epoch 否则影响结果质量</p>
-<h3 id="2-q-former-每个-section-需要约-57-小时200-epochs--100sepoch">2. Q-Former 每个 section 需要约 5.7 小时（200 epochs × ~100s/epoch）<a hidden class="anchor" aria-hidden="true" href="#2-q-former-每个-section-需要约-57-小时200-epochs--100sepoch">#</a></h3>
-<p><strong>解决方案:</strong> User 选择将 epochs 从 200 减少到 50（加速 4 倍），通过修改 pipeline_config.yaml 的 extra_config.qformer.epochs</p>
-<p><strong>关键洞察:</strong> 不同 fusion 策略的计算开销差异巨大：concat/mean/attention 秒级，staig/llava/qformer 分钟到小时级</p>
-<h3 id="3-experimentlogger-没有-save_comparison_csv-方法导致-pipeline-崩溃">3. ExperimentLogger 没有 save_comparison_csv() 方法导致 pipeline 崩溃<a hidden class="anchor" aria-hidden="true" href="#3-experimentlogger-没有-save_comparison_csv-方法导致-pipeline-崩溃">#</a></h3>
-<p><strong>解决方案:</strong> 移除调用，ExperimentLogger 在 log_experiment 内部自动调用 _update_comparison_csv()</p>
-<p><strong>关键洞察:</strong> CSV 汇总是自动的，不需要手动触发</p>
-<h3 id="4-mclust-聚类失败rpy2-未安装导致-importerror">4. mclust 聚类失败（rpy2 未安装导致 ImportError）<a hidden class="anchor" aria-hidden="true" href="#4-mclust-聚类失败rpy2-未安装导致-importerror">#</a></h3>
-<p><strong>解决方案:</strong> 在 runner.py 中添加 ImportError 捕获（原本只捕获 ValueError），fallback 到 KMeans</p>
-<p><strong>关键洞察:</strong> staig_fusion 的 mclust 依赖 R 和 rpy2，General 环境不一定有，需要 robust fallback</p>
-<h3 id="5-每次切换-fusion-策略都重新计算相同的-encoder-embeddinguni2-被算-55-次">5. 每次切换 fusion 策略都重新计算相同的 encoder embedding，UNI2 被算 55+ 次<a hidden class="anchor" aria-hidden="true" href="#5-每次切换-fusion-策略都重新计算相同的-encoder-embeddinguni2-被算-55-次">#</a></h3>
-<p><strong>解决方案:</strong> 设计两阶段架构：Phase 1 提取并缓存所有 encoder embedding（每个 encoder×section 只算一次），Phase 2 从缓存加载执行 fusion+聚类+评估</p>
-<p><strong>关键洞察:</strong> 缓存粒度应该在 encoder 级别，而不是最终的 fusion 结果级别</p>
-<h3 id="6-calendarpro-get_user_timezone-使用-calendarlist-api-导致-403-insufficientpermissions">6. CalendarPro get_user_timezone() 使用 calendarList API 导致 403 insufficientPermissions<a hidden class="anchor" aria-hidden="true" href="#6-calendarpro-get_user_timezone-使用-calendarlist-api-导致-403-insufficientpermissions">#</a></h3>
-<p><strong>解决方案:</strong> 改用 settings().get(setting=&lsquo;timezone&rsquo;)，该 API 在 calendar.events scope 下可用</p>
-<p><strong>关键洞察:</strong> Google Calendar API 不同端点的权限要求不同，settings API 比 calendarList 权限要求更宽松</p>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-30n力施加后视频中机械臂看不到任何运动">1. 30N力施加后视频中机械臂看不到任何运动<a hidden class="anchor" aria-hidden="true" href="#1-30n力施加后视频中机械臂看不到任何运动">#</a></h4>
+<p><strong>解决方案:</strong> 调试发现力被施加到bin2（垃圾箱）而非EEF；修复_get_eef_body_name()在possible_names中添加&rsquo;gripper0_eef&rsquo;等正确名称</p>
+<p><strong>关键洞察:</strong> 第一个包含&rsquo;ee&rsquo;字符串的geom是robot0_screen_collision，属于bin2，字符串匹配fallback极其危险</p>
+<h4 id="2-现有benchmark架构低效同一uni2-embedding被重复计算77次7-fusions--11-sections">2. 现有benchmark架构低效：同一UNI2 embedding被重复计算77次（7 fusions × 11 sections）<a hidden class="anchor" aria-hidden="true" href="#2-现有benchmark架构低效同一uni2-embedding被重复计算77次7-fusions--11-sections">#</a></h4>
+<p><strong>解决方案:</strong> 完全重写pipeline为两阶段架构，Phase 1去重提取，Phase 2复用缓存</p>
+<p><strong>关键洞察:</strong> 关键洞察是：缓存键不应包含fusion策略名——encoder embedding和fusion是正交的两个维度</p>
+<h4 id="3-mujoco每步后自动清除xfrc_appliedduration_steps配置完全不生效">3. MuJoCo每步后自动清除xfrc_applied，duration_steps配置完全不生效<a hidden class="anchor" aria-hidden="true" href="#3-mujoco每步后自动清除xfrc_appliedduration_steps配置完全不生效">#</a></h4>
+<p><strong>解决方案:</strong> 在验证rollout循环中循环重施加力：for t in range(steps): if t &lt; duration_steps: injector.apply(env, spec)</p>
+<p><strong>关键洞察:</strong> xfrc_applied是MuJoCo的持久字段但被每次mj_step清零，需要在外层循环持续重置</p>
+<h4 id="4-pregrasp检测器注册后从未触发多层bug叠加phase始终unknownlookahead始终false近距离门控阻断冷却时间覆盖body名错误">4. PreGrasp检测器注册后从未触发——多层Bug叠加：phase始终unknown→lookahead始终False→近距离门控阻断→冷却时间覆盖→body名错误<a hidden class="anchor" aria-hidden="true" href="#4-pregrasp检测器注册后从未触发多层bug叠加phase始终unknownlookahead始终false近距离门控阻断冷却时间覆盖body名错误">#</a></h4>
+<p><strong>解决方案:</strong> 逐层诊断并修复：1)用get_task_completion_stages()替换stub；2)用future_demo_actions替换零动作仿真；3)全局门控改为按检测器绕过；4)全局冷却改为按检测器独立冷却；5)target改为eef</p>
+<p><strong>关键洞察:</strong> 一个功能看似&rsquo;已实现&rsquo;但实际不可触发，往往是多个独立bug的叠加效果。需要逐步调试而非一次性假设</p>
+<h4 id="5-ccusage---offline模式下opus-46计费为0导致总费用严重偏低033-vs实际1944">5. ccusage &ndash;offline模式下Opus 4.6计费为$0，导致总费用严重偏低（$0.33 vs实际$19.44）<a hidden class="anchor" aria-hidden="true" href="#5-ccusage---offline模式下opus-46计费为0导致总费用严重偏低033-vs实际1944">#</a></h4>
+<p><strong>解决方案:</strong> 去掉&ndash;offline参数，改为在线获取最新模型定价</p>
+<p><strong>关键洞察:</strong> 离线模式的定价表不包含最新模型，对于经常使用新模型的场景必须在线获取定价</p>
+<h4 id="6-claude-cli在嵌套claude-code会话中拒绝执行claudecode环境变量触发保护">6. Claude CLI在嵌套Claude Code会话中拒绝执行（CLAUDECODE环境变量触发保护）<a hidden class="anchor" aria-hidden="true" href="#6-claude-cli在嵌套claude-code会话中拒绝执行claudecode环境变量触发保护">#</a></h4>
+<p><strong>解决方案:</strong> 在调用subprocess前从环境变量中删除CLAUDECODE和CLAUDE_CODE_ENTRY</p>
+<p><strong>关键洞察:</strong> Claude Code会将会话标识注入环境变量，子进程继承后被识别为嵌套会话；清除这两个变量即可绕过</p>
+<h4 id="7-impulsepy的_check_will_close_soon用全零动作仿真夹爪在osc控制下对零动作响应是保持位置而非闭合">7. impulse.py的_check_will_close_soon()用全零动作仿真，夹爪在OSC控制下对零动作响应是保持位置而非闭合<a hidden class="anchor" aria-hidden="true" href="#7-impulsepy的_check_will_close_soon用全零动作仿真夹爪在osc控制下对零动作响应是保持位置而非闭合">#</a></h4>
+<p><strong>解决方案:</strong> 在rollout_generator中将future_demo_actions注入state_info，pre_grasp检测器通过检查未来动作的夹爪分量判断是否即将闭合</p>
+<p><strong>关键洞察:</strong> 离线场景生成时有demo actions可以直接检查，无需仿真预测</p>
+<h4 id="8-批量删除时llm在嵌套claude-code环境中超时导致intentdata为空请求被拒绝">8. 批量删除时LLM在嵌套Claude Code环境中超时，导致intent.data为空请求被拒绝<a hidden class="anchor" aria-hidden="true" href="#8-批量删除时llm在嵌套claude-code环境中超时导致intentdata为空请求被拒绝">#</a></h4>
+<p><strong>解决方案:</strong> 将原始用户输入通过_raw_input传给handler，用正则从中提取搜索关键词、日期范围、batch标志作为fallback</p>
+<p><strong>关键洞察:</strong> SR-only fallback路径需要独立的信息提取能力，不能完全依赖LLM生成结构化data；嵌套AI环境是重要运行约束</p>
+<h4 id="9-q-former-fusion极慢每个epoch约100秒200-epochs--11-sections--63小时">9. Q-Former fusion极慢：每个epoch约100秒，200 epochs × 11 sections = 63小时<a hidden class="anchor" aria-hidden="true" href="#9-q-former-fusion极慢每个epoch约100秒200-epochs--11-sections--63小时">#</a></h4>
+<p><strong>解决方案:</strong> 将epochs从200减至50，通过pipeline_config.yaml中的extra_config.qformer.epochs传参</p>
+<p><strong>关键洞察:</strong> 训练型fusion的epoch数需要根据计算预算动态调整，配置文件要支持per-fusion超参数覆盖</p>
+<h4 id="10-semantic-router将请帮我安排这两天的睡眠和吃饭误分类为update_energyllm超时无法纠正">10. semantic router将「请帮我安排这两天的睡眠和吃饭」误分类为update_energy，LLM超时无法纠正<a hidden class="anchor" aria-hidden="true" href="#10-semantic-router将请帮我安排这两天的睡眠和吃饭误分类为update_energyllm超时无法纠正">#</a></h4>
+<p><strong>解决方案:</strong> 通过unset CLAUDECODE环境变量重启应用，让LLM可以正常运行</p>
+<p><strong>关键洞察:</strong> 嵌套Claude Code环境是调试过程中的根本障碍，解决它比修复单个分类错误更重要</p>
+<h4 id="11-windows下python-subprocess调用npx报filenotfounderrornpx实际是npxcmd">11. Windows下Python subprocess调用npx报FileNotFoundError（npx实际是npx.cmd）<a hidden class="anchor" aria-hidden="true" href="#11-windows下python-subprocess调用npx报filenotfounderrornpx实际是npxcmd">#</a></h4>
+<p><strong>解决方案:</strong> ccusage调用改为shell=True，让Windows命令解析器处理.cmd文件扩展名</p>
+<p><strong>关键洞察:</strong> Windows上npm全局命令是.cmd文件，在Unix-like shell(Git Bash)中可用，但Python subprocess默认不走shell解析</p>
+<h4 id="12-llm返回的json前后有解释文字直接jsonloads失败">12. LLM返回的JSON前后有解释文字，直接json.loads失败<a hidden class="anchor" aria-hidden="true" href="#12-llm返回的json前后有解释文字直接jsonloads失败">#</a></h4>
+<p><strong>解决方案:</strong> 三步解析策略：直接解析→正则提取代码块→找首尾{}区间</p>
+<p><strong>关键洞察:</strong> LLM输出不可信为纯JSON，健壮解析器需要多重回退策略</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="13-force_clip参数被嵌套在injectorsimpulse下但__init__从顶层读取导致始终用默认值">13. force_clip参数被嵌套在injectors.impulse下，但__init__从顶层读取导致始终用默认值<a hidden class="anchor" aria-hidden="true" href="#13-force_clip参数被嵌套在injectorsimpulse下但__init__从顶层读取导致始终用默认值">#</a></h4>
+<p><strong>解决方案:</strong> 修正配置路径，使force_clip从正确的嵌套路径读取</p>
+<p><strong>关键洞察:</strong> 配置路径不匹配是静默bug的常见来源</p>
+<h4 id="14-google-calendar-calendarlist-api返回403-insufficientpermissions每次用户发消息都触发">14. Google Calendar calendarList API返回403 insufficientPermissions，每次用户发消息都触发<a hidden class="anchor" aria-hidden="true" href="#14-google-calendar-calendarlist-api返回403-insufficientpermissions每次用户发消息都触发">#</a></h4>
+<p><strong>解决方案:</strong> 改用settings().get(setting=&lsquo;timezone&rsquo;) API，该API只需calendar.events scope</p>
+<p><strong>关键洞察:</strong> Google Calendar不同端点需要不同OAuth scope，settings API权限需求低于calendarList API</p>
+<h4 id="15-batchdeleteapprovalview发送确认消息后返回空字符串主循环尝试channelsend导致discord-api报错">15. BatchDeleteApprovalView发送确认消息后返回空字符串，主循环尝试channel.send(&quot;&quot;)导致Discord API报错<a hidden class="anchor" aria-hidden="true" href="#15-batchdeleteapprovalview发送确认消息后返回空字符串主循环尝试channelsend导致discord-api报错">#</a></h4>
+<p><strong>解决方案:</strong> 在主消息循环中添加if response:检查，空响应不发送</p>
+<p><strong>关键洞察:</strong> 双重发送模式（handler直接发+主循环再发）需要明确的「已处理」信号约定</p>
+<h4 id="16-basic_contrastive-fusion超时在1h限制下无法完成平均需要77分钟section">16. basic_contrastive fusion超时：在1h限制下无法完成（平均需要77分钟/section）<a hidden class="anchor" aria-hidden="true" href="#16-basic_contrastive-fusion超时在1h限制下无法完成平均需要77分钟section">#</a></h4>
+<p><strong>解决方案:</strong> 将run_all_benchmarks.py中的超时从3600s增加到7200s（2小时）</p>
+<p><strong>关键洞察:</strong> 训练型fusion（basic_contrastive、staig_fusion）比简单fusion慢10-20倍，需要区分对待</p>
+<h4 id="17-mclust聚类在general环境下报importerrorrpy2未安装但只catch了valueerror">17. mclust聚类在General环境下报ImportError（rpy2未安装），但只catch了ValueError<a hidden class="anchor" aria-hidden="true" href="#17-mclust聚类在general环境下报importerrorrpy2未安装但只catch了valueerror">#</a></h4>
+<p><strong>解决方案:</strong> 在runner.py的mclust fallback块中同时捕获ImportError，自动降级到KMeans</p>
+<p><strong>关键洞察:</strong> 缺少rpy2时抛出的是ImportError而非ValueError，需要宽泛的异常处理策略</p>
+<h4 id="18-ssh远程命令中无法使用cd切换工作目录导致反复命令失败">18. SSH远程命令中无法使用cd切换工作目录，导致反复命令失败<a hidden class="anchor" aria-hidden="true" href="#18-ssh远程命令中无法使用cd切换工作目录导致反复命令失败">#</a></h4>
+<p><strong>解决方案:</strong> 使用绝对路径或在ssh命令字符串中显式拼接cd命令；最终通过写shell wrapper脚本解决。另认识到当前节点已直接连接GPU，无需SSH转跳</p>
+<p><strong>关键洞察:</strong> 运行nvidia-smi先检测是否已在GPU节点上，避免不必要的SSH跳转；AI需要额外确认工具调用参数是否真的包含了计划的内容</p>
+<h4 id="19-claude-cli在嵌套claude-code环境中生成日报时返回空内容">19. Claude CLI在嵌套Claude Code环境中生成日报时返回空内容<a hidden class="anchor" aria-hidden="true" href="#19-claude-cli在嵌套claude-code环境中生成日报时返回空内容">#</a></h4>
+<p><strong>解决方案:</strong> 未解决（需要在Claude Code会话外运行）</p>
+<p><strong>关键洞察:</strong> 日报生成脚本不能在Claude Code内部调用，需要独立终端或调度任务</p>
+<h4 id="20-experimentlogger不存在save_comparison_csv方法导致pipeline崩溃">20. ExperimentLogger不存在save_comparison_csv()方法导致pipeline崩溃<a hidden class="anchor" aria-hidden="true" href="#20-experimentlogger不存在save_comparison_csv方法导致pipeline崩溃">#</a></h4>
+<p><strong>解决方案:</strong> 移除错误的外部调用（ExperimentLogger在log_experiment内部自动调用_update_comparison_csv）</p>
+<p><strong>关键洞察:</strong> API文档缺失时需要通过grep函数名来确认实际接口</p>
+<h4 id="21-conda-run输出缓冲问题启动的pipeline进程没有实时输出">21. conda run输出缓冲问题：启动的pipeline进程没有实时输出<a hidden class="anchor" aria-hidden="true" href="#21-conda-run输出缓冲问题启动的pipeline进程没有实时输出">#</a></h4>
+<p><strong>解决方案:</strong> 改用直接调用conda环境的Python二进制（/hpc/group/&hellip;/bin/python -u），配合输出重定向到日志文件</p>
+<p><strong>关键洞察:</strong> conda run在后台任务中会缓冲输出；直接调用Python二进制+PYTHONUNBUFFERED=1是更可靠的方案</p>
 <h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
-<h3 id="pipeline-架构设计">Pipeline 架构设计<a hidden class="anchor" aria-hidden="true" href="#pipeline-架构设计">#</a></h3>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="pregrasp触发失败的根因诊断">PreGrasp触发失败的根因诊断<a hidden class="anchor" aria-hidden="true" href="#pregrasp触发失败的根因诊断">#</a></h4>
 <table>
   <thead>
       <tr>
@@ -276,16 +350,16 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>人类</td>
-          <td>User 提出核心思路：每个 slide 先提取所有 encoder embedding 并缓存到文件，然后对相同 embedding 做不同 fusion，避免重复计算</td>
+          <td>用户提供了完整的计划，已预先分析出get_task_phase()是stub、total_rejected是死代码两个根因</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>AI 扩展设计为完整的两阶段架构，包含 8 个模块、去重逻辑、环境切换、scGPT subprocess 调用、版本控制等工程细节</td>
+          <td>AI在实施过程中发现了计划未预料到的额外3个bug：lookahead使用零动作、全局冷却覆盖触发窗口、全局近距离门控阻断</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> User 抓住了核心瓶颈（重复编码），AI 负责工程化和边界情况处理（scGPT 环境、STAIG 严格模式、缓存版本等）</p>
-<h3 id="q-former-epochs-处理">Q-Former epochs 处理<a hidden class="anchor" aria-hidden="true" href="#q-former-epochs-处理">#</a></h3>
+<p><strong>差异分析:</strong> 用户的计划正确但不完整，AI在实际运行调试中发现了更深层的问题并逐步修复</p>
+<h4 id="两阶段pipeline架构的核心理念">两阶段Pipeline架构的核心理念<a hidden class="anchor" aria-hidden="true" href="#两阶段pipeline架构的核心理念">#</a></h4>
 <table>
   <thead>
       <tr>
@@ -296,16 +370,16 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>人类</td>
-          <td>面对 Q-Former 耗时过长（5.7h/section），User 选择减少 epochs 到 50 而不是跳过或单独运行</td>
+          <td>用户直接指出了问题的本质：encoder embedding和fusion是正交的，应该先批量提取所有embedding存文件，再复用做fusion。这是一个架构级洞察，非常简洁明确</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>AI 提供了三个选项（跳过、减少 epochs、继续），让 User 决策</td>
+          <td>AI首先进行了大量代码探索和分析，提出了三种渐进方案，然后在用户选择后设计了详细的模块化架构</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> User 在时间和结果质量之间做了务实的权衡</p>
-<h3 id="pipeline-重写范围">Pipeline 重写范围<a hidden class="anchor" aria-hidden="true" href="#pipeline-重写范围">#</a></h3>
+<p><strong>差异分析:</strong> 用户直接看到了根本问题（encoder与fusion正交），AI的分析路径更长但更全面；架构核心理念来自用户，模块化实现细节来自AI</p>
+<h4 id="力注入机制调试策略">力注入机制调试策略<a hidden class="anchor" aria-hidden="true" href="#力注入机制调试策略">#</a></h4>
 <table>
   <thead>
       <tr>
@@ -316,29 +390,324 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>人类</td>
-          <td>User 要求「完全重写 pipeline」而非增量改进</td>
+          <td>提出检验假设：先用inf力验证机制是否工作，再逐步缩小范围找问题</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>AI 设计时仍保留了向后兼容性（不修改旧版 run_benchmark.py），创建全新 pipeline/ 包</td>
+          <td>先从理论计算所需力大小（OSC刚度kp=150），推导25-45N应足够产生3cm位移</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> AI 在「完全重写」和「保持兼容性」之间找到了平衡，避免破坏现有工作流</p>
+<p><strong>差异分析:</strong> 人类采用工程直觉的二分法调试，AI依赖理论推导；最终调试日志揭示问题根本不是力大小，而是施力位置错误</p>
+<h4 id="嵌套claude-code环境的识别">嵌套Claude Code环境的识别<a hidden class="anchor" aria-hidden="true" href="#嵌套claude-code环境的识别">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户观察到LLM一直超时，提示「你能告诉我有什么办法能够优化这一块吗」</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI在日志中发现CLAUDECODE环境变量阻止了嵌套调用，通过unset解决</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类提出问题，AI找到了根本原因并给出解决方案；但AI未在一开始就提示这个环境约束</p>
+<h4 id="headless-server云盘同步方案">headless server云盘同步方案<a hidden class="anchor" aria-hidden="true" href="#headless-server云盘同步方案">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>主动提出headless server场景的特殊性（无法装云盘app），要求调研CLI上传方案</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>调研了rclone/gdrive/onedrive等工具，推荐rclone并说明headless认证流程</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类识别到了边缘场景（headless server），AI才进行针对性调研；如果不提醒，AI可能只给出桌面云盘app方案</p>
+<h4 id="vision-encoding耗时瓶颈分析">Vision encoding耗时瓶颈分析<a hidden class="anchor" aria-hidden="true" href="#vision-encoding耗时瓶颈分析">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户主动提出分析vision encoding耗时，说明用户对性能瓶颈有直觉认识</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI通过代码探索识别出三个具体瓶颈：patch提取串行循环、每批推理后empty_cache()、模型首次加载</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户提出问题方向，AI提供了具体量化的瓶颈定位和修复方案</p>
+<h4 id="pregrasp触发逻辑设计">PreGrasp触发逻辑设计<a hidden class="anchor" aria-hidden="true" href="#pregrasp触发逻辑设计">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户指出：夹爪是跳变过程（0→1），只需检测当前开启、N步后是否变化即可，不需要复杂的&rsquo;正在接近&rsquo;逻辑</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI设计了需要连续2帧距离递减的复杂接近检测逻辑</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类对任务物理特性的直觉理解比AI的通用设计更简洁有效；AI的过度工程化增加了不必要的约束条件</p>
+<h4 id="rejection-log分析思路">rejection log分析思路<a hidden class="anchor" aria-hidden="true" href="#rejection-log分析思路">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户直接问：&lsquo;如果根本没有写rejection logging，那请把这个部分删除掉&rsquo;；提出问题本质是接受率vs拒绝率的问题</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI绕道分析各种可能的rejection原因，没有直接检验rejection logging是否真的生效</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类能快速识别分析框架是否有效，AI容易在无效框架下做无谓分析</p>
+<h4 id="批量删除的触发条件设计">批量删除的触发条件设计<a hidden class="anchor" aria-hidden="true" href="#批量删除的触发条件设计">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户明确指出问题：说「取消这些日程」时Bot一直要求「specify which event」，希望能理解批量意图</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI设计了batch布尔字段由LLM判断是否批量，并给出「显示列表+确认按钮」的UX方案</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类发现的是UX问题，AI提供了技术实现方案；但AI未预见到LLM超时的边缘情况，需要人类通过测试发现后再次纠正</p>
+<h4 id="ccusage计费问题定位">ccusage计费问题定位<a hidden class="anchor" aria-hidden="true" href="#ccusage计费问题定位">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>直接指出手动运行npx ccusage daily &ndash;json数据正常，但脚本输出不对，怀疑是&ndash;offline的问题</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>从代码逻辑出发，对比有无&ndash;offline的输出差异，发现offline模式Opus的cost字段为0</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类凭使用经验快速定位到嫌疑点；AI通过系统性对比验证假设。两者互补</p>
+<h4 id="export日志合并需求">export日志合并需求<a hidden class="anchor" aria-hidden="true" href="#export日志合并需求">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>提出「如果检测到已有日志，尝试合并」的需求，考虑到多次export的数据不应丢失</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>设计了(source, project, timestamp)三元组去重+新旧会话合并的具体实现方案</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类提出业务需求，AI设计技术方案；去重键的选择（三元组）是AI提出的</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="q-former过慢的处理策略">Q-Former过慢的处理策略<a hidden class="anchor" aria-hidden="true" href="#q-former过慢的处理策略">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户选择减少epochs（200→50），这是在质量和速度之间的工程权衡</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI提出了三个选项并指出了时间影响（63小时），量化分析后供用户决策</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI提供了量化分析和选项，用户做出了最终的工程判断</p>
 <h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
 <ul>
-<li>初次实现 pipeline 时调用了不存在的 save_comparison_csv() 方法，说明对 ExperimentLogger 内部实现细节理解不够深入</li>
-<li>mclust fallback 最初只捕获 ValueError 而忘记 ImportError，对 Python 异常层级处理不够全面</li>
-<li>对 Google Calendar API 不同端点的权限要求不熟悉，需要通过错误日志才能定位到 calendarList vs settings 的差异</li>
+<li>SSH命令中忘记包含cd的错误重复10次以上，无法从错误中学习调整；需要用绕道方案（shell wrapper）才解决</li>
+<li>在调试&rsquo;力无效&rsquo;问题时，AI先理论推导力大小，而非先验证力是否施加到正确位置；根本问题（body定位错误）被绕过</li>
+<li>未预见嵌套Claude Code环境会阻断LLM调用，导致批量删除实现后立即因LLM超时失效，需要人类通过实际测试才能发现</li>
+<li>设计PreGrasp检测器时过度工程化，添加了任务阶段检查、接近度检测等多个条件；每个额外条件都增加了触发失败的可能性</li>
+<li>计划中未预料到PreGrasp还有lookahead逻辑用零动作、全局冷却、全局门控三个额外bug，需要在实际运行后才能发现</li>
+<li>在设计pipeline_config.yaml时，未能主动提出extra_config.qformer.epochs的配置方案，而是等用户反馈Q-Former过慢后才被动调整</li>
+<li>调用get_task_completion_stages()等已有功能而不知情，重复造轮子；代码库中已有完整的阶段判断逻辑却没被发现</li>
+<li>subagent探索报告了多个「确认的bug」，部分（如TimeoutError处理器不可达、ROUTE_TO_INTENT大写值问题）经AI主体手动验证属于误报</li>
+<li>对Windows平台特性（.cmd文件、npx解析）不够敏感，需要运行失败后才发现并修复</li>
+<li>Claude CLI嵌套会话检测的解决方案（清除CLAUDECODE环境变量）是在实际运行报错后才找到的，未能提前预判</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>Discord回复信息量不足这一UX问题未被AI主动发现，需要人类明确反馈后才着手改进</li>
+<li>盲目复制proxy设置命令，未思考当前任务是否需要网络访问</li>
+<li>批量删除的正则日期提取（_extract_delete_query）仅支持中文格式「N月N号」，英文日期格式未覆盖</li>
+<li>未能预见rpy2/mclust在不同conda环境下的ImportError，只处理了ValueError，导致第一次staig_fusion测试失败</li>
+<li>对ExperimentLogger的API不熟悉，错误地调用了不存在的save_comparison_csv()方法，需要人工触发测试才能发现</li>
+<li>conda run的输出缓冲问题需要多次尝试才能找到可靠的解决方案（&ndash;no-banner不支持、直接shell缓冲等），花费了不必要的时间</li>
+<li>Grep工具在daily_summary.py上多次超时，需要退化到Bash grep命令，说明对大文件的正则搜索存在性能问题</li>
 </ul>
 <h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
 <ul>
-<li>两阶段架构的核心价值：将数据提取（重）和计算逻辑（轻）分离，通过缓存避免重复工作</li>
-<li>缓存设计要点：版本控制、完整性验证、去重逻辑、环境隔离（scGPT 需要 subprocess）</li>
-<li>STAIG 系列 fusion 的特殊性：需要 staig_strict 模式的 vision embedding（256px、频域滤波、无 ImageNet 归一化）和额外的 staig_gene_feat</li>
-<li>Google Calendar API scope 限制：calendar.events 可以访问 settings 端点但不能访问 calendarList，需要选择合适的 API 端点</li>
-<li>性能优化的多维度思考：去重（减少计算次数）、并行化（提高单次效率）、缓存（复用结果）</li>
+<li>两阶段Pipeline架构（提取缓存→复用评估）是benchmark系统的关键设计模式，核心原则是：encoder embedding与fusion策略正交，缓存键不应包含fusion名称</li>
+<li>MuJoCo的xfrc_applied在每次mj_step后被清零，持续力注入必须在外层python循环中每步重新设置</li>
+<li>调试&rsquo;已实现但不触发&rsquo;的功能时，要假设存在多层bug叠加。单独测试每一层（phase→lookahead→gate→cooldown→body name），每层独立验证</li>
+<li>Claude Code通过CLAUDECODE/CLAUDE_CODE_ENTRY环境变量检测嵌套会话，清除这两个变量即可在脚本内调用claude CLI</li>
+<li>robosuite PickPlace环境中EEF body名称是&rsquo;gripper0_eef&rsquo;（body_id=21），不在常见列表中；字符串匹配fallback很危险（&lsquo;screen&rsquo;包含&rsquo;ee&rsquo;会误匹配）</li>
+<li>调试策略：先验证机制是否工作（inf力测试），再验证力施加位置（调试日志），最后才考虑参数调整；跳过任何一步都会延误定位</li>
+<li>离线生成阶段有真实demo actions可用，不需要靠零动作仿真预测未来。将future_demo_actions注入state_info是更可靠的方法</li>
+<li>全局门控和全局冷却是常见的架构陷阱：一个检测器的触发会阻断所有其他检测器，应设计为按检测器独立管理</li>
+<li>双重AI验证系统（SR+LLM）中，LLM fallback不可用时，SR-only路径的intent.data为空。需要为每个intent handler设计基于原始用户输入的fallback信息提取逻辑</li>
+<li>ccusage的&ndash;offline模式定价表不会自动更新新模型，生产环境应去掉&ndash;offline以获取准确计费</li>
+<li>训练型fusion（basic_contrastive=77min/section, staig_fusion=50min, Q-Former=5.7h）与非训练型（concat/mean/attention&lt;1min）速度差异极大，benchmark调度需要分类处理</li>
+<li>框架中存在STUB方法（永远返回False的_check_phase_condition()），这类死代码会导致依赖它的检测器静默失败而难以调试</li>
+<li>Windows上npm全局命令是.cmd文件，Python subprocess需要shell=True才能找到；Unix-like环境（Git Bash）中则无此问题</li>
+<li>rclone是跨平台云盘CLI同步的最佳选择，支持70+云盘，headless server可通过token copy方式认证</li>
+<li>LLM输出解析器需要多重回退策略（直接解析→提取代码块→找{}区间），不能假设输出是纯JSON</li>
 </ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>force_clip参数被嵌套在injectors.impulse下，但__init__从顶层读取导致始终用默认值。配置路径不匹配是静默bug的常见来源</li>
+<li>Discord确认按钮（discord.ui.View）与主消息循环之间需要明确的「已直接发送」约定。handler返回空字符串时主循环不应再次发送，需要添加if response:检查</li>
+<li>conda环境中直接调用Python二进制（/path/to/conda/env/bin/python -u）比conda run更适合后台长时任务，避免输出缓冲问题</li>
+<li>robosuite OSC控制器kp=150（N/m），Sawyer EEF等效质量约5-10kg，稳态位移=F/（Λ·kp），3cm位移需要约25-45N持续力</li>
+<li>在集群上：先用nvidia-smi -L检查当前节点是否已有GPU，有则直接用；SSH到新节点时需要cd到项目目录并激活conda环境</li>
+<li>Google Calendar不同API端点需要不同OAuth scope。calendarList需要calendar.readonly，而settings只需calendar.events。设计时应仔细核对所有使用的API端点</li>
+<li>STAIG的mclust聚类依赖rpy2，在非STAIG环境下会抛出ImportError而非ValueError，需要宽泛的except (ImportError, ValueError)来确保KMeans fallback生效</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd-benchmark-dcc">MIHD Benchmark (DCC)<a hidden class="anchor" aria-hidden="true" href="#mihd-benchmark-dcc">#</a></h3>
+<p><strong>✅ 两阶段Pipeline架构完整实现：12个模块创建与端到端测试</strong>
+<em>20:47:13.055 | claude_code</em>
+基于用户提出的两阶段架构理念（embedding提取与fusion评估分离），AI完整实现了pipeline/模块包（cache_manager, data_preparer, extraction_planner, gene_extractor, vision_extractor, evaluation_planner, runner）及入口脚本。在section 151508上进行端到端测试，修复了两个bug（save_comparison_csv API错误、mclust ImportError未捕获），四种fusion策略（concat/mean/attention/staig_fusion）全部测试通过，ARI范围0.14-0.42。</p>
+<p><strong>🔍 Vision Encoding性能分析：瓶颈识别与三项优化方案设计</strong>
+<em>00:51:22.137 | claude_code</em>
+用户请求分析vision encoding耗时瓶颈。AI识别出三个主要瓶颈：patch提取串行循环（CPU）、每批推理后empty_cache()（约116次）、encoder级无缓存导致重复计算。用户选择同时实施三项优化（添加encoder级缓存、并行化patch提取、优化GPU推理）。这直接引出了完全重写pipeline的需求，实现计划已完成但因用户操作被打断而推迟实施。</p>
+<p><strong>🔄 RTX 5000 Ada新GPU上运行完整Benchmark：Pipeline监控与Q-Former调优</strong>
+<em>21:52:14.896 | claude_code</em>
+用户切换到RTX 5000 Ada（32GB GPU）后，使用新的两阶段pipeline启动完整benchmark。Phase 1高效完成所有encoder提取（UNI2/HIPT/ResNet50/UNI-STAIG），Phase 2完成127/190个实验。发现Q-Former每section需要约5.7小时（200 epochs × 100s），用户决定将epochs减至50。修复了conda run输出缓冲问题，改用直接调用Python二进制。</p>
+<p><strong>🔄 MIHD Benchmark超时处理与实验恢复：basic_contrastive调优</strong>
+<em>00:07:35.904 | claude_code</em>
+在DCC集群上监控benchmark进度时发现basic_contrastive fusion超时（1h限制不足，实际需要77min/section）。将超时上限从3600s改为7200s，同时根据用户要求移除了staig_fusion_e2e实验组（删除相关代码和已有结果），最终重启benchmark调度器继续运行176个待完成实验。</p>
+<h3 id="gadgets-macbook">Gadgets (MacBook)<a hidden class="anchor" aria-hidden="true" href="#gadgets-macbook">#</a></h3>
+<p><strong>✅ 删除废弃工具后更新README和CLAUDE.md</strong>
+<em>00:58:36.238 | claude_code</em>
+用户删除了Gadgets仓库中不再使用的多个工具（Video、audio、image、papers、git、png2text.py等）。AI检查了git状态确认删除范围，更新了README.md（移除废弃工具表格项）和CLAUDE.md（移除对应命令和架构说明），同时更正了test/子模块的命令（从旧的testAll.py更新为新的python -m benchmark.cli）。</p>
+<h3 id="errorrecoverybenchmark">ErrorRecoveryBenchmark<a hidden class="anchor" aria-hidden="true" href="#errorrecoverybenchmark">#</a></h3>
+<p><strong>✅ 调试力注入机制：发现EEF body定位错误并修复</strong>
+<em>21:27:34.381 | claude_code</em>
+实施调试计划：添加&ndash;force_override和&ndash;duration_override参数，在impulse.py添加详细日志。关键发现：力被施加到bin2（垃圾箱）而非gripper0_eef，原因是_get_eef_body_name()的possible_names缺少正确名称导致fallback匹配到&rsquo;robot0_screen_collision&rsquo;（含&rsquo;ee&rsquo;字符串）。修复后inf力测试显示机械臂明显移动，验证机制正常。随后用户提出新需求：1秒持续力+抓取前触发。</p>
+<p><strong>🔍 根因分析：get_task_phase()是STUB导致所有相位相关检测器失效</strong>
+<em>22:49:50.381 | claude_code</em>
+深入分析PreGrasp不触发的根因：get_task_phase()调用了永远返回False的_check_phase_condition()存根方法，始终返回&rsquo;unknown&rsquo;，而PreGrasp和GraspPrecond都要求task_phase为&rsquo;reach&rsquo;或&rsquo;grasp&rsquo;。另外total_rejected永远为0说明rejection logging存在bug。用户指出这两个问题本质相同（死代码），要求制定修复plan，但plan未被批准执行。</p>
+<p><strong>✅ 修复PreGrasp检测器不触发：get_task_phase stub + 死代码清理</strong>
+<em>22:56:34.002 | claude_code</em>
+用户提供计划要求修复PreGrasp永远不触发的问题。AI读取代码后实施了两个计划内修复（get_task_phase重写、database死代码清理），并在运行场景生成验证时发现额外三个bug（lookahead零动作、全局冷却阻断、近距离门控），逐一修复后pregrasp成功触发生成2个场景。所有41个单元测试通过。</p>
+<p><strong>🔄 实现持续力注入机制和PreGrasp检测器</strong>
+<em>22:05:14.381 | claude_code</em>
+实施三阶段计划：(1)修复collect_rollout_stats()支持duration_steps循环重施加力；(2)新建pre_grasp.py检测器，按用户建议简化为检测&rsquo;当前开启+10步后闭合&rsquo;逻辑；(3)更新配置文件。测试发现PreGrasp检测器从未触发，通过夹爪轨迹分析发现demo_1有36步满足条件但检测器仍未触发。</p>
+<p><strong>🔄 增大注入力使视频中机械臂扰动可见</strong>
+<em>00:38:54.892 | claude_code</em>
+用户发现视频中机械臂没有明显运动，与AI讨论后确定原因是力太小（3N对OSC控制的Sawyer臂约产生2-4mm位移）。AI实施了力放大方案（force_range [15,45]N，force_clip 60N，&ndash;force_override参数，Phase 3改用demo actions，实现duration_steps后清零xfrc_applied），但30N后视频仍无可见运动。用户提出用inf大小力进行诊断性测试，该测试在会话结束时被中断。</p>
+<p><strong>🔄 可视化Phase 3改为继续执行demo actions而非静止</strong>
+<em>00:45:39.241 | claude_code</em>
+用户要求修改2_visualize_scene.py，让Phase 3注入错误后机械臂继续执行demo轨迹。AI读取文件后修改了Phase 3循环体，并在an49上成功生成视频（193帧）。通过EGL headless渲染验证，日志显示'533 remaining demo actions&rsquo;确认逻辑正确。随后用户发现视频中机械臂完全没有受到扰动，开始深入调试。</p>
+<h3 id="calendarpro">CalendarPro<a hidden class="anchor" aria-hidden="true" href="#calendarpro">#</a></h3>
+<p><strong>🔄 实现批量删除日历事件功能与修复衍生bug</strong>
+<em>20:08:24.708 | claude_code</em>
+用户通过plan要求实现批量删除功能。AI修改了5个文件：扩展数据模型、更新LLM prompt、扩展search_events参数、重写delete handler、新增BatchDeleteApprovalView。测试时发现LLM因嵌套Claude Code环境超时导致intent.data为空，AI添加了_extract_delete_query fallback。随后发现空消息崩溃和Discord回复详情不足，分别修复。最终通过unset CLAUDECODE重启应用解决根本问题。</p>
+<p><strong>🔄 修复Google Calendar 403权限错误并讨论其他代码问题</strong>
+<em>00:47:55.337 | claude_code</em>
+用户通过plan要求修复calendarList API 403错误，AI将get_user_timezone()改为使用settings API。随后AI主动通过多个subagent探索代码库中的其他问题，发现了dual_verify缺少默认回复、裸except等问题，但subagent报告的部分bug属于误报（经主体验证否定）。计划制定了3项代码质量修复，但ExitPlanMode被用户拒绝。</p>
+<p><strong>✅ 代码质量修复：dual_verify默认回复、裸except、Scheduler实例化优化</strong>
+<em>01:42:23.755 | claude_code</em>
+用户通过plan要求实现3项代码质量修复。AI在dual_verify.py添加了4个新intent的默认回复，修复了executor.py的裸except，并优化了periodic_checker.py中Scheduler的重复实例化。所有82个核心测试通过。</p>
+<h3 id="gadget-summarize">gadget (summarize)<a hidden class="anchor" aria-hidden="true" href="#gadget-summarize">#</a></h3>
+<p><strong>✅ 添加配置文件、机器标识与rclone云盘同步</strong>
+<em>22:14:06.675 | claude_code</em>
+用户需要多设备日志自动同步到云盘而不推送GitHub。AI实现了~/.config/summarize/config.json配置体系，支持device_name、logs_dir、reports_dir、rclone_remote字段，并集成rclone自动上传功能。新增了config &ndash;show和config &ndash;init子命令，更新了tutorial.md和README.md。</p>
+<p><strong>✅ 为summarize工具添加Claude CLI后端</strong>
+<em>21:29:22.461 | claude_code</em>
+用户请求将summarize工具从Anthropic API切换到Claude Code CLI。AI新增了summarize_with_claude_cli函数，将prompt通过stdin传给claude &ndash;print，并将默认后端从anthropic改为claude_cli。同时更新了tutorial.md、requirements.txt，并记录了三种后端的对比。</p>
+<p><strong>✅ 修复ccusage计费、JSON解析与rclone上传结构</strong>
+<em>22:51:43.654 | claude_code</em>
+发现三个问题：ccusage &ndash;offline导致Opus计费为$0，rclone上传分了logs/reports子目录不便管理，JSON解析遇到LLM在JSON前后加文字时失败。AI修复了全部三个问题：去掉&ndash;offline、统一上传目录、重写解析器为三步回退策略。</p>
+<p><strong>🔍 调试Claude CLI嵌套环境下返回空内容的问题</strong>
+<em>22:31:02.666 | claude_code</em>
+用户报告summarize脚本调用Claude CLI返回空stdout导致JSON解析失败。AI检查了subprocess调用代码，发现已有unset CLAUDECODE逻辑，问题可能是Claude CLI将输出写入stderr而非stdout，或者新版CLI在嵌套会话中的行为变化。会话在诊断过程中中断，问题未完全解决。</p>
+<p><strong>✅ 切换Claude CLI模型为Sonnet + 完善export合并逻辑</strong>
+<em>23:26:16.145 | claude_code</em>
+用户要求将claude CLI调用切换为Sonnet模型，AI添加了&ndash;model sonnet参数。随后发现ccusage Opus计费问题并修复。用户提出export时若日志已存在应合并而非覆盖，AI实现了基于三元组去重的合并逻辑。</p>
+<p><strong>🔄 summarize工具添加配置文件与rclone云盘同步支持</strong>
+<em>21:55:40.143 | claude_code</em>
+用户通过plan要求为daily_summary.py添加配置文件和rclone同步功能。AI实现了config.json读写、device_name自动检测、rclone上传和config &ndash;show/&ndash;init子命令。随后用户尝试实际运行生成日报，但Claude CLI在嵌套环境中返回空内容导致失败，未能成功生成。</p>
+<p><strong>✅ 旧版summarize日报（含2026-02-13 CalendarPro记录）</strong>
+<em>23:24:58.955 | claude_code</em>
+这是一个日报分析会话，用户提交了2026-02-13 CalendarPro代码库整理的对话记录，AI以旧版日报格式（无level/importance字段）生成了结构化日报JSON。该会话本身不涉及代码修改。</p>
+<p><strong>✅ 旧版summarize日报（含CalendarPro 2026-02-14记录）</strong>
+<em>23:51:07.975 | claude_code</em>
+旧版日报分析会话，用户提交了CalendarPro 2026-02-14的Bug修复记录，AI生成了结构化日报。该会话本身不涉及代码修改，是summarize工具的一次实际使用。</p>
+<p><strong>✅ 旧版summarize日报（含2026-02-13 CalendarPro记录，第二次）</strong>
+<em>23:47:19.175 | claude_code</em>
+又一个旧版日报分析会话，内容与23:24的会话基本相同，是同一天内重复运行的产物。无代码修改。</p>
 <h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
 <h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
 <table>
@@ -351,23 +720,23 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>总 Token</td>
-          <td>117,931,338</td>
+          <td>118,217,669</td>
       </tr>
       <tr>
           <td>输入 Token</td>
-          <td>37,503</td>
+          <td>37,508</td>
       </tr>
       <tr>
           <td>输出 Token</td>
-          <td>110,846</td>
+          <td>110,857</td>
       </tr>
       <tr>
           <td>Cache 创建</td>
-          <td>5,792,721</td>
+          <td>5,794,068</td>
       </tr>
       <tr>
           <td>Cache 读取</td>
-          <td>111,990,268</td>
+          <td>112,275,236</td>
       </tr>
       <tr>
           <td>Cache 命中率</td>
@@ -375,7 +744,7 @@ document.addEventListener("DOMContentLoaded", function() {
       </tr>
       <tr>
           <td>总费用 (USD)</td>
-          <td>$45.6846</td>
+          <td>$45.8358</td>
       </tr>
   </tbody>
 </table>
@@ -395,12 +764,12 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>claude-opus-4-6</td>
-          <td>19,425</td>
-          <td>108,564</td>
-          <td>3,875,710</td>
-          <td>98,575,697</td>
-          <td>$40.3948</td>
-          <td>88.4%</td>
+          <td>19,430</td>
+          <td>108,575</td>
+          <td>3,877,057</td>
+          <td>98,860,665</td>
+          <td>$40.5460</td>
+          <td>88.5%</td>
       </tr>
       <tr>
           <td>claude-haiku-4-5-20251001</td>
@@ -449,18 +818,18 @@ document.addEventListener("DOMContentLoaded", function() {
           <td>$0.1314</td>
       </tr>
       <tr>
-          <td>TzJsDesktop</td>
-          <td>38,104,868</td>
-          <td>5,123</td>
-          <td>29,850</td>
-          <td>$27.8588</td>
-      </tr>
-      <tr>
           <td>tianhe</td>
           <td>59,510,236</td>
           <td>22,621</td>
           <td>45,170</td>
           <td>$3.1435</td>
+      </tr>
+      <tr>
+          <td>TzJsDesktop</td>
+          <td>38,391,199</td>
+          <td>5,128</td>
+          <td>29,861</td>
+          <td>$28.0100</td>
       </tr>
   </tbody>
 </table>

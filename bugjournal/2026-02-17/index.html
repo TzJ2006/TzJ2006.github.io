@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-17 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="在天河计算节点上推进机器人错误恢复基准测试系统的M5和M6里程碑：修复了三个非冲力注入器的MuJoCo API兼容性Bug，生成了103个新pose_perturb错误场景（数据库扩展至354个场景），并完成了BC-RNN策略的600轮训练（pick_place任务，robomimic框架）">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-02-17/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.af858c2feef42adc7846f815c3e21de9982d82f8fc4f65879451b2686859975a.css" integrity="sha256-r4WML&#43;70Ktx4RvgVw&#43;Id6Zgtgvj8T2WHlFGyaGhZl1o=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-02-17/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-02-17/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-17">
+  <meta property="og:description" content="在天河计算节点上推进机器人错误恢复基准测试系统的M5和M6里程碑：修复了三个非冲力注入器的MuJoCo API兼容性Bug，生成了103个新pose_perturb错误场景（数据库扩展至354个场景），并完成了BC-RNN策略的600轮训练（pick_place任务，robomimic框架）">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-17T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-17T00:00:00-05:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Bug Journal 2026-02-17">
+<meta name="twitter:description" content="在天河计算节点上推进机器人错误恢复基准测试系统的M5和M6里程碑：修复了三个非冲力注入器的MuJoCo API兼容性Bug，生成了103个新pose_perturb错误场景（数据库扩展至354个场景），并完成了BC-RNN策略的600轮训练（pick_place任务，robomimic框架）">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "BugJournals",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-17",
+      "item": "https://tzj2006.github.io/bugjournal/2026-02-17/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-17",
+  "name": "Bug Journal 2026-02-17",
+  "description": "在天河计算节点上推进机器人错误恢复基准测试系统的M5和M6里程碑：修复了三个非冲力注入器的MuJoCo API兼容性Bug，生成了103个新pose_perturb错误场景（数据库扩展至354个场景），并完成了BC-RNN策略的600轮训练（pick_place任务，robomimic框架）",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-17 在天河计算节点上推进机器人错误恢复基准测试系统的M5和M6里程碑：修复了三个非冲力注入器的MuJoCo API兼容性Bug，生成了103个新pose_perturb错误场景（数据库扩展至354个场景），并完成了BC-RNN策略的600轮训练（pick_place任务，robomimic框架）\n今日任务 架构与策略 🔄 运行多策略评估（M6） — 准备运行Random+BC-RNN+Pi0+Pi0.5四策略对比评估，需先验证BC-RNN检查点加载，再启动VLA服务器，最后运行3_collect_data.py ✅ 训练BC-RNN策略 — 使用robomimic框架在pick_place数据集（10个演示）上训练BC-RNN（LSTM+GMM）策略，共600个epoch，损失从-21降至-23。生成检查点路径：bc_rnn_checkpoints/bc_rnn_pick_place/20260217112532/models/model_epoch_600.pth ✅ 修复非冲力注入器MuJoCo API兼容性Bug — 修复pose_perturb.py、friction.py、gripper_bias.py中错误使用mujoco.mj_name2id()的问题，改用robosuite包装器的body_name2id()方法；同时处理MuJoCo物体名称带’_main’后缀的映射问题（如Milk→Milk_main） ✅ 运行非冲力场景生成 — 使用MUJOCO_GL=egl在A800 GPU节点上运行1_generate_scenes.py，生成103个pose_perturb类型错误场景（大位移77个tip_over + 23个large_offset）。注意：friction和gripper_bias因探测器未触发相应条件而未生成场景 ✅ 更新collector.py和3_collect_data.py支持VLA策略 — 为评估流水线添加VLA服务器策略支持：在collector.py的load_policy()中加入vla_server类型，更新_get_obs()以向VLA传递相机图像，在3_collect_data.py中添加VLA策略加载和–vla_pi0_port/–vla_pi05_port参数 实现与修复 ✅ 修复RolloutGenerator注入器enabled检查缺失 — 发现RolloutGenerator加载全部注入器时不检查enabled标志，导致非冲力配置仍会尝试生成impulse场景。修复后根据配置中的enabled字段过滤注入器 ✅ 创建非冲力场景生成配置文件 — 创建benchmark_v4_nonimpulse.yaml，禁用impulse注入器，启用friction/pose_perturb/gripper_bias三种注入器，适当放宽验收阈值 🔄 更新项目全景总结.md — 记录M5/M6的最新进展，更新版本至v4.6 问题与解决方案 关键问题 1. 非冲力注入器（pose_perturb/friction/gripper_bias）使用了错误的MuJoCo API：mujoco.mj_name2id()调用方式与robosuite包装器不兼容 解决方案: 改用robosuite模型对象自带的body_name2id()/geom_name2id()方法；添加_resolve_body_id()辅助函数，自动尝试name+’_main’后缀回退（因为MuJoCo中物体实际名称为Milk_main而非Milk）\n关键洞察: robosuite的MjModel包装器提供的方法签名与原生mujoco Python绑定不同，且对象命名规则统一添加_main后缀，这一隐性约定在无文档说明的情况下只能通过运行时探测发现\n2. MimicGen官方只发布数据集，不提供预训练BC-RNN检查点，M6评估需要BC-RNN模型 解决方案: 用robomimic框架在本地10个pick_place演示上从头训练BC-RNN（LSTM+GMM），600 epoch，约15分钟完成\n关键洞察: 10个演示的数据量偏少，训练出的BC-RNN性能可能较差，但足以作为M6评估的基线策略对比\n3. friction和gripper_bias注入器未能生成任何场景，因为探测器（instability/grasp_precond）在10个演示上未触发对应条件 解决方案: 暂时接受这一结果——pose_perturb成功生成103个场景；friction/gripper_bias需要后续针对性地调整探测器阈值或在更多演示上运行\n关键洞察: 探测器的触发率强依赖于演示数据的运动模式；contact_force类的instability在pick_place任务中触发率极低，需专门设计\n一般问题 4. MUJOCO_EGL_DEVICE_ID设置不当导致场景生成崩溃：第一次用CUDA_VISIBLE_DEVICES=5但MUJOCO_EGL_DEVICE_ID=0，导致assertion失败 解决方案: 将MUJOCO_EGL_DEVICE_ID与CUDA_VISIBLE_DEVICES保持一致（均设为5）\n关键洞察: 在多GPU节点上，MUJOCO_EGL_DEVICE_ID必须指向实际暴露给进程的EGL设备ID，而非逻辑GPU编号\n人类思路 vs AI 思路 战略层面 识别MuJoCo物体名称_main后缀约定 角色 思路 人类 用户通过提供详细的实施计划，已经意识到需要fix注入器，但未预料到_main后缀问题 AI AI在运行时通过打印MuJoCo模型body_name2id字典发现Milk_main、Bread_main等实际名称，并添加了自动回退逻辑 差异分析: AI通过动态探测发现了隐性命名约定，而非从文档推断；人类计划中预设了正确的body名称，导致必须在运行时修正\n实现层面 BC-RNN训练策略选择 角色 思路 人类 用户计划从HuggingFace下载MimicGen预训练数据集再训练 AI AI发现本地已有pick_place数据集（10个demo），直接使用本地数据训练，避免了网络下载；同时选择了GMM头代替基本BC以获得更好的多模态动作建模 差异分析: AI更优先利用本地已有资源，减少不必要的网络依赖；人类方案更通用但更繁琐\nAI 局限性 重要局限 AI未主动检查friction/gripper_bias探测器在当前演示数据上的触发率，导致生成过程中这两类注入器零产出，只有事后分析日志才发现问题 BC-RNN训练配置中的超参数（sequence_length=10, hidden_dim=400）未与数据集规模（10个demo）做针对性适配，可能导致过拟合；AI没有主动提出这一风险 一般局限 AI在处理任务列表时创建了TaskCreate/TaskUpdate工具调用，这些工具调用虽然有组织性，但实际产出代码编辑才是核心贡献，任务管理层面略显繁琐 今日收获 核心收获 robosuite的MjModel包装器与原生mujoco Python绑定API不兼容：前者用body_name2id(name)方法（会抛异常），后者用mujoco.mj_name2id(model, type, name)函数（返回-1）。跨越robosuite/mujoco边界的代码必须明确使用哪一层API robosuite中物理对象的MuJoCo body名称统一添加_main后缀（如PickPlace中Milk→Milk_main），而get_all_object_names()返回的是逻辑名称（不带后缀）。注入器代码必须做名称映射 实践收获 MUJOCO_EGL_DEVICE_ID在多GPU节点上必须与CUDA_VISIBLE_DEVICES指定的设备保持一致，否则EGL初始化断言失败 robomimic BC-RNN（LSTM+GMM，600 epoch）在10个演示的小数据集上约15分钟可以完成训练（8×A800节点），适合快速获得一个基线评估策略 会话摘要 🔄 实施M5非冲力场景生成与M6多策略评估完整计划 02:43:16.013 | claude_code 用户提供了详细的M5/M6实施计划，AI系统性地读取代码库后开始执行。主要完成：创建非冲力配置文件、修复RolloutGenerator的enabled检查缺失、发现并修复三个注入器的MuJoCo API兼容性Bug（mj_name2id调用方式+_main后缀问题）、更新collector.py和3_collect_data.py支持VLA策略评估、训练BC-RNN策略600轮。成功生成103个pose_perturb错误场景，数据库扩展至354个场景。\n✅ 探索MimicGen预训练BC-RNN检查点可用性 00:39:46.933 | claude_code AI系统性地搜索了MimicGen官方仓库、HuggingFace和本地文件系统，确认MimicGen官方只发布数据集而非预训练模型检查点。PickPlace任务只有source数据集可用。这一发现触发了在本地从头训练BC-RNN的决策。\nToken 用量 总览 指标 数值 总 Token 29,155,620 输入 Token 28,475 输出 Token 20,695 Cache 创建 1,816,407 Cache 读取 27,290,043 Cache 命中率 93.8% 总费用 (USD) $0.9056 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-haiku-4-5-20251001 20,166 531 432,098 3,426,311 $0.9056 100.0% claude-opus-4-6 8,309 20,164 1,384,309 23,863,732 $0.0000 0.0% ",
+  "wordCount" : "183",
+  "inLanguage": "en",
+  "datePublished": "2026-02-17T00:00:00-05:00",
+  "dateModified": "2026-02-17T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-02-17/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-17
+    </h1>
+    <div class="post-meta"><span title='2026-02-17 00:00:00 -0500 EST'>February 17, 2026</span>&nbsp;·&nbsp;1 min
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-17">日报 — 2026-02-17<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-17">#</a></h1>
+<blockquote>
+<p>在天河计算节点上推进机器人错误恢复基准测试系统的M5和M6里程碑：修复了三个非冲力注入器的MuJoCo API兼容性Bug，生成了103个新pose_perturb错误场景（数据库扩展至354个场景），并完成了BC-RNN策略的600轮训练（pick_place任务，robomimic框架）</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>🔄 <strong>运行多策略评估（M6）</strong> — 准备运行Random+BC-RNN+Pi0+Pi0.5四策略对比评估，需先验证BC-RNN检查点加载，再启动VLA服务器，最后运行3_collect_data.py</li>
+<li>✅ <strong>训练BC-RNN策略</strong> — 使用robomimic框架在pick_place数据集（10个演示）上训练BC-RNN（LSTM+GMM）策略，共600个epoch，损失从-21降至-23。生成检查点路径：bc_rnn_checkpoints/bc_rnn_pick_place/20260217112532/models/model_epoch_600.pth</li>
+<li>✅ <strong>修复非冲力注入器MuJoCo API兼容性Bug</strong> — 修复pose_perturb.py、friction.py、gripper_bias.py中错误使用mujoco.mj_name2id()的问题，改用robosuite包装器的body_name2id()方法；同时处理MuJoCo物体名称带&rsquo;_main&rsquo;后缀的映射问题（如Milk→Milk_main）</li>
+<li>✅ <strong>运行非冲力场景生成</strong> — 使用MUJOCO_GL=egl在A800 GPU节点上运行1_generate_scenes.py，生成103个pose_perturb类型错误场景（大位移77个tip_over + 23个large_offset）。注意：friction和gripper_bias因探测器未触发相应条件而未生成场景</li>
+<li>✅ <strong>更新collector.py和3_collect_data.py支持VLA策略</strong> — 为评估流水线添加VLA服务器策略支持：在collector.py的load_policy()中加入vla_server类型，更新_get_obs()以向VLA传递相机图像，在3_collect_data.py中添加VLA策略加载和&ndash;vla_pi0_port/&ndash;vla_pi05_port参数</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>修复RolloutGenerator注入器enabled检查缺失</strong> — 发现RolloutGenerator加载全部注入器时不检查enabled标志，导致非冲力配置仍会尝试生成impulse场景。修复后根据配置中的enabled字段过滤注入器</li>
+<li>✅ <strong>创建非冲力场景生成配置文件</strong> — 创建benchmark_v4_nonimpulse.yaml，禁用impulse注入器，启用friction/pose_perturb/gripper_bias三种注入器，适当放宽验收阈值</li>
+<li>🔄 <strong>更新项目全景总结.md</strong> — 记录M5/M6的最新进展，更新版本至v4.6</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-非冲力注入器pose_perturbfrictiongripper_bias使用了错误的mujoco-apimujocomj_name2id调用方式与robosuite包装器不兼容">1. 非冲力注入器（pose_perturb/friction/gripper_bias）使用了错误的MuJoCo API：mujoco.mj_name2id()调用方式与robosuite包装器不兼容<a hidden class="anchor" aria-hidden="true" href="#1-非冲力注入器pose_perturbfrictiongripper_bias使用了错误的mujoco-apimujocomj_name2id调用方式与robosuite包装器不兼容">#</a></h4>
+<p><strong>解决方案:</strong> 改用robosuite模型对象自带的body_name2id()/geom_name2id()方法；添加_resolve_body_id()辅助函数，自动尝试name+&rsquo;_main&rsquo;后缀回退（因为MuJoCo中物体实际名称为Milk_main而非Milk）</p>
+<p><strong>关键洞察:</strong> robosuite的MjModel包装器提供的方法签名与原生mujoco Python绑定不同，且对象命名规则统一添加_main后缀，这一隐性约定在无文档说明的情况下只能通过运行时探测发现</p>
+<h4 id="2-mimicgen官方只发布数据集不提供预训练bc-rnn检查点m6评估需要bc-rnn模型">2. MimicGen官方只发布数据集，不提供预训练BC-RNN检查点，M6评估需要BC-RNN模型<a hidden class="anchor" aria-hidden="true" href="#2-mimicgen官方只发布数据集不提供预训练bc-rnn检查点m6评估需要bc-rnn模型">#</a></h4>
+<p><strong>解决方案:</strong> 用robomimic框架在本地10个pick_place演示上从头训练BC-RNN（LSTM+GMM），600 epoch，约15分钟完成</p>
+<p><strong>关键洞察:</strong> 10个演示的数据量偏少，训练出的BC-RNN性能可能较差，但足以作为M6评估的基线策略对比</p>
+<h4 id="3-friction和gripper_bias注入器未能生成任何场景因为探测器instabilitygrasp_precond在10个演示上未触发对应条件">3. friction和gripper_bias注入器未能生成任何场景，因为探测器（instability/grasp_precond）在10个演示上未触发对应条件<a hidden class="anchor" aria-hidden="true" href="#3-friction和gripper_bias注入器未能生成任何场景因为探测器instabilitygrasp_precond在10个演示上未触发对应条件">#</a></h4>
+<p><strong>解决方案:</strong> 暂时接受这一结果——pose_perturb成功生成103个场景；friction/gripper_bias需要后续针对性地调整探测器阈值或在更多演示上运行</p>
+<p><strong>关键洞察:</strong> 探测器的触发率强依赖于演示数据的运动模式；contact_force类的instability在pick_place任务中触发率极低，需专门设计</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="4-mujoco_egl_device_id设置不当导致场景生成崩溃第一次用cuda_visible_devices5但mujoco_egl_device_id0导致assertion失败">4. MUJOCO_EGL_DEVICE_ID设置不当导致场景生成崩溃：第一次用CUDA_VISIBLE_DEVICES=5但MUJOCO_EGL_DEVICE_ID=0，导致assertion失败<a hidden class="anchor" aria-hidden="true" href="#4-mujoco_egl_device_id设置不当导致场景生成崩溃第一次用cuda_visible_devices5但mujoco_egl_device_id0导致assertion失败">#</a></h4>
+<p><strong>解决方案:</strong> 将MUJOCO_EGL_DEVICE_ID与CUDA_VISIBLE_DEVICES保持一致（均设为5）</p>
+<p><strong>关键洞察:</strong> 在多GPU节点上，MUJOCO_EGL_DEVICE_ID必须指向实际暴露给进程的EGL设备ID，而非逻辑GPU编号</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="识别mujoco物体名称_main后缀约定">识别MuJoCo物体名称_main后缀约定<a hidden class="anchor" aria-hidden="true" href="#识别mujoco物体名称_main后缀约定">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户通过提供详细的实施计划，已经意识到需要fix注入器，但未预料到_main后缀问题</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI在运行时通过打印MuJoCo模型body_name2id字典发现Milk_main、Bread_main等实际名称，并添加了自动回退逻辑</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI通过动态探测发现了隐性命名约定，而非从文档推断；人类计划中预设了正确的body名称，导致必须在运行时修正</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="bc-rnn训练策略选择">BC-RNN训练策略选择<a hidden class="anchor" aria-hidden="true" href="#bc-rnn训练策略选择">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户计划从HuggingFace下载MimicGen预训练数据集再训练</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI发现本地已有pick_place数据集（10个demo），直接使用本地数据训练，避免了网络下载；同时选择了GMM头代替基本BC以获得更好的多模态动作建模</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI更优先利用本地已有资源，减少不必要的网络依赖；人类方案更通用但更繁琐</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>AI未主动检查friction/gripper_bias探测器在当前演示数据上的触发率，导致生成过程中这两类注入器零产出，只有事后分析日志才发现问题</li>
+<li>BC-RNN训练配置中的超参数（sequence_length=10, hidden_dim=400）未与数据集规模（10个demo）做针对性适配，可能导致过拟合；AI没有主动提出这一风险</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>AI在处理任务列表时创建了TaskCreate/TaskUpdate工具调用，这些工具调用虽然有组织性，但实际产出代码编辑才是核心贡献，任务管理层面略显繁琐</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>robosuite的MjModel包装器与原生mujoco Python绑定API不兼容：前者用body_name2id(name)方法（会抛异常），后者用mujoco.mj_name2id(model, type, name)函数（返回-1）。跨越robosuite/mujoco边界的代码必须明确使用哪一层API</li>
+<li>robosuite中物理对象的MuJoCo body名称统一添加_main后缀（如PickPlace中Milk→Milk_main），而get_all_object_names()返回的是逻辑名称（不带后缀）。注入器代码必须做名称映射</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>MUJOCO_EGL_DEVICE_ID在多GPU节点上必须与CUDA_VISIBLE_DEVICES指定的设备保持一致，否则EGL初始化断言失败</li>
+<li>robomimic BC-RNN（LSTM+GMM，600 epoch）在10个演示的小数据集上约15分钟可以完成训练（8×A800节点），适合快速获得一个基线评估策略</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<p><strong>🔄 实施M5非冲力场景生成与M6多策略评估完整计划</strong>
+<em>02:43:16.013 | claude_code</em>
+用户提供了详细的M5/M6实施计划，AI系统性地读取代码库后开始执行。主要完成：创建非冲力配置文件、修复RolloutGenerator的enabled检查缺失、发现并修复三个注入器的MuJoCo API兼容性Bug（mj_name2id调用方式+_main后缀问题）、更新collector.py和3_collect_data.py支持VLA策略评估、训练BC-RNN策略600轮。成功生成103个pose_perturb错误场景，数据库扩展至354个场景。</p>
+<p><strong>✅ 探索MimicGen预训练BC-RNN检查点可用性</strong>
+<em>00:39:46.933 | claude_code</em>
+AI系统性地搜索了MimicGen官方仓库、HuggingFace和本地文件系统，确认MimicGen官方只发布数据集而非预训练模型检查点。PickPlace任务只有source数据集可用。这一发现触发了在本地从头训练BC-RNN的决策。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>29,155,620</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>28,475</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>20,695</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>1,816,407</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>27,290,043</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>93.8%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$0.9056</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>20,166</td>
+          <td>531</td>
+          <td>432,098</td>
+          <td>3,426,311</td>
+          <td>$0.9056</td>
+          <td>100.0%</td>
+      </tr>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>8,309</td>
+          <td>20,164</td>
+          <td>1,384,309</td>
+          <td>23,863,732</td>
+          <td>$0.0000</td>
+          <td>0.0%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
