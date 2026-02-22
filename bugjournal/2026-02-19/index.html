@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-19 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="当日工作横跨三个项目：MIHD 空间转录组项目完成多份技术文档撰写、聚类可视化改进及三种自监督聚类方法（STEGO/BYOL&#43;GAT/SCAN）全量实现与测试（SCAN 最优 ARI 0.303）；ErrorRecoveryBenchmark 项目完成 M12–M14 代码实现、M13 全量单元测试及 Phase II 有效性论证战略规划；同时开展 H&amp;E image-only 聚类文献深度调研并修复 Windows VS Code Remote-SSH 连接故障，共记录 17 段对话。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-02-19/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.af858c2feef42adc7846f815c3e21de9982d82f8fc4f65879451b2686859975a.css" integrity="sha256-r4WML&#43;70Ktx4RvgVw&#43;Id6Zgtgvj8T2WHlFGyaGhZl1o=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-02-19/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-02-19/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-19">
+  <meta property="og:description" content="当日工作横跨三个项目：MIHD 空间转录组项目完成多份技术文档撰写、聚类可视化改进及三种自监督聚类方法（STEGO/BYOL&#43;GAT/SCAN）全量实现与测试（SCAN 最优 ARI 0.303）；ErrorRecoveryBenchmark 项目完成 M12–M14 代码实现、M13 全量单元测试及 Phase II 有效性论证战略规划；同时开展 H&amp;E image-only 聚类文献深度调研并修复 Windows VS Code Remote-SSH 连接故障，共记录 17 段对话。">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-19T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-19T00:00:00-05:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Bug Journal 2026-02-19">
+<meta name="twitter:description" content="当日工作横跨三个项目：MIHD 空间转录组项目完成多份技术文档撰写、聚类可视化改进及三种自监督聚类方法（STEGO/BYOL&#43;GAT/SCAN）全量实现与测试（SCAN 最优 ARI 0.303）；ErrorRecoveryBenchmark 项目完成 M12–M14 代码实现、M13 全量单元测试及 Phase II 有效性论证战略规划；同时开展 H&amp;E image-only 聚类文献深度调研并修复 Windows VS Code Remote-SSH 连接故障，共记录 17 段对话。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "BugJournals",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-19",
+      "item": "https://tzj2006.github.io/bugjournal/2026-02-19/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-19",
+  "name": "Bug Journal 2026-02-19",
+  "description": "当日工作横跨三个项目：MIHD 空间转录组项目完成多份技术文档撰写、聚类可视化改进及三种自监督聚类方法（STEGO/BYOL+GAT/SCAN）全量实现与测试（SCAN 最优 ARI 0.303）；ErrorRecoveryBenchmark 项目完成 M12–M14 代码实现、M13 全量单元测试及 Phase II 有效性论证战略规划；同时开展 H\u0026amp;E image-only 聚类文献深度调研并修复 Windows VS Code Remote-SSH 连接故障，共记录 17 段对话。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-19 当日工作横跨三个项目：MIHD 空间转录组项目完成多份技术文档撰写、聚类可视化改进及三种自监督聚类方法（STEGO/BYOL+GAT/SCAN）全量实现与测试（SCAN 最优 ARI 0.303）；ErrorRecoveryBenchmark 项目完成 M12–M14 代码实现、M13 全量单元测试及 Phase II 有效性论证战略规划；同时开展 H\u0026E image-only 聚类文献深度调研并修复 Windows VS Code Remote-SSH 连接故障，共记录 17 段对话。\n今日任务 架构与策略 ✅ 实现 Image-Only 聚类增强三方法（STEGO / BYOL+GAT / SCAN） — 新建 STEGOHead.py、BYOLAdapter.py、SpatialGATRefiner.py、SCANHead.py，修改 run_benchmark.py 的 argparse/validation/apply_fusion 集成点，以及 config.yaml、models/init.py 等配套配置，共涉及 5 个新文件 + 4 个文件修改。 ✅ H\u0026E Image-Only 聚类方法深度文献调研 — 系统搜索并整理了 image-only 组织域聚类方法（MILWRM、F-SEG、Deep Contrastive Clustering）、多模态方法中的 image-only ablation 数据（DLPFC ARI 0.11–0.16）、foundation model 训练机制、跨领域类比（FGVC/医学影像/遥感），以及无监督适配方案（STEGO/SCAN/BYOL/TTT-MAE）。 ✅ M14 基线评估代码基础设施实现 — 为 collector.py 添加 resume 支持（读取 episodes.jsonl 跳过已完成 episode）；为 3_collect_data.py 添加 –resume/–scene_offset/–scene_limit 参数；将 4_analyze_results.py 扩展为支持多 run 合并、per-error-type 分解矩阵、summary.json 输出（+120 行）；Makefile 添加 m14 系列 targets。 ✅ M13 错误分类体系论证全量实现 — 实现 M13 全部内容：docs/taxonomy_justification.md（FMEA 映射 + 6×3 完备性矩阵）、scripts/7_classifier_reliability.py（Cohen’s/Fleiss’ kappa）、scripts/8_error_type_discriminability.py（Kruskal-Wallis + rank reversal）、tests/unit/test_classifier_reliability.py（30 个单元测试全部通过）、更新 Makefile 和项目总结。 🔄 Phase II 有效性论证战略规划（G1–G7/M1–M15） — 根据用户提出的四大研究方向（大规模数据集、分类论证、基线评估、Foundation Model 有用性验证），设计包含中目标和快速验证小目标的完整路线图，确认遥操作收集恢复轨迹路线和仅 PickPlace 任务范围，计划文本已写入但 ExitPlanMode 提交被拒绝。 ✅ 病理视觉基础模型文献综述（UNI/UNI2 相关方法） — 在 docs/VISION_ENCODER_LITERATURE_SURVEY.md 中调研了 spEMO、STAIG、SpaGCN、SPADE、GIST、HEST-1k 等方法如何使用 UNI/UNI2/GigaPath 等 PFM，重点比较了 patch 提取方式、embedding 维度、融合策略和评测结果。 ✅ 在 DLPFC 151673 上测试三种新方法并修复 STEGO NaN bug — 并行跑 STEGO、BYOL+GAT、SCAN 三种方法，发现并修复 STEGO loss NaN（输入 L2 归一化 + 数值稳定 logsumexp + float64）。SCAN 效果最佳 ARI=0.303，BYOL ARI=0.237，STEGO 修复后 ARI=0.209，baseline ARI=0.251。 ✅ 更新 MIHD 增强计划（大目标 7，含 Image Encoder 增强规划） — 将文献调研成果整理为结构化大目标 7，涵盖文献综述、根因分析、跨领域类比、BYOL 详解、候选方案、实施路线（Phase 1–5）、预期效果与风险、验证计划及参考文献，写入 ENHANCEMENT_PLAN_CN.md（约 +500 行）。 ✅ VLA 与 Foundation Models 错误恢复能力调研文档 — 联网搜索并撰写 docs/VLA_Foundation_Models_Survey.md：梳理 8 个声称具备 Error Recovery 能力的 VLA 模型（SC-VLA、CycleVLA、FailSafe、FPC-VLA、RoboFAC、VLAC 等）以及 9 个主流 Foundation Model（π0、π0-FAST、π0.5、OpenVLA、GR00T N1、Octo、HPT 等）的架构和使用方式。 ✅ M12 大规模数据集构建（代码部分） — 新建 scripts/6_dataset_statistics.py（统计 + gap 分析）、configs/mimicgen_augment_200.json，在 database.py 添加 create_stratified_split()，调低检测器 min_step 阈值（100→50）并增大 max_scenes_per_demo（10→20），在 1_generate_scenes.py 添加 –dataset_path 参数，更新 Makefile。 🔄 M14 基线方法完整评估计划设计 — 探索 454 个错误场景评估管线，分析 scripts/3_collect_data.py、collector.py、4_analyze_results.py 和策略适配器，设计在 454 场景×4 策略×3 seeds=5448 episodes 上运行完整基线评估的实施方案（含 resume 支持、多 run 合并分析和 per-error-type 分解报告），计划提交被中断。 ✅ UNI/UNI2 原论文评测任务深度分析 — 系统整理了 UNI 原论文（Nature Medicine 2024）的 34 个临床评测任务（ROI 分类、Slide 分类、细胞分割、图像检索）以及 UNI2 的 8 个 benchmark 任务，创建了 docs/UNI2_EVALUATION_ANALYSIS.md，揭示监督线性评测与无监督聚类评测的本质差异。 🔄 SCAN embeddings + PCA 与全 fusion 方法对比 — 编写 eval_scan_fusion.py，将 SCAN 优化后的视觉 embeddings 与 PCA 基因特征做所有 fusion 方法的对比；basic_contrastive / qformer / staig_fusion 因空间坐标 bug 报错，已改用 adata.obsm[‘spatial’] 修复，全量对比尚未完成（mean fusion ARI 0.340，llava_mlp+SCAN ARI 0.409）。 实现与修复 ✅ 项目全景总结.md 更新与精简重构（v4.9，1554→763 行） — 分两步操作：首先大幅重写新增 Phase II 四大目标（G4–G7）、M12–M15 里程碑详细子目标、16 天执行路线图；随后将文档从 ~1554 行精简至 763 行（删除重复章节 §11、迁移 VLM 教程至 docs/vlm_tutorial.md），完整保留 87 个 checklist 条目，更新全部代码统计数据。 ✅ CLAUDE.md 精简优化（ErrorRecoveryBenchmark） — 将 CLAUDE.md 从 205 行压缩至 163 行（-20%）：修正错误类型数（17→24）、补全 validator 列表（4 个）、合并 Pipeline stages 与 Key modules、压缩 Related Project 章节（48→18 行）、新增 Test fixtures 和 Data formats 两个小节。 ✅ 创建 MIHD Vision Encoder 使用指南 — 在 docs/VISION_ENCODER_GUIDE.md 中详细描述从 H\u0026E 图像到 embedding 的完整流程，包括图像定位、坐标对齐、patch 提取、UNI2/UNI/HIPT/ResNet50 四种 encoder 的架构差异与使用方式，以及 10 种融合策略。 ✅ 改进聚类可视化：增加 H\u0026E 原图面板 — 修改 scripts/run_benchmark.py 的 create_clustering_visualization() 函数，将 1×2 布局改为 1×3 布局，最左面板用 sc.pl.spatial 显示 H\u0026E 原图（不叠加 spot 点），坐标系与其他两个面板对齐。 🔄 M12 GPU 执行（MimicGen 扩增 + BC-RNN 捕获） — 启动 MimicGen 扩增任务时遇到 EGL device ID 不匹配错误（CUDA_VISIBLE_DEVICES=3 但 MUJOCO_EGL_DEVICE_ID 未正确设置），已修复命令后重新提交，BC-RNN 和 Pi0 natural capture 任务计划并行在不同 GPU 上运行，执行结果待确认。 ✅ 创建 RM-IDEAL 评分中英双语文档 — 在 docs/RM_IDEAL_SCORE.md 中完整记录了 RM-IDEAL 的定义（WWL 图核 + Wasserstein 距离）、使用原因（弥补 ARI/NMI 缺乏空间感知的盲区）及使用方法（RMIdealEvaluator API 和 CLI），包含中英双语版本。 ✅ 批量更新全部 UNI2 可视化（不重新推理） — 从缓存的 _embeddings.npz 文件中读取 embeddings/pred_labels/gt_labels，调用更新后的可视化函数，重新生成所有 11 个 DLPFC section 的三面板可视化；151510 缺少 lowres 图像通过 hires→lowres symlink 解决。 ✅ 修复 Windows VS Code Remote-SSH 连接失败 — 定位根因为 SSH config 中 ControlMaster/ControlPath/ControlPersist 在 Windows 上不兼容 Unix domain socket，注释掉这三行并清理残留 stale socket 文件；tianhe 和 an49 连接恢复正常，an47 确认为 Slurm 无活跃作业策略导致，非 SSH 问题。 问题与解决方案 关键问题 1. STEGO 训练过程中 loss 始终为 NaN，无法收敛 解决方案: 两步修复：① 对输入 image_emb 做 L2 归一化（防止初始投影幅度过大）；② InfoNCE 计算中先减去每行最大值再做 exp（数值稳定 logsumexp），并将相似度矩阵计算切换到 float64\n关键洞察: n=3639 的 dense 余弦相似度矩阵 ÷ temperature=0.07 → 值域 ~[-14, 14]，float32 的 exp 在高温下容易溢出；减去行最大值是标准 numerically stable softmax 的必要步骤\n2. 搜索 image-only 方法的 ablation study 数字时，几乎所有多模态方法的 ablation 都是「去掉 image」而非「只用 image」，导致无法直接获得 image-only 的 ARI 解决方案: 转向搜索专门的 image-only baseline 论文，找到 SpaConTDS 论文明确报告了 stLearn（ARI=0.11）和 SpaConTDS（ARI=0.16）的 image-only 结果\n关键洞察: 多模态 ST 领域的 ablation 设计从根本上以 gene expression 为主体，image 被视为辅助，这一领域规范导致 image-only 数据极度稀缺\n3. collector.py 长时间 VLA 评估（5–15h）在 crash 后会丢失全部进度 解决方案: 在 collect_on_scenes() 开头读取已有 episodes.jsonl，构建 completed 集合，在三重循环中 skip 已完成的 (scene_id, policy_name, seed) 组合\n关键洞察: JSONL 格式天然支持 append，每个 episode 完成即落盘，resume 只需在启动时读回一次，不需要数据库或 checkpoint 机制\n4. transport/place 相位场景完全空白（各 0 条），而 pre_reach 250 条，造成严重的相位不平衡 解决方案: 降低检测器 min_step 参数（100→50），增大 max_scenes_per_demo（10→20），利用 BC-RNN（有约 60–70% 成功率）做 natural capture 以覆盖后期相位\n关键洞察: 当前 min_step=100 使 instability detector 只在 100 步后触发，恰好错过了大部分 lift/transport 阶段；BC-RNN 是唯一能到达后期相位的策略\n5. HEST-1k benchmark 对不同维度 encoder 的比较存在不公平性（Ridge 回归惩罚高维 embedding） 解决方案: 论文设计了 PCA 降维到 256 维再做 Ridge 回归的标准化流程，消除维度差异对公平比较的影响\n关键洞察: PCA 归一化是多模型公平比较的重要设计决策，直接对比不同维度的 embedding 会系统性低估高维模型的能力\n6. MILWRM 被 AI 在第一轮搜索中描述为 image-only 方法，实际上是基于 gene expression 的聚类方法 解决方案: 通过直接读取 PMC 全文发现：‘MILWRM is solely based on gene expression’，在第二轮整理时予以更正\n关键洞察: 论文摘要/标题中的 ‘morphology’ 描述具有误导性，必须读原文方法部分才能确认输入模态\n7. 用户多次在 ExitPlanMode 调用时中断，导致计划提交失败（M12、M13、M14 等多次规划会话均被打断） 解决方案: 用户的实际工作流是：AI 制定计划文本 → 用户手动复制计划 → 新会话中以 ‘Implement the following plan:’ 方式提交实现任务\n关键洞察: 用户不希望 AI 自动进入计划审批流程，而是保留对计划文本的手动控制权，这是一种有意的人在回路设计\n一般问题 8. eval_scan_fusion.py 的空间坐标 shape 变成 (1, 2) 导致 basic_contrastive / qformer 报错 解决方案: 不使用 load_spatial_coordinates() 重新加载（barcode 匹配失败），改为直接读取 adata.obsm[‘spatial’]，该字段由 load_dlpfc_data() 已正确填充\n关键洞察: load_dlpfc_data() 和 load_spatial_coordinates() 两个函数的 barcode 格式不统一，复用 adata.obsm[‘spatial’] 是更可靠的坐标来源\n9. Windows OpenSSH 与 VS Code Remote-SSH 不兼容：ControlMaster 使用 Unix domain socket，Windows 不支持，导致 SSH 进程崩溃（Bad file descriptor / nonexistent pipe） 解决方案: 注释掉 SSH config 中的 ControlMaster auto、ControlPath、ControlPersist 三行，并清理 ~/.ssh/sockets/ 下的残留 socket 文件\n关键洞察: Windows OpenSSH 与 Linux 行为不同，连接复用机制（ControlMaster）在 Windows 上根本不支持 Unix domain socket 路径，症状与认知中的网络或认证问题完全不同\n10. 用户不清楚「获取恢复训练数据」的含义，对 G4 实验设计产生疑惑 解决方案: AI 通过具体例子（正常 demo vs 从错误状态恢复的轨迹对比）澄清概念，用户理解后选择了人工遥操作方案\n关键洞察: 技术规划文档中的专业术语需要及时用具体案例解释，避免用户在关键决策上产生误解\n11. 多个关键论文（Nature Medicine、Science Research）因付费墙无法通过 WebFetch 访问 解决方案: 转用 PMC 全文（pmc.ncbi.nlm.nih.gov）、bioRxiv 预印本、GitHub README 和 HuggingFace 模型页面作为替代数据源\n关键洞察: PMC 作为 NIH 资助论文的开放存储库，通常包含 Nature Medicine 等顶刊论文的全文，是学术搜索的有效替代途径\n12. AI 在 argparse 验证时使用 –device cpu，导致 CPU 进程运行 76 分钟占用大量内存 解决方案: kill 掉僵尸进程，恢复 GPU 资源，重新在 GPU 上跑测试\n关键洞察: 做快速语法验证时应该用 –help 或 ast.parse() 而不是实际运行 benchmark；即便是「验证」也应默认使用 GPU\n13. MimicGen 启动失败：MUJOCO_EGL_DEVICE_ID 未与 CUDA_VISIBLE_DEVICES 对齐，robosuite EGL 断言报错 解决方案: 将命令从 MUJOCO_EGL_DEVICE_ID=0 修正为 MUJOCO_EGL_DEVICE_ID=3，与 CUDA_VISIBLE_DEVICES=3 保持一致\n关键洞察: robosuite 要求 MUJOCO_EGL_DEVICE_ID 必须与实际 GPU 编号（非 CUDA 逻辑编号 0）完全匹配，使用 CUDA_VISIBLE_DEVICES 屏蔽后，EGL 仍用物理 GPU ID\n14. 项目文档（~33k tokens）超出单次读取限制，无法整体处理 解决方案: 分批读取（每批 400 行）+ 并行 Explore agent 收集真实代码统计数据，最终用 Write 工具一次性重写整个文档\n关键洞察: 对于超大文件，分批读取+统一重写比逐段编辑更高效，避免多次 Edit 工具调用的累积错误风险\n15. 151510 section 缺少 tissue_lowres_image.png，导致 sc.read_visium 报错 解决方案: 创建 tissue_hires_image.png → tissue_lowres_image.png 的 symlink，解决依赖问题\n关键洞察: scanpy 默认依赖 lowres 图像，但 lowres 本质上可以用 hires 替代，只是显示分辨率不同，功能上完全等价\n16. eval_scan_fusion.py 调用 load_dlpfc_data() 时解包错误（too many values to unpack） 解决方案: 将 adata, _ = … 改为 adata = load_dlpfc_data(…) 直接赋值\n关键洞察: 函数返回值类型需与 docstring 严格对应，load_dlpfc_data 的文档说返回 AnnData，但实际有多版本调用约定\n17. 单元测试中 numpy bool 使用 is True 比较失败 解决方案: 改为 == True 或 assert result['significant']，因为 numpy bool 不是 Python 内置 True 单例\n关键洞察: numpy 布尔值与 Python bool 不是同一对象，is True 会失败，统计库返回的布尔值应用 == 或直接 truthy 判断\n人类思路 vs AI 思路 战略层面 CRC-100K 组织分类与空间域识别本质上是同类问题 角色 思路 人类 用户主动提出 UNI 的 task1（CRC-100K）本质上就是聚类，质疑为什么 UNI 评测与 MIHD 空间域识别被视为不同类型的任务 AI AI 最初将 UNI 的 ROI 分类任务和 MIHD 的空间域识别作为两类任务分别描述，没有主动指出两者的本质相似性 差异分析: 用户识别出了关键的概念对等关系，迫使 AI 深入分析两者的真正区别——监督 vs 无监督评估方式，而非任务类型本身不同。这个洞察揭示了文献中的空白：没有人直接评测 UNI2 embedding 的无监督聚类 ARI\n项目阶段转型与 Phase II 有效性论证战略规划 角色 思路 人类 用户从研究目的出发，明确提出四个战略方向（造大数据集、论证分类设计依据、建立基准性能、用 Foundation Model 证明数据有用性），规划了 G4–G7 四大目标和 M12–M15 里程碑，并指出 BC-RNN 是解决 transport/place 空白的核心 AI AI 从代码库现状出发，识别当前 454 场景的类型分布失衡、分析工具不足等具体瓶颈，然后逐层细化为可执行实验设计序列 差异分析: 用户从论文贡献出发（what to prove），AI 从工程实现出发（how to implement）。人类设定了「为什么这个 benchmark 有用」的核心问题，AI 将其转化为可执行的实验设计序列，两者互补\nUNI2 可视化中棕色 patch 的原因分析 角色 思路 人类 用户观察到 UNI2 可视化中有棕色小斑点周期性重复分布在整个组织上，提出这个具体的视觉现象需要解释 AI AI 分析棕色 cluster 是 UNI2 将「视觉异常结构」（血管横截面、大神经元胞体、切片折叠等）跨层归并的结果，因为这些结构在癌症病理图像中是显著标志 差异分析: 用户的观察触发了对视觉 encoder 内在工作机制的深入分析，AI 将其上升到「形态相似性 vs 生物学层级相似性」的概念差异，为后续增加 H\u0026E 对比面板的改进提供了科学动机\n调研范围的精准边界设定 角色 思路 人类 用户在 AI 返回多模态方法时，明确要求「我只要 image only 的部分」，拒绝了 AI 提供的多模态对比参考；进一步缩小到「ablation study 里的 image only」 AI AI 倾向于给出全面的综述，包含 image-only、多模态、H\u0026E→基因预测等多个相关但不同的研究方向 差异分析: 用户对研究问题的边界比 AI 更清晰，AI 有「给得越多越好」的倾向；用户通过明确拒绝和重定向，将调研精准控制在目标范围内\n分类论证方案设计（M13） 角色 思路 人类 用户指定了具体的论证维度：FMEA 映射（引用 ISO 15066/10218）、操作原语分解、文献对比，以及 6×3 完备性矩阵的具体格式 AI AI 提出了 Cohen’s kappa 作为非冗余性验证、Kruskal-Wallis + Dunn 检验作为区分度验证的技术实现路径，并设计了 synthetic data 单元测试策略 差异分析: 用户设定了论证的框架和标准（要能发表在论文里）；AI 选择了具体的统计方法和实现架构\n全量方案先规划后执行 vs 直接给出完整实现计划 角色 思路 人类 用户提前准备了极其详细的实施计划（Phase 1–6，精确到行号），直接作为 prompt 传入 AI AI 忠实执行了人类的计划，未做结构性调整 差异分析: 人类完成了架构设计工作，AI 完成了代码实现工作；这是一个人类主导设计、AI 主导执行的分工模式\n跨领域类比的主动延伸 角色 思路 人类 用户主动问「这个问题在 CV 或者其他领域是否有出现过？」和「有没有现成的无监督/自监督的方法转移方案？」，将调研从 domain-specific 扩展到通用 CV 方法论 AI AI 在被问及之前没有主动引导到跨领域类比和解决方案的方向 差异分析: 用户具备将具体问题泛化为通用范式的元认知能力，AI 的回应策略是就问题回答问题，较少主动提升抽象层次\nExitPlanMode 工作流设计 角色 思路 人类 用户选择不通过 ExitPlanMode 审批，而是手动接管计划文本，在新会话中以 ‘Implement the following plan:’ 方式触发实现——保持对计划内容的完整控制 AI AI 默认在规划完成后调用 ExitPlanMode 请求用户审批，遵循标准的计划→审批→实现流程 差异分析: 用户不信任 ExitPlanMode 的审批 UI，偏好异步的文本粘贴工作流。AI 没有从前几次中断中学习这一偏好，在多次会话中重复了同样的行为\n恢复训练数据的获取策略 角色 思路 人类 用户选择人工遥操作（最高质量但最费力的方式），反映了对数据质量的重视，以及对 Foundation Model 微调实验可信度的考量 AI AI 提供了两种选项：Oracle Recovery（自动化，仅适用于注入场景）和人工遥操作，并指出前者成本更低 差异分析: 用户优先考虑实验的论文可信度，AI 优先考虑工程实现难度。最终用户的选择更符合研究严谨性要求，但 AI 成功地用「先采集 50 条做快速验证」的建议降低了执行风险\n实现层面 为可视化增加 H\u0026E 原图面板 角色 思路 人类 用户提出需要 H\u0026E 原图作为对比，以便直观验证棕色 patch 在组织上的实际形态 AI AI 执行了代码修改，选择用 sc.pl.spatial 无 color 参数渲染（保持坐标系一致），而非直接嵌入原始图像文件 差异分析: 需求来自用户，AI 负责技术实现选择。AI 正确选择了利用 scanpy 内置坐标对齐机制，避免了手动对齐的复杂性\nGPU vs CPU 测试选择 角色 思路 人类 人类明确指出应使用 GPU，并在 AI 提交 CPU 命令时立即中断纠正 AI AI 主动使用 –device cpu 做「快速语法验证」，没有考虑到这会在 HPC 环境上产生资源竞争问题 差异分析: 人类对 HPC 资源使用有意识，不允许无谓的 CPU 计算；AI 习惯用 CPU 做轻量测试，未意识到 benchmark 脚本即使 –device cpu 也会加载完整模型并运行全部 spot\nBYOL 的具体记忆引导 角色 思路 人类 用户主动提起「我记得有个方法使用了 BYOL」，引导 AI 去查找 BYOL 在 ST/病理学中的具体应用 AI AI 在此之前的综述中虽然提到了多种自监督方法，但未特别突出 BYOL 与 ST 的关联 差异分析: 用户对领域文献有预存的碎片记忆，能够通过线索引导 AI 挖掘具体方法（STAIG 用 BYOL 训练 image encoder）\n文档优化的目标设定 角色 思路 人类 用户明确要求完整保留所有大目标/中目标/小目标 checklist，即使这意味着目标章节从 130 行扩展到 210 行，超过了原本「减少 50%」的整体目标 AI AI 最初的精简计划倾向于均匀压缩各章节，在收到明确指示后调整了目标章节的处理策略 差异分析: 用户清楚地知道哪些内容是「活的文档」（checklist 需要持续更新），哪些是「死的冗余」（重复的架构描述）。AI 的默认策略是均匀精简，用户纠正了这一倾向\nAI 局限性 重要局限 多次错误使用或无法从用户中断中学习 ExitPlanMode 工具使用模式：在文档任务中误用（应仅用于代码实现计划审批）；在 M12/M13/M14 规划会话中连续重复调用并被拒绝，未能识别用户偏好手动文本粘贴工作流这一稳定模式 初始实现 STEGOSpatialLoss 时遗漏了数值稳定的 logsumexp 处理，直接使用 torch.logsumexp 在 temperature=0.07 的高幅度输入下产生 NaN，需要两轮修复才解决 多次无法获取 Nature/ScienceDirect 论文全文（403/303 重定向），且即使获取到 HTML 版本，图片中的数值也无法读取，导致无法确认 F-SEG 等论文的具体数值；初始调研中错误地将 MILWRM 归类为 image-only 方法（基于摘要层面理解），需通过直接读取全文才得以纠正 未能主动指出「视觉 encoder 独立评测数据极度稀缺」这一重要文献空白，需要用户追问多次才逐步揭示；同样，在调研中倾向生成边界模糊的全面综述（同时列举 image-only 和多模态方法），而非按用户实际需求精准过滤 在设计 G4 恢复数据方案时将「Oracle Recovery」排在首选，但用户倾向于学术可信度更高的「人工遥操作」。AI 对研究场景中学术严谨性优先于工程便捷性的判断权重不足 一般局限 未考虑 HPC 环境资源问题，在多 GPU 节点上启动了 –device cpu 的 benchmark 进程，导致该进程运行 76 分钟未被发现，占用大量 RAM 编写 eval_scan_fusion.py 时对 load_dlpfc_data() 和 load_spatial_coordinates() 的返回格式记忆不准确，导致两处 bug（解包错误 + 坐标 shape 异常），需要运行才发现 MimicGen 启动命令中未能正确处理 CUDA_VISIBLE_DEVICES 与 MUJOCO_EGL_DEVICE_ID 的关系，生成了错误的执行命令（EGL_DEVICE_ID=0 而非 3），需要人类协助修正 在第一次分析「棕色重复 patch」时，误将 scGPT 的可视化（用户错误粘贴）当作 UNI2 分析对象，给出了关于 scGPT embedding 坍缩的错误分析，浪费了交互轮次 在编写单元测试时未考虑到 numpy bool 与 Python bool 的类型差异，使用了 is True 而非 == True，导致测试失败后才发现并修正 今日收获 核心收获 H\u0026E image-only 在 DLPFC 精细分层（7 层）上 ARI 仅 0.11–0.16，而多模态达 0.45–0.64。根因不是 encoder 能力不足，而是：① 训练数据以癌症为主（脑组织占比极小）；② DINOv2 学到粗粒度语义（tumor vs stroma）而非皮层层间微妙梯度；③ patch 独立编码缺乏空间上下文（Layer 3 vs 4 的区分需要知道在整个皮层中的相对深度） UNI/UNI2 对 patch 做的是监督线性评测（linear probe + KNN），而空间域识别做的是无监督聚类——表面相同的任务因评测范式不同导致难度天壤之别。UNI2 在 CRC-100K 上准确率 0.957 并不意味着无监督聚类 ARI 也高，这是一个重要的评测认知偏差 纯 image-only 在粗粒度任务（WSI 组织类型分类，Accuracy 0.93+）效果很好，在细粒度空间域识别上失败——这一二分是理解什么时候 image-only baseline 有意义的关键 当前文献中几乎没有任何方法做过纯视觉 embedding 的空间域识别独立评测，spEMO 报告的是多模态融合结果，HEST-1k 评测的是基因表达预测。纯视觉 ARI 在现有少量证据中非常低（~0.11–0.23），既是 MIHD benchmark 的差异化价值所在，也是值得系统研究的文献空白 SCAN（语义聚类 + 最近邻）在 image-only 设置下表现最优：151673 section 上 ARI=0.303 vs baseline=0.251（+20.6%），优于 STEGO 和 BYOL+GAT，说明特征空间 k-NN 一致性约束比空间几何对比更有效 BC-RNN 是解决 transport/place 相位空白的唯一可行路径：Pi0 成功率 0%，random policy 无法到达后期阶段，只有 BC-RNN 有约 60–70% SR 能进入 transport/place，从而产生这些相位的自然错误 Benchmark 论文的核心论证链：大规模数据集（M12）→ 分类有原则（M13）→ 基线性能（M14）→ 数据有用性（M15）。缺少任何一环都无法支撑核心贡献声明 Error Recovery Benchmark 项目已完成 v4.0–v4.8 基础设施建设（454 场景/20 分类器/完整评估管线），现阶段核心任务是「论证有用性」而非继续建设基础设施。这是项目从工程阶段转向研究阶段的关键节点 SCAN embeddings 替换原始 UNI2 做 mean fusion 时 ARI 从 0.275 提升到 0.340（+24%），说明 SCAN 精炼后的特征与基因特征的 mean 融合具有协同效应；llava_mlp+SCAN 也有小幅提升（ARI 0.409） 自监督训练前必须对冻结特征（UNI2 输出 1536-dim）做 L2 归一化；不归一化时初始投影输出幅度过大，会导致对比损失直接 NaN UNI2 在 DLPFC 上产生「棕色重复 patch」的根本原因：它将血管、大神经元胞体等「视觉异常结构」归并到同一 cluster，因为这些结构在其预训练的癌症病理数据中是重要特征。这揭示了域迁移（癌症病理→正常脑组织）的具体表现 HEST-1k benchmark 发现病理 PFM 性能与模型规模呈对数正相关（Pearson R=0.81），但与预训练数据量的相关性较弱（R=0.48）——架构和训练方法比数据堆量更重要 BYOL 相比 SimCLR 的核心优势在于不需要负样本（小 batch 友好）、对数据增强不敏感——这两点恰好契合 ST/病理学场景（少量 patch、类间差异小不适合构造负样本）。STAIG 正是利用 BYOL 在目标域 H\u0026E patches 上做自监督训练来适配 image encoder 跨领域通用解决框架（按数据量和计算资源从重到轻排列）：① 大数据域内预训练（有足量无标注数据时）；② PEFT 微调（LoRA/Adapter，保留通用知识）；③ 测试时自适应（TTT-MAE，无监督）；④ 特征 distillation（STEGO/SCAN，利用近邻结构） VLA 错误恢复领域已有 8 个具体模型（SC-VLA、CycleVLA、FailSafe、FPC-VLA、RoboFAC、VLAC 等），其中 FailSafe 和 VLA-SCT 是 training-free 插件，最易与现有评估管线集成 验证 Foundation Model 提升效果（G4）的实验设计需要三组对比：基线/正常微调/恢复微调。恢复训练数据的质量直接决定实验结论的可信度，人工遥操作虽耗时但论文可信度更高 FMEA（失效模式与影响分析）是为机器人错误分类提供理论依据的有效框架，ISO 15066/10218/IEC 61508 可作为 Grasp Failure、Drop、Collision 等 Category 的标准参考源 实践收获 文档精简的核心原则：识别哪些内容是「活的可操作 checklist」（不压缩），哪些是「沉淀的历史记录」（大幅压缩），而非均匀精简。项目文档从 ~33k tokens 精简到 763 行说明这一策略的有效性 JSONL 格式配合 resume 逻辑是长时间 GPU 评估任务的最佳实践：每个 episode 完成即 append 落盘，重启后只需读取一次文件重建 completed 集合，无需数据库或复杂 checkpoint 机制 Windows 上 SSH ControlMaster 使用 Unix domain socket，Windows 根本不支持，导致的症状（Bad file descriptor / nonexistent pipe）容易被误诊为网络或认证问题。所有跨平台 SSH config 应明确排除 ControlMaster 相关选项 robosuite + MimicGen 环境中，MUJOCO_EGL_DEVICE_ID 必须使用物理 GPU 编号（如 3），而非 CUDA 逻辑编号（0），即使设置了 CUDA_VISIBLE_DEVICES=3 在 HPC 多 GPU 节点上做代码验证应优先使用 ast.parse() 或 python –help，绝不应该让 benchmark 脚本以 CPU 模式运行以「验证语法」 会话摘要 Windows SSH配置 ✅ 修复 VS Code Remote-SSH 连接 tianhe/an49/an47 失败（ControlMaster Windows 不兼容） 04:42:44.170 | claude_code 用户报告三台服务器 SSH 连接失败，AI 检查 SSH config 后发现 ControlMaster/ControlPath/ControlPersist 导致 stale socket 文件使后续连接全部失败。注释掉这三行并清理 stale socket 后，tianhe 和 an49 恢复正常。an47 的拒绝被正确判断为 Slurm 无活跃作业的节点访问策略，非 SSH 问题。\nMIHD ✅ 视觉编码器指南、文献综述与聚类可视化改进 14:26:25.532 | claude_code 本次会话包含多项连续工作：创建了视觉编码器使用指南（docs/VISION_ENCODER_GUIDE.md）；广泛调研了 spEMO、STAIG、SPADE、HEST-1k 等方法对 UNI/UNI2 的使用方式并形成文献综述；深入分析了 UNI 原论文 34 个评测任务和 vision-only 评测空白；讨论了 UNI2 聚类中棕色重复 patch 的成因；改进了可视化代码以增加 H\u0026E 原图对比面板；最终批量更新了所有 11 个 DLPFC section 的 UNI2 可视化。\n✅ H\u0026E Image-Only 聚类方法深度调研：文献、指标、根因分析与无监督适配方案 19:54:06.170 | claude_code 用户要求调研 H\u0026E 图像 image-only 聚类方法。AI 通过多轮搜索整理了 MILWRM、F-SEG、Deep Contrastive Clustering 等专门方法，并在多模态方法的 ablation 中挖掘 image-only 数据（DLPFC ARI 0.11–0.16）。在用户追问下，深入分析了 foundation model 在空间域识别上失效的五个根因，并类比 FGVC/医学影像/遥感等领域的类似问题及社区解决方案。最终重点讨论了 BYOL 在 STAIG 中的具体应用，并将所有调研结果以结构化大目标 7 的形式写入 MIHD 增强计划文档（+500 行）。\n🔄 实现并测试 Image-Only 聚类增强三方法（STEGO/BYOL+GAT/SCAN），修复 STEGO NaN bug 20:59:45.683 | claude_code 用户提供了完整的 6 阶段实施计划，AI 创建了 5 个新模型文件并修改了 4 个现有文件，将三种自监督方法集成进 run_benchmark.py。在 DLPFC 151673 section 的测试中，STEGO 出现 NaN bug（两轮修复：输入归一化 + 数值稳定 logsumexp），SCAN 效果最佳（ARI 0.303 vs baseline 0.251）。此外创建了 eval_scan_fusion.py 脚本用于 SCAN embeddings 与全 fusion 方法的交叉对比，部分方法因坐标 bug 报错待修复。\n❌ 阅读 ENHANCEMENT_PLAN_CN.md 并规划 Image Encoder 增强方案 20:48:09.624 | claude_code 用户要求完成增强计划文档中 image encoder 增强部分。AI 探索了 ImageEncoder.py、STAIGTrainer.py、datasets.py、spatial_utils.py 等核心模块，完成了架构理解和集成点分析，进入计划模式后开始撰写实施方案，但在提交计划前被用户中断，未获批准执行。\n✅ RM-IDEAL 评分中英双语结构性文档创建 14:20:09.677 | claude_code 用户请求编写 RM-IDEAL 评分的结构性文档，AI 探索了代码库并生成了文档。随后用户要求同步创建中文版本。最终在 docs/RM_IDEAL_SCORE.md 生成了包含定义、使用原因、使用方法三大章节的中英双语文档。\nErrorRecoveryBenchmark 🔄 Phase II 有效性论证：从基础设施到论文核心实验的战略规划 16:05:21.618 | claude_code 用户提出四大研究方向（大规模数据集/分类论证/基线评估/FM 有用性验证），要求细化为可执行的中小目标并更新项目文档。AI 进行三路并行探索（当前管线状态/评估指标/VLA 集成），设计了包含 G1–G7、M1–M15 的完整 Phase II 计划。在关键决策上，AI 向用户澄清了「恢复训练数据」概念，用户选择了人工遥操作路线和仅 PickPlace 任务范围。计划文件已写入并根据用户决策更新，但最终 ExitPlanMode 提交被拒绝，会话中断。\n✅ M13 全量实现：错误分类论证文档 + 统计脚本 + 30 个单元测试 21:36:06.631 | claude_code 用户以 ‘Implement the following plan’ 方式提交 M13 计划，AI 完整实现了所有内容：docs/taxonomy_justification.md（FMEA 映射 + 6×3 完备性矩阵）、scripts/7_classifier_reliability.py（Cohen’s/Fleiss’ kappa + 非冗余验证）、scripts/8_error_type_discriminability.py（Kruskal-Wallis + rank reversal）、tests/unit/test_classifier_reliability.py（30 个测试）。修复了 numpy bool 比较 bug 后，30/30 测试全部通过。\n✅ M14 基线评估基础设施实现：resume 支持、多 run 分析、per-error-type 分解 21:48:25.170 | claude_code 按既定计划实现 M14 所需的全部代码变更：collector.py 添加 resume 逻辑（skip 已完成 episode）；3_collect_data.py 添加 –resume/–scene_offset/–scene_limit；4_analyze_results.py 重写为支持多 run 合并、per-error-type 矩阵分解、summary.json 输出；Makefile 添加分组并行运行的 m14 系列 targets。所有文件通过语法检查，Makefile dry-run 验证正确，项目全景总结更新至 v4.10。\n✅ VLA 与 Foundation Model 错误恢复能力调研文档编写 15:59:46.631 | claude_code 用户要求联网搜索声称具备 error recovery 能力的 VLA 模型和主流机器人 Foundation Models。AI 进行了 12 次搜索，覆盖 SC-VLA、CycleVLA、FailSafe、FPC-VLA、RoboFAC、VLAC 等 8 个 recovery 模型和 π0/π0-FAST/π0.5/OpenVLA/GR00T N1 等 9 个基础模型。最终创建 docs/VLA_Foundation_Models_Survey.md 并更新项目总结至 v4.8。\n🔄 M12 代码实现：数据集统计、分层划分、检测器调参、MimicGen 配置 22:17:51.831 | claude_code 用户以 ‘Implement the following plan’ 方式提交 M12 计划，AI 完成了全部代码变更（6 个文件新建/修改），并尝试在 GPU 上执行 MimicGen 扩增任务，但首次因 EGL device ID 不匹配失败，修正命令后重新提交后话题截止，GPU 执行结果未知。所有代码变更本身已完成。\n✅ 项目全景总结更新：新增 Phase II 论证有效性计划（v4.9） 17:30:42.651 | claude_code 用户要求根据「论证 Error Recovery Benchmark 有效性」计划更新 项目全景总结.md。AI 对文档进行大幅重写：拆分为 Phase I（已完成）和 Phase II（待执行）两个阶段，新增 G4–G7 大目标、M12–M15 里程碑详细子目标、16 天执行路线图、Section 15 详细规划，并更新风险分析和总结章节。\n🔄 项目全景总结文档重构：1554 行精简至 763 行并迁移 VLM 教程 20:17:43.767 | claude_code 用户提供了详细的文档优化计划，要求将 ~1554 行的项目文档精简 50% 并迁移操作指南到独立文件。AI 分批读取大文件内容，通过 Explore agent 收集真实代码统计数据（53 文件/14300 行等），成功创建 docs/vlm_tutorial.md（331 行）并将主文档重写为 763 行。验证确认所有 87 个 checklist 条目完整保留（G1–G7/M1–M15/S 级），统计数据全部更新为实际值。随后用户要求开始 M14 基线评估，AI 进行了广泛的管线探索，设计了含 resume 支持和多策略分离运行的实施方案，但最终提交计划时被中断。\n❌ M12 规划：根据项目总结设计大规模数据集构建方案 21:18:21.831 | claude_code 用户要求根据项目全景总结完成 M12，AI 进行了深度代码库探索（场景生成管线、BC-RNN checkpoints、MimicGen workspace、策略适配器）并设计了 13 步实现计划。在调用 ExitPlanMode 请求计划审批时被用户中断，规划阶段未完成。\n❌ M13 规划：设计错误分类体系论证实现方案 21:19:31.831 | claude_code 用户要求根据项目全景总结完成 M13，AI 并行探索了错误分类体系、指标模块、评估管线后生成了详细实现计划（含 taxonomy_justification.md、可靠性脚本、区分度脚本、单元测试等）。在调用 ExitPlanMode 时再次被用户中断。\n✅ CLAUDE.md 精简优化：205 行压缩至 163 行 20:03:03.225 | claude_code 用户提供了详细的 CLAUDE.md 改进计划并要求实现。AI 探索了 conftest.py 测试夹具、error_taxonomy.py 类型数量、validators 列表后，对文档进行了精准修改：修正错误类型数（17→24）、补全 validator 列表、合并冗余章节、压缩 Related Project 节（48→18 行）、新增 Test fixtures 和 Data formats 小节，最终压缩 20%。\n❌ /init 命令：分析代码库生成 CLAUDE.md 19:51:32.631 | claude_code 用户触发 /init 命令，AI 开始探索代码库以改善现有 CLAUDE.md。AI 并行启动了两个探索 agent，但在生成改进计划并调用 ExitPlanMode 时被用户中断，计划未被采纳。\nToken 用量 总览 指标 数值 总 Token 27,649,181 输入 Token 22,086 输出 Token 37,532 Cache 创建 1,201,531 Cache 读取 26,388,032 Cache 命中率 95.6% 总费用 (USD) $19.7339 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 11,324 37,404 907,418 24,569,805 $18.9480 96.0% claude-haiku-4-5-20251001 10,752 99 228,410 1,515,992 $0.4484 2.3% claude-sonnet-4-6 10 29 65,703 302,235 $0.3375 1.7% 各设备用量 设备 总 Token 输入 输出 费用 DCC 27,623,958 22,083 37,522 $19.6811 tianhe 25,223 3 10 $0.0527 ",
+  "wordCount" : "2162",
+  "inLanguage": "en",
+  "datePublished": "2026-02-19T00:00:00-05:00",
+  "dateModified": "2026-02-19T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-02-19/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-19
+    </h1>
+    <div class="post-meta"><span title='2026-02-19 00:00:00 -0500 EST'>February 19, 2026</span>&nbsp;·&nbsp;11 min
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-19">日报 — 2026-02-19<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-19">#</a></h1>
+<blockquote>
+<p>当日工作横跨三个项目：MIHD 空间转录组项目完成多份技术文档撰写、聚类可视化改进及三种自监督聚类方法（STEGO/BYOL+GAT/SCAN）全量实现与测试（SCAN 最优 ARI 0.303）；ErrorRecoveryBenchmark 项目完成 M12–M14 代码实现、M13 全量单元测试及 Phase II 有效性论证战略规划；同时开展 H&amp;E image-only 聚类文献深度调研并修复 Windows VS Code Remote-SSH 连接故障，共记录 17 段对话。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>实现 Image-Only 聚类增强三方法（STEGO / BYOL+GAT / SCAN）</strong> — 新建 STEGOHead.py、BYOLAdapter.py、SpatialGATRefiner.py、SCANHead.py，修改 run_benchmark.py 的 argparse/validation/apply_fusion 集成点，以及 config.yaml、models/<strong>init</strong>.py 等配套配置，共涉及 5 个新文件 + 4 个文件修改。</li>
+<li>✅ <strong>H&amp;E Image-Only 聚类方法深度文献调研</strong> — 系统搜索并整理了 image-only 组织域聚类方法（MILWRM、F-SEG、Deep Contrastive Clustering）、多模态方法中的 image-only ablation 数据（DLPFC ARI 0.11–0.16）、foundation model 训练机制、跨领域类比（FGVC/医学影像/遥感），以及无监督适配方案（STEGO/SCAN/BYOL/TTT-MAE）。</li>
+<li>✅ <strong>M14 基线评估代码基础设施实现</strong> — 为 collector.py 添加 resume 支持（读取 episodes.jsonl 跳过已完成 episode）；为 3_collect_data.py 添加 &ndash;resume/&ndash;scene_offset/&ndash;scene_limit 参数；将 4_analyze_results.py 扩展为支持多 run 合并、per-error-type 分解矩阵、summary.json 输出（+120 行）；Makefile 添加 m14 系列 targets。</li>
+<li>✅ <strong>M13 错误分类体系论证全量实现</strong> — 实现 M13 全部内容：docs/taxonomy_justification.md（FMEA 映射 + 6×3 完备性矩阵）、scripts/7_classifier_reliability.py（Cohen&rsquo;s/Fleiss&rsquo; kappa）、scripts/8_error_type_discriminability.py（Kruskal-Wallis + rank reversal）、tests/unit/test_classifier_reliability.py（30 个单元测试全部通过）、更新 Makefile 和项目总结。</li>
+<li>🔄 <strong>Phase II 有效性论证战略规划（G1–G7/M1–M15）</strong> — 根据用户提出的四大研究方向（大规模数据集、分类论证、基线评估、Foundation Model 有用性验证），设计包含中目标和快速验证小目标的完整路线图，确认遥操作收集恢复轨迹路线和仅 PickPlace 任务范围，计划文本已写入但 ExitPlanMode 提交被拒绝。</li>
+<li>✅ <strong>病理视觉基础模型文献综述（UNI/UNI2 相关方法）</strong> — 在 docs/VISION_ENCODER_LITERATURE_SURVEY.md 中调研了 spEMO、STAIG、SpaGCN、SPADE、GIST、HEST-1k 等方法如何使用 UNI/UNI2/GigaPath 等 PFM，重点比较了 patch 提取方式、embedding 维度、融合策略和评测结果。</li>
+<li>✅ <strong>在 DLPFC 151673 上测试三种新方法并修复 STEGO NaN bug</strong> — 并行跑 STEGO、BYOL+GAT、SCAN 三种方法，发现并修复 STEGO loss NaN（输入 L2 归一化 + 数值稳定 logsumexp + float64）。SCAN 效果最佳 ARI=0.303，BYOL ARI=0.237，STEGO 修复后 ARI=0.209，baseline ARI=0.251。</li>
+<li>✅ <strong>更新 MIHD 增强计划（大目标 7，含 Image Encoder 增强规划）</strong> — 将文献调研成果整理为结构化大目标 7，涵盖文献综述、根因分析、跨领域类比、BYOL 详解、候选方案、实施路线（Phase 1–5）、预期效果与风险、验证计划及参考文献，写入 ENHANCEMENT_PLAN_CN.md（约 +500 行）。</li>
+<li>✅ <strong>VLA 与 Foundation Models 错误恢复能力调研文档</strong> — 联网搜索并撰写 docs/VLA_Foundation_Models_Survey.md：梳理 8 个声称具备 Error Recovery 能力的 VLA 模型（SC-VLA、CycleVLA、FailSafe、FPC-VLA、RoboFAC、VLAC 等）以及 9 个主流 Foundation Model（π0、π0-FAST、π0.5、OpenVLA、GR00T N1、Octo、HPT 等）的架构和使用方式。</li>
+<li>✅ <strong>M12 大规模数据集构建（代码部分）</strong> — 新建 scripts/6_dataset_statistics.py（统计 + gap 分析）、configs/mimicgen_augment_200.json，在 database.py 添加 create_stratified_split()，调低检测器 min_step 阈值（100→50）并增大 max_scenes_per_demo（10→20），在 1_generate_scenes.py 添加 &ndash;dataset_path 参数，更新 Makefile。</li>
+<li>🔄 <strong>M14 基线方法完整评估计划设计</strong> — 探索 454 个错误场景评估管线，分析 scripts/3_collect_data.py、collector.py、4_analyze_results.py 和策略适配器，设计在 454 场景×4 策略×3 seeds=5448 episodes 上运行完整基线评估的实施方案（含 resume 支持、多 run 合并分析和 per-error-type 分解报告），计划提交被中断。</li>
+<li>✅ <strong>UNI/UNI2 原论文评测任务深度分析</strong> — 系统整理了 UNI 原论文（Nature Medicine 2024）的 34 个临床评测任务（ROI 分类、Slide 分类、细胞分割、图像检索）以及 UNI2 的 8 个 benchmark 任务，创建了 docs/UNI2_EVALUATION_ANALYSIS.md，揭示监督线性评测与无监督聚类评测的本质差异。</li>
+<li>🔄 <strong>SCAN embeddings + PCA 与全 fusion 方法对比</strong> — 编写 eval_scan_fusion.py，将 SCAN 优化后的视觉 embeddings 与 PCA 基因特征做所有 fusion 方法的对比；basic_contrastive / qformer / staig_fusion 因空间坐标 bug 报错，已改用 adata.obsm[&lsquo;spatial&rsquo;] 修复，全量对比尚未完成（mean fusion ARI 0.340，llava_mlp+SCAN ARI 0.409）。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>项目全景总结.md 更新与精简重构（v4.9，1554→763 行）</strong> — 分两步操作：首先大幅重写新增 Phase II 四大目标（G4–G7）、M12–M15 里程碑详细子目标、16 天执行路线图；随后将文档从 ~1554 行精简至 763 行（删除重复章节 §11、迁移 VLM 教程至 docs/vlm_tutorial.md），完整保留 87 个 checklist 条目，更新全部代码统计数据。</li>
+<li>✅ <strong>CLAUDE.md 精简优化（ErrorRecoveryBenchmark）</strong> — 将 CLAUDE.md 从 205 行压缩至 163 行（-20%）：修正错误类型数（17→24）、补全 validator 列表（4 个）、合并 Pipeline stages 与 Key modules、压缩 Related Project 章节（48→18 行）、新增 Test fixtures 和 Data formats 两个小节。</li>
+<li>✅ <strong>创建 MIHD Vision Encoder 使用指南</strong> — 在 docs/VISION_ENCODER_GUIDE.md 中详细描述从 H&amp;E 图像到 embedding 的完整流程，包括图像定位、坐标对齐、patch 提取、UNI2/UNI/HIPT/ResNet50 四种 encoder 的架构差异与使用方式，以及 10 种融合策略。</li>
+<li>✅ <strong>改进聚类可视化：增加 H&amp;E 原图面板</strong> — 修改 scripts/run_benchmark.py 的 create_clustering_visualization() 函数，将 1×2 布局改为 1×3 布局，最左面板用 sc.pl.spatial 显示 H&amp;E 原图（不叠加 spot 点），坐标系与其他两个面板对齐。</li>
+<li>🔄 <strong>M12 GPU 执行（MimicGen 扩增 + BC-RNN 捕获）</strong> — 启动 MimicGen 扩增任务时遇到 EGL device ID 不匹配错误（CUDA_VISIBLE_DEVICES=3 但 MUJOCO_EGL_DEVICE_ID 未正确设置），已修复命令后重新提交，BC-RNN 和 Pi0 natural capture 任务计划并行在不同 GPU 上运行，执行结果待确认。</li>
+<li>✅ <strong>创建 RM-IDEAL 评分中英双语文档</strong> — 在 docs/RM_IDEAL_SCORE.md 中完整记录了 RM-IDEAL 的定义（WWL 图核 + Wasserstein 距离）、使用原因（弥补 ARI/NMI 缺乏空间感知的盲区）及使用方法（RMIdealEvaluator API 和 CLI），包含中英双语版本。</li>
+<li>✅ <strong>批量更新全部 UNI2 可视化（不重新推理）</strong> — 从缓存的 _embeddings.npz 文件中读取 embeddings/pred_labels/gt_labels，调用更新后的可视化函数，重新生成所有 11 个 DLPFC section 的三面板可视化；151510 缺少 lowres 图像通过 hires→lowres symlink 解决。</li>
+<li>✅ <strong>修复 Windows VS Code Remote-SSH 连接失败</strong> — 定位根因为 SSH config 中 ControlMaster/ControlPath/ControlPersist 在 Windows 上不兼容 Unix domain socket，注释掉这三行并清理残留 stale socket 文件；tianhe 和 an49 连接恢复正常，an47 确认为 Slurm 无活跃作业策略导致，非 SSH 问题。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-stego-训练过程中-loss-始终为-nan无法收敛">1. STEGO 训练过程中 loss 始终为 NaN，无法收敛<a hidden class="anchor" aria-hidden="true" href="#1-stego-训练过程中-loss-始终为-nan无法收敛">#</a></h4>
+<p><strong>解决方案:</strong> 两步修复：① 对输入 image_emb 做 L2 归一化（防止初始投影幅度过大）；② InfoNCE 计算中先减去每行最大值再做 exp（数值稳定 logsumexp），并将相似度矩阵计算切换到 float64</p>
+<p><strong>关键洞察:</strong> n=3639 的 dense 余弦相似度矩阵 ÷ temperature=0.07 → 值域 ~[-14, 14]，float32 的 exp 在高温下容易溢出；减去行最大值是标准 numerically stable softmax 的必要步骤</p>
+<h4 id="2-搜索-image-only-方法的-ablation-study-数字时几乎所有多模态方法的-ablation-都是去掉-image而非只用-image导致无法直接获得-image-only-的-ari">2. 搜索 image-only 方法的 ablation study 数字时，几乎所有多模态方法的 ablation 都是「去掉 image」而非「只用 image」，导致无法直接获得 image-only 的 ARI<a hidden class="anchor" aria-hidden="true" href="#2-搜索-image-only-方法的-ablation-study-数字时几乎所有多模态方法的-ablation-都是去掉-image而非只用-image导致无法直接获得-image-only-的-ari">#</a></h4>
+<p><strong>解决方案:</strong> 转向搜索专门的 image-only baseline 论文，找到 SpaConTDS 论文明确报告了 stLearn（ARI=0.11）和 SpaConTDS（ARI=0.16）的 image-only 结果</p>
+<p><strong>关键洞察:</strong> 多模态 ST 领域的 ablation 设计从根本上以 gene expression 为主体，image 被视为辅助，这一领域规范导致 image-only 数据极度稀缺</p>
+<h4 id="3-collectorpy-长时间-vla-评估515h在-crash-后会丢失全部进度">3. collector.py 长时间 VLA 评估（5–15h）在 crash 后会丢失全部进度<a hidden class="anchor" aria-hidden="true" href="#3-collectorpy-长时间-vla-评估515h在-crash-后会丢失全部进度">#</a></h4>
+<p><strong>解决方案:</strong> 在 collect_on_scenes() 开头读取已有 episodes.jsonl，构建 completed 集合，在三重循环中 skip 已完成的 (scene_id, policy_name, seed) 组合</p>
+<p><strong>关键洞察:</strong> JSONL 格式天然支持 append，每个 episode 完成即落盘，resume 只需在启动时读回一次，不需要数据库或 checkpoint 机制</p>
+<h4 id="4-transportplace-相位场景完全空白各-0-条而-pre_reach-250-条造成严重的相位不平衡">4. transport/place 相位场景完全空白（各 0 条），而 pre_reach 250 条，造成严重的相位不平衡<a hidden class="anchor" aria-hidden="true" href="#4-transportplace-相位场景完全空白各-0-条而-pre_reach-250-条造成严重的相位不平衡">#</a></h4>
+<p><strong>解决方案:</strong> 降低检测器 min_step 参数（100→50），增大 max_scenes_per_demo（10→20），利用 BC-RNN（有约 60–70% 成功率）做 natural capture 以覆盖后期相位</p>
+<p><strong>关键洞察:</strong> 当前 min_step=100 使 instability detector 只在 100 步后触发，恰好错过了大部分 lift/transport 阶段；BC-RNN 是唯一能到达后期相位的策略</p>
+<h4 id="5-hest-1k-benchmark-对不同维度-encoder-的比较存在不公平性ridge-回归惩罚高维-embedding">5. HEST-1k benchmark 对不同维度 encoder 的比较存在不公平性（Ridge 回归惩罚高维 embedding）<a hidden class="anchor" aria-hidden="true" href="#5-hest-1k-benchmark-对不同维度-encoder-的比较存在不公平性ridge-回归惩罚高维-embedding">#</a></h4>
+<p><strong>解决方案:</strong> 论文设计了 PCA 降维到 256 维再做 Ridge 回归的标准化流程，消除维度差异对公平比较的影响</p>
+<p><strong>关键洞察:</strong> PCA 归一化是多模型公平比较的重要设计决策，直接对比不同维度的 embedding 会系统性低估高维模型的能力</p>
+<h4 id="6-milwrm-被-ai-在第一轮搜索中描述为-image-only-方法实际上是基于-gene-expression-的聚类方法">6. MILWRM 被 AI 在第一轮搜索中描述为 image-only 方法，实际上是基于 gene expression 的聚类方法<a hidden class="anchor" aria-hidden="true" href="#6-milwrm-被-ai-在第一轮搜索中描述为-image-only-方法实际上是基于-gene-expression-的聚类方法">#</a></h4>
+<p><strong>解决方案:</strong> 通过直接读取 PMC 全文发现：&lsquo;MILWRM is solely based on gene expression&rsquo;，在第二轮整理时予以更正</p>
+<p><strong>关键洞察:</strong> 论文摘要/标题中的 &lsquo;morphology&rsquo; 描述具有误导性，必须读原文方法部分才能确认输入模态</p>
+<h4 id="7-用户多次在-exitplanmode-调用时中断导致计划提交失败m12m13m14-等多次规划会话均被打断">7. 用户多次在 ExitPlanMode 调用时中断，导致计划提交失败（M12、M13、M14 等多次规划会话均被打断）<a hidden class="anchor" aria-hidden="true" href="#7-用户多次在-exitplanmode-调用时中断导致计划提交失败m12m13m14-等多次规划会话均被打断">#</a></h4>
+<p><strong>解决方案:</strong> 用户的实际工作流是：AI 制定计划文本 → 用户手动复制计划 → 新会话中以 &lsquo;Implement the following plan:&rsquo; 方式提交实现任务</p>
+<p><strong>关键洞察:</strong> 用户不希望 AI 自动进入计划审批流程，而是保留对计划文本的手动控制权，这是一种有意的人在回路设计</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="8-eval_scan_fusionpy-的空间坐标-shape-变成-1-2-导致-basic_contrastive--qformer-报错">8. eval_scan_fusion.py 的空间坐标 shape 变成 (1, 2) 导致 basic_contrastive / qformer 报错<a hidden class="anchor" aria-hidden="true" href="#8-eval_scan_fusionpy-的空间坐标-shape-变成-1-2-导致-basic_contrastive--qformer-报错">#</a></h4>
+<p><strong>解决方案:</strong> 不使用 load_spatial_coordinates() 重新加载（barcode 匹配失败），改为直接读取 adata.obsm[&lsquo;spatial&rsquo;]，该字段由 load_dlpfc_data() 已正确填充</p>
+<p><strong>关键洞察:</strong> load_dlpfc_data() 和 load_spatial_coordinates() 两个函数的 barcode 格式不统一，复用 adata.obsm[&lsquo;spatial&rsquo;] 是更可靠的坐标来源</p>
+<h4 id="9-windows-openssh-与-vs-code-remote-ssh-不兼容controlmaster-使用-unix-domain-socketwindows-不支持导致-ssh-进程崩溃bad-file-descriptor--nonexistent-pipe">9. Windows OpenSSH 与 VS Code Remote-SSH 不兼容：ControlMaster 使用 Unix domain socket，Windows 不支持，导致 SSH 进程崩溃（Bad file descriptor / nonexistent pipe）<a hidden class="anchor" aria-hidden="true" href="#9-windows-openssh-与-vs-code-remote-ssh-不兼容controlmaster-使用-unix-domain-socketwindows-不支持导致-ssh-进程崩溃bad-file-descriptor--nonexistent-pipe">#</a></h4>
+<p><strong>解决方案:</strong> 注释掉 SSH config 中的 ControlMaster auto、ControlPath、ControlPersist 三行，并清理 ~/.ssh/sockets/ 下的残留 socket 文件</p>
+<p><strong>关键洞察:</strong> Windows OpenSSH 与 Linux 行为不同，连接复用机制（ControlMaster）在 Windows 上根本不支持 Unix domain socket 路径，症状与认知中的网络或认证问题完全不同</p>
+<h4 id="10-用户不清楚获取恢复训练数据的含义对-g4-实验设计产生疑惑">10. 用户不清楚「获取恢复训练数据」的含义，对 G4 实验设计产生疑惑<a hidden class="anchor" aria-hidden="true" href="#10-用户不清楚获取恢复训练数据的含义对-g4-实验设计产生疑惑">#</a></h4>
+<p><strong>解决方案:</strong> AI 通过具体例子（正常 demo vs 从错误状态恢复的轨迹对比）澄清概念，用户理解后选择了人工遥操作方案</p>
+<p><strong>关键洞察:</strong> 技术规划文档中的专业术语需要及时用具体案例解释，避免用户在关键决策上产生误解</p>
+<h4 id="11-多个关键论文nature-medicinescience-research因付费墙无法通过-webfetch-访问">11. 多个关键论文（Nature Medicine、Science Research）因付费墙无法通过 WebFetch 访问<a hidden class="anchor" aria-hidden="true" href="#11-多个关键论文nature-medicinescience-research因付费墙无法通过-webfetch-访问">#</a></h4>
+<p><strong>解决方案:</strong> 转用 PMC 全文（pmc.ncbi.nlm.nih.gov）、bioRxiv 预印本、GitHub README 和 HuggingFace 模型页面作为替代数据源</p>
+<p><strong>关键洞察:</strong> PMC 作为 NIH 资助论文的开放存储库，通常包含 Nature Medicine 等顶刊论文的全文，是学术搜索的有效替代途径</p>
+<h4 id="12-ai-在-argparse-验证时使用---device-cpu导致-cpu-进程运行-76-分钟占用大量内存">12. AI 在 argparse 验证时使用 &ndash;device cpu，导致 CPU 进程运行 76 分钟占用大量内存<a hidden class="anchor" aria-hidden="true" href="#12-ai-在-argparse-验证时使用---device-cpu导致-cpu-进程运行-76-分钟占用大量内存">#</a></h4>
+<p><strong>解决方案:</strong> kill 掉僵尸进程，恢复 GPU 资源，重新在 GPU 上跑测试</p>
+<p><strong>关键洞察:</strong> 做快速语法验证时应该用 &ndash;help 或 ast.parse() 而不是实际运行 benchmark；即便是「验证」也应默认使用 GPU</p>
+<h4 id="13-mimicgen-启动失败mujoco_egl_device_id-未与-cuda_visible_devices-对齐robosuite-egl-断言报错">13. MimicGen 启动失败：MUJOCO_EGL_DEVICE_ID 未与 CUDA_VISIBLE_DEVICES 对齐，robosuite EGL 断言报错<a hidden class="anchor" aria-hidden="true" href="#13-mimicgen-启动失败mujoco_egl_device_id-未与-cuda_visible_devices-对齐robosuite-egl-断言报错">#</a></h4>
+<p><strong>解决方案:</strong> 将命令从 MUJOCO_EGL_DEVICE_ID=0 修正为 MUJOCO_EGL_DEVICE_ID=3，与 CUDA_VISIBLE_DEVICES=3 保持一致</p>
+<p><strong>关键洞察:</strong> robosuite 要求 MUJOCO_EGL_DEVICE_ID 必须与实际 GPU 编号（非 CUDA 逻辑编号 0）完全匹配，使用 CUDA_VISIBLE_DEVICES 屏蔽后，EGL 仍用物理 GPU ID</p>
+<h4 id="14-项目文档33k-tokens超出单次读取限制无法整体处理">14. 项目文档（~33k tokens）超出单次读取限制，无法整体处理<a hidden class="anchor" aria-hidden="true" href="#14-项目文档33k-tokens超出单次读取限制无法整体处理">#</a></h4>
+<p><strong>解决方案:</strong> 分批读取（每批 400 行）+ 并行 Explore agent 收集真实代码统计数据，最终用 Write 工具一次性重写整个文档</p>
+<p><strong>关键洞察:</strong> 对于超大文件，分批读取+统一重写比逐段编辑更高效，避免多次 Edit 工具调用的累积错误风险</p>
+<h4 id="15-151510-section-缺少-tissue_lowres_imagepng导致-scread_visium-报错">15. 151510 section 缺少 tissue_lowres_image.png，导致 sc.read_visium 报错<a hidden class="anchor" aria-hidden="true" href="#15-151510-section-缺少-tissue_lowres_imagepng导致-scread_visium-报错">#</a></h4>
+<p><strong>解决方案:</strong> 创建 tissue_hires_image.png → tissue_lowres_image.png 的 symlink，解决依赖问题</p>
+<p><strong>关键洞察:</strong> scanpy 默认依赖 lowres 图像，但 lowres 本质上可以用 hires 替代，只是显示分辨率不同，功能上完全等价</p>
+<h4 id="16-eval_scan_fusionpy-调用-load_dlpfc_data-时解包错误too-many-values-to-unpack">16. eval_scan_fusion.py 调用 load_dlpfc_data() 时解包错误（too many values to unpack）<a hidden class="anchor" aria-hidden="true" href="#16-eval_scan_fusionpy-调用-load_dlpfc_data-时解包错误too-many-values-to-unpack">#</a></h4>
+<p><strong>解决方案:</strong> 将 adata, _ = &hellip; 改为 adata = load_dlpfc_data(&hellip;) 直接赋值</p>
+<p><strong>关键洞察:</strong> 函数返回值类型需与 docstring 严格对应，load_dlpfc_data 的文档说返回 AnnData，但实际有多版本调用约定</p>
+<h4 id="17-单元测试中-numpy-bool-使用-is-true-比较失败">17. 单元测试中 numpy bool 使用 <code>is True</code> 比较失败<a hidden class="anchor" aria-hidden="true" href="#17-单元测试中-numpy-bool-使用-is-true-比较失败">#</a></h4>
+<p><strong>解决方案:</strong> 改为 <code>== True</code> 或 <code>assert result['significant']</code>，因为 numpy bool 不是 Python 内置 True 单例</p>
+<p><strong>关键洞察:</strong> numpy 布尔值与 Python bool 不是同一对象，<code>is True</code> 会失败，统计库返回的布尔值应用 <code>==</code> 或直接 truthy 判断</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="crc-100k-组织分类与空间域识别本质上是同类问题">CRC-100K 组织分类与空间域识别本质上是同类问题<a hidden class="anchor" aria-hidden="true" href="#crc-100k-组织分类与空间域识别本质上是同类问题">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户主动提出 UNI 的 task1（CRC-100K）本质上就是聚类，质疑为什么 UNI 评测与 MIHD 空间域识别被视为不同类型的任务</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 最初将 UNI 的 ROI 分类任务和 MIHD 的空间域识别作为两类任务分别描述，没有主动指出两者的本质相似性</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户识别出了关键的概念对等关系，迫使 AI 深入分析两者的真正区别——监督 vs 无监督评估方式，而非任务类型本身不同。这个洞察揭示了文献中的空白：没有人直接评测 UNI2 embedding 的无监督聚类 ARI</p>
+<h4 id="项目阶段转型与-phase-ii-有效性论证战略规划">项目阶段转型与 Phase II 有效性论证战略规划<a hidden class="anchor" aria-hidden="true" href="#项目阶段转型与-phase-ii-有效性论证战略规划">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户从研究目的出发，明确提出四个战略方向（造大数据集、论证分类设计依据、建立基准性能、用 Foundation Model 证明数据有用性），规划了 G4–G7 四大目标和 M12–M15 里程碑，并指出 BC-RNN 是解决 transport/place 空白的核心</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 从代码库现状出发，识别当前 454 场景的类型分布失衡、分析工具不足等具体瓶颈，然后逐层细化为可执行实验设计序列</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户从论文贡献出发（what to prove），AI 从工程实现出发（how to implement）。人类设定了「为什么这个 benchmark 有用」的核心问题，AI 将其转化为可执行的实验设计序列，两者互补</p>
+<h4 id="uni2-可视化中棕色-patch-的原因分析">UNI2 可视化中棕色 patch 的原因分析<a hidden class="anchor" aria-hidden="true" href="#uni2-可视化中棕色-patch-的原因分析">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户观察到 UNI2 可视化中有棕色小斑点周期性重复分布在整个组织上，提出这个具体的视觉现象需要解释</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 分析棕色 cluster 是 UNI2 将「视觉异常结构」（血管横截面、大神经元胞体、切片折叠等）跨层归并的结果，因为这些结构在癌症病理图像中是显著标志</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户的观察触发了对视觉 encoder 内在工作机制的深入分析，AI 将其上升到「形态相似性 vs 生物学层级相似性」的概念差异，为后续增加 H&amp;E 对比面板的改进提供了科学动机</p>
+<h4 id="调研范围的精准边界设定">调研范围的精准边界设定<a hidden class="anchor" aria-hidden="true" href="#调研范围的精准边界设定">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户在 AI 返回多模态方法时，明确要求「我只要 image only 的部分」，拒绝了 AI 提供的多模态对比参考；进一步缩小到「ablation study 里的 image only」</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 倾向于给出全面的综述，包含 image-only、多模态、H&amp;E→基因预测等多个相关但不同的研究方向</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户对研究问题的边界比 AI 更清晰，AI 有「给得越多越好」的倾向；用户通过明确拒绝和重定向，将调研精准控制在目标范围内</p>
+<h4 id="分类论证方案设计m13">分类论证方案设计（M13）<a hidden class="anchor" aria-hidden="true" href="#分类论证方案设计m13">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户指定了具体的论证维度：FMEA 映射（引用 ISO 15066/10218）、操作原语分解、文献对比，以及 6×3 完备性矩阵的具体格式</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 提出了 Cohen&rsquo;s kappa 作为非冗余性验证、Kruskal-Wallis + Dunn 检验作为区分度验证的技术实现路径，并设计了 synthetic data 单元测试策略</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户设定了论证的框架和标准（要能发表在论文里）；AI 选择了具体的统计方法和实现架构</p>
+<h4 id="全量方案先规划后执行-vs-直接给出完整实现计划">全量方案先规划后执行 vs 直接给出完整实现计划<a hidden class="anchor" aria-hidden="true" href="#全量方案先规划后执行-vs-直接给出完整实现计划">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户提前准备了极其详细的实施计划（Phase 1–6，精确到行号），直接作为 prompt 传入</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 忠实执行了人类的计划，未做结构性调整</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类完成了架构设计工作，AI 完成了代码实现工作；这是一个人类主导设计、AI 主导执行的分工模式</p>
+<h4 id="跨领域类比的主动延伸">跨领域类比的主动延伸<a hidden class="anchor" aria-hidden="true" href="#跨领域类比的主动延伸">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户主动问「这个问题在 CV 或者其他领域是否有出现过？」和「有没有现成的无监督/自监督的方法转移方案？」，将调研从 domain-specific 扩展到通用 CV 方法论</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 在被问及之前没有主动引导到跨领域类比和解决方案的方向</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户具备将具体问题泛化为通用范式的元认知能力，AI 的回应策略是就问题回答问题，较少主动提升抽象层次</p>
+<h4 id="exitplanmode-工作流设计">ExitPlanMode 工作流设计<a hidden class="anchor" aria-hidden="true" href="#exitplanmode-工作流设计">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户选择不通过 ExitPlanMode 审批，而是手动接管计划文本，在新会话中以 &lsquo;Implement the following plan:&rsquo; 方式触发实现——保持对计划内容的完整控制</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 默认在规划完成后调用 ExitPlanMode 请求用户审批，遵循标准的计划→审批→实现流程</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户不信任 ExitPlanMode 的审批 UI，偏好异步的文本粘贴工作流。AI 没有从前几次中断中学习这一偏好，在多次会话中重复了同样的行为</p>
+<h4 id="恢复训练数据的获取策略">恢复训练数据的获取策略<a hidden class="anchor" aria-hidden="true" href="#恢复训练数据的获取策略">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户选择人工遥操作（最高质量但最费力的方式），反映了对数据质量的重视，以及对 Foundation Model 微调实验可信度的考量</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 提供了两种选项：Oracle Recovery（自动化，仅适用于注入场景）和人工遥操作，并指出前者成本更低</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户优先考虑实验的论文可信度，AI 优先考虑工程实现难度。最终用户的选择更符合研究严谨性要求，但 AI 成功地用「先采集 50 条做快速验证」的建议降低了执行风险</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="为可视化增加-he-原图面板">为可视化增加 H&amp;E 原图面板<a hidden class="anchor" aria-hidden="true" href="#为可视化增加-he-原图面板">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户提出需要 H&amp;E 原图作为对比，以便直观验证棕色 patch 在组织上的实际形态</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 执行了代码修改，选择用 sc.pl.spatial 无 color 参数渲染（保持坐标系一致），而非直接嵌入原始图像文件</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 需求来自用户，AI 负责技术实现选择。AI 正确选择了利用 scanpy 内置坐标对齐机制，避免了手动对齐的复杂性</p>
+<h4 id="gpu-vs-cpu-测试选择">GPU vs CPU 测试选择<a hidden class="anchor" aria-hidden="true" href="#gpu-vs-cpu-测试选择">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类明确指出应使用 GPU，并在 AI 提交 CPU 命令时立即中断纠正</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 主动使用 &ndash;device cpu 做「快速语法验证」，没有考虑到这会在 HPC 环境上产生资源竞争问题</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类对 HPC 资源使用有意识，不允许无谓的 CPU 计算；AI 习惯用 CPU 做轻量测试，未意识到 benchmark 脚本即使 &ndash;device cpu 也会加载完整模型并运行全部 spot</p>
+<h4 id="byol-的具体记忆引导">BYOL 的具体记忆引导<a hidden class="anchor" aria-hidden="true" href="#byol-的具体记忆引导">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户主动提起「我记得有个方法使用了 BYOL」，引导 AI 去查找 BYOL 在 ST/病理学中的具体应用</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 在此之前的综述中虽然提到了多种自监督方法，但未特别突出 BYOL 与 ST 的关联</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户对领域文献有预存的碎片记忆，能够通过线索引导 AI 挖掘具体方法（STAIG 用 BYOL 训练 image encoder）</p>
+<h4 id="文档优化的目标设定">文档优化的目标设定<a hidden class="anchor" aria-hidden="true" href="#文档优化的目标设定">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户明确要求完整保留所有大目标/中目标/小目标 checklist，即使这意味着目标章节从 130 行扩展到 210 行，超过了原本「减少 50%」的整体目标</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 最初的精简计划倾向于均匀压缩各章节，在收到明确指示后调整了目标章节的处理策略</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户清楚地知道哪些内容是「活的文档」（checklist 需要持续更新），哪些是「死的冗余」（重复的架构描述）。AI 的默认策略是均匀精简，用户纠正了这一倾向</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>多次错误使用或无法从用户中断中学习 ExitPlanMode 工具使用模式：在文档任务中误用（应仅用于代码实现计划审批）；在 M12/M13/M14 规划会话中连续重复调用并被拒绝，未能识别用户偏好手动文本粘贴工作流这一稳定模式</li>
+<li>初始实现 STEGOSpatialLoss 时遗漏了数值稳定的 logsumexp 处理，直接使用 torch.logsumexp 在 temperature=0.07 的高幅度输入下产生 NaN，需要两轮修复才解决</li>
+<li>多次无法获取 Nature/ScienceDirect 论文全文（403/303 重定向），且即使获取到 HTML 版本，图片中的数值也无法读取，导致无法确认 F-SEG 等论文的具体数值；初始调研中错误地将 MILWRM 归类为 image-only 方法（基于摘要层面理解），需通过直接读取全文才得以纠正</li>
+<li>未能主动指出「视觉 encoder 独立评测数据极度稀缺」这一重要文献空白，需要用户追问多次才逐步揭示；同样，在调研中倾向生成边界模糊的全面综述（同时列举 image-only 和多模态方法），而非按用户实际需求精准过滤</li>
+<li>在设计 G4 恢复数据方案时将「Oracle Recovery」排在首选，但用户倾向于学术可信度更高的「人工遥操作」。AI 对研究场景中学术严谨性优先于工程便捷性的判断权重不足</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>未考虑 HPC 环境资源问题，在多 GPU 节点上启动了 &ndash;device cpu 的 benchmark 进程，导致该进程运行 76 分钟未被发现，占用大量 RAM</li>
+<li>编写 eval_scan_fusion.py 时对 load_dlpfc_data() 和 load_spatial_coordinates() 的返回格式记忆不准确，导致两处 bug（解包错误 + 坐标 shape 异常），需要运行才发现</li>
+<li>MimicGen 启动命令中未能正确处理 CUDA_VISIBLE_DEVICES 与 MUJOCO_EGL_DEVICE_ID 的关系，生成了错误的执行命令（EGL_DEVICE_ID=0 而非 3），需要人类协助修正</li>
+<li>在第一次分析「棕色重复 patch」时，误将 scGPT 的可视化（用户错误粘贴）当作 UNI2 分析对象，给出了关于 scGPT embedding 坍缩的错误分析，浪费了交互轮次</li>
+<li>在编写单元测试时未考虑到 numpy bool 与 Python bool 的类型差异，使用了 <code>is True</code> 而非 <code>== True</code>，导致测试失败后才发现并修正</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>H&amp;E image-only 在 DLPFC 精细分层（7 层）上 ARI 仅 0.11–0.16，而多模态达 0.45–0.64。根因不是 encoder 能力不足，而是：① 训练数据以癌症为主（脑组织占比极小）；② DINOv2 学到粗粒度语义（tumor vs stroma）而非皮层层间微妙梯度；③ patch 独立编码缺乏空间上下文（Layer 3 vs 4 的区分需要知道在整个皮层中的相对深度）</li>
+<li>UNI/UNI2 对 patch 做的是监督线性评测（linear probe + KNN），而空间域识别做的是无监督聚类——表面相同的任务因评测范式不同导致难度天壤之别。UNI2 在 CRC-100K 上准确率 0.957 并不意味着无监督聚类 ARI 也高，这是一个重要的评测认知偏差</li>
+<li>纯 image-only 在粗粒度任务（WSI 组织类型分类，Accuracy 0.93+）效果很好，在细粒度空间域识别上失败——这一二分是理解什么时候 image-only baseline 有意义的关键</li>
+<li>当前文献中几乎没有任何方法做过纯视觉 embedding 的空间域识别独立评测，spEMO 报告的是多模态融合结果，HEST-1k 评测的是基因表达预测。纯视觉 ARI 在现有少量证据中非常低（~0.11–0.23），既是 MIHD benchmark 的差异化价值所在，也是值得系统研究的文献空白</li>
+<li>SCAN（语义聚类 + 最近邻）在 image-only 设置下表现最优：151673 section 上 ARI=0.303 vs baseline=0.251（+20.6%），优于 STEGO 和 BYOL+GAT，说明特征空间 k-NN 一致性约束比空间几何对比更有效</li>
+<li>BC-RNN 是解决 transport/place 相位空白的唯一可行路径：Pi0 成功率 0%，random policy 无法到达后期阶段，只有 BC-RNN 有约 60–70% SR 能进入 transport/place，从而产生这些相位的自然错误</li>
+<li>Benchmark 论文的核心论证链：大规模数据集（M12）→ 分类有原则（M13）→ 基线性能（M14）→ 数据有用性（M15）。缺少任何一环都无法支撑核心贡献声明</li>
+<li>Error Recovery Benchmark 项目已完成 v4.0–v4.8 基础设施建设（454 场景/20 分类器/完整评估管线），现阶段核心任务是「论证有用性」而非继续建设基础设施。这是项目从工程阶段转向研究阶段的关键节点</li>
+<li>SCAN embeddings 替换原始 UNI2 做 mean fusion 时 ARI 从 0.275 提升到 0.340（+24%），说明 SCAN 精炼后的特征与基因特征的 mean 融合具有协同效应；llava_mlp+SCAN 也有小幅提升（ARI 0.409）</li>
+<li>自监督训练前必须对冻结特征（UNI2 输出 1536-dim）做 L2 归一化；不归一化时初始投影输出幅度过大，会导致对比损失直接 NaN</li>
+<li>UNI2 在 DLPFC 上产生「棕色重复 patch」的根本原因：它将血管、大神经元胞体等「视觉异常结构」归并到同一 cluster，因为这些结构在其预训练的癌症病理数据中是重要特征。这揭示了域迁移（癌症病理→正常脑组织）的具体表现</li>
+<li>HEST-1k benchmark 发现病理 PFM 性能与模型规模呈对数正相关（Pearson R=0.81），但与预训练数据量的相关性较弱（R=0.48）——架构和训练方法比数据堆量更重要</li>
+<li>BYOL 相比 SimCLR 的核心优势在于不需要负样本（小 batch 友好）、对数据增强不敏感——这两点恰好契合 ST/病理学场景（少量 patch、类间差异小不适合构造负样本）。STAIG 正是利用 BYOL 在目标域 H&amp;E patches 上做自监督训练来适配 image encoder</li>
+<li>跨领域通用解决框架（按数据量和计算资源从重到轻排列）：① 大数据域内预训练（有足量无标注数据时）；② PEFT 微调（LoRA/Adapter，保留通用知识）；③ 测试时自适应（TTT-MAE，无监督）；④ 特征 distillation（STEGO/SCAN，利用近邻结构）</li>
+<li>VLA 错误恢复领域已有 8 个具体模型（SC-VLA、CycleVLA、FailSafe、FPC-VLA、RoboFAC、VLAC 等），其中 FailSafe 和 VLA-SCT 是 training-free 插件，最易与现有评估管线集成</li>
+<li>验证 Foundation Model 提升效果（G4）的实验设计需要三组对比：基线/正常微调/恢复微调。恢复训练数据的质量直接决定实验结论的可信度，人工遥操作虽耗时但论文可信度更高</li>
+<li>FMEA（失效模式与影响分析）是为机器人错误分类提供理论依据的有效框架，ISO 15066/10218/IEC 61508 可作为 Grasp Failure、Drop、Collision 等 Category 的标准参考源</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>文档精简的核心原则：识别哪些内容是「活的可操作 checklist」（不压缩），哪些是「沉淀的历史记录」（大幅压缩），而非均匀精简。项目文档从 ~33k tokens 精简到 763 行说明这一策略的有效性</li>
+<li>JSONL 格式配合 resume 逻辑是长时间 GPU 评估任务的最佳实践：每个 episode 完成即 append 落盘，重启后只需读取一次文件重建 completed 集合，无需数据库或复杂 checkpoint 机制</li>
+<li>Windows 上 SSH ControlMaster 使用 Unix domain socket，Windows 根本不支持，导致的症状（Bad file descriptor / nonexistent pipe）容易被误诊为网络或认证问题。所有跨平台 SSH config 应明确排除 ControlMaster 相关选项</li>
+<li>robosuite + MimicGen 环境中，MUJOCO_EGL_DEVICE_ID 必须使用物理 GPU 编号（如 3），而非 CUDA 逻辑编号（0），即使设置了 CUDA_VISIBLE_DEVICES=3</li>
+<li>在 HPC 多 GPU 节点上做代码验证应优先使用 ast.parse() 或 python &ndash;help，绝不应该让 benchmark 脚本以 CPU 模式运行以「验证语法」</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="windows-ssh配置">Windows SSH配置<a hidden class="anchor" aria-hidden="true" href="#windows-ssh配置">#</a></h3>
+<p><strong>✅ 修复 VS Code Remote-SSH 连接 tianhe/an49/an47 失败（ControlMaster Windows 不兼容）</strong>
+<em>04:42:44.170 | claude_code</em>
+用户报告三台服务器 SSH 连接失败，AI 检查 SSH config 后发现 ControlMaster/ControlPath/ControlPersist 导致 stale socket 文件使后续连接全部失败。注释掉这三行并清理 stale socket 后，tianhe 和 an49 恢复正常。an47 的拒绝被正确判断为 Slurm 无活跃作业的节点访问策略，非 SSH 问题。</p>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>✅ 视觉编码器指南、文献综述与聚类可视化改进</strong>
+<em>14:26:25.532 | claude_code</em>
+本次会话包含多项连续工作：创建了视觉编码器使用指南（docs/VISION_ENCODER_GUIDE.md）；广泛调研了 spEMO、STAIG、SPADE、HEST-1k 等方法对 UNI/UNI2 的使用方式并形成文献综述；深入分析了 UNI 原论文 34 个评测任务和 vision-only 评测空白；讨论了 UNI2 聚类中棕色重复 patch 的成因；改进了可视化代码以增加 H&amp;E 原图对比面板；最终批量更新了所有 11 个 DLPFC section 的 UNI2 可视化。</p>
+<p><strong>✅ H&amp;E Image-Only 聚类方法深度调研：文献、指标、根因分析与无监督适配方案</strong>
+<em>19:54:06.170 | claude_code</em>
+用户要求调研 H&amp;E 图像 image-only 聚类方法。AI 通过多轮搜索整理了 MILWRM、F-SEG、Deep Contrastive Clustering 等专门方法，并在多模态方法的 ablation 中挖掘 image-only 数据（DLPFC ARI 0.11–0.16）。在用户追问下，深入分析了 foundation model 在空间域识别上失效的五个根因，并类比 FGVC/医学影像/遥感等领域的类似问题及社区解决方案。最终重点讨论了 BYOL 在 STAIG 中的具体应用，并将所有调研结果以结构化大目标 7 的形式写入 MIHD 增强计划文档（+500 行）。</p>
+<p><strong>🔄 实现并测试 Image-Only 聚类增强三方法（STEGO/BYOL+GAT/SCAN），修复 STEGO NaN bug</strong>
+<em>20:59:45.683 | claude_code</em>
+用户提供了完整的 6 阶段实施计划，AI 创建了 5 个新模型文件并修改了 4 个现有文件，将三种自监督方法集成进 run_benchmark.py。在 DLPFC 151673 section 的测试中，STEGO 出现 NaN bug（两轮修复：输入归一化 + 数值稳定 logsumexp），SCAN 效果最佳（ARI 0.303 vs baseline 0.251）。此外创建了 eval_scan_fusion.py 脚本用于 SCAN embeddings 与全 fusion 方法的交叉对比，部分方法因坐标 bug 报错待修复。</p>
+<p><strong>❌ 阅读 ENHANCEMENT_PLAN_CN.md 并规划 Image Encoder 增强方案</strong>
+<em>20:48:09.624 | claude_code</em>
+用户要求完成增强计划文档中 image encoder 增强部分。AI 探索了 ImageEncoder.py、STAIGTrainer.py、datasets.py、spatial_utils.py 等核心模块，完成了架构理解和集成点分析，进入计划模式后开始撰写实施方案，但在提交计划前被用户中断，未获批准执行。</p>
+<p><strong>✅ RM-IDEAL 评分中英双语结构性文档创建</strong>
+<em>14:20:09.677 | claude_code</em>
+用户请求编写 RM-IDEAL 评分的结构性文档，AI 探索了代码库并生成了文档。随后用户要求同步创建中文版本。最终在 docs/RM_IDEAL_SCORE.md 生成了包含定义、使用原因、使用方法三大章节的中英双语文档。</p>
+<h3 id="errorrecoverybenchmark">ErrorRecoveryBenchmark<a hidden class="anchor" aria-hidden="true" href="#errorrecoverybenchmark">#</a></h3>
+<p><strong>🔄 Phase II 有效性论证：从基础设施到论文核心实验的战略规划</strong>
+<em>16:05:21.618 | claude_code</em>
+用户提出四大研究方向（大规模数据集/分类论证/基线评估/FM 有用性验证），要求细化为可执行的中小目标并更新项目文档。AI 进行三路并行探索（当前管线状态/评估指标/VLA 集成），设计了包含 G1–G7、M1–M15 的完整 Phase II 计划。在关键决策上，AI 向用户澄清了「恢复训练数据」概念，用户选择了人工遥操作路线和仅 PickPlace 任务范围。计划文件已写入并根据用户决策更新，但最终 ExitPlanMode 提交被拒绝，会话中断。</p>
+<p><strong>✅ M13 全量实现：错误分类论证文档 + 统计脚本 + 30 个单元测试</strong>
+<em>21:36:06.631 | claude_code</em>
+用户以 &lsquo;Implement the following plan&rsquo; 方式提交 M13 计划，AI 完整实现了所有内容：docs/taxonomy_justification.md（FMEA 映射 + 6×3 完备性矩阵）、scripts/7_classifier_reliability.py（Cohen&rsquo;s/Fleiss&rsquo; kappa + 非冗余验证）、scripts/8_error_type_discriminability.py（Kruskal-Wallis + rank reversal）、tests/unit/test_classifier_reliability.py（30 个测试）。修复了 numpy bool 比较 bug 后，30/30 测试全部通过。</p>
+<p><strong>✅ M14 基线评估基础设施实现：resume 支持、多 run 分析、per-error-type 分解</strong>
+<em>21:48:25.170 | claude_code</em>
+按既定计划实现 M14 所需的全部代码变更：collector.py 添加 resume 逻辑（skip 已完成 episode）；3_collect_data.py 添加 &ndash;resume/&ndash;scene_offset/&ndash;scene_limit；4_analyze_results.py 重写为支持多 run 合并、per-error-type 矩阵分解、summary.json 输出；Makefile 添加分组并行运行的 m14 系列 targets。所有文件通过语法检查，Makefile dry-run 验证正确，项目全景总结更新至 v4.10。</p>
+<p><strong>✅ VLA 与 Foundation Model 错误恢复能力调研文档编写</strong>
+<em>15:59:46.631 | claude_code</em>
+用户要求联网搜索声称具备 error recovery 能力的 VLA 模型和主流机器人 Foundation Models。AI 进行了 12 次搜索，覆盖 SC-VLA、CycleVLA、FailSafe、FPC-VLA、RoboFAC、VLAC 等 8 个 recovery 模型和 π0/π0-FAST/π0.5/OpenVLA/GR00T N1 等 9 个基础模型。最终创建 docs/VLA_Foundation_Models_Survey.md 并更新项目总结至 v4.8。</p>
+<p><strong>🔄 M12 代码实现：数据集统计、分层划分、检测器调参、MimicGen 配置</strong>
+<em>22:17:51.831 | claude_code</em>
+用户以 &lsquo;Implement the following plan&rsquo; 方式提交 M12 计划，AI 完成了全部代码变更（6 个文件新建/修改），并尝试在 GPU 上执行 MimicGen 扩增任务，但首次因 EGL device ID 不匹配失败，修正命令后重新提交后话题截止，GPU 执行结果未知。所有代码变更本身已完成。</p>
+<p><strong>✅ 项目全景总结更新：新增 Phase II 论证有效性计划（v4.9）</strong>
+<em>17:30:42.651 | claude_code</em>
+用户要求根据「论证 Error Recovery Benchmark 有效性」计划更新 项目全景总结.md。AI 对文档进行大幅重写：拆分为 Phase I（已完成）和 Phase II（待执行）两个阶段，新增 G4–G7 大目标、M12–M15 里程碑详细子目标、16 天执行路线图、Section 15 详细规划，并更新风险分析和总结章节。</p>
+<p><strong>🔄 项目全景总结文档重构：1554 行精简至 763 行并迁移 VLM 教程</strong>
+<em>20:17:43.767 | claude_code</em>
+用户提供了详细的文档优化计划，要求将 ~1554 行的项目文档精简 50% 并迁移操作指南到独立文件。AI 分批读取大文件内容，通过 Explore agent 收集真实代码统计数据（53 文件/14300 行等），成功创建 docs/vlm_tutorial.md（331 行）并将主文档重写为 763 行。验证确认所有 87 个 checklist 条目完整保留（G1–G7/M1–M15/S 级），统计数据全部更新为实际值。随后用户要求开始 M14 基线评估，AI 进行了广泛的管线探索，设计了含 resume 支持和多策略分离运行的实施方案，但最终提交计划时被中断。</p>
+<p><strong>❌ M12 规划：根据项目总结设计大规模数据集构建方案</strong>
+<em>21:18:21.831 | claude_code</em>
+用户要求根据项目全景总结完成 M12，AI 进行了深度代码库探索（场景生成管线、BC-RNN checkpoints、MimicGen workspace、策略适配器）并设计了 13 步实现计划。在调用 ExitPlanMode 请求计划审批时被用户中断，规划阶段未完成。</p>
+<p><strong>❌ M13 规划：设计错误分类体系论证实现方案</strong>
+<em>21:19:31.831 | claude_code</em>
+用户要求根据项目全景总结完成 M13，AI 并行探索了错误分类体系、指标模块、评估管线后生成了详细实现计划（含 taxonomy_justification.md、可靠性脚本、区分度脚本、单元测试等）。在调用 ExitPlanMode 时再次被用户中断。</p>
+<p><strong>✅ CLAUDE.md 精简优化：205 行压缩至 163 行</strong>
+<em>20:03:03.225 | claude_code</em>
+用户提供了详细的 CLAUDE.md 改进计划并要求实现。AI 探索了 conftest.py 测试夹具、error_taxonomy.py 类型数量、validators 列表后，对文档进行了精准修改：修正错误类型数（17→24）、补全 validator 列表、合并冗余章节、压缩 Related Project 节（48→18 行）、新增 Test fixtures 和 Data formats 小节，最终压缩 20%。</p>
+<p><strong>❌ /init 命令：分析代码库生成 CLAUDE.md</strong>
+<em>19:51:32.631 | claude_code</em>
+用户触发 /init 命令，AI 开始探索代码库以改善现有 CLAUDE.md。AI 并行启动了两个探索 agent，但在生成改进计划并调用 ExitPlanMode 时被用户中断，计划未被采纳。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>27,649,181</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>22,086</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>37,532</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>1,201,531</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>26,388,032</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>95.6%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$19.7339</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>11,324</td>
+          <td>37,404</td>
+          <td>907,418</td>
+          <td>24,569,805</td>
+          <td>$18.9480</td>
+          <td>96.0%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>10,752</td>
+          <td>99</td>
+          <td>228,410</td>
+          <td>1,515,992</td>
+          <td>$0.4484</td>
+          <td>2.3%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>10</td>
+          <td>29</td>
+          <td>65,703</td>
+          <td>302,235</td>
+          <td>$0.3375</td>
+          <td>1.7%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>27,623,958</td>
+          <td>22,083</td>
+          <td>37,522</td>
+          <td>$19.6811</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>25,223</td>
+          <td>3</td>
+          <td>10</td>
+          <td>$0.0527</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
