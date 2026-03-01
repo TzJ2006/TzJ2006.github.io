@@ -7,7 +7,7 @@
 <meta name="robots" content="index, follow">
 <title>Bug Journal 2026-02-12 | TzJ&#39;s Net</title>
 <meta name="keywords" content="Bug Journal">
-<meta name="description" content="在DCC集群上为MIHD空间转录组多模态融合框架制定并开始实施大规模增强计划，涵盖嵌入归一化、Q-Former/LLaVA MLP融合、QueST风格的niche查询与批次效应校正、以及全局超参数配置化。">
+<meta name="description" content="在 MIHD 项目中完成了 CLAUDE.md 重构与 6 项增强功能的架构规划，并开始实施归一化工具与配置基础模块。">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-02-12/">
 
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-02-12/">
   <meta property="og:site_name" content="TzJ&#39;s Net">
   <meta property="og:title" content="Bug Journal 2026-02-12">
-  <meta property="og:description" content="在DCC集群上为MIHD空间转录组多模态融合框架制定并开始实施大规模增强计划，涵盖嵌入归一化、Q-Former/LLaVA MLP融合、QueST风格的niche查询与批次效应校正、以及全局超参数配置化。">
+  <meta property="og:description" content="在 MIHD 项目中完成了 CLAUDE.md 重构与 6 项增强功能的架构规划，并开始实施归一化工具与配置基础模块。">
   <meta property="og:locale" content="en-us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="bugjournal">
@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <meta property="article:modified_time" content="2026-02-12T00:00:00-05:00">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Bug Journal 2026-02-12">
-<meta name="twitter:description" content="在DCC集群上为MIHD空间转录组多模态融合框架制定并开始实施大规模增强计划，涵盖嵌入归一化、Q-Former/LLaVA MLP融合、QueST风格的niche查询与批次效应校正、以及全局超参数配置化。">
+<meta name="twitter:description" content="在 MIHD 项目中完成了 CLAUDE.md 重构与 6 项增强功能的架构规划，并开始实施归一化工具与配置基础模块。">
 
 
 <script type="application/ld+json">
@@ -124,12 +124,12 @@ document.addEventListener("DOMContentLoaded", function() {
   "@type": "BlogPosting",
   "headline": "Bug Journal 2026-02-12",
   "name": "Bug Journal 2026-02-12",
-  "description": "在DCC集群上为MIHD空间转录组多模态融合框架制定并开始实施大规模增强计划，涵盖嵌入归一化、Q-Former/LLaVA MLP融合、QueST风格的niche查询与批次效应校正、以及全局超参数配置化。",
+  "description": "在 MIHD 项目中完成了 CLAUDE.md 重构与 6 项增强功能的架构规划，并开始实施归一化工具与配置基础模块。",
   "keywords": [
     "Bug Journal"
   ],
-  "articleBody": "日报 — 2026-02-12 在DCC集群上为MIHD空间转录组多模态融合框架制定并开始实施大规模增强计划，涵盖嵌入归一化、Q-Former/LLaVA MLP融合、QueST风格的niche查询与批次效应校正、以及全局超参数配置化。\n今日任务 架构与策略 ✅ MIHD增强计划制定与文档化 — 基于6个研究想法，设计了包含7个实施阶段的详细计划（Big Aim→Middle Aim→Small Aim→Tiny Aim层级），并写入docs/ENHANCEMENT_PLAN.md ✅ 创建utils/normalization.py — 实现了L2归一化、StandardScaler归一化、dispatcher函数以及PyTorch等价函数，支持三点归一化（编码器后、融合前、融合后） 🔄 Q-Former + LLaVA MLP融合实现 — 计划创建models/QFormerFusion.py，实现BLIP-2风格Q-Former和LLaVA 2层MLP连接器两种融合策略 🔄 扩展config.yaml — 开始向config.yaml添加encoder/fusion超参数配置节，实施Phase 1 Config Foundation 🔄 QueST niche查询与批次校正实现 — 计划创建utils/niche_utils.py、models/NicheEncoder.py、models/BatchCorrection.py，将QueST的niche查询和对抗式批次校正迁移到MIHD 实现与修复 ✅ 更新CLAUDE.md — 将CLAUDE.md从579行精简至188行（减少67%），消除冗余，补充缺失的GCN编码器、basic_contrastive融合、utils模块说明、测试运行说明等，并添加ASCII管道流程图 问题与解决方案 关键问题 1. MIHD当前嵌入归一化不一致：UNI2/scGPT/PCA已L2归一化，但HIPT/ResNet50/MLP/GCN未归一化，且融合前后均无统一归一化 解决方案: 设计三点归一化方案（post-encoder、pre-fusion、post-fusion），通过utils/normalization.py统一管理，L2归一化对已归一化向量幂等所以安全\n关键洞察: 归一化不一致是下游聚类质量下降的根本原因之一；L2归一化的幂等性使其可无副作用地应用于所有编码器输出\n2. 现有config.yaml和config_manager.py缺乏对大量超参数的支持，导致代码中存在大量硬编码值 解决方案: 设计完整的配置化方案，将normalization、Q-Former、LLaVA MLP、批次校正、niche查询的所有超参数纳入config.yaml和对应dataclass\n关键洞察: 配置化是超参数搜索的前提；必须先建立config foundation才能进行其他所有改进\n3. LLaVA名称歧义：用户说’Q-Former in LLaVA’，但实际上LLaVA使用的是简单2层MLP，Q-Former来自BLIP-2 解决方案: AI澄清了两种架构的区别，并向用户确认是否两者都实现；用户选择两者都实现\n关键洞察: 在实现前澄清架构名称歧义，避免了错误实现；LLaVA MLP比Q-Former更轻量适合作为基线对比\n一般问题 4. 原CLAUDE.md存在大量冗余（smart runner命令出现两次、squidpy警告出现3次、组件列表重复），且缺少关键信息 解决方案: 重写CLAUDE.md，精简67%同时补充缺失内容（GCN编码器、测试运行指令、utils模块说明等）\n关键洞察: 文档冗余会降低AI助手的工作效率；精简到关键信息同时保留架构概述最有价值\n人类思路 vs AI 思路 战略层面 6个研究想法的提出 角色 思路 人类 人类从实际研究需求出发，提出了嵌入归一化、Q-Former融合、QueST应用、批次效应校正、全局超参数配置化共6个互相关联的改进方向，并指定了QueST代码库路径 AI AI分析了依赖关系，确定了实施顺序（Config→Norm→UNI2实验→Q-Former→Niche→批次校正→完整配置），并发现了技术细节（如LLaVA实际使用MLP而非Q-Former） 差异分析: 人类提供高层次研究方向和直觉，AI负责将其转化为具体可执行的技术任务层级；AI主动澄清了’LLaVA中的Q-Former’这一名称误用\nQueST功能的使用方式 角色 思路 人类 人类想了解QueST如何处理疾病数据和批次效应，并希望在MIHD中实现类似功能 AI AI探索了QueST代码库（BatchDiscriminator、GINLayers、TLS查询逻辑），并设计了将这些功能移植到MIHD的具体方案 差异分析: 人类关注’能否做到’，AI负责’如何做到’的技术细节；AI发现QueST使用对抗训练方式进行批次校正\n实现层面 实施顺序决策 角色 思路 人类 人类在AI开始执行后主动打断，要求先写计划文件再执行 AI AI初始倾向于直接开始实施（创建了task列表并开始读取文件），未先产出可审查的计划文档 差异分析: 人类的工作流偏好是先文档化计划，这是一个AI未能预判的工作习惯；被打断后AI立即调整策略\nAI 局限性 一般局限 AI在未问清用户工作流偏好的情况下，直接开始创建任务列表和读取文件，而未先输出可供审查的计划文档，导致被用户打断 AI将’LLaVA中的Q-Former’作为需要主动澄清的歧义，而非直接按字面意思实现，这是正确的；但需要依赖用户提问环节而非自主判断最合理方案 今日收获 核心收获 空间转录组多模态融合中，嵌入归一化不一致是常见但容易忽视的问题；L2归一化的幂等性使其成为安全的默认选择，可统一应用于所有编码器输出而不损害已归一化的向量 Q-Former（BLIP-2）vs LLaVA MLP连接器是两种不同的跨模态对齐机制：Q-Former使用可学习查询向量+交叉注意力，LLaVA使用更简单的2层MLP投影；两者都值得作为融合策略尝试 QueST使用对抗式批次判别器（BatchDiscriminator + GINLayers）进行批次效应校正，通过最大化批次不可区分性来学习批次无关表示；这种方法可以作为独立的后处理模块插入到任意融合管道中 大型代码改进项目中，配置化必须先于功能实现；建立统一的配置体系（config.yaml + dataclass）是后续所有超参数搜索和实验对比的基础 实践收获 在AI辅助开发工作流中，‘先写计划文档再执行’是一个重要的检查点，允许人类在大量代码生成前审查和调整方向，特别适合多阶段、多文件的大型重构任务 会话摘要 🔄 为MIHD生成CLAUDE.md并规划6大增强方向 17:12:36.312 | claude_code 用户通过/init命令触发CLAUDE.md生成，AI探索了整个MIHD代码库和QueST代码库，并对Q-Former架构进行了研究。用户随后提出6个互相关联的改进想法（嵌入归一化、UNI2+scGPT实验、Q-Former融合、QueST niche查询、批次效应校正、全局超参数配置化），AI通过澄清问题确认了实现范围（两种融合策略均实现、QueST功能移植到MIHD、完整管道配置化）。最终AI生成了详细的7阶段实施计划并写入计划文件，但用户在AI尝试退出计划模式时拒绝，会话以计划审查中状态结束。\n🔄 开始实施MIHD增强计划：config基础层和归一化工具 17:34:50.362 | claude_code AI开始按照计划实施：读取了config.yaml、config_manager.py、Fusion.py、run_benchmark.py等关键文件，读取了QueST的layers.py和model.py以了解BatchDiscriminator和GINLayers实现。成功创建了utils/normalization.py（包含L2归一化、StandardScaler归一化、dispatcher函数），并开始修改config.yaml添加超参数节，但在编辑config.yaml时被用户打断。整体实施进度约完成Phase 1-2的30%。\nToken 用量 总览 指标 数值 总 Token 5,459,892 输入 Token 45,436 输出 Token 1,231 Cache 创建 543,037 Cache 读取 4,870,188 Cache 命中率 90.0% 总费用 (USD) $4.1489 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 66 1,150 311,998 3,370,495 $3.6643 88.3% claude-haiku-4-5-20251001 45,370 81 231,039 1,499,693 $0.4845 11.7% ",
-  "wordCount" : "194",
+  "articleBody": "日报 — 2026-02-12 在 MIHD 项目中完成了 CLAUDE.md 重构与 6 项增强功能的架构规划，并开始实施归一化工具与配置基础模块。\n今日任务 架构与策略 ✅ MIHD 6 项增强功能架构规划 — 针对嵌入归一化不一致、融合策略有限、无 batch correction、超参数硬编码等问题，设计了包含 normalization、Q-Former/LLaVA MLP fusion、QueST niche querying、adversarial batch correction、全量 config 化的 7 阶段实施计划，写入 docs/ENHANCEMENT_PLAN.md。 🔄 Phase 1: Config Foundation 实施 — 扩展 config.yaml 添加 encoder/fusion 超参数字段，在 config_manager.py 中新增对应 dataclass。实施过程中被用户打断，config.yaml 编辑未完成。 ✅ Phase 2: 归一化工具模块创建 — 创建 utils/normalization.py，实现 l2_normalize、standard_scale、normalize_embeddings（numpy 和 torch 双版本），支持 post-encoder / pre-fusion / post-fusion 三点归一化。 实现与修复 ✅ CLAUDE.md 重构优化 — 通过 /init 命令分析 MIHD 代码库，将 CLAUDE.md 从 579 行精简至 188 行（减少 67%），消除重复内容，补充缺失的 GCN encoder、batch correction fusion 等组件描述，新增 ASCII 管道架构图和测试运行指令。 问题与解决方案 关键问题 1. MIHD 融合管道中嵌入归一化不一致：UNI2/scGPT/PCA 已做 L2 归一化，但 HIPT/ResNet50/MLP/GCN 没有；融合后也没有归一化，影响下游聚类效果。 解决方案: 设计三点归一化框架（post-encoder、pre-fusion、post-fusion），通过 utils/normalization.py 提供统一接口，所有方法均可通过 config 字段独立开关，L2 归一化对已归一化向量幂等，不影响 UNI2/scGPT。\n关键洞察: 归一化一致性是多模态融合的基础，三点控制覆盖了编码器输出差异、融合前对齐和融合后分布统一三个不同问题，不能用单一策略替代。\n2. Q-Former（BLIP-2）和 LLaVA MLP 常被混淆，用户提出\"实现 Q-Former\"时两种架构均有其价值。 解决方案: AI 主动区分两者差异并提问，用户选择\"Both\"——Q-Former 用空间邻居 token 做交叉注意力，LLaVA MLP 是 2 层投影连接器，均纳入实施计划。\n关键洞察: LLaVA 实际使用的是 MLP 连接器而非 Q-Former，名称混用是论文社区常见误解；正确区分有助于选择合适融合复杂度。\n一般问题 3. AI 未经规划直接开始实施，用户需要先有文档化的计划。 解决方案: 用户主动打断并要求先将计划写入文件（docs/ENHANCEMENT_PLAN.md），之后再按阶段实施。\n关键洞察: 大型多阶段实现任务应先文档化计划再编码，防止中途方向偏移且便于团队对齐。\n4. CLAUDE.md 原版存在严重冗余（smart runner 命令出现两次、squidpy 警告出现 3 次）且缺少关键组件描述（GCN encoder、batch correction fusion、utils/ 模块）。 解决方案: 通过并行 Task agent 全面探索代码库后，对照 AGENTS.md / GEMINI.md / README.md 三个参考文档重写，删除可由 ls 直接发现的文件列表和 STAIG changelog 历史，精简至 188 行。\n关键洞察: CLAUDE.md 的价值在于跨文件的架构洞察，而非文件列表或可从代码直接读取的信息。\n人类思路 vs AI 思路 战略层面 实施顺序管理：先规划还是先编码 角色 思路 人类 用户在 AI 已开始创建 Task 并准备直接编码时，主动打断并要求先将完整计划写入文件，体现了工程化项目管理意识。 AI AI 倾向于在理解需求后立即开始创建任务并实施，缺少主动提出文档化计划的意识。 差异分析: 人类将计划文档视为沟通与对齐工具，而 AI 将任务完成视为首要目标，导致在缺乏文档的情况下过早进入编码阶段。\nQ-Former 与 LLaVA MLP 的架构选择 角色 思路 人类 用户最初提出\"实现 Q-Former like LLaVA 的融合方法\"，将两者混用。当 AI 提问后，用户决定\"Both\"，希望同时实现两种方案进行对比。 AI AI 正确识别了两者的技术差异（Q-Former=BLIP-2，LLaVA=MLP connector），主动提问澄清，并为两者各自设计了实现方案。 差异分析: AI 在技术细节辨别上优于用户，但用户的\"Both\"决策体现了实验驱动的研究思路，AI 未主动提出同时实现两种方案。\n实现层面 ExitPlanMode 与计划确认流程 角色 思路 人类 用户在 AI 调用 ExitPlanMode 时拒绝了该操作，但未说明原因（可能是计划尚需调整，或不希望通过该工具确认）。 AI AI 在完成计划设计后按标准流程调用 ExitPlanMode 请求用户批准。 差异分析: 用户对 AI 工具调用流程有自己的预期，拒绝 ExitPlanMode 后未继续说明下一步，导致该会话以未完成状态结束。\nAI 局限性 重要局限 未主动提出先写计划文档再编码的工作流建议，在接到大型多阶段实施任务时直接开始创建 Task 和编码，需要用户手动打断才调整策略。 一般局限 在两个并行 Task agent 探索代码库后，主 agent 仍重复读取部分相同文件（如 run_benchmark.py、Fusion.py），造成上下文冗余。 今日收获 核心收获 QueST 使用 k-hop 子图池化做 niche representation，通过对比学习训练 niche encoder，并用 BatchDiscriminator（对抗训练）做 batch effect 校正，这套思路可直接移植到 MIHD 的 post-fusion 阶段。 MIHD 融合管道中三点归一化（post-encoder / pre-fusion / post-fusion）是解决异构 embedding 分布不一致的系统性方案，L2 归一化对已归一化向量幂等这一性质使其可安全应用于全部 encoder。 Q-Former（BLIP-2）使用可学习 query token + 交叉注意力从视觉特征中提取信息；LLaVA 实际使用的是 2 层 MLP 投影连接器，两者复杂度和训练成本差异显著，空间转录组场景中 Q-Former 可利用空间邻居作为上下文 token。 实践收获 大型多阶段实施计划应先文档化（写入 docs/ENHANCEMENT_PLAN.md 等）再按阶段编码，方便团队对齐和中途调整方向。 会话摘要 🔄 CLAUDE.md 重构与 6 项增强功能架构规划 17:12:36.312 | claude_code 通过 /init 命令全面分析 MIHD 代码库，将 CLAUDE.md 从 579 行精简至 188 行，消除冗余并补充缺失组件。随后用户提出 6 项增强想法（归一化、UNI2+scGPT、Q-Former/LLaVA、QueST niche query、batch correction、全量 config 化），AI 探索了 QueST 源码和 Q-Former 架构，向用户澄清关键技术选择后，生成完整的 7 阶段实施计划并写入 docs/ENHANCEMENT_PLAN.md。会话在 ExitPlanMode 被用户拒绝后结束，原因未知。\n🔄 MIHD 增强计划实施：归一化工具与配置基础模块 17:34:50.362 | claude_code 用户要求按规划实施 MIHD 增强计划。AI 被打断后首先将计划完整写入 docs/ENHANCEMENT_PLAN.md，随后读取 run_benchmark.py、Fusion.py、config.yaml 等关键文件，创建了 utils/normalization.py（三点归一化工具，支持 l2/standard/none，含 numpy 和 torch 双版本），并开始扩展 config.yaml 添加归一化和 fusion 超参数字段。config.yaml 编辑在完成前被用户打断，Phase 1 仍处于进行中状态。\nToken 用量 总览 指标 数值 总 Token 5,459,892 输入 Token 45,436 输出 Token 1,231 Cache 创建 543,037 Cache 读取 4,870,188 Cache 命中率 90.0% 总费用 (USD) $4.1489 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 66 1,150 311,998 3,370,495 $3.6643 88.3% claude-haiku-4-5-20251001 45,370 81 231,039 1,499,693 $0.4845 11.7% ",
+  "wordCount" : "410",
   "inLanguage": "en",
   "datePublished": "2026-02-12T00:00:00-05:00",
   "dateModified": "2026-02-12T00:00:00-05:00",
@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <h1 class="post-title entry-hint-parent">
       Bug Journal 2026-02-12
     </h1>
-    <div class="post-meta"><span title='2026-02-12 00:00:00 -0500 EST'>February 12, 2026</span>&nbsp;·&nbsp;1 min
+    <div class="post-meta"><span title='2026-02-12 00:00:00 -0500 EST'>February 12, 2026</span>&nbsp;·&nbsp;2 min
 
 
       
@@ -234,39 +234,37 @@ document.addEventListener("DOMContentLoaded", function() {
   </header> 
   <div class="post-content"><h1 id="日报--2026-02-12">日报 — 2026-02-12<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-12">#</a></h1>
 <blockquote>
-<p>在DCC集群上为MIHD空间转录组多模态融合框架制定并开始实施大规模增强计划，涵盖嵌入归一化、Q-Former/LLaVA MLP融合、QueST风格的niche查询与批次效应校正、以及全局超参数配置化。</p>
+<p>在 MIHD 项目中完成了 CLAUDE.md 重构与 6 项增强功能的架构规划，并开始实施归一化工具与配置基础模块。</p>
 </blockquote>
 <h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
 <h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
 <ul>
-<li>✅ <strong>MIHD增强计划制定与文档化</strong> — 基于6个研究想法，设计了包含7个实施阶段的详细计划（Big Aim→Middle Aim→Small Aim→Tiny Aim层级），并写入docs/ENHANCEMENT_PLAN.md</li>
-<li>✅ <strong>创建utils/normalization.py</strong> — 实现了L2归一化、StandardScaler归一化、dispatcher函数以及PyTorch等价函数，支持三点归一化（编码器后、融合前、融合后）</li>
-<li>🔄 <strong>Q-Former + LLaVA MLP融合实现</strong> — 计划创建models/QFormerFusion.py，实现BLIP-2风格Q-Former和LLaVA 2层MLP连接器两种融合策略</li>
-<li>🔄 <strong>扩展config.yaml</strong> — 开始向config.yaml添加encoder/fusion超参数配置节，实施Phase 1 Config Foundation</li>
-<li>🔄 <strong>QueST niche查询与批次校正实现</strong> — 计划创建utils/niche_utils.py、models/NicheEncoder.py、models/BatchCorrection.py，将QueST的niche查询和对抗式批次校正迁移到MIHD</li>
+<li>✅ <strong>MIHD 6 项增强功能架构规划</strong> — 针对嵌入归一化不一致、融合策略有限、无 batch correction、超参数硬编码等问题，设计了包含 normalization、Q-Former/LLaVA MLP fusion、QueST niche querying、adversarial batch correction、全量 config 化的 7 阶段实施计划，写入 docs/ENHANCEMENT_PLAN.md。</li>
+<li>🔄 <strong>Phase 1: Config Foundation 实施</strong> — 扩展 config.yaml 添加 encoder/fusion 超参数字段，在 config_manager.py 中新增对应 dataclass。实施过程中被用户打断，config.yaml 编辑未完成。</li>
+<li>✅ <strong>Phase 2: 归一化工具模块创建</strong> — 创建 utils/normalization.py，实现 l2_normalize、standard_scale、normalize_embeddings（numpy 和 torch 双版本），支持 post-encoder / pre-fusion / post-fusion 三点归一化。</li>
 </ul>
 <h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
 <ul>
-<li>✅ <strong>更新CLAUDE.md</strong> — 将CLAUDE.md从579行精简至188行（减少67%），消除冗余，补充缺失的GCN编码器、basic_contrastive融合、utils模块说明、测试运行说明等，并添加ASCII管道流程图</li>
+<li>✅ <strong>CLAUDE.md 重构优化</strong> — 通过 /init 命令分析 MIHD 代码库，将 CLAUDE.md 从 579 行精简至 188 行（减少 67%），消除重复内容，补充缺失的 GCN encoder、batch correction fusion 等组件描述，新增 ASCII 管道架构图和测试运行指令。</li>
 </ul>
 <h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
 <h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
-<h4 id="1-mihd当前嵌入归一化不一致uni2scgptpca已l2归一化但hiptresnet50mlpgcn未归一化且融合前后均无统一归一化">1. MIHD当前嵌入归一化不一致：UNI2/scGPT/PCA已L2归一化，但HIPT/ResNet50/MLP/GCN未归一化，且融合前后均无统一归一化<a hidden class="anchor" aria-hidden="true" href="#1-mihd当前嵌入归一化不一致uni2scgptpca已l2归一化但hiptresnet50mlpgcn未归一化且融合前后均无统一归一化">#</a></h4>
-<p><strong>解决方案:</strong> 设计三点归一化方案（post-encoder、pre-fusion、post-fusion），通过utils/normalization.py统一管理，L2归一化对已归一化向量幂等所以安全</p>
-<p><strong>关键洞察:</strong> 归一化不一致是下游聚类质量下降的根本原因之一；L2归一化的幂等性使其可无副作用地应用于所有编码器输出</p>
-<h4 id="2-现有configyaml和config_managerpy缺乏对大量超参数的支持导致代码中存在大量硬编码值">2. 现有config.yaml和config_manager.py缺乏对大量超参数的支持，导致代码中存在大量硬编码值<a hidden class="anchor" aria-hidden="true" href="#2-现有configyaml和config_managerpy缺乏对大量超参数的支持导致代码中存在大量硬编码值">#</a></h4>
-<p><strong>解决方案:</strong> 设计完整的配置化方案，将normalization、Q-Former、LLaVA MLP、批次校正、niche查询的所有超参数纳入config.yaml和对应dataclass</p>
-<p><strong>关键洞察:</strong> 配置化是超参数搜索的前提；必须先建立config foundation才能进行其他所有改进</p>
-<h4 id="3-llava名称歧义用户说q-former-in-llava但实际上llava使用的是简单2层mlpq-former来自blip-2">3. LLaVA名称歧义：用户说&rsquo;Q-Former in LLaVA&rsquo;，但实际上LLaVA使用的是简单2层MLP，Q-Former来自BLIP-2<a hidden class="anchor" aria-hidden="true" href="#3-llava名称歧义用户说q-former-in-llava但实际上llava使用的是简单2层mlpq-former来自blip-2">#</a></h4>
-<p><strong>解决方案:</strong> AI澄清了两种架构的区别，并向用户确认是否两者都实现；用户选择两者都实现</p>
-<p><strong>关键洞察:</strong> 在实现前澄清架构名称歧义，避免了错误实现；LLaVA MLP比Q-Former更轻量适合作为基线对比</p>
+<h4 id="1-mihd-融合管道中嵌入归一化不一致uni2scgptpca-已做-l2-归一化但-hiptresnet50mlpgcn-没有融合后也没有归一化影响下游聚类效果">1. MIHD 融合管道中嵌入归一化不一致：UNI2/scGPT/PCA 已做 L2 归一化，但 HIPT/ResNet50/MLP/GCN 没有；融合后也没有归一化，影响下游聚类效果。<a hidden class="anchor" aria-hidden="true" href="#1-mihd-融合管道中嵌入归一化不一致uni2scgptpca-已做-l2-归一化但-hiptresnet50mlpgcn-没有融合后也没有归一化影响下游聚类效果">#</a></h4>
+<p><strong>解决方案:</strong> 设计三点归一化框架（post-encoder、pre-fusion、post-fusion），通过 utils/normalization.py 提供统一接口，所有方法均可通过 config 字段独立开关，L2 归一化对已归一化向量幂等，不影响 UNI2/scGPT。</p>
+<p><strong>关键洞察:</strong> 归一化一致性是多模态融合的基础，三点控制覆盖了编码器输出差异、融合前对齐和融合后分布统一三个不同问题，不能用单一策略替代。</p>
+<h4 id="2-q-formerblip-2和-llava-mlp-常被混淆用户提出实现-q-former时两种架构均有其价值">2. Q-Former（BLIP-2）和 LLaVA MLP 常被混淆，用户提出&quot;实现 Q-Former&quot;时两种架构均有其价值。<a hidden class="anchor" aria-hidden="true" href="#2-q-formerblip-2和-llava-mlp-常被混淆用户提出实现-q-former时两种架构均有其价值">#</a></h4>
+<p><strong>解决方案:</strong> AI 主动区分两者差异并提问，用户选择&quot;Both&quot;——Q-Former 用空间邻居 token 做交叉注意力，LLaVA MLP 是 2 层投影连接器，均纳入实施计划。</p>
+<p><strong>关键洞察:</strong> LLaVA 实际使用的是 MLP 连接器而非 Q-Former，名称混用是论文社区常见误解；正确区分有助于选择合适融合复杂度。</p>
 <h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
-<h4 id="4-原claudemd存在大量冗余smart-runner命令出现两次squidpy警告出现3次组件列表重复且缺少关键信息">4. 原CLAUDE.md存在大量冗余（smart runner命令出现两次、squidpy警告出现3次、组件列表重复），且缺少关键信息<a hidden class="anchor" aria-hidden="true" href="#4-原claudemd存在大量冗余smart-runner命令出现两次squidpy警告出现3次组件列表重复且缺少关键信息">#</a></h4>
-<p><strong>解决方案:</strong> 重写CLAUDE.md，精简67%同时补充缺失内容（GCN编码器、测试运行指令、utils模块说明等）</p>
-<p><strong>关键洞察:</strong> 文档冗余会降低AI助手的工作效率；精简到关键信息同时保留架构概述最有价值</p>
+<h4 id="3-ai-未经规划直接开始实施用户需要先有文档化的计划">3. AI 未经规划直接开始实施，用户需要先有文档化的计划。<a hidden class="anchor" aria-hidden="true" href="#3-ai-未经规划直接开始实施用户需要先有文档化的计划">#</a></h4>
+<p><strong>解决方案:</strong> 用户主动打断并要求先将计划写入文件（docs/ENHANCEMENT_PLAN.md），之后再按阶段实施。</p>
+<p><strong>关键洞察:</strong> 大型多阶段实现任务应先文档化计划再编码，防止中途方向偏移且便于团队对齐。</p>
+<h4 id="4-claudemd-原版存在严重冗余smart-runner-命令出现两次squidpy-警告出现-3-次且缺少关键组件描述gcn-encoderbatch-correction-fusionutils-模块">4. CLAUDE.md 原版存在严重冗余（smart runner 命令出现两次、squidpy 警告出现 3 次）且缺少关键组件描述（GCN encoder、batch correction fusion、utils/ 模块）。<a hidden class="anchor" aria-hidden="true" href="#4-claudemd-原版存在严重冗余smart-runner-命令出现两次squidpy-警告出现-3-次且缺少关键组件描述gcn-encoderbatch-correction-fusionutils-模块">#</a></h4>
+<p><strong>解决方案:</strong> 通过并行 Task agent 全面探索代码库后，对照 AGENTS.md / GEMINI.md / README.md 三个参考文档重写，删除可由 ls 直接发现的文件列表和 STAIG changelog 历史，精简至 188 行。</p>
+<p><strong>关键洞察:</strong> CLAUDE.md 的价值在于跨文件的架构洞察，而非文件列表或可从代码直接读取的信息。</p>
 <h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
 <h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
-<h4 id="6个研究想法的提出">6个研究想法的提出<a hidden class="anchor" aria-hidden="true" href="#6个研究想法的提出">#</a></h4>
+<h4 id="实施顺序管理先规划还是先编码">实施顺序管理：先规划还是先编码<a hidden class="anchor" aria-hidden="true" href="#实施顺序管理先规划还是先编码">#</a></h4>
 <table>
   <thead>
       <tr>
@@ -277,16 +275,16 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>人类</td>
-          <td>人类从实际研究需求出发，提出了嵌入归一化、Q-Former融合、QueST应用、批次效应校正、全局超参数配置化共6个互相关联的改进方向，并指定了QueST代码库路径</td>
+          <td>用户在 AI 已开始创建 Task 并准备直接编码时，主动打断并要求先将完整计划写入文件，体现了工程化项目管理意识。</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>AI分析了依赖关系，确定了实施顺序（Config→Norm→UNI2实验→Q-Former→Niche→批次校正→完整配置），并发现了技术细节（如LLaVA实际使用MLP而非Q-Former）</td>
+          <td>AI 倾向于在理解需求后立即开始创建任务并实施，缺少主动提出文档化计划的意识。</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> 人类提供高层次研究方向和直觉，AI负责将其转化为具体可执行的技术任务层级；AI主动澄清了&rsquo;LLaVA中的Q-Former&rsquo;这一名称误用</p>
-<h4 id="quest功能的使用方式">QueST功能的使用方式<a hidden class="anchor" aria-hidden="true" href="#quest功能的使用方式">#</a></h4>
+<p><strong>差异分析:</strong> 人类将计划文档视为沟通与对齐工具，而 AI 将任务完成视为首要目标，导致在缺乏文档的情况下过早进入编码阶段。</p>
+<h4 id="q-former-与-llava-mlp-的架构选择">Q-Former 与 LLaVA MLP 的架构选择<a hidden class="anchor" aria-hidden="true" href="#q-former-与-llava-mlp-的架构选择">#</a></h4>
 <table>
   <thead>
       <tr>
@@ -297,17 +295,17 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>人类</td>
-          <td>人类想了解QueST如何处理疾病数据和批次效应，并希望在MIHD中实现类似功能</td>
+          <td>用户最初提出&quot;实现 Q-Former like LLaVA 的融合方法&quot;，将两者混用。当 AI 提问后，用户决定&quot;Both&quot;，希望同时实现两种方案进行对比。</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>AI探索了QueST代码库（BatchDiscriminator、GINLayers、TLS查询逻辑），并设计了将这些功能移植到MIHD的具体方案</td>
+          <td>AI 正确识别了两者的技术差异（Q-Former=BLIP-2，LLaVA=MLP connector），主动提问澄清，并为两者各自设计了实现方案。</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> 人类关注&rsquo;能否做到&rsquo;，AI负责&rsquo;如何做到&rsquo;的技术细节；AI发现QueST使用对抗训练方式进行批次校正</p>
+<p><strong>差异分析:</strong> AI 在技术细节辨别上优于用户，但用户的&quot;Both&quot;决策体现了实验驱动的研究思路，AI 未主动提出同时实现两种方案。</p>
 <h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
-<h4 id="实施顺序决策">实施顺序决策<a hidden class="anchor" aria-hidden="true" href="#实施顺序决策">#</a></h4>
+<h4 id="exitplanmode-与计划确认流程">ExitPlanMode 与计划确认流程<a hidden class="anchor" aria-hidden="true" href="#exitplanmode-与计划确认流程">#</a></h4>
 <table>
   <thead>
       <tr>
@@ -318,40 +316,42 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>人类</td>
-          <td>人类在AI开始执行后主动打断，要求先写计划文件再执行</td>
+          <td>用户在 AI 调用 ExitPlanMode 时拒绝了该操作，但未说明原因（可能是计划尚需调整，或不希望通过该工具确认）。</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>AI初始倾向于直接开始实施（创建了task列表并开始读取文件），未先产出可审查的计划文档</td>
+          <td>AI 在完成计划设计后按标准流程调用 ExitPlanMode 请求用户批准。</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> 人类的工作流偏好是先文档化计划，这是一个AI未能预判的工作习惯；被打断后AI立即调整策略</p>
+<p><strong>差异分析:</strong> 用户对 AI 工具调用流程有自己的预期，拒绝 ExitPlanMode 后未继续说明下一步，导致该会话以未完成状态结束。</p>
 <h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>未主动提出先写计划文档再编码的工作流建议，在接到大型多阶段实施任务时直接开始创建 Task 和编码，需要用户手动打断才调整策略。</li>
+</ul>
 <h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
 <ul>
-<li>AI在未问清用户工作流偏好的情况下，直接开始创建任务列表和读取文件，而未先输出可供审查的计划文档，导致被用户打断</li>
-<li>AI将&rsquo;LLaVA中的Q-Former&rsquo;作为需要主动澄清的歧义，而非直接按字面意思实现，这是正确的；但需要依赖用户提问环节而非自主判断最合理方案</li>
+<li>在两个并行 Task agent 探索代码库后，主 agent 仍重复读取部分相同文件（如 run_benchmark.py、Fusion.py），造成上下文冗余。</li>
 </ul>
 <h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
 <h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
 <ul>
-<li>空间转录组多模态融合中，嵌入归一化不一致是常见但容易忽视的问题；L2归一化的幂等性使其成为安全的默认选择，可统一应用于所有编码器输出而不损害已归一化的向量</li>
-<li>Q-Former（BLIP-2）vs LLaVA MLP连接器是两种不同的跨模态对齐机制：Q-Former使用可学习查询向量+交叉注意力，LLaVA使用更简单的2层MLP投影；两者都值得作为融合策略尝试</li>
-<li>QueST使用对抗式批次判别器（BatchDiscriminator + GINLayers）进行批次效应校正，通过最大化批次不可区分性来学习批次无关表示；这种方法可以作为独立的后处理模块插入到任意融合管道中</li>
-<li>大型代码改进项目中，配置化必须先于功能实现；建立统一的配置体系（config.yaml + dataclass）是后续所有超参数搜索和实验对比的基础</li>
+<li>QueST 使用 k-hop 子图池化做 niche representation，通过对比学习训练 niche encoder，并用 BatchDiscriminator（对抗训练）做 batch effect 校正，这套思路可直接移植到 MIHD 的 post-fusion 阶段。</li>
+<li>MIHD 融合管道中三点归一化（post-encoder / pre-fusion / post-fusion）是解决异构 embedding 分布不一致的系统性方案，L2 归一化对已归一化向量幂等这一性质使其可安全应用于全部 encoder。</li>
+<li>Q-Former（BLIP-2）使用可学习 query token + 交叉注意力从视觉特征中提取信息；LLaVA 实际使用的是 2 层 MLP 投影连接器，两者复杂度和训练成本差异显著，空间转录组场景中 Q-Former 可利用空间邻居作为上下文 token。</li>
 </ul>
 <h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
 <ul>
-<li>在AI辅助开发工作流中，&lsquo;先写计划文档再执行&rsquo;是一个重要的检查点，允许人类在大量代码生成前审查和调整方向，特别适合多阶段、多文件的大型重构任务</li>
+<li>大型多阶段实施计划应先文档化（写入 docs/ENHANCEMENT_PLAN.md 等）再按阶段编码，方便团队对齐和中途调整方向。</li>
 </ul>
 <h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
-<p><strong>🔄 为MIHD生成CLAUDE.md并规划6大增强方向</strong>
+<p><strong>🔄 CLAUDE.md 重构与 6 项增强功能架构规划</strong>
 <em>17:12:36.312 | claude_code</em>
-用户通过/init命令触发CLAUDE.md生成，AI探索了整个MIHD代码库和QueST代码库，并对Q-Former架构进行了研究。用户随后提出6个互相关联的改进想法（嵌入归一化、UNI2+scGPT实验、Q-Former融合、QueST niche查询、批次效应校正、全局超参数配置化），AI通过澄清问题确认了实现范围（两种融合策略均实现、QueST功能移植到MIHD、完整管道配置化）。最终AI生成了详细的7阶段实施计划并写入计划文件，但用户在AI尝试退出计划模式时拒绝，会话以计划审查中状态结束。</p>
-<p><strong>🔄 开始实施MIHD增强计划：config基础层和归一化工具</strong>
+通过 /init 命令全面分析 MIHD 代码库，将 CLAUDE.md 从 579 行精简至 188 行，消除冗余并补充缺失组件。随后用户提出 6 项增强想法（归一化、UNI2+scGPT、Q-Former/LLaVA、QueST niche query、batch correction、全量 config 化），AI 探索了 QueST 源码和 Q-Former 架构，向用户澄清关键技术选择后，生成完整的 7 阶段实施计划并写入 docs/ENHANCEMENT_PLAN.md。会话在 ExitPlanMode 被用户拒绝后结束，原因未知。</p>
+<p><strong>🔄 MIHD 增强计划实施：归一化工具与配置基础模块</strong>
 <em>17:34:50.362 | claude_code</em>
-AI开始按照计划实施：读取了config.yaml、config_manager.py、Fusion.py、run_benchmark.py等关键文件，读取了QueST的layers.py和model.py以了解BatchDiscriminator和GINLayers实现。成功创建了utils/normalization.py（包含L2归一化、StandardScaler归一化、dispatcher函数），并开始修改config.yaml添加超参数节，但在编辑config.yaml时被用户打断。整体实施进度约完成Phase 1-2的30%。</p>
+用户要求按规划实施 MIHD 增强计划。AI 被打断后首先将计划完整写入 docs/ENHANCEMENT_PLAN.md，随后读取 run_benchmark.py、Fusion.py、config.yaml 等关键文件，创建了 utils/normalization.py（三点归一化工具，支持 l2/standard/none，含 numpy 和 torch 双版本），并开始扩展 config.yaml 添加归一化和 fusion 超参数字段。config.yaml 编辑在完成前被用户打断，Phase 1 仍处于进行中状态。</p>
 <h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
 <h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
 <table>

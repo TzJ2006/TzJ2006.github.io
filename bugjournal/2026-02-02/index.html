@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-02 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="在 DCC 服务器上调查 MIHD 项目的 benchmarking 结果存储位置，发现可视化文件与实验对比数据分散在多个子目录中。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-02-02/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.af858c2feef42adc7846f815c3e21de9982d82f8fc4f65879451b2686859975a.css" integrity="sha256-r4WML&#43;70Ktx4RvgVw&#43;Id6Zgtgvj8T2WHlFGyaGhZl1o=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-02-02/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-02-02/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-02">
+  <meta property="og:description" content="在 DCC 服务器上调查 MIHD 项目的 benchmarking 结果存储位置，发现可视化文件与实验对比数据分散在多个子目录中。">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-02T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-02T00:00:00-05:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Bug Journal 2026-02-02">
+<meta name="twitter:description" content="在 DCC 服务器上调查 MIHD 项目的 benchmarking 结果存储位置，发现可视化文件与实验对比数据分散在多个子目录中。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "BugJournals",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-02",
+      "item": "https://tzj2006.github.io/bugjournal/2026-02-02/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-02",
+  "name": "Bug Journal 2026-02-02",
+  "description": "在 DCC 服务器上调查 MIHD 项目的 benchmarking 结果存储位置，发现可视化文件与实验对比数据分散在多个子目录中。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-02 在 DCC 服务器上调查 MIHD 项目的 benchmarking 结果存储位置，发现可视化文件与实验对比数据分散在多个子目录中。\n今日任务 架构与策略 🔄 调查 MIHD benchmarking 结果与可视化文件的存储位置 — 用户发现之前修复后的 ARI 结果（约 0.45）未出现在 experiments_log.md 中，要求 AI 定位实验结果和可视化文件。AI 找到了 experiment_comparison.csv 及 pca_uni2_staig_fusion/visualizations/ 中的 PNG 文件，但对话在读取 CSV 内容中途截止，尚未完成完整的结果分析与对账。 问题与解决方案 一般问题 1. experiments_log.md 中缺少最新修复后的 benchmarking 结果记录，用户预期 ARI ≈ 0.45，但 CSV 记录的最早一条为 0.3757。 解决方案: AI 定位到 experiment_comparison.csv 作为完整结果的存储位置，并找到了可视化 PNG 文件在 pca_uni2_staig_fusion/visualizations/ 目录下，但尚未完成具体数值的核对与差异解释。\n关键洞察: 实验结果分散存储：experiments_log.md 仅为部分记录，完整数据在 experiment_comparison.csv，可视化在各模型组合子目录的 visualizations/ 文件夹中。\n2. AI 误将目录路径传入 Read 工具，导致 EISDIR 错误。 解决方案: AI 随即改用 Bash 的 ls 命令列举目录内容，绕过了工具使用错误。\n关键洞察: Read 工具只能用于文件，目录探索应使用 Bash ls 或 Glob 工具。\n人类思路 vs AI 思路 战略层面 ARI 预期值与实际记录值的差异识别 角色 思路 人类 用户记得之前修复时 ARI 被调到约 0.45，并主动质疑为何日志中未体现该结果，方向明确。 AI AI 直接读取文件并列举目录，未主动对比用户提到的 0.45 与 CSV 中 0.3757 之间的差异，缺乏主动分析。 差异分析: 人类持有上下文记忆（历史修复目标），AI 只做被动文件检索，未能主动发现数值不符的关键问题。\nAI 局限性 重要局限 AI 未主动对比用户期望的 ARI ≈ 0.45 与 CSV 中实际记录的 0.3757，未能识别并指出两者之间的潜在差距，需要用户自己来发现这一问题。 一般局限 AI 将目录路径传递给 Read 工具，产生 EISDIR 错误，说明 AI 在工具选择上存在基本判断失误。 今日收获 实践收获 MIHD 项目的实验结果分三层存储：experiments_log.md（部分摘要）、experiment_comparison.csv（完整对比数据）、各模型组合子目录下的 visualizations/ 文件夹（PNG 可视化），需整体查阅才能获得全貌。 会话摘要 🔄 调查 MIHD benchmarking 结果与可视化文件存储位置 20:32:20.984 | claude_code 用户询问之前修复 MIHD 后 ARI 约 0.45 的 benchmarking 结果为何未出现在 experiments_log.md 中，并询问可视化文件位置。AI 依次检查了 experiments_log.md、输出目录结构，在 pca_uni2_staig_fusion/visualizations/ 中找到了三张 PNG 可视化文件，并开始读取 experiment_comparison.csv，但对话在 CSV 内容加载时截止，ARI 数值差异（期望 0.45 vs 记录 0.3757）未得到解释。\nToken 用量 总览 指标 数值 总 Token 1,128,206 输入 Token 250 输出 Token 46 Cache 创建 185,962 Cache 读取 941,948 Cache 命中率 83.5% 总费用 (USD) $0.3271 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-haiku-4-5-20251001 250 46 185,962 941,948 $0.3271 100.0% ",
+  "wordCount" : "216",
+  "inLanguage": "en",
+  "datePublished": "2026-02-02T00:00:00-05:00",
+  "dateModified": "2026-02-02T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-02-02/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-02
+    </h1>
+    <div class="post-meta"><span title='2026-02-02 00:00:00 -0500 EST'>February 2, 2026</span>&nbsp;·&nbsp;2 min
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-02">日报 — 2026-02-02<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-02">#</a></h1>
+<blockquote>
+<p>在 DCC 服务器上调查 MIHD 项目的 benchmarking 结果存储位置，发现可视化文件与实验对比数据分散在多个子目录中。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>🔄 <strong>调查 MIHD benchmarking 结果与可视化文件的存储位置</strong> — 用户发现之前修复后的 ARI 结果（约 0.45）未出现在 experiments_log.md 中，要求 AI 定位实验结果和可视化文件。AI 找到了 experiment_comparison.csv 及 pca_uni2_staig_fusion/visualizations/ 中的 PNG 文件，但对话在读取 CSV 内容中途截止，尚未完成完整的结果分析与对账。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="1-experiments_logmd-中缺少最新修复后的-benchmarking-结果记录用户预期-ari--045但-csv-记录的最早一条为-03757">1. experiments_log.md 中缺少最新修复后的 benchmarking 结果记录，用户预期 ARI ≈ 0.45，但 CSV 记录的最早一条为 0.3757。<a hidden class="anchor" aria-hidden="true" href="#1-experiments_logmd-中缺少最新修复后的-benchmarking-结果记录用户预期-ari--045但-csv-记录的最早一条为-03757">#</a></h4>
+<p><strong>解决方案:</strong> AI 定位到 experiment_comparison.csv 作为完整结果的存储位置，并找到了可视化 PNG 文件在 pca_uni2_staig_fusion/visualizations/ 目录下，但尚未完成具体数值的核对与差异解释。</p>
+<p><strong>关键洞察:</strong> 实验结果分散存储：experiments_log.md 仅为部分记录，完整数据在 experiment_comparison.csv，可视化在各模型组合子目录的 visualizations/ 文件夹中。</p>
+<h4 id="2-ai-误将目录路径传入-read-工具导致-eisdir-错误">2. AI 误将目录路径传入 Read 工具，导致 EISDIR 错误。<a hidden class="anchor" aria-hidden="true" href="#2-ai-误将目录路径传入-read-工具导致-eisdir-错误">#</a></h4>
+<p><strong>解决方案:</strong> AI 随即改用 Bash 的 ls 命令列举目录内容，绕过了工具使用错误。</p>
+<p><strong>关键洞察:</strong> Read 工具只能用于文件，目录探索应使用 Bash ls 或 Glob 工具。</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="ari-预期值与实际记录值的差异识别">ARI 预期值与实际记录值的差异识别<a hidden class="anchor" aria-hidden="true" href="#ari-预期值与实际记录值的差异识别">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户记得之前修复时 ARI 被调到约 0.45，并主动质疑为何日志中未体现该结果，方向明确。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 直接读取文件并列举目录，未主动对比用户提到的 0.45 与 CSV 中 0.3757 之间的差异，缺乏主动分析。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类持有上下文记忆（历史修复目标），AI 只做被动文件检索，未能主动发现数值不符的关键问题。</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>AI 未主动对比用户期望的 ARI ≈ 0.45 与 CSV 中实际记录的 0.3757，未能识别并指出两者之间的潜在差距，需要用户自己来发现这一问题。</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>AI 将目录路径传递给 Read 工具，产生 EISDIR 错误，说明 AI 在工具选择上存在基本判断失误。</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>MIHD 项目的实验结果分三层存储：experiments_log.md（部分摘要）、experiment_comparison.csv（完整对比数据）、各模型组合子目录下的 visualizations/ 文件夹（PNG 可视化），需整体查阅才能获得全貌。</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<p><strong>🔄 调查 MIHD benchmarking 结果与可视化文件存储位置</strong>
+<em>20:32:20.984 | claude_code</em>
+用户询问之前修复 MIHD 后 ARI 约 0.45 的 benchmarking 结果为何未出现在 experiments_log.md 中，并询问可视化文件位置。AI 依次检查了 experiments_log.md、输出目录结构，在 pca_uni2_staig_fusion/visualizations/ 中找到了三张 PNG 可视化文件，并开始读取 experiment_comparison.csv，但对话在 CSV 内容加载时截止，ARI 数值差异（期望 0.45 vs 记录 0.3757）未得到解释。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>1,128,206</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>250</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>46</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>185,962</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>941,948</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>83.5%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$0.3271</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>250</td>
+          <td>46</td>
+          <td>185,962</td>
+          <td>941,948</td>
+          <td>$0.3271</td>
+          <td>100.0%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

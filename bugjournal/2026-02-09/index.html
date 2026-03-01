@@ -7,7 +7,7 @@
 <meta name="robots" content="index, follow">
 <title>Bug Journal 2026-02-09 | TzJ&#39;s Net</title>
 <meta name="keywords" content="Bug Journal">
-<meta name="description" content="在MIHD项目中为聚类可视化添加ARI/NMI指标叠加，并运行所有DLPFC切片的RM-Ideal基准测试，完成多种embedding方法的系统性评估。">
+<meta name="description" content="为MIHD项目的聚类和RM-Ideal可视化图添加了ARI/NMI等指标文字叠加，并对所有11个DLPFC切片运行了PCA&#43;UNI&#43;STAIG Fusion基准测试及RM-Ideal评估。">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-02-09/">
 
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-02-09/">
   <meta property="og:site_name" content="TzJ&#39;s Net">
   <meta property="og:title" content="Bug Journal 2026-02-09">
-  <meta property="og:description" content="在MIHD项目中为聚类可视化添加ARI/NMI指标叠加，并运行所有DLPFC切片的RM-Ideal基准测试，完成多种embedding方法的系统性评估。">
+  <meta property="og:description" content="为MIHD项目的聚类和RM-Ideal可视化图添加了ARI/NMI等指标文字叠加，并对所有11个DLPFC切片运行了PCA&#43;UNI&#43;STAIG Fusion基准测试及RM-Ideal评估。">
   <meta property="og:locale" content="en-us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="bugjournal">
@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <meta property="article:modified_time" content="2026-02-09T00:00:00-05:00">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Bug Journal 2026-02-09">
-<meta name="twitter:description" content="在MIHD项目中为聚类可视化添加ARI/NMI指标叠加，并运行所有DLPFC切片的RM-Ideal基准测试，完成多种embedding方法的系统性评估。">
+<meta name="twitter:description" content="为MIHD项目的聚类和RM-Ideal可视化图添加了ARI/NMI等指标文字叠加，并对所有11个DLPFC切片运行了PCA&#43;UNI&#43;STAIG Fusion基准测试及RM-Ideal评估。">
 
 
 <script type="application/ld+json">
@@ -124,12 +124,12 @@ document.addEventListener("DOMContentLoaded", function() {
   "@type": "BlogPosting",
   "headline": "Bug Journal 2026-02-09",
   "name": "Bug Journal 2026-02-09",
-  "description": "在MIHD项目中为聚类可视化添加ARI/NMI指标叠加，并运行所有DLPFC切片的RM-Ideal基准测试，完成多种embedding方法的系统性评估。",
+  "description": "为MIHD项目的聚类和RM-Ideal可视化图添加了ARI/NMI等指标文字叠加，并对所有11个DLPFC切片运行了PCA+UNI+STAIG Fusion基准测试及RM-Ideal评估。",
   "keywords": [
     "Bug Journal"
   ],
-  "articleBody": "日报 — 2026-02-09 在MIHD项目中为聚类可视化添加ARI/NMI指标叠加，并运行所有DLPFC切片的RM-Ideal基准测试，完成多种embedding方法的系统性评估。\n今日任务 实现与修复 🔄 运行所有DLPFC切片的RM-Ideal评估 — 对所有有embedding结果的切片（151508/151509有多种方法，151669-151675只有uni_staig_fusion）并行运行evaluate_rm_ideal.py，使用–niche_label all计算所有层级的Spearman/P@K/SameLabel指标并生成可视化。5个切片已完成，151508/151509仍在运行中（因为有多个embedding方法需评估）。 🔄 运行pca+uni+staig_fusion配置的全部DLPFC切片基准测试 — 用户要求重新运行之前表现最好的配置（pca+uni+staig_fusion+STAIG对齐）在所有11个DLPFC切片上，不覆盖已有结果。151508/151509已缓存跳过，151510因缺少spatial coordinates失败，正在处理其余切片。 ✅ 为聚类可视化添加ARI/NMI/Silhouette指标叠加 — 将utils/visualization.py从scanpy的save=方式重构为显式fig/axes布局，添加metrics参数，在图底部叠加ARI/NMI/Silhouette文本框。同时修改run_benchmark.py中的调用传递metrics dict，以及evaluate_rm_ideal.py的visualize()方法添加Spearman/P@K/SameLabel指标叠加。发现run_benchmark.py内部还有一个本地copy的create_clustering_visualization函数也需同步更新。 问题与解决方案 一般问题 1. utils/visualization.py的修改未生效，因为run_benchmark.py内部有一个同名函数的本地copy覆盖了import 解决方案: 找到并同步更新run_benchmark.py:1644处的本地copy函数\n关键洞察: 代码重复（本地copy vs 模块import）导致修改无效，需要检查调用链\n2. 用户指出应参考pca_uni_staig_fusion文件夹的已有结果，而不是重新运行性能差的配置 解决方案: 检查experiments_log和summary CSV，确认pca+uni+staig_fusion是最佳配置，切换到该配置并使用–skip_cached\n关键洞察: 先查看已有结果再决定运行策略，避免重复计算\n3. 三个实验并行运行时GPU内存不足，PCA+UNI2+STAIG进程被OOM Killed 解决方案: 停止并行任务，改为顺序运行（用\u0026\u0026链接）\n关键洞察: GPU内存不够同时加载多个STAIG模型，必须串行运行\n4. staig_fusion在151510/151672等切片上报错：requires spatial coordinates 解决方案: 这些切片数据缺少spatial CSV文件，属于数据问题，暂时跳过\n关键洞察: 部分DLPFC切片的spatial坐标文件缺失，staig_fusion无法处理\n人类思路 vs AI 思路 实现层面 选择运行配置 角色 思路 人类 用户知道pca_uni_staig_fusion文件夹里有好结果，直接指向具体目录 AI AI倾向于重新运行最新生成的uni_staig_fusion（没有pca基因编码器）配置 差异分析: AI忽略了已存在的高质量结果，用户的历史知识更准确地指向了正确配置\n并行vs串行执行策略 角色 思路 人类 用户未明确指定，但期望任务顺利完成 AI AI首先尝试并行运行三个实验，导致OOM崩溃，然后改为串行 差异分析: AI高估了GPU内存容量，需要用户环境约束来纠正策略\nAI 局限性 一般局限 在修改visualization函数后未检查是否存在同名本地copy，导致修改未生效，需要第二轮调试才发现问题 未能记住之前会话中pca_uni_staig_fusion是最佳配置，需要用户提醒才重新查看 首次计划运行时（ExitPlanMode）被用户拒绝，说明AI在实现前花费了过多时间在规划阶段 今日收获 实践收获 scanpy的sc.pl.spatial(save=)方式会自动保存到figures/目录且不返回figure对象，需要改用ax=参数+手动fig.savefig()才能添加自定义注释 DLPFC数据集中151510/151672/151674/151676等切片缺少spatial坐标，staig_fusion无法处理；需要在pipeline中做更好的数据验证 会话摘要 🔄 实现可视化指标叠加并运行全DLPFC基准测试 21:50:31.276 | claude_code 用户提供了完整的实现计划，AI依次修改了utils/visualization.py（重构为显式fig/axes，添加metrics文本框）、scripts/run_benchmark.py（传递metrics dict，同时发现并修复了本地copy函数）、scripts/evaluate_rm_ideal.py（添加Spearman/P@K叠加）。验证运行151508后图片正确显示metrics。随后用户要求运行全部DLPFC切片，AI先尝试并行运行三种配置但OOM崩溃，后改串行；用户纠正应使用pca_uni_staig_fusion配置（已有高质量结果），最终使用–skip_cached避免覆盖，完成7/11切片的可视化。最后并行启动了所有可用切片的RM-Ideal评估，5个切片已完成，2个仍在运行。\n🔄 为聚类可视化添加NMI/ARI指标叠加（规划阶段） 21:46:17.845 | claude_code 用户要求在聚类可视化图上添加NMI/ARI分数，以及在RM-Ideal可视化上添加p值等基准结果。AI探索了visualization.py和evaluate_rm_ideal.py的实现，制定了四步修改计划：重构可视化函数使用显式fig/axes布局，在各调用处传递metrics参数。用户最终拒绝了ExitPlanMode执行请求，等待下一个会话实现。\nToken 用量 总览 指标 数值 总 Token 10,207,919 输入 Token 276 输出 Token 8,008 Cache 创建 510,804 Cache 读取 9,688,831 Cache 命中率 95.0% 总费用 (USD) $7.8716 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 248 7,991 453,924 9,483,634 $7.7799 98.8% claude-haiku-4-5-20251001 28 17 56,880 205,197 $0.0917 1.2% ",
-  "wordCount" : "151",
+  "articleBody": "日报 — 2026-02-09 为MIHD项目的聚类和RM-Ideal可视化图添加了ARI/NMI等指标文字叠加，并对所有11个DLPFC切片运行了PCA+UNI+STAIG Fusion基准测试及RM-Ideal评估。\n今日任务 架构与策略 🔄 对所有切片运行RM-Ideal评估 — 并行启动7个切片的 RM-Ideal 评估任务（对所有 niche label，使用 uni_staig_fusion 等 embedding）。151669-151675的5个切片已完成，151508和151509因需评估多个 embedding 方法仍在运行。 实现与修复 🔄 对全部DLPFC切片运行PCA+UNI+STAIG Fusion基准测试 — 以 pca_uni_staig_fusion 配置（不覆盖已有结果）运行全部11个DLPFC切片。151508和151509已有缓存结果跳过，151510/151672/151674/151676因数据问题失败，其余7个切片（151669-151675）成功完成并生成可视化。 ✅ 为聚类可视化添加ARI/NMI指标叠加 — 重构 utils/visualization.py 和 scripts/run_benchmark.py 中的 create_clustering_visualization() 函数，使用显式 fig/axes 布局替代 scanpy 的 save= 参数，在图底部叠加 ARI、NMI、Silhouette 指标文本框。 ✅ 为RM-Ideal可视化添加Spearman/P@K指标叠加 — 在 evaluate_rm_ideal.py 的 visualize() 函数中添加 metrics 参数，在 suptitle 下方渲染 Spearman r、p 值、P@10/20/50、SameLabel@50 的文字注释。 ✅ 验证可视化修改（151508基准测试） — 运行 PCA+UNI2+concat 基准测试以验证指标叠加效果，生成含 ARI=0.1807、NMI=0.3034 的可视化图，确认文字框正常渲染在图像底部。 问题与解决方案 关键问题 1. 修改了 utils/visualization.py 中的函数，但实际被调用的是 run_benchmark.py 内部同名的重复函数定义（第1644行），导致可视化修改未生效。 解决方案: 通过 grep 发现 run_benchmark.py 内部存在局部版本的 create_clustering_visualization()，对其进行相同的重构（添加 metrics 参数和 fig/axes 显式布局）。\n关键洞察: 在修改工具函数前，应先全局搜索函数名称以确认是否存在同名的局部实现覆盖。\n2. AI最初尝试重新运行实验生成新结果，而用户实际希望直接使用已有的最佳实验 pca_uni_staig_fusion（ARI最高）继续补充剩余切片。 解决方案: 用户明确指出参考 pca_uni_staig_fusion 文件夹，并要求不覆盖已有输出。AI改为使用 –skip_cached 参数跳过已缓存的151508和151509，仅处理剩余切片。\n关键洞察: 在扩展实验前应先盘点已有最佳结果，复用已有 embedding 和可视化以节省计算资源。\n3. 并行启动3个GPU实验（PCA/GCN/None + UNI2 + STAIG Fusion）导致显存争抢，PCA进程被操作系统以信号137（OOM Kill）杀掉。 解决方案: 停止并行任务，改为串行执行。但串行命令中151510因缺少空间坐标数据而抛出 ValueError 导致整个批次中止。\n关键洞察: GPU实验应串行运行，且脚本需要对单个切片的错误进行 try/except 以继续处理其余切片。\n4. 多个切片（151510、151672、151674、151676）在 staig_fusion 模式下出现不同错误：151510/151672 缺少空间坐标，151674 出现 OpenCV cvtColor 断言错误（图像为空），151676 模型训练过程中 loss 出现 NaN。 解决方案: 这些切片的错误被记录在 experiment_failures.log，跳过并继续处理其余切片。根本原因（数据文件缺失或格式问题）尚未修复。\n关键洞察: 部分 DLPFC 切片的数据文件格式与其他切片不同，需要单独调查数据完整性。\n人类思路 vs AI 思路 战略层面 识别最优实验配置 角色 思路 人类 用户直接指出 pca_uni_staig_fusion 文件夹中已有高质量结果，要求AI以此为基础补全其余切片，不要重新运行或覆盖。 AI AI最初查阅了所有 summary CSV 文件进行比较，但行动上是直接启动了新的 uni_staig_fusion 全量重跑（–override），忽略了 pca_uni_staig_fusion 的已有成果。 差异分析: 人类有更清晰的全局记忆，知道哪次实验结果最好；AI虽然能读取 CSV 数据，但在制定行动方案时未能将现有成果的保护放在首位。\n发现代码中的重复函数定义 角色 思路 人类 用户通过观察基准测试结果未变化（指标未出现在图中），间接触发了对问题的排查。 AI AI在修改 utils/visualization.py 后直接运行测试，测试失败时通过 grep 才发现 run_benchmark.py 内部存在同名局部函数覆盖了工具模块中的实现。 差异分析: AI没有在修改前预先搜索函数的所有调用和定义位置，需要测试失败后才发现问题；这是一个本可提前避免的遗漏。\n实现层面 计划实现方式 角色 思路 人类 用户在第一次会话中拒绝了 AI 的 ExitPlanMode 请求，在第二次会话中直接提供了完整的实现计划（文件、函数、代码片段），要求 AI 直接执行。 AI AI在第一次会话中花费了大量时间通过 Task agent 探索代码库，最终生成了一份详细的计划文档后尝试进入计划审批模式。 差异分析: 人类已在脑中完成了规划，直接提供了精确的实现指令；AI的探索过程带来了一定的重复劳动。\nAI 局限性 重要局限 未在修改工具模块函数前全局搜索同名函数定义，导致漏掉了 run_benchmark.py 内部的重复实现，修改未生效，需要额外的调试步骤才能发现。 并行启动多个 GPU 密集型任务时未考虑显存容量限制，导致进程被 OOM Kill。对于单机多实验的场景，AI 缺乏主动进行资源估算的意识。 在用户要求补全切片时，AI优先想到重新运行 uni_staig_fusion，而不是先确认已有的最佳配置（pca_uni_staig_fusion）是否可以直接复用，需要用户明确纠正。 一般局限 对于 151510 等切片的空间坐标缺失问题，AI未能提供根本原因分析或修复建议，只是记录错误并跳过。 今日收获 核心收获 修改某个函数前，应先用 grep 全局搜索该函数名的所有定义位置（不仅仅是调用位置），以确认是否存在同名局部实现覆盖工具模块的情况。 在 HPC 单节点上并行运行多个 GPU 实验会导致 OOM。正确做法是串行执行，或使用作业调度系统（如 SLURM）分配独立节点。 在扩展或重新运行实验前，应先盘点 outputs/ 目录中已有的最佳结果，明确哪些切片已有缓存、哪些需要补全，使用 –skip_cached 而非 –override 保护已有成果。 实践收获 将 scanpy 的 sc.pl.spatial(…, save=filename) 替换为显式 fig, axes = plt.subplots() + sc.pl.spatial(…, ax=ax, show=False) + fig.savefig() 的方式，可以获得对图像对象的完整控制权，从而实现自定义文字/指标叠加。 会话摘要 🔄 实现可视化指标叠加并验证基准测试结果 21:50:31.276 | claude_code 用户直接提供了完整的实现计划，AI按计划修改了4个文件。中途发现 run_benchmark.py 内部存在重复的同名函数定义（第1644行），AI对其进行了相同的重构后，151508基准测试验证通过，可视化图底部正确显示了ARI=0.1807、NMI=0.3034的指标文本框。随后用户要求对全部DLPFC切片运行PCA+UNI+STAIG配置，AI并行启动了3个GPU实验但因OOM被杀，改为串行后因151510数据问题中止，最终在用户指引下使用已有最佳配置（pca_uni_staig_fusion）以–skip_cached补全了剩余切片的可视化。\n🔄 对全部DLPFC切片并行运行RM-Ideal评估 22:57:20.476 | claude_code 用户要求对所有有 embedding 的切片运行 RM-Ideal 评估以生成可视化。AI并行启动了7个后台任务，151669-151675的5个切片快速完成（每个niche label约3分钟），151508和151509因需评估多个embedding方法仍在运行中。已完成切片的结果保存在 outputs/rm_ideal_evaluation/ 下的各自子目录中。\n❌ 探索代码库并规划可视化指标叠加方案 21:46:17.845 | claude_code 用户要求在聚类可视化中添加NMI/ARI分数，并在RM-Ideal评估可视化中添加p值等指标。AI通过Task agent和多次文件读取详细探索了两套可视化系统的实现。AI生成了完整的修改计划，但用户在AI尝试进入计划审批模式时拒绝了请求。\nToken 用量 总览 指标 数值 总 Token 10,207,919 输入 Token 276 输出 Token 8,008 Cache 创建 510,804 Cache 读取 9,688,831 Cache 命中率 95.0% 总费用 (USD) $7.8716 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 248 7,991 453,924 9,483,634 $7.7799 98.8% claude-haiku-4-5-20251001 28 17 56,880 205,197 $0.0917 1.2% ",
+  "wordCount" : "333",
   "inLanguage": "en",
   "datePublished": "2026-02-09T00:00:00-05:00",
   "dateModified": "2026-02-09T00:00:00-05:00",
@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <h1 class="post-title entry-hint-parent">
       Bug Journal 2026-02-09
     </h1>
-    <div class="post-meta"><span title='2026-02-09 00:00:00 -0500 EST'>February 9, 2026</span>&nbsp;·&nbsp;1 min
+    <div class="post-meta"><span title='2026-02-09 00:00:00 -0500 EST'>February 9, 2026</span>&nbsp;·&nbsp;2 min
 
 
       
@@ -234,32 +234,78 @@ document.addEventListener("DOMContentLoaded", function() {
   </header> 
   <div class="post-content"><h1 id="日报--2026-02-09">日报 — 2026-02-09<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-09">#</a></h1>
 <blockquote>
-<p>在MIHD项目中为聚类可视化添加ARI/NMI指标叠加，并运行所有DLPFC切片的RM-Ideal基准测试，完成多种embedding方法的系统性评估。</p>
+<p>为MIHD项目的聚类和RM-Ideal可视化图添加了ARI/NMI等指标文字叠加，并对所有11个DLPFC切片运行了PCA+UNI+STAIG Fusion基准测试及RM-Ideal评估。</p>
 </blockquote>
 <h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>🔄 <strong>对所有切片运行RM-Ideal评估</strong> — 并行启动7个切片的 RM-Ideal 评估任务（对所有 niche label，使用 uni_staig_fusion 等 embedding）。151669-151675的5个切片已完成，151508和151509因需评估多个 embedding 方法仍在运行。</li>
+</ul>
 <h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
 <ul>
-<li>🔄 <strong>运行所有DLPFC切片的RM-Ideal评估</strong> — 对所有有embedding结果的切片（151508/151509有多种方法，151669-151675只有uni_staig_fusion）并行运行evaluate_rm_ideal.py，使用&ndash;niche_label all计算所有层级的Spearman/P@K/SameLabel指标并生成可视化。5个切片已完成，151508/151509仍在运行中（因为有多个embedding方法需评估）。</li>
-<li>🔄 <strong>运行pca+uni+staig_fusion配置的全部DLPFC切片基准测试</strong> — 用户要求重新运行之前表现最好的配置（pca+uni+staig_fusion+STAIG对齐）在所有11个DLPFC切片上，不覆盖已有结果。151508/151509已缓存跳过，151510因缺少spatial coordinates失败，正在处理其余切片。</li>
-<li>✅ <strong>为聚类可视化添加ARI/NMI/Silhouette指标叠加</strong> — 将utils/visualization.py从scanpy的save=方式重构为显式fig/axes布局，添加metrics参数，在图底部叠加ARI/NMI/Silhouette文本框。同时修改run_benchmark.py中的调用传递metrics dict，以及evaluate_rm_ideal.py的visualize()方法添加Spearman/P@K/SameLabel指标叠加。发现run_benchmark.py内部还有一个本地copy的create_clustering_visualization函数也需同步更新。</li>
+<li>🔄 <strong>对全部DLPFC切片运行PCA+UNI+STAIG Fusion基准测试</strong> — 以 pca_uni_staig_fusion 配置（不覆盖已有结果）运行全部11个DLPFC切片。151508和151509已有缓存结果跳过，151510/151672/151674/151676因数据问题失败，其余7个切片（151669-151675）成功完成并生成可视化。</li>
+<li>✅ <strong>为聚类可视化添加ARI/NMI指标叠加</strong> — 重构 utils/visualization.py 和 scripts/run_benchmark.py 中的 create_clustering_visualization() 函数，使用显式 fig/axes 布局替代 scanpy 的 save= 参数，在图底部叠加 ARI、NMI、Silhouette 指标文本框。</li>
+<li>✅ <strong>为RM-Ideal可视化添加Spearman/P@K指标叠加</strong> — 在 evaluate_rm_ideal.py 的 visualize() 函数中添加 metrics 参数，在 suptitle 下方渲染 Spearman r、p 值、P@10/20/50、SameLabel@50 的文字注释。</li>
+<li>✅ <strong>验证可视化修改（151508基准测试）</strong> — 运行 PCA+UNI2+concat 基准测试以验证指标叠加效果，生成含 ARI=0.1807、NMI=0.3034 的可视化图，确认文字框正常渲染在图像底部。</li>
 </ul>
 <h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
-<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
-<h4 id="1-utilsvisualizationpy的修改未生效因为run_benchmarkpy内部有一个同名函数的本地copy覆盖了import">1. utils/visualization.py的修改未生效，因为run_benchmark.py内部有一个同名函数的本地copy覆盖了import<a hidden class="anchor" aria-hidden="true" href="#1-utilsvisualizationpy的修改未生效因为run_benchmarkpy内部有一个同名函数的本地copy覆盖了import">#</a></h4>
-<p><strong>解决方案:</strong> 找到并同步更新run_benchmark.py:1644处的本地copy函数</p>
-<p><strong>关键洞察:</strong> 代码重复（本地copy vs 模块import）导致修改无效，需要检查调用链</p>
-<h4 id="2-用户指出应参考pca_uni_staig_fusion文件夹的已有结果而不是重新运行性能差的配置">2. 用户指出应参考pca_uni_staig_fusion文件夹的已有结果，而不是重新运行性能差的配置<a hidden class="anchor" aria-hidden="true" href="#2-用户指出应参考pca_uni_staig_fusion文件夹的已有结果而不是重新运行性能差的配置">#</a></h4>
-<p><strong>解决方案:</strong> 检查experiments_log和summary CSV，确认pca+uni+staig_fusion是最佳配置，切换到该配置并使用&ndash;skip_cached</p>
-<p><strong>关键洞察:</strong> 先查看已有结果再决定运行策略，避免重复计算</p>
-<h4 id="3-三个实验并行运行时gpu内存不足pcauni2staig进程被oom-killed">3. 三个实验并行运行时GPU内存不足，PCA+UNI2+STAIG进程被OOM Killed<a hidden class="anchor" aria-hidden="true" href="#3-三个实验并行运行时gpu内存不足pcauni2staig进程被oom-killed">#</a></h4>
-<p><strong>解决方案:</strong> 停止并行任务，改为顺序运行（用&amp;&amp;链接）</p>
-<p><strong>关键洞察:</strong> GPU内存不够同时加载多个STAIG模型，必须串行运行</p>
-<h4 id="4-staig_fusion在151510151672等切片上报错requires-spatial-coordinates">4. staig_fusion在151510/151672等切片上报错：requires spatial coordinates<a hidden class="anchor" aria-hidden="true" href="#4-staig_fusion在151510151672等切片上报错requires-spatial-coordinates">#</a></h4>
-<p><strong>解决方案:</strong> 这些切片数据缺少spatial CSV文件，属于数据问题，暂时跳过</p>
-<p><strong>关键洞察:</strong> 部分DLPFC切片的spatial坐标文件缺失，staig_fusion无法处理</p>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-修改了-utilsvisualizationpy-中的函数但实际被调用的是-run_benchmarkpy-内部同名的重复函数定义第1644行导致可视化修改未生效">1. 修改了 utils/visualization.py 中的函数，但实际被调用的是 run_benchmark.py 内部同名的重复函数定义（第1644行），导致可视化修改未生效。<a hidden class="anchor" aria-hidden="true" href="#1-修改了-utilsvisualizationpy-中的函数但实际被调用的是-run_benchmarkpy-内部同名的重复函数定义第1644行导致可视化修改未生效">#</a></h4>
+<p><strong>解决方案:</strong> 通过 grep 发现 run_benchmark.py 内部存在局部版本的 create_clustering_visualization()，对其进行相同的重构（添加 metrics 参数和 fig/axes 显式布局）。</p>
+<p><strong>关键洞察:</strong> 在修改工具函数前，应先全局搜索函数名称以确认是否存在同名的局部实现覆盖。</p>
+<h4 id="2-ai最初尝试重新运行实验生成新结果而用户实际希望直接使用已有的最佳实验-pca_uni_staig_fusionari最高继续补充剩余切片">2. AI最初尝试重新运行实验生成新结果，而用户实际希望直接使用已有的最佳实验 pca_uni_staig_fusion（ARI最高）继续补充剩余切片。<a hidden class="anchor" aria-hidden="true" href="#2-ai最初尝试重新运行实验生成新结果而用户实际希望直接使用已有的最佳实验-pca_uni_staig_fusionari最高继续补充剩余切片">#</a></h4>
+<p><strong>解决方案:</strong> 用户明确指出参考 pca_uni_staig_fusion 文件夹，并要求不覆盖已有输出。AI改为使用 &ndash;skip_cached 参数跳过已缓存的151508和151509，仅处理剩余切片。</p>
+<p><strong>关键洞察:</strong> 在扩展实验前应先盘点已有最佳结果，复用已有 embedding 和可视化以节省计算资源。</p>
+<h4 id="3-并行启动3个gpu实验pcagcnnone--uni2--staig-fusion导致显存争抢pca进程被操作系统以信号137oom-kill杀掉">3. 并行启动3个GPU实验（PCA/GCN/None + UNI2 + STAIG Fusion）导致显存争抢，PCA进程被操作系统以信号137（OOM Kill）杀掉。<a hidden class="anchor" aria-hidden="true" href="#3-并行启动3个gpu实验pcagcnnone--uni2--staig-fusion导致显存争抢pca进程被操作系统以信号137oom-kill杀掉">#</a></h4>
+<p><strong>解决方案:</strong> 停止并行任务，改为串行执行。但串行命令中151510因缺少空间坐标数据而抛出 ValueError 导致整个批次中止。</p>
+<p><strong>关键洞察:</strong> GPU实验应串行运行，且脚本需要对单个切片的错误进行 try/except 以继续处理其余切片。</p>
+<h4 id="4-多个切片151510151672151674151676在-staig_fusion-模式下出现不同错误151510151672-缺少空间坐标151674-出现-opencv-cvtcolor-断言错误图像为空151676-模型训练过程中-loss-出现-nan">4. 多个切片（151510、151672、151674、151676）在 staig_fusion 模式下出现不同错误：151510/151672 缺少空间坐标，151674 出现 OpenCV cvtColor 断言错误（图像为空），151676 模型训练过程中 loss 出现 NaN。<a hidden class="anchor" aria-hidden="true" href="#4-多个切片151510151672151674151676在-staig_fusion-模式下出现不同错误151510151672-缺少空间坐标151674-出现-opencv-cvtcolor-断言错误图像为空151676-模型训练过程中-loss-出现-nan">#</a></h4>
+<p><strong>解决方案:</strong> 这些切片的错误被记录在 experiment_failures.log，跳过并继续处理其余切片。根本原因（数据文件缺失或格式问题）尚未修复。</p>
+<p><strong>关键洞察:</strong> 部分 DLPFC 切片的数据文件格式与其他切片不同，需要单独调查数据完整性。</p>
 <h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="识别最优实验配置">识别最优实验配置<a hidden class="anchor" aria-hidden="true" href="#识别最优实验配置">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户直接指出 pca_uni_staig_fusion 文件夹中已有高质量结果，要求AI以此为基础补全其余切片，不要重新运行或覆盖。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI最初查阅了所有 summary CSV 文件进行比较，但行动上是直接启动了新的 uni_staig_fusion 全量重跑（&ndash;override），忽略了 pca_uni_staig_fusion 的已有成果。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类有更清晰的全局记忆，知道哪次实验结果最好；AI虽然能读取 CSV 数据，但在制定行动方案时未能将现有成果的保护放在首位。</p>
+<h4 id="发现代码中的重复函数定义">发现代码中的重复函数定义<a hidden class="anchor" aria-hidden="true" href="#发现代码中的重复函数定义">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户通过观察基准测试结果未变化（指标未出现在图中），间接触发了对问题的排查。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI在修改 utils/visualization.py 后直接运行测试，测试失败时通过 grep 才发现 run_benchmark.py 内部存在同名局部函数覆盖了工具模块中的实现。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI没有在修改前预先搜索函数的所有调用和定义位置，需要测试失败后才发现问题；这是一个本可提前避免的遗漏。</p>
 <h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
-<h4 id="选择运行配置">选择运行配置<a hidden class="anchor" aria-hidden="true" href="#选择运行配置">#</a></h4>
+<h4 id="计划实现方式">计划实现方式<a hidden class="anchor" aria-hidden="true" href="#计划实现方式">#</a></h4>
 <table>
   <thead>
       <tr>
@@ -270,55 +316,47 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>人类</td>
-          <td>用户知道pca_uni_staig_fusion文件夹里有好结果，直接指向具体目录</td>
+          <td>用户在第一次会话中拒绝了 AI 的 ExitPlanMode 请求，在第二次会话中直接提供了完整的实现计划（文件、函数、代码片段），要求 AI 直接执行。</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>AI倾向于重新运行最新生成的uni_staig_fusion（没有pca基因编码器）配置</td>
+          <td>AI在第一次会话中花费了大量时间通过 Task agent 探索代码库，最终生成了一份详细的计划文档后尝试进入计划审批模式。</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> AI忽略了已存在的高质量结果，用户的历史知识更准确地指向了正确配置</p>
-<h4 id="并行vs串行执行策略">并行vs串行执行策略<a hidden class="anchor" aria-hidden="true" href="#并行vs串行执行策略">#</a></h4>
-<table>
-  <thead>
-      <tr>
-          <th>角色</th>
-          <th>思路</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>人类</td>
-          <td>用户未明确指定，但期望任务顺利完成</td>
-      </tr>
-      <tr>
-          <td>AI</td>
-          <td>AI首先尝试并行运行三个实验，导致OOM崩溃，然后改为串行</td>
-      </tr>
-  </tbody>
-</table>
-<p><strong>差异分析:</strong> AI高估了GPU内存容量，需要用户环境约束来纠正策略</p>
+<p><strong>差异分析:</strong> 人类已在脑中完成了规划，直接提供了精确的实现指令；AI的探索过程带来了一定的重复劳动。</p>
 <h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>未在修改工具模块函数前全局搜索同名函数定义，导致漏掉了 run_benchmark.py 内部的重复实现，修改未生效，需要额外的调试步骤才能发现。</li>
+<li>并行启动多个 GPU 密集型任务时未考虑显存容量限制，导致进程被 OOM Kill。对于单机多实验的场景，AI 缺乏主动进行资源估算的意识。</li>
+<li>在用户要求补全切片时，AI优先想到重新运行 uni_staig_fusion，而不是先确认已有的最佳配置（pca_uni_staig_fusion）是否可以直接复用，需要用户明确纠正。</li>
+</ul>
 <h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
 <ul>
-<li>在修改visualization函数后未检查是否存在同名本地copy，导致修改未生效，需要第二轮调试才发现问题</li>
-<li>未能记住之前会话中pca_uni_staig_fusion是最佳配置，需要用户提醒才重新查看</li>
-<li>首次计划运行时（ExitPlanMode）被用户拒绝，说明AI在实现前花费了过多时间在规划阶段</li>
+<li>对于 151510 等切片的空间坐标缺失问题，AI未能提供根本原因分析或修复建议，只是记录错误并跳过。</li>
 </ul>
 <h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>修改某个函数前，应先用 grep 全局搜索该函数名的所有定义位置（不仅仅是调用位置），以确认是否存在同名局部实现覆盖工具模块的情况。</li>
+<li>在 HPC 单节点上并行运行多个 GPU 实验会导致 OOM。正确做法是串行执行，或使用作业调度系统（如 SLURM）分配独立节点。</li>
+<li>在扩展或重新运行实验前，应先盘点 outputs/ 目录中已有的最佳结果，明确哪些切片已有缓存、哪些需要补全，使用 &ndash;skip_cached 而非 &ndash;override 保护已有成果。</li>
+</ul>
 <h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
 <ul>
-<li>scanpy的sc.pl.spatial(save=)方式会自动保存到figures/目录且不返回figure对象，需要改用ax=参数+手动fig.savefig()才能添加自定义注释</li>
-<li>DLPFC数据集中151510/151672/151674/151676等切片缺少spatial坐标，staig_fusion无法处理；需要在pipeline中做更好的数据验证</li>
+<li>将 scanpy 的 sc.pl.spatial(&hellip;, save=filename) 替换为显式 fig, axes = plt.subplots() + sc.pl.spatial(&hellip;, ax=ax, show=False) + fig.savefig() 的方式，可以获得对图像对象的完整控制权，从而实现自定义文字/指标叠加。</li>
 </ul>
 <h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
-<p><strong>🔄 实现可视化指标叠加并运行全DLPFC基准测试</strong>
+<p><strong>🔄 实现可视化指标叠加并验证基准测试结果</strong>
 <em>21:50:31.276 | claude_code</em>
-用户提供了完整的实现计划，AI依次修改了utils/visualization.py（重构为显式fig/axes，添加metrics文本框）、scripts/run_benchmark.py（传递metrics dict，同时发现并修复了本地copy函数）、scripts/evaluate_rm_ideal.py（添加Spearman/P@K叠加）。验证运行151508后图片正确显示metrics。随后用户要求运行全部DLPFC切片，AI先尝试并行运行三种配置但OOM崩溃，后改串行；用户纠正应使用pca_uni_staig_fusion配置（已有高质量结果），最终使用&ndash;skip_cached避免覆盖，完成7/11切片的可视化。最后并行启动了所有可用切片的RM-Ideal评估，5个切片已完成，2个仍在运行。</p>
-<p><strong>🔄 为聚类可视化添加NMI/ARI指标叠加（规划阶段）</strong>
+用户直接提供了完整的实现计划，AI按计划修改了4个文件。中途发现 run_benchmark.py 内部存在重复的同名函数定义（第1644行），AI对其进行了相同的重构后，151508基准测试验证通过，可视化图底部正确显示了ARI=0.1807、NMI=0.3034的指标文本框。随后用户要求对全部DLPFC切片运行PCA+UNI+STAIG配置，AI并行启动了3个GPU实验但因OOM被杀，改为串行后因151510数据问题中止，最终在用户指引下使用已有最佳配置（pca_uni_staig_fusion）以&ndash;skip_cached补全了剩余切片的可视化。</p>
+<p><strong>🔄 对全部DLPFC切片并行运行RM-Ideal评估</strong>
+<em>22:57:20.476 | claude_code</em>
+用户要求对所有有 embedding 的切片运行 RM-Ideal 评估以生成可视化。AI并行启动了7个后台任务，151669-151675的5个切片快速完成（每个niche label约3分钟），151508和151509因需评估多个embedding方法仍在运行中。已完成切片的结果保存在 outputs/rm_ideal_evaluation/ 下的各自子目录中。</p>
+<p><strong>❌ 探索代码库并规划可视化指标叠加方案</strong>
 <em>21:46:17.845 | claude_code</em>
-用户要求在聚类可视化图上添加NMI/ARI分数，以及在RM-Ideal可视化上添加p值等基准结果。AI探索了visualization.py和evaluate_rm_ideal.py的实现，制定了四步修改计划：重构可视化函数使用显式fig/axes布局，在各调用处传递metrics参数。用户最终拒绝了ExitPlanMode执行请求，等待下一个会话实现。</p>
+用户要求在聚类可视化中添加NMI/ARI分数，并在RM-Ideal评估可视化中添加p值等指标。AI通过Task agent和多次文件读取详细探索了两套可视化系统的实现。AI生成了完整的修改计划，但用户在AI尝试进入计划审批模式时拒绝了请求。</p>
 <h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
 <h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
 <table>

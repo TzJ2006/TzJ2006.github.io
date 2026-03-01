@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-27 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="在天河超算集群上进行存储分析、Slurm 环境探索，并查看 M14 基线评估结果（Pi0/Pi0.5/BC-RNN 在错误恢复场景上全部接近零成功率）。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-02-27/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.af858c2feef42adc7846f815c3e21de9982d82f8fc4f65879451b2686859975a.css" integrity="sha256-r4WML&#43;70Ktx4RvgVw&#43;Id6Zgtgvj8T2WHlFGyaGhZl1o=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-02-27/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-02-27/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-27">
+  <meta property="og:description" content="在天河超算集群上进行存储分析、Slurm 环境探索，并查看 M14 基线评估结果（Pi0/Pi0.5/BC-RNN 在错误恢复场景上全部接近零成功率）。">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-27T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-27T00:00:00-05:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Bug Journal 2026-02-27">
+<meta name="twitter:description" content="在天河超算集群上进行存储分析、Slurm 环境探索，并查看 M14 基线评估结果（Pi0/Pi0.5/BC-RNN 在错误恢复场景上全部接近零成功率）。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "BugJournals",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-27",
+      "item": "https://tzj2006.github.io/bugjournal/2026-02-27/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-27",
+  "name": "Bug Journal 2026-02-27",
+  "description": "在天河超算集群上进行存储分析、Slurm 环境探索，并查看 M14 基线评估结果（Pi0/Pi0.5/BC-RNN 在错误恢复场景上全部接近零成功率）。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-27 在天河超算集群上进行存储分析、Slurm 环境探索，并查看 M14 基线评估结果（Pi0/Pi0.5/BC-RNN 在错误恢复场景上全部接近零成功率）。\n今日任务 架构与策略 ✅ M14 基线评估结果查看 — 查看之前对 649 个错误恢复场景运行的 Pi0、Pi0.5、BC-RNN 和 Random 策略的评估结果，确认各策略在 error recovery 任务上均接近零成功率。 ✅ 天河集群 Slurm 环境探索与使用指南 — 探索 tianhexy-a 集群的 Slurm 命令、分区信息、GPU 节点状态，发现 pam_slurm_adopt 限制，整理出完整的 GPU 节点申请与稳定连接方案（salloc + tmux）。 实现与修复 ❌ 查找训练集评估代码修改 — 用户记得曾要求将评估切换为 evaluate on training set，但 AI 未能在代码库中找到相关修改记录，需要用户进一步澄清具体需求。 ✅ HDD_POOL 存储空间分析 — 分析 /XYFS01/HDD_POOL/sysu_gbli2/sysu_gbli2xy_1/ 下所有用户目录的占用情况，识别空间大户。采用并行 du 扫描解决大目录超时问题，最终获得全组各用户的磁盘使用概况。 问题与解决方案 关键问题 1. M14 评估中所有学习策略的恢复进度均低于 Random 策略 解决方案: 暂无解决方案，这是预期结果——error injection 将机器人推到训练分布之外，未经针对性训练的策略无法泛化；M15（LoRA finetune Pi0.5）是后续解法\n关键洞察: Random 策略的 recovery progress 反而最高（0.0199），说明当前学习策略在非分布数据上会做出有害动作，而非中性随机动作\n2. 集群配置了 pam_slurm_adopt，无法直接 SSH 到计算节点（测试 an53 返回 Access denied） 解决方案: 必须先通过 salloc 获得 job allocation，然后才能 SSH 或通过 srun 连接到节点；使用 tmux + salloc 保证断线后 job 不被杀\n关键洞察: 这是天河集群的安全机制，不是错误；正确工作流是 tmux → salloc → srun –pty bash 或 ssh 一般问题 3. GPU GRES 在 sinfo 中显示为 (null)，不知道是否需要 –gres=gpu 参数 解决方案: GRES 为 null 说明 GPU 未在 Slurm 中注册为 GRES 资源，申请节点时不需要 –gres=gpu:X 参数，分配到节点后 GPU 自动可用\n关键洞察: 部分集群直接按节点分配 GPU，不走 GRES 机制\n4. 大目录 du 扫描反复超时（miniconda3、VLA_data、chenshiyu 等目录 5 分钟内无法完成扫描） 解决方案: 切换为并行后台任务（所有目录同时扫描），并对每个目录设置独立 timeout，最终 VLA_data（248GB）等大部分目录成功扫描完成\n关键洞察: Lustre 文件系统 inode 元数据访问延迟高，串行扫描会被单个大目录阻塞；并行化是必要的，但 5 个超极大目录（\u003e2TB）仍无法在限制时间内完成\n人类思路 vs AI 思路 战略层面 M14 评估结果的解读 角色 思路 人类 用户简单询问评估结果如何 AI AI 不仅汇报数字，还主动解释了 Random \u003e 学习策略的反直觉现象，并将结果与 M15 的必要性关联 差异分析: AI 在结果解读和项目连贯性分析上表现较好\n训练集评估需求的记忆 角色 思路 人类 用户记得之前提出过将评估改为 evaluate on training set，但 AI 在代码库中找不到任何相关修改 AI AI 系统性搜索了代码库，但无法找到用户记忆中的修改；只能请用户澄清 差异分析: 人类记忆了跨会话的需求变更意图，但 AI 没有持久上下文；AI 倾向于以代码事实为准而非用户口述\n实现层面 存储分析策略 角色 思路 人类 用户提出不仅要看自己的目录，还要分析整个组所有人的目录占用 AI AI 最初只分析了用户自己的 29GB 目录，需要用户主动扩展需求才覆盖全组 差异分析: AI 倾向于完成字面任务，用户的系统性视角更强；用户主动提出扩大分析范围\nAI 局限性 重要局限 跨会话记忆缺失：用户记得曾经要求修改评估为 training set 模式，但 AI 在当前会话中无法找到任何证据，只能搜索代码库而非回忆对话历史 一般局限 大文件系统扫描效率低：AI 多次启动串行扫描任务，反复超时后才切换到并行策略，浪费了较多时间（至少 3 次失败尝试） GPU 资源探测不够精准：对于 GRES 显示 null 的情况，AI 没有立即给出明确结论，而是继续尝试多种检查命令，增加了不必要的来回 今日收获 核心收获 M14 核心发现：BC-RNN、Pi0、Pi0.5 在 649 个错误恢复场景上成功率全部接近零（BC-RNN 0.28%，VLA 0%），且学习策略的 recovery progress 低于 Random，说明策略在非分布数据上会主动做出有害动作。这强烈支持 M15（有针对性的 LoRA finetune）的必要性。 天河集群使用要点：tianhexy-a 集群有 ai 和 xy-a800 两个 GPU 分区，当前有 9 个空闲节点（an16/21/23/28-29/31/34/39-40）；pam_slurm_adopt 阻止无 job 的 SSH；正确流程是 tmux → salloc → srun –pty bash；GPU 不需要 –gres 参数。 实践收获 组存储现状：共享文件系统总量 7.5PB，已用 81%；单组 sysu_gbli2xy_1 已确认使用约 14.7TB+（含超时未扫完目录估计 25-35TB），最大用户 chenjunye 约 5.1TB，用户自身 tangzijia 只有 28GB，处于最小量级。 Lustre 文件系统扫描技巧：对 HPC 上的大型 Lustre 存储，du 串行扫描会被大目录阻塞，需要并行后台任务配合 timeout；lfs quota 可能因配置问题数据不准确。 会话摘要 ✅ M14 基线评估结果：Pi0/Pi0.5/BC-RNN 在错误恢复场景上的表现 05:57:24.382 | claude_code 用户询问之前运行的 Pi0 和 BC-RNN 评估结果。AI 在 outputs/evaluation_logs/ 中找到完整结果：649 个 PickPlace 错误恢复场景上，BC-RNN 成功率 0.28%，Pi0 和 Pi0.5 均为 0%，且所有学习策略的 recovery progress 均低于 Random 策略（0.0199），揭示了严重的分布偏移问题，强化了 M15 LoRA finetune 的必要性。\n✅ 天河集群 Slurm 环境探索：GPU 节点申请与稳定连接方案 05:18:36.275 | claude_code 用户希望了解天河集群的 Slurm 命令及如何申请和连接 GPU 节点。AI 系统性探索了集群状态，发现 tianhexy-a 集群、ai/xy-a800 分区（各有 8-9 个空闲 A800 节点）、pam_slurm_adopt 安全机制（禁止无 job 的直接 SSH）。最终提供了完整的三种工作流（salloc 交互式、sbatch 批处理、tmux 稳定会话），并解释了 GPU 不需要 –gres 参数的原因。\n🔍 查找 Pi0.5/BC-RNN 评估切换为训练集评估的代码修改 07:57:48.342 | claude_code 用户提到之前要求将评估改为在训练集上评估，希望确认此修改是否已实现。AI 搜索了 pi05_phoenix、scripts、configs 等目录及项目文档，未能找到任何训练集评估相关的代码修改痕迹。对话以 AI 请用户澄清具体需求（seed 复用？train/test split？）结束，未达成明确结论。\n✅ HDD_POOL 全组存储空间分析与用户目录占用排名 04:28:09.784 | claude_code 用户要求分析整个组的 HDD_POOL 存储情况。AI 先分析了用户自己的 29GB 目录（以 mimicgen_datasets 19GB 为主），然后扩展到全组 23 个用户目录。通过多轮并行 du 扫描，最终识别出 chenjunye（5.1TB）为最大用户，整体组使用量估计 25-35TB，文件系统整体使用率 81%。\nToken 用量 总览 指标 数值 总 Token 4,329,640 输入 Token 2,234 输出 Token 11,427 Cache 创建 249,262 Cache 读取 4,066,717 Cache 命中率 94.2% 总费用 (USD) $2.0983 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 1,005 7,082 88,178 1,835,239 $1.6508 78.7% claude-haiku-4-5-20251001 1,229 4,345 161,084 2,231,478 $0.4475 21.3% ",
+  "wordCount" : "457",
+  "inLanguage": "en",
+  "datePublished": "2026-02-27T00:00:00-05:00",
+  "dateModified": "2026-02-27T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-02-27/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-27
+    </h1>
+    <div class="post-meta"><span title='2026-02-27 00:00:00 -0500 EST'>February 27, 2026</span>&nbsp;·&nbsp;3 min
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-27">日报 — 2026-02-27<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-27">#</a></h1>
+<blockquote>
+<p>在天河超算集群上进行存储分析、Slurm 环境探索，并查看 M14 基线评估结果（Pi0/Pi0.5/BC-RNN 在错误恢复场景上全部接近零成功率）。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>M14 基线评估结果查看</strong> — 查看之前对 649 个错误恢复场景运行的 Pi0、Pi0.5、BC-RNN 和 Random 策略的评估结果，确认各策略在 error recovery 任务上均接近零成功率。</li>
+<li>✅ <strong>天河集群 Slurm 环境探索与使用指南</strong> — 探索 tianhexy-a 集群的 Slurm 命令、分区信息、GPU 节点状态，发现 pam_slurm_adopt 限制，整理出完整的 GPU 节点申请与稳定连接方案（salloc + tmux）。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>❌ <strong>查找训练集评估代码修改</strong> — 用户记得曾要求将评估切换为 evaluate on training set，但 AI 未能在代码库中找到相关修改记录，需要用户进一步澄清具体需求。</li>
+<li>✅ <strong>HDD_POOL 存储空间分析</strong> — 分析 /XYFS01/HDD_POOL/sysu_gbli2/sysu_gbli2xy_1/ 下所有用户目录的占用情况，识别空间大户。采用并行 du 扫描解决大目录超时问题，最终获得全组各用户的磁盘使用概况。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-m14-评估中所有学习策略的恢复进度均低于-random-策略">1. M14 评估中所有学习策略的恢复进度均低于 Random 策略<a hidden class="anchor" aria-hidden="true" href="#1-m14-评估中所有学习策略的恢复进度均低于-random-策略">#</a></h4>
+<p><strong>解决方案:</strong> 暂无解决方案，这是预期结果——error injection 将机器人推到训练分布之外，未经针对性训练的策略无法泛化；M15（LoRA finetune Pi0.5）是后续解法</p>
+<p><strong>关键洞察:</strong> Random 策略的 recovery progress 反而最高（0.0199），说明当前学习策略在非分布数据上会做出有害动作，而非中性随机动作</p>
+<h4 id="2-集群配置了-pam_slurm_adopt无法直接-ssh-到计算节点测试-an53-返回-access-denied">2. 集群配置了 pam_slurm_adopt，无法直接 SSH 到计算节点（测试 an53 返回 Access denied）<a hidden class="anchor" aria-hidden="true" href="#2-集群配置了-pam_slurm_adopt无法直接-ssh-到计算节点测试-an53-返回-access-denied">#</a></h4>
+<p><strong>解决方案:</strong> 必须先通过 salloc 获得 job allocation，然后才能 SSH 或通过 srun 连接到节点；使用 tmux + salloc 保证断线后 job 不被杀</p>
+<p><strong>关键洞察:</strong> 这是天河集群的安全机制，不是错误；正确工作流是 tmux → salloc → srun &ndash;pty bash 或 ssh <node></p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="3-gpu-gres-在-sinfo-中显示为-null不知道是否需要---gresgpu-参数">3. GPU GRES 在 sinfo 中显示为 (null)，不知道是否需要 &ndash;gres=gpu 参数<a hidden class="anchor" aria-hidden="true" href="#3-gpu-gres-在-sinfo-中显示为-null不知道是否需要---gresgpu-参数">#</a></h4>
+<p><strong>解决方案:</strong> GRES 为 null 说明 GPU 未在 Slurm 中注册为 GRES 资源，申请节点时不需要 &ndash;gres=gpu:X 参数，分配到节点后 GPU 自动可用</p>
+<p><strong>关键洞察:</strong> 部分集群直接按节点分配 GPU，不走 GRES 机制</p>
+<h4 id="4-大目录-du-扫描反复超时miniconda3vla_datachenshiyu-等目录-5-分钟内无法完成扫描">4. 大目录 du 扫描反复超时（miniconda3、VLA_data、chenshiyu 等目录 5 分钟内无法完成扫描）<a hidden class="anchor" aria-hidden="true" href="#4-大目录-du-扫描反复超时miniconda3vla_datachenshiyu-等目录-5-分钟内无法完成扫描">#</a></h4>
+<p><strong>解决方案:</strong> 切换为并行后台任务（所有目录同时扫描），并对每个目录设置独立 timeout，最终 VLA_data（248GB）等大部分目录成功扫描完成</p>
+<p><strong>关键洞察:</strong> Lustre 文件系统 inode 元数据访问延迟高，串行扫描会被单个大目录阻塞；并行化是必要的，但 5 个超极大目录（&gt;2TB）仍无法在限制时间内完成</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="m14-评估结果的解读">M14 评估结果的解读<a hidden class="anchor" aria-hidden="true" href="#m14-评估结果的解读">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户简单询问评估结果如何</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 不仅汇报数字，还主动解释了 Random &gt; 学习策略的反直觉现象，并将结果与 M15 的必要性关联</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI 在结果解读和项目连贯性分析上表现较好</p>
+<h4 id="训练集评估需求的记忆">训练集评估需求的记忆<a hidden class="anchor" aria-hidden="true" href="#训练集评估需求的记忆">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户记得之前提出过将评估改为 evaluate on training set，但 AI 在代码库中找不到任何相关修改</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 系统性搜索了代码库，但无法找到用户记忆中的修改；只能请用户澄清</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类记忆了跨会话的需求变更意图，但 AI 没有持久上下文；AI 倾向于以代码事实为准而非用户口述</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="存储分析策略">存储分析策略<a hidden class="anchor" aria-hidden="true" href="#存储分析策略">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户提出不仅要看自己的目录，还要分析整个组所有人的目录占用</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 最初只分析了用户自己的 29GB 目录，需要用户主动扩展需求才覆盖全组</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI 倾向于完成字面任务，用户的系统性视角更强；用户主动提出扩大分析范围</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>跨会话记忆缺失：用户记得曾经要求修改评估为 training set 模式，但 AI 在当前会话中无法找到任何证据，只能搜索代码库而非回忆对话历史</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>大文件系统扫描效率低：AI 多次启动串行扫描任务，反复超时后才切换到并行策略，浪费了较多时间（至少 3 次失败尝试）</li>
+<li>GPU 资源探测不够精准：对于 GRES 显示 null 的情况，AI 没有立即给出明确结论，而是继续尝试多种检查命令，增加了不必要的来回</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>M14 核心发现：BC-RNN、Pi0、Pi0.5 在 649 个错误恢复场景上成功率全部接近零（BC-RNN 0.28%，VLA 0%），且学习策略的 recovery progress 低于 Random，说明策略在非分布数据上会主动做出有害动作。这强烈支持 M15（有针对性的 LoRA finetune）的必要性。</li>
+<li>天河集群使用要点：tianhexy-a 集群有 ai 和 xy-a800 两个 GPU 分区，当前有 9 个空闲节点（an16/21/23/28-29/31/34/39-40）；pam_slurm_adopt 阻止无 job 的 SSH；正确流程是 tmux → salloc → srun &ndash;pty bash；GPU 不需要 &ndash;gres 参数。</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>组存储现状：共享文件系统总量 7.5PB，已用 81%；单组 sysu_gbli2xy_1 已确认使用约 14.7TB+（含超时未扫完目录估计 25-35TB），最大用户 chenjunye 约 5.1TB，用户自身 tangzijia 只有 28GB，处于最小量级。</li>
+<li>Lustre 文件系统扫描技巧：对 HPC 上的大型 Lustre 存储，du 串行扫描会被大目录阻塞，需要并行后台任务配合 timeout；lfs quota 可能因配置问题数据不准确。</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<p><strong>✅ M14 基线评估结果：Pi0/Pi0.5/BC-RNN 在错误恢复场景上的表现</strong>
+<em>05:57:24.382 | claude_code</em>
+用户询问之前运行的 Pi0 和 BC-RNN 评估结果。AI 在 outputs/evaluation_logs/ 中找到完整结果：649 个 PickPlace 错误恢复场景上，BC-RNN 成功率 0.28%，Pi0 和 Pi0.5 均为 0%，且所有学习策略的 recovery progress 均低于 Random 策略（0.0199），揭示了严重的分布偏移问题，强化了 M15 LoRA finetune 的必要性。</p>
+<p><strong>✅ 天河集群 Slurm 环境探索：GPU 节点申请与稳定连接方案</strong>
+<em>05:18:36.275 | claude_code</em>
+用户希望了解天河集群的 Slurm 命令及如何申请和连接 GPU 节点。AI 系统性探索了集群状态，发现 tianhexy-a 集群、ai/xy-a800 分区（各有 8-9 个空闲 A800 节点）、pam_slurm_adopt 安全机制（禁止无 job 的直接 SSH）。最终提供了完整的三种工作流（salloc 交互式、sbatch 批处理、tmux 稳定会话），并解释了 GPU 不需要 &ndash;gres 参数的原因。</p>
+<p><strong>🔍 查找 Pi0.5/BC-RNN 评估切换为训练集评估的代码修改</strong>
+<em>07:57:48.342 | claude_code</em>
+用户提到之前要求将评估改为在训练集上评估，希望确认此修改是否已实现。AI 搜索了 pi05_phoenix、scripts、configs 等目录及项目文档，未能找到任何训练集评估相关的代码修改痕迹。对话以 AI 请用户澄清具体需求（seed 复用？train/test split？）结束，未达成明确结论。</p>
+<p><strong>✅ HDD_POOL 全组存储空间分析与用户目录占用排名</strong>
+<em>04:28:09.784 | claude_code</em>
+用户要求分析整个组的 HDD_POOL 存储情况。AI 先分析了用户自己的 29GB 目录（以 mimicgen_datasets 19GB 为主），然后扩展到全组 23 个用户目录。通过多轮并行 du 扫描，最终识别出 chenjunye（5.1TB）为最大用户，整体组使用量估计 25-35TB，文件系统整体使用率 81%。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>4,329,640</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>2,234</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>11,427</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>249,262</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>4,066,717</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>94.2%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$2.0983</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>1,005</td>
+          <td>7,082</td>
+          <td>88,178</td>
+          <td>1,835,239</td>
+          <td>$1.6508</td>
+          <td>78.7%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>1,229</td>
+          <td>4,345</td>
+          <td>161,084</td>
+          <td>2,231,478</td>
+          <td>$0.4475</td>
+          <td>21.3%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

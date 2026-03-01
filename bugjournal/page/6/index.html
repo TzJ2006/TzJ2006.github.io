@@ -183,160 +183,175 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Bug Journal 2025-05-09
+    <h2 class="entry-hint-parent">Bug Journal 2025-06-05
     </h2>
   </header>
   <div class="entry-content">
-    <p>遇到的问题</p>
+    <p>DemoGen: Synthetic Demonstration Generation for Data-Efficient Visuomotor Policy Learning 发表时间：24 Feb 2025
+动机 Robust，还得是Robust。
+为什么不加数据(ο´･д･)??
+过拟合严重，加数据要每个场景都测很多次，哪怕不用人测也要机器人测。
+那怎么办呢(ο´･д･)??
+很简单，纯计算模拟不就是了。
+主要论点 用一个演示数据生成很多演示数据，用很多的演示数据 train 机器人
+这样就不需要实际操作，但是可以直接获得大量数据。
+模型流程图 一言以蔽之：先算个大概，再看看这个“大概动作”能不能 work.
+思路是：一张 PPT 中的图片可以旋转放大缩小，路径也可以
+机器人一共有两段动作
+一段是碰到物体前的动作
+一段是碰到物体后的动作
+对于第一段，直接用一个变换矩阵变换
+对于第二段，直接规划一个新路径 (use RRT-Connect)
+现在我们通过模拟环境验证这个路径行不行 (会不会穿模，会不会碰撞)
+如果可以用的话
+然后通过模拟环境生成这个路径的图像
+实验设定 虚拟环境：1 条 GroundTruth
+真实环境: 1 条真人数据 &#43; 2 次 Replay（机器人自己模拟一遍这个轨迹）
+一共模拟 10k 帧左右的数据 (收益递减，10k 属于一个平衡点)
+结果 V.S. RoboGround 方面 DemoGen RoboGround 目标问题 数据高效、空间泛化性差的视觉模仿学习 多任务泛化能力差、语义-空间信息连接弱 核心思想 从少量人类演示中合成大量视觉演示数据用于模仿学习 grounding mask（掩码）作为embedding增强泛化 数据生成方式 从 BEHAVIOR 数据库中采样演示 → 空间重定向 → 物理优化 → 点云合成图像 构建大量高复杂度场景 → 使用 LVLM（如 GLaMM）生成目标物体 &#43; placement mask 人类演示 一条 在仿真中自动生成，无需真实 rollouts 任务表征形式 (图像帧, 末端动作)对 图像 &#43; mask &#43; 指令 &#43; robot state 中间表示 None（直接预测动作） 掩码（mask）作为空间引导 依赖模型 Immitation Learning 利用 VLM &#43; Grounded Perceiver 构建 mask-guided policy 泛化方式 利用空间重定向与图像合成覆盖更多初始状态 通过 grounding masks 和多样 instruction 提升语义-空间泛化 DOGlove: Dexterous Manipulation with a Low-Cost Open-Source Haptic Force Feedback Glove ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-05-09 18:52:47 +0800 +0800'>May 9, 2025</span>&nbsp;·&nbsp;1 min</footer>
-  <a class="entry-link" aria-label="post link to Bug Journal 2025-05-09" href="https://tzj2006.github.io/bugjournal/2025-05-09/"></a>
+  <footer class="entry-footer"><span title='2025-06-05 10:00:00 +0800 +0800'>June 5, 2025</span>&nbsp;·&nbsp;2 min</footer>
+  <a class="entry-link" aria-label="post link to Bug Journal 2025-06-05" href="https://tzj2006.github.io/bugjournal/2025-06-05/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Bug Journal 20250508
+    <h2 class="entry-hint-parent">Bug Journal 2025-06-04
     </h2>
   </header>
   <div class="entry-content">
-    <p>初识具身智能</p>
-  </div>
-  <footer class="entry-footer"><span title='2025-05-08 19:30:40 +0800 +0800'>May 8, 2025</span>&nbsp;·&nbsp;1 min</footer>
-  <a class="entry-link" aria-label="post link to Bug Journal 20250508" href="https://tzj2006.github.io/bugjournal/2025-05-08/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Bug Journal 2025-03-28
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>Talk 6: scDesign3: Semi-synthetic Negative &amp; Positive Control 数据不够的时候需要一些 simulated data
-那这时候 simlator 就需要 interpretable &amp; realistic (real data characteristic &amp; contains ground truth data)
-e.g. single cell RNA simulator -&gt; 考虑 gene gene correlation -&gt; 考虑别的 cell types and omics -&gt; RNA count to RNA read
-这个可以用来给数据预处理&#43;降噪
-Talk 7: spacial omics data 理解 low-rank property of Hi-C chromatin contact maps.
-数据上有 3 维（question what type of data / or do you have ground truth of the location of the spatial data? are the model predicting the location or the gene expression or both of them? ）
+    <p>Leveraging Locality to Boost Sample Efficiency in Robotic Manipulation 发表时间：15 Jun 2024
+动机 当前机器人操作策略（如模仿学习、RL）在训练时通常会学习一个全局策略函数 \pi(o_t)，即从全图像或全状态观察中直接输出动作。但：
+问题 1：学习难度高（需要从高维图像中学全局策略）； 问题 2：泛化差（模型可能过拟合于训练视角或场景）； 问题 3：sample efficiency 差（训练数据需求量大）
+作者提出一个核心假设：很多 manipulation 任务其实是“局部决策驱动”的， 也就是说：只关注局部 patch（例如抓取点附近区域）即可决定动作。
+主要论点 提出 Local Policy Networks（LPN）： 将策略函数设计为一组 局部策略（local policy heads）； 每个 head 只负责“在自己 patch 上预测动作”； 用 heatmap 表示哪些 patch 是可行操作区域（如抓取点）； 最终策略通过对多个 local head 输出聚合（weighted sum）得到。
+模型流程图 简单来说，就是寻找关键点，预测关键点的移动，然后整合成动作
+实验 setting: 使用数据集：RT-1（Robotics Transformer 1）:
+Google Everyday Robot（移动底座 &#43; 7-DoF机械臂 &#43; gripper） 数据来源 真实机器人操作任务，由人类远程操作（teleoperation）或脚本演示收集 数据规模 ~130k 条实际机器人操作轨迹，覆盖 700&#43; 种任务 采样频率 每条轨迹包含约 50–100 帧关键帧（图像 &#43; 动作） 场景 家庭式办公环境（桌面、水槽、地面） 物体 80&#43; 类常见物体（杯子、水瓶、纸巾、玩具、锅等） 语言指令 每个轨迹附有一条人类编写的自然语言 task 描述（用于多模态模型） 对于每一条指令：
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-03-28 08:36:01 -0600 -0600'>March 28, 2025</span>&nbsp;·&nbsp;2 min</footer>
-  <a class="entry-link" aria-label="post link to Bug Journal 2025-03-28" href="https://tzj2006.github.io/bugjournal/2025-03-28/"></a>
+  <footer class="entry-footer"><span title='2025-06-04 11:16:31 +0800 +0800'>June 4, 2025</span>&nbsp;·&nbsp;2 min</footer>
+  <a class="entry-link" aria-label="post link to Bug Journal 2025-06-04" href="https://tzj2006.github.io/bugjournal/2025-06-04/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Bug Journal 2025-03-27
+    <h2 class="entry-hint-parent">Bug Journal 2025-06-03
     </h2>
   </header>
   <div class="entry-content">
-    <p>MCBIOS Conference Day 1:
-Talk 1: sharing data: https://datacommons.cancer.gov/ 介绍了很多数据：特点是比较多，比较新，并且user-friendly. 还有 NIH founding 可以 use start-up server.
-https://computational.cancer.gov/ 介绍了很多模型：都是用来预处理数据的
-比如有一个 AI-based toolbox (类似scanpy) 可以预处理所有数据
-还有 Automated Data Collection
-link TBD
-LLM 翻译诊断结果
-Talk 2: Write code with Github Copilot. 你能用这个干嘛 当然是写代码啦，还能干嘛（
-好处是可以直接在你的 IDE 里面生成(虽然现在 ChatGPT.app 也可以了，(反正都是一家的[doge])
-比如说你可以先写一段注释来让 Copilot 生成你想要的代码
-然后选中这段代码并且点击旁边的小星星来让 Copilot 更改这段代码
-用于重复的项目效果更佳。比如分离数据集
-修bug还挺好用的(虽然有时候越修越多[doge])
-修改代码的语言：比如把 R code 换成 python code.
-还可以 explain what the code is doing (by using /explain).
+    <p>Catch It! Learning to Catch in Flight with Mobile Dexterous Hands 发表时间: 16 Sep 2024
+动机 Basically, 这是之前那篇 DexCatch: Learning to Catch Arbitrary Objects with Dexterous Hands 的 follow up. 讲述了 Shanghai Qi Zhi Institute 和 Shanghai AI Lab 的人如何把上一篇文章的工作部署到真机器人上。
+模型流程图 这是真机器人的样子： 一个双目摄像头，一个 6 DoF 的机械臂，一个 16 DoF 的灵巧手，还有一个可以移动的平台。
+训练的过程分为两步：
+第一步是不管灵巧手，先尝试移动整个机器人让物体砸到灵巧手上。 第二步是微调灵巧手让手抓住这个物体。
+最后在控制上加了一个速度优化器解决了无法抓到从未见过的物体的问题。
+解决的难点 部署到真机器人上 一步到位 end-to-end 效果没那么好 抓不住从未见过的物体 还需要解决的难点 从未见过的物体还是不好抓 仍然没有考虑材质之类的问题 还是无法在当物体在空中时就判断物体的形状 Reinforcement Learning with Foundation Priors: Let the Embodied Agent Efficiently Learn on Its Own 发布时间: 4 Oct. 2023
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-03-27 13:24:41 -0600 -0600'>March 27, 2025</span>&nbsp;·&nbsp;1 min</footer>
-  <a class="entry-link" aria-label="post link to Bug Journal 2025-03-27" href="https://tzj2006.github.io/bugjournal/2025-03-27/"></a>
+  <footer class="entry-footer"><span title='2025-06-03 11:50:32 +0800 +0800'>June 3, 2025</span>&nbsp;·&nbsp;4 min</footer>
+  <a class="entry-link" aria-label="post link to Bug Journal 2025-06-03" href="https://tzj2006.github.io/bugjournal/2025-06-03/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Bug Journal 2025-02-04
+    <h2 class="entry-hint-parent">Bug Journal 2025-06-02
     </h2>
   </header>
   <div class="entry-content">
-    <p>. –&gt; find all characters except ‘\n’.
-^ –&gt; find all the start of the string
-$ –&gt; find all the end of the string.
-[…] find a character inside the [].
-[^] find characters not inside the [].
-\. find the special characters.
-\d all numbers &lt;=&gt; [0-9]
-\D all not numbers &lt;=&gt; [^0-9]
-\s all space characters
-\S all not space characters
-\w all letter, num, and . [a-z-A-Z0-9].
+    <p>Review of Three base VLA models and three basic CNNs.</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-06-02 11:24:12 +0800 +0800'>June 2, 2025</span>&nbsp;·&nbsp;1 min</footer>
+  <a class="entry-link" aria-label="post link to Bug Journal 2025-06-02" href="https://tzj2006.github.io/bugjournal/2025-06-02/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Bug Journal 2025-06-01
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>主流视觉-文本多模态模型技术分析 近年来，视觉和文本结合的多模态模型取得了显著进展。在此，我们选取当前主流的几种模型（包括但不限于 CLIP、ALIGN、BLIP、BLIP-2、GIT、Flamingo、GPT-4V），逐一分析它们的架构设计、模态对齐方式、输入 token 统一表示方法、损失函数与训练策略、数据集与伪标签使用情况，并讨论它们如何在架构或训练上应对多模态学习的六大难点。
+CLIP (OpenAI, 2021) 整体架构设计： CLIP 采用 双编码器架构 ：包括一个图像编码器和一个文本编码器，两者分别将图像和文本映射到相同维度的向量空间lightly.ai。图像编码器可以使用 ResNet 或 Vision Transformer 等架构，文本编码器则是基于 Transformer 的语言模型lightly.ai。在输出端，两个编码器各自接一个线性投影，将图像和文本特征投影到共享的多模态嵌入空间lightly.ai。这种架构并不在中途融合图像和文本特征，而是各自编码后在嵌入空间对齐。 模态对齐方式： CLIP通过对比学习实现视觉-语言对齐。训练时，模型给定一批图文对，学习预测哪张图像与哪段文本匹配lightly.ai。具体而言，CLIP使用 对称的跨模态对比损失 （即分别以图像检索文本和文本检索图像计算两个方向的softmax交叉熵损失），最大化真实匹配的图文嵌入相似度，最小化非匹配对的相似度lightly.ai。这种训练使图像和文本编码器产生的特征在共享空间中成对靠近lightly.ai。 输入 token 表达统一： CLIP并未显式统一图像和文本的输入表示格式。 图像和文本各有独立的token化和编码流程 ：文本用BPE分词作为离散token输入Transformer，图像则以像素或patch为输入到CNN/ViT得到连续特征lightly.ai。两种模态的数据直到嵌入空间才进行统一对齐。因此CLIP通过独立编码&#43;对齐空间的方式，规避了直接将图像作为序列token处理的不统一问题。 损失函数与训练策略： 损失采用 对比学习的InfoNCE损失 （实现为带温度系数的归一化softmax交叉熵）research.google。在一个batch中，真实的图文对作为正样本，不匹配的组合作为负样本，通过softmax拉开正负样本的评分差距。为提高训练效率，CLIP使用了大批量训练（成千上万的对/批）以提供足够的负样本，同时在实现上对大batch的softmax作了数值稳定和分布式计算的优化lightly.ai。图像预处理上，只用了基本的数据增广（如随机裁剪）以保持图片内容与文本描述对应lightly.ai。CLIP从随机初始化开始端到端训练图像和文本编码器，没有使用预训练的视觉或语言模型lightly.ai。 数据集及伪标签： CLIP在一个超大规模的图文配对数据集上预训练，包含约4亿对图像-文本arxiv.org（主要来自互联网的图片及其旁白文本）。这些文本多为图像的标题或描述，具有较大噪声，但规模极其庞大。CLIP没有使用合成的文本标签或额外的人工标注数据，完全依赖自然语言的弱监督arxiv.org。如此大量的图文对无需人工清洗，使模型学习到广泛的视觉概念。训练中未使用伪标签技术，也未针对数据稀缺问题额外生成合成数据，因为其数据规模本身就非常巨大。 六大难点应对： 模态对齐困难： CLIP通过对比损失直接学习图像和文本的全局语义对齐，将匹配的图文特征拉近，不匹配的推远lightly.ai。超大规模多样化数据和对比学习目标极大缓解了模态对齐难题，使模型学习到稳健的跨模态表示空间。 token格式不统一： 采用双编码器架构有效避免了将图像离散化为“词”的问题。图像由专门的视觉编码器处理，文本由文本编码器处理，二者输出相同格式的向量后再比对lightly.ai。这种后期对齐的方法在不统一输入token格式的前提下，实现了多模态表示的统一。 语义粒度不匹配： CLIP对图像和文本都是提取整体级别的表示（整幅图像对应整段文本）。它没有显式对齐图像局部区域与文本片段，因此可能无法细粒度对齐具体对象。但庞大的训练语料涵盖各种粒度描述，在全局对比目标下模型隐式学到了一定程度的细粒度关联。后续研究如Fine-Grained CLIP等正是受限于CLIP在局部语义对齐上的不足lightly.ailightly.ai。总体而言，CLIP主要对齐全局语义，对于细粒度语义不匹配问题未作专门架构设计。 多模态上下文保持： CLIP一次只处理单一的图-文对，不涉及序列化的多轮交互或多张图像输入。因此 多模态上下文 （如对话历史或多图情景）并未在架构中体现。CLIP更侧重于独立图文对的匹配，对跨时序或多轮情境无法建模。这一限制在CLIP应用于对话或多图任务时需要借助外部机制解决。 训练数据稀缺： CLIP通过大规模弱标注数据从根本上缓解了数据稀缺的问题arxiv.org。无需逐张图人工标注类别，而是利用网络中丰富的图像文本对，实现“以量补质”。即使这些网络文本存在噪声，作者证明只要规模足够大，模型仍能学到有效特征research.google。因此CLIP没有使用数据增强或伪标注技术，而是倾向于直接收集海量数据。 计算开销高： 训练CLIP确实需要巨大的算力和显存，但相对来说，其双塔架构使训练可并行展开，推理时也可分别预编码图文后做相似度计算，具有一定的效率优势lightly.ai。与需要跨模态交叉注意力的单体模型相比，CLIP的对比学习目标在实现分布式并行时稍有挑战，需要对大batch软max做特殊优化lightly.ai。后续研究提出用sigmoid替代softmax（如 SigLIP）来简化分布式实现lightly.ai。总的来说，OpenAI通过合理的工程和算法优化，使CLIP在可能的范围内降低了计算开销，但其预训练仍是大规模的（数百万 GPU 时）。值得一提的是，CLIP模型体积适中（例如ViT-B/32版约有数亿参数），推理可在单GPU上高效完成，实现了训练成本和推理效率的折中。 参考： CLIP 的论文arxiv.org详细描述了其对比预训练方法，OpenAI 的博客也提供了概述lightly.ai。代码实现可参考 OpenAI 提供的开源版本或 HuggingFace 的CLIP模型库huggingface.co。
+ALIGN (Google, 2021) 整体架构设计： ALIGN（ A Large-scale ImaGe and Noisy-Text embedding ）延续了与CLIP相同的双编码器对比学习架构research.google。它包含独立的图像编码器和文本编码器，两者输出到同一向量空间。与CLIP不同的是，Google使用了更大规模的主干：EfficientNet-L2卷积网络作为图像编码器，BERT-Large作为文本编码器，并均从随机初始化开始训练research.google。模型最终投影到一个共享嵌入空间，用于图文检索和匹配任务。 模态对齐方式： ALIGN采用对比损失（normalized softmax）来训练，使匹配的图文对嵌入向量接近，不匹配的远离research.google。具体而言，对每个图像-文本对，计算嵌入的余弦相似度，并通过softmax使得正确匹配对在一批样本中得到最高的似然。损失在图到文和文到图两个方向对称计算，如同CLIP的做法。这种以批为单位的跨模态对比训练，使模型学到强大的图文对齐表示。 输入 token 表达统一： ALIGN同样没有将图像直接离散为token序列，而是通过双通道处理：图像经过CNN提取特征向量，文本经过BERT编码为文本向量。两模态输出向量通过各自的投影层映射到同维空间。由于采用独立编码器，ALIGN不要求图像和文本的输入格式统一，而是在输出embedding空间实现统一表示research.google。 损失函数与训练策略： 使用 对比学习损失 （InfoNCE变体），在大批量上训练模型research.google。Google收集了极其庞大的图文数据，使每个训练step都含有大量负例，从而有效训练对比目标。与CLIP类似，ALIGN需要跨GPU同步计算softmax分母，这在工程上有所挑战。值得注意的是，作者强调尽管数据非常嘈杂，他们仅做 最小程度的过滤 ，通过数据规模来弥补噪声research.google。训练策略上，ALIGN从头训练EfficientNet-L2和BERT-Large，这意味着需要相当长的训练时间，但好处是模型能够充分适配新的数据分布。 数据集及伪标签： ALIGN的亮点在于使用了超过10亿对图像-Alt文本的超大规模数据集research.google。这些图像来自网络，文本是网页提供的替代文本（alt-text），数据 无需人工标注 。与早期精心清洗的小型数据集（如Conceptual Captions 300万对）不同，ALIGN 放宽过滤标准 ，只做了基于频率的简单过滤，最终得到约18亿对图文数据research.google。这些文本描述可能包含噪声甚至与图像无关，但研究表明 规模弥补质量 ：如此海量的数据使模型学到泛化的视觉语言表示research.google。ALIGN未使用任何合成标签或伪标注技术——完全依赖真实的网络数据，其策略是用极大规模的弱标注数据来缓解数据稀缺和噪声问题research.google。 六大难点应对： 模态对齐困难： ALIGN证明了数据规模在对齐中的重要作用。通过十倍于CLIP的数据规模和强大的对比损失，模型学到了稳健的跨模态对齐能力research.googleresearch.google。即使数据噪声较高，足够的样本多样性也促使模型捕获图像和文本的正确对应关系，在Flickr30K、COCO等检索任务上超越了之前更复杂的有交叉注意力的模型research.google。 token格式不统一： 与CLIP类似，ALIGN通过双编码器架构回避了统一输入格式的问题。图像和文本分别编码，各自发挥最适合的网络结构（CNN对像素、Transformer对文本），最终只需统一embedding空间即可research.google。因此，不需要对图像进行文本化表示，也不需要修改文本token空间来容纳图像信息。 语义粒度不匹配： ALIGN的训练目标依旧作用在 全局图像-句子层面 ，没有显式对齐局部区域与词语。它依靠CNN提取图像总体特征，并用整句文本描述来监督。对于图像细节（如小物体或局部属性）与文本词汇的对应，没有专门机制来处理。这方面的不足在ALIGN中仍然存在，不过由于EfficientNet-L2具有强大的表征能力，加上海量数据涵盖各种描述粒度，一定程度上模型可以借助上下文学到细粒度信息。但总体来说，ALIGN主要解决宏观对齐，对细粒度语义的不匹配没有特殊解决方案。 多模态上下文保持： ALIGN同样一次仅处理单一图文对，没有上下文记忆能力。它不支持在模型内部串联多轮对话或多张图片。Google在ALIGN中更关注开放域的检索和零样本分类能力research.google，未涉及多模态对话等情境。因此，ALIGN在多轮交互或长上下文问题上没有新的设计。后续若需要保持多模态上下文，需要在ALIGN提取的embedding之外搭建额外机制（例如将ALIGN作为编码器，配合语言模型处理对话历史）。 训练数据稀缺： ALIGN的策略是极端扩增数据规模以消除数据稀缺瓶颈research.google。无需昂贵的人力标注，直接爬取网络 alt-text 即可得到十亿级别的配对。作者证明即使数据噪声大，但数量上去了，同样可以训练出SOTA模型research.google。因此，在数据方面，ALIGN并没有使用数据增强或伪标签，而是依赖互联网海量数据源。这一思路对于普通研究者来说难以复现，但从方法上证明了解决数据匮乏的一条可行路径：即利用 弱标注的大数据 。 计算开销高： 为训练ALIGN，Google使用了更大模型和更多数据，训练开销比CLIP更为惊人。然而ALIGN架构简单（无交叉注意力交互），这使得训练可以高效并行扩展research.google。他们成功训练了一个EfficientNet-L2（参数接近10亿级）和BERT-Large的组合，可见投入了巨大的计算资源research.google。尽管计算开销高昂，ALIGN通过 冻结架构复杂性 （只用双塔，不引入额外模块）来保障多机并行效率，也说明在同等资源下，优先扩大数据规模比增加模型复杂度更有效research.googleresearch.google。因此，ALIGN在可用算力内追求最大的数据量和模型规模，以取得最佳性能。 参考： ALIGN 的研究细节发表于 ICML 2021research.google。Google Research 官方博客提供了对ALIGN的通俗描述research.googleresearch.google。由于该模型未开源，实现细节可参考开源的对比学习框架或OpenCLIP等类似项目。
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-02-04 13:26:59 -0500 EST'>February 4, 2025</span>&nbsp;·&nbsp;1 min</footer>
-  <a class="entry-link" aria-label="post link to Bug Journal 2025-02-04" href="https://tzj2006.github.io/bugjournal/2025-02-04/"></a>
+  <footer class="entry-footer"><span title='2025-06-01 12:00:14 +0800 +0800'>June 1, 2025</span>&nbsp;·&nbsp;3 min</footer>
+  <a class="entry-link" aria-label="post link to Bug Journal 2025-06-01" href="https://tzj2006.github.io/bugjournal/2025-06-01/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Bug Journal 2025-02-02
+    <h2 class="entry-hint-parent">Bug Journal 2025-05-31
     </h2>
   </header>
   <div class="entry-content">
-    <p>Speed of M4 Pro</p>
+    <p>主要动机 目前有三大挑战：数据稀缺、泛化能力不足，以及在复杂物理环境中效果不好 作者希望通过引入大规模语言及VLA模型在自然语言处理和计算机视觉中的成功经验解决这个问题.
+主要论点 在预训练的视-语言模型（VLM，本文采用 PaliGemma）基础上，增加一个“动作专家”（action expert），通过条件流匹配（diffusion policy）生成高频、连续的动作序列（每秒可达50 Hz）
+模型流程图 收集数据 -&gt; 训练$\phi_0$ -&gt; Zero-Shot/微调/Fine-tune
+数据来自7种不同的机器人，68个不同的任务，总计 10k小时。
+每一个单独机械臂的自由度在 6-7 (有些机器人有多机械臂)
+输入有 3 块，分别是：Image, Language, and State
+Image 用 400M Pretrained VIT SigLip 得到 embedding, 一共会有up to 3 个 Image， 所以最会有 3 个 embedding (没有就填 0)
+Language 用 2.6B Pretrained LLM Gemma, 得到 embedding
+最后是关节信息，最多会有 18 个(没有就填 0)。
+之后运用 Diffusion Policy 来生成每一步的动作
+生成的是 $p(A_t|O_t)$, 即，在给定条件(环境下)，每一个动作的概率。
+这时给一个 chunk 内的真实动作加噪音，然后让模型学习如何去噪。
+方式如下：
+随机采一个噪声级别 $\tau$，采一个高斯噪声 $\varepsilon$； 构造带噪动作块 $A_t^\tau = \tau A_t &#43; (1 - \tau)\varepsilon$； 用观测 $o_t$ 与 $A_t^\tau$ 输入网络，预测去噪速度场 $v_\theta(A_t^\tau, o_t) &lt;-&gt; \varepsilon - A_t$； 以 $\left| v_\theta - (\varepsilon - A_t) \right|^2$ 作为监督信号； 推理的时候就会把这个过程分成 10-20步，每一步去噪一点点，最终得到一个动作 注：“这个过程&#34;指的是随机生成一个噪声，然后从这个噪声去噪的过程
+...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-02-02 21:31:49 -0500 EST'>February 2, 2025</span>&nbsp;·&nbsp;1 min</footer>
-  <a class="entry-link" aria-label="post link to Bug Journal 2025-02-02" href="https://tzj2006.github.io/bugjournal/2025-02-02/"></a>
+  <footer class="entry-footer"><span title='2025-05-30 17:06:08 +0800 +0800'>May 30, 2025</span>&nbsp;·&nbsp;2 min</footer>
+  <a class="entry-link" aria-label="post link to Bug Journal 2025-05-31" href="https://tzj2006.github.io/bugjournal/2025-05-31/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Bug Journal 2025-01-24
+    <h2 class="entry-hint-parent">Bug Journal 2025-05-30
     </h2>
   </header>
   <div class="entry-content">
-    <p>ipykernel, PID</p>
+    <p>Docker 的安装和调试</p>
   </div>
-  <footer class="entry-footer"><span title='2025-01-24 11:49:30 -0500 EST'>January 24, 2025</span>&nbsp;·&nbsp;1 min</footer>
-  <a class="entry-link" aria-label="post link to Bug Journal 2025-01-24" href="https://tzj2006.github.io/bugjournal/2025-01-24/"></a>
+  <footer class="entry-footer"><span title='2025-05-30 11:04:48 +0800 +0800'>May 30, 2025</span>&nbsp;·&nbsp;2 min</footer>
+  <a class="entry-link" aria-label="post link to Bug Journal 2025-05-30" href="https://tzj2006.github.io/bugjournal/2025-05-30/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Bug Journal 2025-01-17
+    <h2 class="entry-hint-parent">Bug Journal 2025-05-29
     </h2>
   </header>
   <div class="entry-content">
-    <p>Ollama</p>
+    <p>Paper review 2025-05-29</p>
   </div>
-  <footer class="entry-footer"><span title='2025-01-17 14:14:30 -0500 EST'>January 17, 2025</span>&nbsp;·&nbsp;1 min</footer>
-  <a class="entry-link" aria-label="post link to Bug Journal 2025-01-17" href="https://tzj2006.github.io/bugjournal/2025-01-17/"></a>
+  <footer class="entry-footer"><span title='2025-05-29 09:30:00 +0800 +0800'>May 29, 2025</span>&nbsp;·&nbsp;1 min</footer>
+  <a class="entry-link" aria-label="post link to Bug Journal 2025-05-29" href="https://tzj2006.github.io/bugjournal/2025-05-29/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Bug Journal 2025-01-14
+    <h2 class="entry-hint-parent">Bug Journal 2025-05-28
     </h2>
   </header>
   <div class="entry-content">
-    <p>Part module load When you want to use something on the server, please first check whether it is on the server or not.
-Use this command:
-module avail Then load using this command:
-module load [your model name] Important:
-You can always email rescomputing@duke.edu to get support.
-</p>
+    <p>2025-05-28 论文阅读笔记</p>
   </div>
-  <footer class="entry-footer"><span title='2025-01-14 14:53:30 -0500 EST'>January 14, 2025</span>&nbsp;·&nbsp;1 min</footer>
-  <a class="entry-link" aria-label="post link to Bug Journal 2025-01-14" href="https://tzj2006.github.io/bugjournal/2025-01-14/"></a>
+  <footer class="entry-footer"><span title='2025-05-28 14:41:55 +0800 +0800'>May 28, 2025</span>&nbsp;·&nbsp;2 min</footer>
+  <a class="entry-link" aria-label="post link to Bug Journal 2025-05-28" href="https://tzj2006.github.io/bugjournal/2025-05-28/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Bug Journal 2025-01-12
+    <h2 class="entry-hint-parent">Bug Journal 2025-05-27
     </h2>
   </header>
   <div class="entry-content">
-    <p>When facing this problem, you can stop using GPU and change to CPU and check the error.
-</p>
+    <p>A template for reading AI papers</p>
   </div>
-  <footer class="entry-footer"><span title='2025-01-12 22:45:56 -0500 EST'>January 12, 2025</span>&nbsp;·&nbsp;1 min</footer>
-  <a class="entry-link" aria-label="post link to Bug Journal 2025-01-12" href="https://tzj2006.github.io/bugjournal/2025-01-12/"></a>
+  <footer class="entry-footer"><span title='2025-05-27 16:00:00 +0800 +0800'>May 27, 2025</span>&nbsp;·&nbsp;1 min</footer>
+  <a class="entry-link" aria-label="post link to Bug Journal 2025-05-27" href="https://tzj2006.github.io/bugjournal/2025-05-27/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">
