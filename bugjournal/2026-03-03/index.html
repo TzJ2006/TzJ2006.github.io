@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-03 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="在 macOS 桌面壁纸应用上完成屏保时钟独立窗口 &#43; .behindWindow 架构重构及全系列 Bug 修复（灰色重影/窗口遮挡/视频切换），同时在天河集群完成 Pi0.5 全量 MimicGen 评测（9 任务）并梳理 Pi0.5/BC-RNN 训练现状，但历史视频黑屏回归与完整 evaluation 计划仍待实施。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-03-03/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.af858c2feef42adc7846f815c3e21de9982d82f8fc4f65879451b2686859975a.css" integrity="sha256-r4WML&#43;70Ktx4RvgVw&#43;Id6Zgtgvj8T2WHlFGyaGhZl1o=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-03-03/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-03-03/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-03">
+  <meta property="og:description" content="在 macOS 桌面壁纸应用上完成屏保时钟独立窗口 &#43; .behindWindow 架构重构及全系列 Bug 修复（灰色重影/窗口遮挡/视频切换），同时在天河集群完成 Pi0.5 全量 MimicGen 评测（9 任务）并梳理 Pi0.5/BC-RNN 训练现状，但历史视频黑屏回归与完整 evaluation 计划仍待实施。">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-03T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-03T00:00:00-05:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Bug Journal 2026-03-03">
+<meta name="twitter:description" content="在 macOS 桌面壁纸应用上完成屏保时钟独立窗口 &#43; .behindWindow 架构重构及全系列 Bug 修复（灰色重影/窗口遮挡/视频切换），同时在天河集群完成 Pi0.5 全量 MimicGen 评测（9 任务）并梳理 Pi0.5/BC-RNN 训练现状，但历史视频黑屏回归与完整 evaluation 计划仍待实施。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "BugJournals",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-03-03",
+      "item": "https://tzj2006.github.io/bugjournal/2026-03-03/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-03",
+  "name": "Bug Journal 2026-03-03",
+  "description": "在 macOS 桌面壁纸应用上完成屏保时钟独立窗口 + .behindWindow 架构重构及全系列 Bug 修复（灰色重影/窗口遮挡/视频切换），同时在天河集群完成 Pi0.5 全量 MimicGen 评测（9 任务）并梳理 Pi0.5/BC-RNN 训练现状，但历史视频黑屏回归与完整 evaluation 计划仍待实施。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-03 在 macOS 桌面壁纸应用上完成屏保时钟独立窗口 + .behindWindow 架构重构及全系列 Bug 修复（灰色重影/窗口遮挡/视频切换），同时在天河集群完成 Pi0.5 全量 MimicGen 评测（9 任务）并梳理 Pi0.5/BC-RNN 训练现状，但历史视频黑屏回归与完整 evaluation 计划仍待实施。\n今日任务 架构与策略 ✅ 屏保时钟架构重构（独立窗口 + .behindWindow） — 经历 .withinWindow、SwiftUI material、NSHostingView 快照等多轮失败方案后，确立最终架构：将时钟拆分为独立透明 NSWindow，使用 .behindWindow NSVisualEffectView + NSAttributedString 生成 CALayer 文字遮罩，由窗口服务器在合成层面实现可透视硬件加速视频的毛玻璃文字效果。 ✅ 屏保时钟衍生 Bug 修复系列（重影/遮挡/动画/字重） — ① renderTextMask 空白位图（NSHostingView 不实现 draw(_:)，改用 NSAttributedString）② 视频重载后时钟被壁纸窗口覆盖（重排 clockWindow 层叠顺序）③ CALayer 隐式动画产生灰色残影（CATransaction.setDisableActions(true)）④ 三处字重不一致导致毛玻璃边缘溢出（统一 .regular） ✅ Pi0.5 MimicGen 全量批量评测（9 任务） — 在 an46 节点通过 Slurm job 47209 完成全部 9 个 MimicGen 任务的批量评测（每任务 20 次 trial）。Stack D0/D1 达 100%/95%，StackThree D0/D1 达 80%/90%，Coffee D0 45%，Threading D0 45%，ThreePieceAssembly D0/D1 均为 30%，结果保存至 outputs/pi05_eval_results_batched/。 🔄 修复重启后历史视频黑屏回归 — 视频切换 URL 校验 guard 引入回归：重启后历史记录 URL 无沙盒权限，guard 直接返回无权限原始 URL 导致黑屏。需区分 NSOpenPanel 来源（自带临时权限，可直接使用）与历史记录来源（必须走书签恢复路径），方案已设计但 ExitPlanMode 被拒，待下次实施。 ✅ 视频切换 Bug 修复（ensureFileAccess URL 校验） — 在 SharedWallpaperWindowManager.ensureFileAccess() 中添加 guard：书签解析结果与请求 URL 不一致时返回原始 URL（NSOpenPanel URL 自带临时沙盒权限），修复了书签按屏幕 ID 存储导致切换后仍播放旧视频的问题。 🔄 统计 Pi0.5 与 BC-RNN 训练现状 — 调查所有训练 checkpoint 目录：Pi0.5 主流任务已达 step 17000-18000（threading/assembly 约 10000），BC-RNN 全部 9 个任务已完成 epoch 600。历史 m14 base model evaluation 成功率 0%。完整 evaluation 执行和视频渲染计划尚未实施。 ✅ 无视频时黑屏屏保支持 — 移除屏保启动对媒体内容的 guard 限制，遍历所有 NSScreen 分两路处理：有壁纸窗口则提升现有窗口，无则创建黑色背景 NSWindow 并显示时钟；updateClockLabels 同步更新支持逻辑，菜单项始终启用。 实现与修复 ✅ 历史记录缩略图沙盒权限修复 + CPU/VKC 优化 — ① ThumbnailGenerator 在创建 AVAsset/NSImage 前从 BookmarkStore 激活 per-URL 安全作用域书签，修复历史视频缩略图空白；② 移除 updatePlaybackStateForAllScreens() 中多余的精确帧 seek，仅播放状态变化时发送通知；③ 为 AVPlayerView 禁用 allowsVideoFrameAnalysis 消除 VKCImageAnalyzerRequest 报错。 ✅ 调查 an53 NODE_FAIL 崩溃原因 — 通过 sacct 确认 an53 于 08:30 发生 NODE_FAIL 崩溃（09:41 重启完成），与 AI 操作（05:07 前完成只读命令）无关，最可能原因为 8 个 GPU 满载过热或 OOM。SSH 访问需先清除旧 known_hosts 并重新申请 Slurm interactive job。 ✅ Version 4.1 ChangeLog 整合发布 — 将 Preview 0228/0301/0302 三个条目合并为正式 Version 4.1，按屏保、历史记录、书签与权限、播放模式、性能与稳定性、窗口管理 6 类组织，内容从约 38 条精简至 18 条（减少约 53%），保留中英双语格式。 问题与解决方案 关键问题 1. NSVisualEffectView 无法为 AVPlayerView 硬件加速视频提供毛玻璃效果：.withinWindow 无法采样 Metal/CoreVideo 渲染内容，SwiftUI .ultraThinMaterial 内部使用 .behindWindow 采样桌面而非窗口内视频 解决方案: 将时钟移至独立 NSWindow，使用 .behindWindow 混合模式，由窗口服务器在合成层面处理模糊，可正确透视所有后方窗口内容（包括 Metal/CoreVideo 渲染）\n关键洞察: AVPlayerView 通过 Metal/CoreVideo 在独立 compositing surface 渲染，不参与同窗口内的内容采样；.behindWindow 在窗口服务器层面工作，是唯一能突破此限制的方式\n2. NSHostingView.cacheDisplay 生成空白位图，renderTextMask 始终返回 nil，时钟完全不可见 解决方案: 改用 NSAttributedString + NSImage 绘制路径，完全绕开 SwiftUI/CALayer 渲染机制\n关键洞察: NSHostingView 完全通过 CALayer 渲染，不实现 draw(:)；cacheDisplay 依赖 draw(:)，对 NSHostingView 永远返回空白 bitmap\n3. 视频切换后仍播放旧视频：书签按屏幕 ID 存储，解析出旧视频 URL，allowReuse 判定复用旧播放器 解决方案: 在书签解析后对比解析结果与请求 URL，不一致则返回原始 URL（NSOpenPanel URL 自带临时沙盒访问权限）\n关键洞察: NSOpenPanel 返回的 URL 自带临时沙盒权限，无需书签；书签只在 saveBookmark() 中更新，应信任 Panel 来源的 URL\n4. URL 校验 guard 引入回归：重启后历史记录 URL 无沙盒权限，guard 直接返回无权限 URL 导致黑屏 解决方案: 需区分 URL 来源：NSOpenPanel 来源可直接使用，历史记录来源必须走书签恢复路径（即使路径不同也应尝试书签获取权限）\n关键洞察: 两类 URL 的沙盒权限模型完全不同，不能用统一逻辑处理；修复切换 bug 时过度简化了判断逻辑，未考虑持久化场景\n5. reloadAndPlayVideo 后时钟窗口被视频窗口覆盖，时钟消失 解决方案: 视频重载完成后遍历 clockWindows，调用 clockWin.order(.above, relativeTo: wallpaperWin.windowNumber) 重排层叠顺序\n关键洞察: showVideo → ensureWallpaperController → orderFrontRegardless() 会将壁纸窗口无条件置顶，独立时钟窗口不会自动跟随，需手动维护层叠关系\n6. 每秒更新遮罩时 CALayer 隐式动画（~0.25s 交叉淡出）产生灰色数字残影 解决方案: 在 contents/frame 赋值前后用 CATransaction.begin() + setDisableActions(true) + commit() 禁用隐式动画\n关键洞察: CALayer 默认对 contents 属性执行约 0.25s 交叉淡出；旧遮罩在新遮罩渐入过程中以灰色形式显现，且字重不一致会进一步扩大毛玻璃溢出范围\n7. 三处字重不一致（Highlight .light vs Mask .regular）导致毛玻璃从文字边缘溢出 解决方案: 将三处时间字重统一为 .regular，保持遮罩形状与高光文字完全对齐\n关键洞察: 遮罩决定 NSVisualEffectView 的裁剪边界；遮罩比高光更粗时，灰色毛玻璃会从高光文字边缘露出\n一般问题 8. 历史视频缩略图在沙盒环境无读取权限，ThumbnailGenerator 静默返回 nil 解决方案: 在读取文件前从 BookmarkStore 获取 per-URL 书签并激活安全作用域访问，通过 defer 释放\n关键洞察: 沙盒 app 读取历史文件需显式激活安全作用域书签；AVAsset 和 NSImage(contentsOf:) 不会自动获取权限\n人类思路 vs AI 思路 战略层面 屏保架构选择的迭代过程 角色 思路 人类 通过多次拒绝 ExitPlanMode 驱动 AI 不断深入调研，在 .behindWindow 独立窗口方案上批准实施 AI 经历 .withinWindow、SwiftUI material、NSHostingView 快照等多个失败方案后，通过 Agent 调研 AVPlayerView 渲染机制，最终找到正确的独立窗口架构 差异分析: 人类通过持续否定过滤错误方向，AI 能系统调研技术文档找到架构级方案，两者协作完成了复杂的架构决策\n时钟不可见的根因定位 角色 思路 人类 直觉地指出「会不会是 label 在 video 下面」，直接指向窗口层叠顺序问题 AI 从 renderTextMask 空白位图角度入手，检查 NSFont、contentsGravity 等代码细节，命中了 NSHostingView 不实现 draw(_:) 的独立问题 差异分析: 人类从视觉现象推断物理原因（遮挡），AI 从代码数据流角度分析，两个诊断方向互补命中了两个不同 bug\nBug 修复引入的回归问题 角色 思路 人类 实际运行后发现重启时历史视频黑屏，主动指出 AI 的修复引入了新 bug AI 只聚焦于修复切换 bug 的正向路径，未考虑重启场景下历史 URL 的权限差异 差异分析: AI 缺乏对两类 URL 来源权限模型差异的全局认知；人类通过实际测试发现了 AI 方案的盲区，证明实测反馈是发现系统级 bug 的关键路径\n数字切换动画的改进方向 角色 思路 人类 要求减少数字变化的明显程度；当 AI 的 crossfade 方案引入新重影后，立即感知并要求回滚 AI 主动提出 CABasicAnimation crossfade 方案，认为可平滑过渡 差异分析: AI 的理论方案适得其反；人类的实时视觉感知比代码推断更直接可靠，是最终方向判断的决定因素\n过度规划而非直接实施 角色 思路 人类 提供了明确的实现计划，期望 AI 直接执行 AI 读取文件后再次启动多个 Agent 进行探索和规划，重新产出计划而非实施，导致同一任务浪费一整个会话 差异分析: AI 在获得明确任务后仍倾向于过度分析；人类的明确指令应触发执行而非规划\nAI 局限性 重要局限 修复视频切换 bug 时未充分考虑 NSOpenPanel URL 与历史记录 URL 的沙盒权限模型差异，一个修复破坏了另一功能（历史视频黑屏回归），暴露了对跨场景副作用评估不足的问题 对 AVPlayerView 硬件加速渲染与 NSVisualEffectView 兼容性预判不足，先后尝试 .withinWindow 和 SwiftUI material 等无效方案，需多轮失败迭代后才确定正确架构 使用 NSHostingView.cacheDisplay 快照 SwiftUI 视图，未预见 NSHostingView 不实现 draw(_:) 的基础限制，导致 renderTextMask 始终返回 nil 并引入「时钟完全不可见」的严重 bug 主动提出的 CABasicAnimation crossfade 方案未达预期，反而引入灰色重影新 bug；过度信任理论分析，需依赖人类实时视觉反馈才能发现问题 获得明确实现计划时仍反复启动多 Agent 重新规划，过度分析而非执行；且集群训练状态调查在 session 内未能完整输出结构化结论，用户需求未完全闭环 今日收获 核心收获 AVPlayerView 通过 Metal/CoreVideo 在独立 compositing surface 渲染，不参与同窗口内容采样。为硬件加速视频添加毛玻璃效果的正确模式：独立透明 NSWindow + .behindWindow NSVisualEffectView，由窗口服务器在合成层面处理，可突破所有渲染层隔离限制 NSHostingView 完全通过 CALayer 渲染，不实现 draw(:)；cacheDisplay 对其永远返回空白 bitmap。需要 bitmap 快照时须改用 NSAttributedString 绘制或 CALayer.render(in:)，不能依赖任何基于 draw(:) 的快照机制 沙盒权限有两种来源，必须分别处理：NSOpenPanel 返回的 URL 自带会话级临时访问权限（可直接使用）；历史记录/重启场景必须通过 security-scoped bookmark 恢复持久权限。用统一逻辑处理两类来源是常见的回归来源 CALayer 的 contents/frame 属性默认有约 0.25s 隐式动画；需要即时更新遮罩/内容时，必须用 CATransaction.begin() + setDisableActions(true) + commit() 包裹赋值操作，否则产生视觉残影 macOS 独立覆盖窗口架构中，任何调用 orderFrontRegardless() 的操作都会打乱层叠顺序；需在每次视频重载/窗口刷新后主动调用 order(.above, relativeTo:) 重排所有覆盖层，不能假设层叠顺序会自动保持 Pi0.5 在 Stack 类任务上泛化良好（step 17000 时 Stack D0 100%、D1 95%），但对 Coffee 和 ThreePieceAssembly 等高精度任务仍需更多训练步数或更大数据集；BC-RNN 全部 9 任务 epoch 600 已完成，可作为基线对比 会话摘要 Desktop Video Wallpaper 🔄 屏保时钟架构重构（.behindWindow 独立窗口）+ 多轮 Bug 修复 + 视频切换修复 + 4.1 发布 04:41:21.822 | claude_code 全天围绕屏保时钟与视频切换展开多轮迭代。早期多次探索与规划（ExitPlanMode 被拒）后，在 02:55 会话成功实施 .behindWindow 独立窗口架构，并逐步解决空白位图（改用 NSAttributedString）、窗口遮挡（重排层叠顺序）、CALayer 隐式动画灰色重影（setDisableActions）、字重不一致（统一 .regular）等衍生 bug。并行完成：无视频黑屏屏保支持、时钟可读性增强（透明度 0.35→0.85，3 层阴影）、历史缩略图沙盒权限修复、CPU/VKC 优化。在另一会话修复了视频切换播放旧视频 bug，但引入了重启后历史视频黑屏回归（方案已设计，待实施）。最终整合发布 Version 4.1 ChangeLog（38 条精简至 18 条）。\nErrorRecoveryBenchmark 🔄 Pi0.5 全量评测完成 + an53 崩溃调查 + Pi0.5/BC-RNN 训练现状梳理 04:34:57.802 | claude_code 在 an46 节点通过 Slurm job 47209 完成 Pi0.5 全部 9 个 MimicGen 任务批量评测（每任务 20 次），Stack 系列表现优异（95-100%），ThreePieceAssembly 最难（30%）。调查 an53 于 08:30 发生的 NODE_FAIL 崩溃，通过时间线分析确认与 AI 操作无关（最可能原因为 GPU 满载过热/OOM），09:41 重启完成。梳理训练现状：Pi0.5 主流任务 step 17000-18000，BC-RNN 全部 9 任务 epoch 600 完成。完整 evaluation 执行和视频渲染计划因 session 结束未实施。\nToken 用量 总览 指标 数值 总 Token 32,238,027 输入 Token 35,274 输出 Token 68,731 Cache 创建 1,212,927 Cache 读取 30,921,095 Cache 命中率 96.2% 总费用 (USD) $21.0427 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 9,105 50,510 829,702 27,150,981 $20.0694 95.4% claude-haiku-4-5-20251001 26,169 18,221 383,225 3,770,114 $0.9733 4.6% ",
+  "wordCount" : "776",
+  "inLanguage": "en",
+  "datePublished": "2026-03-03T00:00:00-05:00",
+  "dateModified": "2026-03-03T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-03-03/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-03
+    </h1>
+    <div class="post-meta"><span title='2026-03-03 00:00:00 -0500 EST'>March 3, 2026</span>&nbsp;·&nbsp;4 min
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-03">日报 — 2026-03-03<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-03">#</a></h1>
+<blockquote>
+<p>在 macOS 桌面壁纸应用上完成屏保时钟独立窗口 + .behindWindow 架构重构及全系列 Bug 修复（灰色重影/窗口遮挡/视频切换），同时在天河集群完成 Pi0.5 全量 MimicGen 评测（9 任务）并梳理 Pi0.5/BC-RNN 训练现状，但历史视频黑屏回归与完整 evaluation 计划仍待实施。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>屏保时钟架构重构（独立窗口 + .behindWindow）</strong> — 经历 .withinWindow、SwiftUI material、NSHostingView 快照等多轮失败方案后，确立最终架构：将时钟拆分为独立透明 NSWindow，使用 .behindWindow NSVisualEffectView + NSAttributedString 生成 CALayer 文字遮罩，由窗口服务器在合成层面实现可透视硬件加速视频的毛玻璃文字效果。</li>
+<li>✅ <strong>屏保时钟衍生 Bug 修复系列（重影/遮挡/动画/字重）</strong> — ① renderTextMask 空白位图（NSHostingView 不实现 draw(_:)，改用 NSAttributedString）② 视频重载后时钟被壁纸窗口覆盖（重排 clockWindow 层叠顺序）③ CALayer 隐式动画产生灰色残影（CATransaction.setDisableActions(true)）④ 三处字重不一致导致毛玻璃边缘溢出（统一 .regular）</li>
+<li>✅ <strong>Pi0.5 MimicGen 全量批量评测（9 任务）</strong> — 在 an46 节点通过 Slurm job 47209 完成全部 9 个 MimicGen 任务的批量评测（每任务 20 次 trial）。Stack D0/D1 达 100%/95%，StackThree D0/D1 达 80%/90%，Coffee D0 45%，Threading D0 45%，ThreePieceAssembly D0/D1 均为 30%，结果保存至 outputs/pi05_eval_results_batched/。</li>
+<li>🔄 <strong>修复重启后历史视频黑屏回归</strong> — 视频切换 URL 校验 guard 引入回归：重启后历史记录 URL 无沙盒权限，guard 直接返回无权限原始 URL 导致黑屏。需区分 NSOpenPanel 来源（自带临时权限，可直接使用）与历史记录来源（必须走书签恢复路径），方案已设计但 ExitPlanMode 被拒，待下次实施。</li>
+<li>✅ <strong>视频切换 Bug 修复（ensureFileAccess URL 校验）</strong> — 在 SharedWallpaperWindowManager.ensureFileAccess() 中添加 guard：书签解析结果与请求 URL 不一致时返回原始 URL（NSOpenPanel URL 自带临时沙盒权限），修复了书签按屏幕 ID 存储导致切换后仍播放旧视频的问题。</li>
+<li>🔄 <strong>统计 Pi0.5 与 BC-RNN 训练现状</strong> — 调查所有训练 checkpoint 目录：Pi0.5 主流任务已达 step 17000-18000（threading/assembly 约 10000），BC-RNN 全部 9 个任务已完成 epoch 600。历史 m14 base model evaluation 成功率 0%。完整 evaluation 执行和视频渲染计划尚未实施。</li>
+<li>✅ <strong>无视频时黑屏屏保支持</strong> — 移除屏保启动对媒体内容的 guard 限制，遍历所有 NSScreen 分两路处理：有壁纸窗口则提升现有窗口，无则创建黑色背景 NSWindow 并显示时钟；updateClockLabels 同步更新支持逻辑，菜单项始终启用。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>历史记录缩略图沙盒权限修复 + CPU/VKC 优化</strong> — ① ThumbnailGenerator 在创建 AVAsset/NSImage 前从 BookmarkStore 激活 per-URL 安全作用域书签，修复历史视频缩略图空白；② 移除 updatePlaybackStateForAllScreens() 中多余的精确帧 seek，仅播放状态变化时发送通知；③ 为 AVPlayerView 禁用 allowsVideoFrameAnalysis 消除 VKCImageAnalyzerRequest 报错。</li>
+<li>✅ <strong>调查 an53 NODE_FAIL 崩溃原因</strong> — 通过 sacct 确认 an53 于 08:30 发生 NODE_FAIL 崩溃（09:41 重启完成），与 AI 操作（05:07 前完成只读命令）无关，最可能原因为 8 个 GPU 满载过热或 OOM。SSH 访问需先清除旧 known_hosts 并重新申请 Slurm interactive job。</li>
+<li>✅ <strong>Version 4.1 ChangeLog 整合发布</strong> — 将 Preview 0228/0301/0302 三个条目合并为正式 Version 4.1，按屏保、历史记录、书签与权限、播放模式、性能与稳定性、窗口管理 6 类组织，内容从约 38 条精简至 18 条（减少约 53%），保留中英双语格式。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-nsvisualeffectview-无法为-avplayerview-硬件加速视频提供毛玻璃效果withinwindow-无法采样-metalcorevideo-渲染内容swiftui-ultrathinmaterial-内部使用-behindwindow-采样桌面而非窗口内视频">1. NSVisualEffectView 无法为 AVPlayerView 硬件加速视频提供毛玻璃效果：.withinWindow 无法采样 Metal/CoreVideo 渲染内容，SwiftUI .ultraThinMaterial 内部使用 .behindWindow 采样桌面而非窗口内视频<a hidden class="anchor" aria-hidden="true" href="#1-nsvisualeffectview-无法为-avplayerview-硬件加速视频提供毛玻璃效果withinwindow-无法采样-metalcorevideo-渲染内容swiftui-ultrathinmaterial-内部使用-behindwindow-采样桌面而非窗口内视频">#</a></h4>
+<p><strong>解决方案:</strong> 将时钟移至独立 NSWindow，使用 .behindWindow 混合模式，由窗口服务器在合成层面处理模糊，可正确透视所有后方窗口内容（包括 Metal/CoreVideo 渲染）</p>
+<p><strong>关键洞察:</strong> AVPlayerView 通过 Metal/CoreVideo 在独立 compositing surface 渲染，不参与同窗口内的内容采样；.behindWindow 在窗口服务器层面工作，是唯一能突破此限制的方式</p>
+<h4 id="2-nshostingviewcachedisplay-生成空白位图rendertextmask-始终返回-nil时钟完全不可见">2. NSHostingView.cacheDisplay 生成空白位图，renderTextMask 始终返回 nil，时钟完全不可见<a hidden class="anchor" aria-hidden="true" href="#2-nshostingviewcachedisplay-生成空白位图rendertextmask-始终返回-nil时钟完全不可见">#</a></h4>
+<p><strong>解决方案:</strong> 改用 NSAttributedString + NSImage 绘制路径，完全绕开 SwiftUI/CALayer 渲染机制</p>
+<p><strong>关键洞察:</strong> NSHostingView 完全通过 CALayer 渲染，不实现 draw(<em>:)；cacheDisplay 依赖 draw(</em>:)，对 NSHostingView 永远返回空白 bitmap</p>
+<h4 id="3-视频切换后仍播放旧视频书签按屏幕-id-存储解析出旧视频-urlallowreuse-判定复用旧播放器">3. 视频切换后仍播放旧视频：书签按屏幕 ID 存储，解析出旧视频 URL，allowReuse 判定复用旧播放器<a hidden class="anchor" aria-hidden="true" href="#3-视频切换后仍播放旧视频书签按屏幕-id-存储解析出旧视频-urlallowreuse-判定复用旧播放器">#</a></h4>
+<p><strong>解决方案:</strong> 在书签解析后对比解析结果与请求 URL，不一致则返回原始 URL（NSOpenPanel URL 自带临时沙盒访问权限）</p>
+<p><strong>关键洞察:</strong> NSOpenPanel 返回的 URL 自带临时沙盒权限，无需书签；书签只在 saveBookmark() 中更新，应信任 Panel 来源的 URL</p>
+<h4 id="4-url-校验-guard-引入回归重启后历史记录-url-无沙盒权限guard-直接返回无权限-url-导致黑屏">4. URL 校验 guard 引入回归：重启后历史记录 URL 无沙盒权限，guard 直接返回无权限 URL 导致黑屏<a hidden class="anchor" aria-hidden="true" href="#4-url-校验-guard-引入回归重启后历史记录-url-无沙盒权限guard-直接返回无权限-url-导致黑屏">#</a></h4>
+<p><strong>解决方案:</strong> 需区分 URL 来源：NSOpenPanel 来源可直接使用，历史记录来源必须走书签恢复路径（即使路径不同也应尝试书签获取权限）</p>
+<p><strong>关键洞察:</strong> 两类 URL 的沙盒权限模型完全不同，不能用统一逻辑处理；修复切换 bug 时过度简化了判断逻辑，未考虑持久化场景</p>
+<h4 id="5-reloadandplayvideo-后时钟窗口被视频窗口覆盖时钟消失">5. reloadAndPlayVideo 后时钟窗口被视频窗口覆盖，时钟消失<a hidden class="anchor" aria-hidden="true" href="#5-reloadandplayvideo-后时钟窗口被视频窗口覆盖时钟消失">#</a></h4>
+<p><strong>解决方案:</strong> 视频重载完成后遍历 clockWindows，调用 clockWin.order(.above, relativeTo: wallpaperWin.windowNumber) 重排层叠顺序</p>
+<p><strong>关键洞察:</strong> showVideo → ensureWallpaperController → orderFrontRegardless() 会将壁纸窗口无条件置顶，独立时钟窗口不会自动跟随，需手动维护层叠关系</p>
+<h4 id="6-每秒更新遮罩时-calayer-隐式动画025s-交叉淡出产生灰色数字残影">6. 每秒更新遮罩时 CALayer 隐式动画（~0.25s 交叉淡出）产生灰色数字残影<a hidden class="anchor" aria-hidden="true" href="#6-每秒更新遮罩时-calayer-隐式动画025s-交叉淡出产生灰色数字残影">#</a></h4>
+<p><strong>解决方案:</strong> 在 contents/frame 赋值前后用 CATransaction.begin() + setDisableActions(true) + commit() 禁用隐式动画</p>
+<p><strong>关键洞察:</strong> CALayer 默认对 contents 属性执行约 0.25s 交叉淡出；旧遮罩在新遮罩渐入过程中以灰色形式显现，且字重不一致会进一步扩大毛玻璃溢出范围</p>
+<h4 id="7-三处字重不一致highlight-light-vs-mask-regular导致毛玻璃从文字边缘溢出">7. 三处字重不一致（Highlight .light vs Mask .regular）导致毛玻璃从文字边缘溢出<a hidden class="anchor" aria-hidden="true" href="#7-三处字重不一致highlight-light-vs-mask-regular导致毛玻璃从文字边缘溢出">#</a></h4>
+<p><strong>解决方案:</strong> 将三处时间字重统一为 .regular，保持遮罩形状与高光文字完全对齐</p>
+<p><strong>关键洞察:</strong> 遮罩决定 NSVisualEffectView 的裁剪边界；遮罩比高光更粗时，灰色毛玻璃会从高光文字边缘露出</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="8-历史视频缩略图在沙盒环境无读取权限thumbnailgenerator-静默返回-nil">8. 历史视频缩略图在沙盒环境无读取权限，ThumbnailGenerator 静默返回 nil<a hidden class="anchor" aria-hidden="true" href="#8-历史视频缩略图在沙盒环境无读取权限thumbnailgenerator-静默返回-nil">#</a></h4>
+<p><strong>解决方案:</strong> 在读取文件前从 BookmarkStore 获取 per-URL 书签并激活安全作用域访问，通过 defer 释放</p>
+<p><strong>关键洞察:</strong> 沙盒 app 读取历史文件需显式激活安全作用域书签；AVAsset 和 NSImage(contentsOf:) 不会自动获取权限</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="屏保架构选择的迭代过程">屏保架构选择的迭代过程<a hidden class="anchor" aria-hidden="true" href="#屏保架构选择的迭代过程">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>通过多次拒绝 ExitPlanMode 驱动 AI 不断深入调研，在 .behindWindow 独立窗口方案上批准实施</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>经历 .withinWindow、SwiftUI material、NSHostingView 快照等多个失败方案后，通过 Agent 调研 AVPlayerView 渲染机制，最终找到正确的独立窗口架构</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类通过持续否定过滤错误方向，AI 能系统调研技术文档找到架构级方案，两者协作完成了复杂的架构决策</p>
+<h4 id="时钟不可见的根因定位">时钟不可见的根因定位<a hidden class="anchor" aria-hidden="true" href="#时钟不可见的根因定位">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>直觉地指出「会不会是 label 在 video 下面」，直接指向窗口层叠顺序问题</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>从 renderTextMask 空白位图角度入手，检查 NSFont、contentsGravity 等代码细节，命中了 NSHostingView 不实现 draw(_:) 的独立问题</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类从视觉现象推断物理原因（遮挡），AI 从代码数据流角度分析，两个诊断方向互补命中了两个不同 bug</p>
+<h4 id="bug-修复引入的回归问题">Bug 修复引入的回归问题<a hidden class="anchor" aria-hidden="true" href="#bug-修复引入的回归问题">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>实际运行后发现重启时历史视频黑屏，主动指出 AI 的修复引入了新 bug</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>只聚焦于修复切换 bug 的正向路径，未考虑重启场景下历史 URL 的权限差异</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI 缺乏对两类 URL 来源权限模型差异的全局认知；人类通过实际测试发现了 AI 方案的盲区，证明实测反馈是发现系统级 bug 的关键路径</p>
+<h4 id="数字切换动画的改进方向">数字切换动画的改进方向<a hidden class="anchor" aria-hidden="true" href="#数字切换动画的改进方向">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>要求减少数字变化的明显程度；当 AI 的 crossfade 方案引入新重影后，立即感知并要求回滚</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>主动提出 CABasicAnimation crossfade 方案，认为可平滑过渡</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI 的理论方案适得其反；人类的实时视觉感知比代码推断更直接可靠，是最终方向判断的决定因素</p>
+<h4 id="过度规划而非直接实施">过度规划而非直接实施<a hidden class="anchor" aria-hidden="true" href="#过度规划而非直接实施">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>提供了明确的实现计划，期望 AI 直接执行</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>读取文件后再次启动多个 Agent 进行探索和规划，重新产出计划而非实施，导致同一任务浪费一整个会话</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI 在获得明确任务后仍倾向于过度分析；人类的明确指令应触发执行而非规划</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>修复视频切换 bug 时未充分考虑 NSOpenPanel URL 与历史记录 URL 的沙盒权限模型差异，一个修复破坏了另一功能（历史视频黑屏回归），暴露了对跨场景副作用评估不足的问题</li>
+<li>对 AVPlayerView 硬件加速渲染与 NSVisualEffectView 兼容性预判不足，先后尝试 .withinWindow 和 SwiftUI material 等无效方案，需多轮失败迭代后才确定正确架构</li>
+<li>使用 NSHostingView.cacheDisplay 快照 SwiftUI 视图，未预见 NSHostingView 不实现 draw(_:) 的基础限制，导致 renderTextMask 始终返回 nil 并引入「时钟完全不可见」的严重 bug</li>
+<li>主动提出的 CABasicAnimation crossfade 方案未达预期，反而引入灰色重影新 bug；过度信任理论分析，需依赖人类实时视觉反馈才能发现问题</li>
+<li>获得明确实现计划时仍反复启动多 Agent 重新规划，过度分析而非执行；且集群训练状态调查在 session 内未能完整输出结构化结论，用户需求未完全闭环</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>AVPlayerView 通过 Metal/CoreVideo 在独立 compositing surface 渲染，不参与同窗口内容采样。为硬件加速视频添加毛玻璃效果的正确模式：独立透明 NSWindow + .behindWindow NSVisualEffectView，由窗口服务器在合成层面处理，可突破所有渲染层隔离限制</li>
+<li>NSHostingView 完全通过 CALayer 渲染，不实现 draw(<em>:)；cacheDisplay 对其永远返回空白 bitmap。需要 bitmap 快照时须改用 NSAttributedString 绘制或 CALayer.render(in:)，不能依赖任何基于 draw(</em>:) 的快照机制</li>
+<li>沙盒权限有两种来源，必须分别处理：NSOpenPanel 返回的 URL 自带会话级临时访问权限（可直接使用）；历史记录/重启场景必须通过 security-scoped bookmark 恢复持久权限。用统一逻辑处理两类来源是常见的回归来源</li>
+<li>CALayer 的 contents/frame 属性默认有约 0.25s 隐式动画；需要即时更新遮罩/内容时，必须用 CATransaction.begin() + setDisableActions(true) + commit() 包裹赋值操作，否则产生视觉残影</li>
+<li>macOS 独立覆盖窗口架构中，任何调用 orderFrontRegardless() 的操作都会打乱层叠顺序；需在每次视频重载/窗口刷新后主动调用 order(.above, relativeTo:) 重排所有覆盖层，不能假设层叠顺序会自动保持</li>
+<li>Pi0.5 在 Stack 类任务上泛化良好（step 17000 时 Stack D0 100%、D1 95%），但对 Coffee 和 ThreePieceAssembly 等高精度任务仍需更多训练步数或更大数据集；BC-RNN 全部 9 任务 epoch 600 已完成，可作为基线对比</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="desktop-video-wallpaper">Desktop Video Wallpaper<a hidden class="anchor" aria-hidden="true" href="#desktop-video-wallpaper">#</a></h3>
+<p><strong>🔄 屏保时钟架构重构（.behindWindow 独立窗口）+ 多轮 Bug 修复 + 视频切换修复 + 4.1 发布</strong>
+<em>04:41:21.822 | claude_code</em>
+全天围绕屏保时钟与视频切换展开多轮迭代。早期多次探索与规划（ExitPlanMode 被拒）后，在 02:55 会话成功实施 .behindWindow 独立窗口架构，并逐步解决空白位图（改用 NSAttributedString）、窗口遮挡（重排层叠顺序）、CALayer 隐式动画灰色重影（setDisableActions）、字重不一致（统一 .regular）等衍生 bug。并行完成：无视频黑屏屏保支持、时钟可读性增强（透明度 0.35→0.85，3 层阴影）、历史缩略图沙盒权限修复、CPU/VKC 优化。在另一会话修复了视频切换播放旧视频 bug，但引入了重启后历史视频黑屏回归（方案已设计，待实施）。最终整合发布 Version 4.1 ChangeLog（38 条精简至 18 条）。</p>
+<h3 id="errorrecoverybenchmark">ErrorRecoveryBenchmark<a hidden class="anchor" aria-hidden="true" href="#errorrecoverybenchmark">#</a></h3>
+<p><strong>🔄 Pi0.5 全量评测完成 + an53 崩溃调查 + Pi0.5/BC-RNN 训练现状梳理</strong>
+<em>04:34:57.802 | claude_code</em>
+在 an46 节点通过 Slurm job 47209 完成 Pi0.5 全部 9 个 MimicGen 任务批量评测（每任务 20 次），Stack 系列表现优异（95-100%），ThreePieceAssembly 最难（30%）。调查 an53 于 08:30 发生的 NODE_FAIL 崩溃，通过时间线分析确认与 AI 操作无关（最可能原因为 GPU 满载过热/OOM），09:41 重启完成。梳理训练现状：Pi0.5 主流任务 step 17000-18000，BC-RNN 全部 9 任务 epoch 600 完成。完整 evaluation 执行和视频渲染计划因 session 结束未实施。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>32,238,027</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>35,274</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>68,731</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>1,212,927</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>30,921,095</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>96.2%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$21.0427</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>9,105</td>
+          <td>50,510</td>
+          <td>829,702</td>
+          <td>27,150,981</td>
+          <td>$20.0694</td>
+          <td>95.4%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>26,169</td>
+          <td>18,221</td>
+          <td>383,225</td>
+          <td>3,770,114</td>
+          <td>$0.9733</td>
+          <td>4.6%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
