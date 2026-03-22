@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-13 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="从零构建学术研究者自动画像工具（research 包）并完成 Levine/Abbeel 深度分析、修复多个系统性 Bug；同时为 RoboTwin Place Dual Shoes 仿真任务添加5个逐帧运动进度变量并修复数据收集 Bug">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-03-13/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-03-13/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-03-13/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-13">
+  <meta property="og:description" content="从零构建学术研究者自动画像工具（research 包）并完成 Levine/Abbeel 深度分析、修复多个系统性 Bug；同时为 RoboTwin Place Dual Shoes 仿真任务添加5个逐帧运动进度变量并修复数据收集 Bug">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-13T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-13T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-13">
+  <meta name="twitter:description" content="从零构建学术研究者自动画像工具（research 包）并完成 Levine/Abbeel 深度分析、修复多个系统性 Bug；同时为 RoboTwin Place Dual Shoes 仿真任务添加5个逐帧运动进度变量并修复数据收集 Bug">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "BugJournals",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-03-13",
+      "item": "https://tzj2006.github.io/bugjournal/2026-03-13/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-13",
+  "name": "Bug Journal 2026-03-13",
+  "description": "从零构建学术研究者自动画像工具（research 包）并完成 Levine/Abbeel 深度分析、修复多个系统性 Bug；同时为 RoboTwin Place Dual Shoes 仿真任务添加5个逐帧运动进度变量并修复数据收集 Bug",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-13 今日概览 做了什么： 在两个并行项目取得重要进展：实现了14模块的 research Python 包，支持多数据源学术研究者分析、LLM 奖项识别和 BFS 学生网络探索；同时为 RoboTwin 机器人仿真的 Place Dual Shoes 任务设计并实现了5个新的逐帧运动进度变量，移除了 critical_region 怎么做的： research 包采用分层架构（API/模型/分析/输出层），以 S2 为主数据源（500篇历史论文），通过 haiku→sonnet→opus 逐级升级的 JSON 解析容错管线保证鲁棒性；RoboTwin 采用后处理 patch 方案，在每次 move() 结束后更新 pkl 文件，用 np.clip 处理边界异常 有什么用： research 工具直接产出 Sergey Levine 和 Pieter Abbeel 的结构化学术画像，系统性揭示 VLA 范式演化脉络，奠定可复用分析基础设施；RoboTwin 新变量为 VLA 模型提供了更丰富的操作进度监督信号（时间/距离进度、目标末端位姿/关节状态），有助于提升策略学习效果 从零构建学术研究者自动画像工具（research 包）并完成 Levine/Abbeel 深度分析、修复多个系统性 Bug；同时为 RoboTwin Place Dual Shoes 仿真任务添加5个逐帧运动进度变量并修复数据收集 Bug\n今日任务 架构与策略 ✅ 设计并实现 research 学术研究者分析工具（14个模块） — 从架构设计到完整落地：CLI（analyze/show/list/config）、数据模型、SHA-256 磁盘缓存、ArXiv 客户端（HTML优先/PDF后备）、S2 客户端、LLM 抽象层（Claude CLI subprocess）、加权评分算法、学生发现（共著图谱 BFS）、快速/详细双模式、Markdown+JSON 报告渲染 ✅ 实现按年份分组论文选择 + LLM 奖项识别 — 以 S2（500篇）取代 ArXiv（100篇）为主数据源，按年份分组每年≤10篇，年内按奖项权重（best_paper=4 \u003e highlight=3 \u003e spotlight=2 \u003e oral=1）→引用量排序；新增 _identify_awards 步骤调用 LLM 从训练数据识别获奖论文（用户创新方案） ✅ 为 RoboTwin Place Dual Shoes 添加5个逐帧运动进度变量 — 实现 manip_progress_time（帧索引插值的时间进度）、manip_progress_distance_left/right（基于 EE 位置的距离进度，公式：1-|current-final|/|start-final|，np.clip 限[0,1]）、target_endpose 和 target_joint（move 结束时的末端状态），同时移除 critical_region 变量 ✅ 对 Sergey Levine 和 Pieter Abbeel 完成 LLM 深度学术分析 — 生成两位 Robotics/VLA 大佬的结构化学术画像，涵盖三阶段轨迹报告和突破性工作（TRPO/MAML/SAC/DDPM/QAM 等）；Pieter Abbeel 的 JSON 因中文内容格式问题经历4次修复后成功解析 ✅ 修复 JSON 解析容错机制（haiku→sonnet→opus 逐级升级） — 重构 parse_json_response 为三层：_try_parse_json（纯解析，防递归）、逐级 LLM 修复循环（haiku→sonnet→opus）、_save_failed_response（原始响应原子写入日志）；同步移除 detailed 模式 top-10 全文下载限制 实现与修复 ✅ 修复 RoboTwin critical_region 残留和距离负值两个 Bug — Bug 1：在 pickle 后处理阶段显式 pop 掉 critical_region key，绕过基类 get_obs()（line 510）无条件写入；Bug 2：用 np.clip(…, 0.0, 1.0) 处理曲线轨迹导致的距离进度越界 ✅ 编写 tutorial.md 和 research/CLAUDE.md — 完整中文使用教程（覆盖安装/命令/模式/学生发现/评分体系/缓存机制）和架构说明（9步 pipeline 流程、关键设计决策、数据模型） 问题与解决方案 关键问题 1. 奖项数据（spotlight/highlight/best paper）无法从 ArXiv 或 S2 API 获取，传统 API 方案失效 解决方案: 将论文标题+年份+venue 发给 LLM，利用其训练数据中的奖项知识进行识别，返回结构化 JSON\n关键洞察: LLM 的世界知识可弥补 API 数据缺口，将知识库检索转化为 LLM 推理是一种有效的数据获取新范式，适用于训练数据覆盖范围内的事实查询\n2. RoboTwin：新变量（target_endpose、target_joint 等）需要「未来知识」（move 结束时的末端状态），而数据是逐帧收集的 解决方案: 采用后处理方案：先正常收集帧，move() 结束后再 patch pkl 文件填入所有新字段；pkl2hdf5.py 使用泛型递归字典转换，无需修改该工具\n关键洞察: 当变量计算依赖未来状态时，后处理 patch 方案优于实时收集，这种设计解耦了收集与计算，并兼容通用字典转换工具\n3. ArXiv 仅返回最近100篇论文，以其为主数据源导致历史高引论文大量丢失，无法体现完整学术脉络 解决方案: 以 Semantic Scholar 为主数据源（可获取500篇带完整历史的论文），ArXiv 仅用于丰富 arxiv_id/pdf_url 等元数据，两者按标题匹配合并\n关键洞察: 学术脉络分析要求历史完整性，主数据源选择应优先覆盖范围而非近期性；S2 的历史深度与 ArXiv 的最新性是互补关系\n4. JSON 解析失败时原始实现仅用 Haiku 修复一次后丢失响应，且存在递归调用风险（修复后输出仍无法解析会触发无限递归） 解决方案: 将解析和修复解耦：_try_parse_json 只做纯解析不触发 LLM，逐级循环 haiku→sonnet→opus，全部失败则原子写入日志文件\n关键洞察: 容错管线中「解析」与「修复」必须分离以防递归；逐级升级平衡成本与成功率；失败响应落盘支持离线调试\n5. RoboTwin：删除 get_critical_region_label() 子类 override 后，HDF5 文件中 critical_region 字段仍然存在 解决方案: 在 move() 的 pickle 后处理阶段显式调用 pkl_data.pop(‘critical_region’, None) 删除该 key\n关键洞察: 基类 _base_task.py 的 get_obs()（line 510）无条件写入 critical_region，仅删除子类 override 不够，必须在后处理阶段主动删除；修改子类前必须检查基类隐式行为\n一般问题 6. RoboTwin：manip_progress_distance 出现负值 解决方案: 用 np.clip(…, 0.0, 1.0) 将左右手距离进度强制限制在 [0,1] 范围\n关键洞察: 机器人末端执行器路径为曲线而非直线，中间帧到终点的距离可能大于起点到终点的距离，导致负进度值；基于距离的进度指标在曲线路径下必须 clamp\n人类思路 vs AI 思路 战略层面 创新方案的提出：LLM 知识作为数据源 \u0026 ArXiv HTML 全文提取 角色 思路 人类 直接提出将论文标题列表给 LLM 识别奖项（利用训练数据知识绕过 API 缺失）；同时指出 ArXiv 现支持 HTML 格式，应优先用 HTML 提取全文，无需 PyMuPDF AI 意识到奖项 API 数据缺失后只能列举选项等待决策；初始选择 PDF 下载方案，未考虑 ArXiv HTML 格式的存在 差异分析: 人类在跨域迁移（知识库→LLM推理）和平台最新特性感知上具有直觉优势；AI 方案更保守，停留在传统解决路径上\n算法设计由人类主导，AI 负责工程落地 角色 思路 人类 在 RoboTwin 中明确提出5个新变量的计算公式和语义（如距离插值公式 1- AI 将需求映射到具体代码结构（move() override + pkl 后处理方案；_select_papers_by_year 函数），负责工程实现 差异分析: 核心算法设计和关键创新均来自人类，AI 主要做工程实现和代码结构设计\n通过实验验证发现 AI 遗漏的边界情况 角色 思路 人类 检查实际 HDF5 文件发现 critical_region 残留；检查实际数据发现距离进度负值；运行日志时发现 author_id 被误读为论文数量 AI 初次实现时认为删除子类 override 就足够了，未检查基类无条件写入；设计距离进度公式时未考虑曲线路径的边界情况；实现日志时未预见语义歧义 差异分析: 人类通过实验验证敏锐发现 AI 在设计和实现阶段忽视的运行时边界条件与用户体验问题\nAI 局限性 重要局限 在需要创新方案时（奖项识别数据源、ArXiv HTML 全文提取），AI 只能穷举已知选项等待用户决策，无法主动想到将 LLM 训练知识作为检索源或利用平台最新特性的创新路径，需要用户直接提出才能实现。 在复杂代码库中初次实现时，易遗漏基类的隐式行为（如 get_obs() 无条件写入 critical_region）以及容错管线中的递归风险（parse_json_response 的 LLM 修复递归）；这两类问题都需要人类通过实验发现后才修复，反映了 AI 在「理解继承体系的隐式副作用」上的系统性盲点。 一般局限 LLM 在长篇复杂中文内容的 JSON 格式化上不稳定（Pieter Abbeel 分析经历4次修复），且在设计阶段未能预见边界条件（曲线路径导致距离进度越界），说明 AI 对运行时异常情况的预判能力仍不足。 今日收获 核心收获 LLM 的训练数据知识可作为结构化 API 数据的补充来源：奖项信息、关系推断等无法从 API 获取的历史知识，可通过向 LLM 提问获取。这是「将知识库查询转化为 LLM 推理」的新范式，适用于训练数据覆盖范围内的事实查询。 需要「未来知识」的变量设计应采用后处理 patch 方案：先正常收集帧，操作结束后统一 patch pkl 文件。这种设计解耦了收集与计算，且兼容泛型字典转换工具（无需修改 pkl2hdf5.py）。 容错管线的分层设计原则：「解析」和「修复」必须分离（用不同函数）以防递归；逐级升级（小模型→大模型）平衡成本与成功率；失败响应落盘支持离线调试。这三点构成 LLM 输出解析的鲁棒性设计模式。 学术分析工具的数据源策略：历史完整性（S2 500篇带引用数据）比近期性（ArXiv 100篇）更重要；两者配合最佳——S2 提供历史深度和引用数据，ArXiv 提供最新 preprint 和 HTML/PDF 链接。单一数据源无法满足脉络分析需求。 修改子类前必须检查基类是否有无条件写入该字段的代码，否则仅删除 override 不足以去除字段；基于距离的进度指标在曲线路径下会越界，需 clamp 到 [0,1]。两者都体现了「充分理解基类行为和运行时边界」的重要性。 顶级学者（Levine/Abbeel）成功的核心在于「数学严谨性+工程实用性+范式转换时机」的三重结合；Sergey Levine 的轨迹揭示 VLA 范式在 2023 年前后的关键转折：以 GPT-4/CLIP 成熟为契机，机器人控制被重新表述为「接地的语言-视觉-动作生成」问题，这是当前 Robotics 领域最重要的技术趋势。 会话摘要 Gadget Research Tool ✅ 从零设计并实现学术研究者分析工具，完成 Levine/Abbeel 深度分析，修复系统性 Bug 20:08:05.279 | claude_code 全天围绕 research 包展开多个会话：架构规划阶段确认14模块分层设计、双数据源策略（S2为主/ArXiv为辅）、Claude CLI 为唯一 LLM 后端、BFS 学生递归探索；实现阶段完成所有模块并通过语法验证；首次运行后发现并修复 S2 日志格式歧义 Bug；重构论文选择逻辑（按年份分组、奖项权重排序），新增 LLM 奖项识别功能（用户创新方案）；对 Sergey Levine（h-index 166）和 Pieter Abbeel（h-index 164）完成 LLM 深度分析，Abbeel 的 JSON 因中文格式问题经4次修复后解析成功；最后修复 JSON 解析容错（haiku→sonnet→opus 逐级升级、防递归重构）和 detailed 模式全文下载限制，并编写 tutorial.md 和 CLAUDE.md。\nRoboTwin VLA ✅ 为 Place Dual Shoes 任务添加5个逐帧运动进度变量并修复两个数据 Bug 15:34:27.123 | claude_code 两个会话完成：第一会话广泛探索代码结构（_base_task.py、place_dual_shoes.py 等），设计基于 move() 后处理 patch pkl 的实现方案；第二会话执行计划，添加 manip_progress_time、manip_progress_distance_left/right、target_endpose、target_joint，移除 critical_region override。用户测试后发现两个 Bug：HDF5 仍含 critical_region（基类 get_obs() line 510 无条件写入）和距离进度负值（曲线路径越界），均通过 pkl 后处理 pop 和 np.clip 修复。\nRoboTwin (tianhe server) ❌ tianhe 超算服务器激活 RefineVLA conda 环境（立即中断） 03:18:46.380 | claude_code 激活 RefineVLA conda 环境后会话立即被用户中断，未进行实质性工作。\nToken 用量 总览 指标 数值 总 Token 9,052,306 输入 Token 17,097 输出 Token 56,229 Cache 创建 946,324 Cache 读取 8,032,656 Cache 命中率 89.5% 总费用 (USD) $7.8188 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 10,427 27,763 532,078 5,424,059 $6.7837 86.8% claude-haiku-4-5-20251001 6,664 28,443 374,166 2,573,780 $0.8740 11.2% claude-sonnet-4-6 6 23 40,080 34,817 $0.1611 2.1% 各设备用量 设备 总 Token 输入 输出 费用 MacBook 6,061,812 8,903 37,850 $5.5926 tianhe 2,990,494 8,194 18,379 $2.2262 ",
+  "wordCount" : "613",
+  "inLanguage": "en",
+  "datePublished": "2026-03-13T00:00:00-05:00",
+  "dateModified": "2026-03-13T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-03-13/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/research/" title="research">
+                    <span>research</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-13
+    </h1>
+    <div class="post-meta"><span title='2026-03-13 00:00:00 -0500 -0500'>March 13, 2026</span>&nbsp;·&nbsp;<span>3 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-13">日报 — 2026-03-13<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-13">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 在两个并行项目取得重要进展：实现了14模块的 research Python 包，支持多数据源学术研究者分析、LLM 奖项识别和 BFS 学生网络探索；同时为 RoboTwin 机器人仿真的 Place Dual Shoes 任务设计并实现了5个新的逐帧运动进度变量，移除了 critical_region</li>
+<li><strong>怎么做的：</strong> research 包采用分层架构（API/模型/分析/输出层），以 S2 为主数据源（500篇历史论文），通过 haiku→sonnet→opus 逐级升级的 JSON 解析容错管线保证鲁棒性；RoboTwin 采用后处理 patch 方案，在每次 move() 结束后更新 pkl 文件，用 np.clip 处理边界异常</li>
+<li><strong>有什么用：</strong> research 工具直接产出 Sergey Levine 和 Pieter Abbeel 的结构化学术画像，系统性揭示 VLA 范式演化脉络，奠定可复用分析基础设施；RoboTwin 新变量为 VLA 模型提供了更丰富的操作进度监督信号（时间/距离进度、目标末端位姿/关节状态），有助于提升策略学习效果</li>
+</ul>
+<blockquote>
+<p>从零构建学术研究者自动画像工具（research 包）并完成 Levine/Abbeel 深度分析、修复多个系统性 Bug；同时为 RoboTwin Place Dual Shoes 仿真任务添加5个逐帧运动进度变量并修复数据收集 Bug</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>设计并实现 research 学术研究者分析工具（14个模块）</strong> — 从架构设计到完整落地：CLI（analyze/show/list/config）、数据模型、SHA-256 磁盘缓存、ArXiv 客户端（HTML优先/PDF后备）、S2 客户端、LLM 抽象层（Claude CLI subprocess）、加权评分算法、学生发现（共著图谱 BFS）、快速/详细双模式、Markdown+JSON 报告渲染</li>
+<li>✅ <strong>实现按年份分组论文选择 + LLM 奖项识别</strong> — 以 S2（500篇）取代 ArXiv（100篇）为主数据源，按年份分组每年≤10篇，年内按奖项权重（best_paper=4 &gt; highlight=3 &gt; spotlight=2 &gt; oral=1）→引用量排序；新增 _identify_awards 步骤调用 LLM 从训练数据识别获奖论文（用户创新方案）</li>
+<li>✅ <strong>为 RoboTwin Place Dual Shoes 添加5个逐帧运动进度变量</strong> — 实现 manip_progress_time（帧索引插值的时间进度）、manip_progress_distance_left/right（基于 EE 位置的距离进度，公式：1-|current-final|/|start-final|，np.clip 限[0,1]）、target_endpose 和 target_joint（move 结束时的末端状态），同时移除 critical_region 变量</li>
+<li>✅ <strong>对 Sergey Levine 和 Pieter Abbeel 完成 LLM 深度学术分析</strong> — 生成两位 Robotics/VLA 大佬的结构化学术画像，涵盖三阶段轨迹报告和突破性工作（TRPO/MAML/SAC/DDPM/QAM 等）；Pieter Abbeel 的 JSON 因中文内容格式问题经历4次修复后成功解析</li>
+<li>✅ <strong>修复 JSON 解析容错机制（haiku→sonnet→opus 逐级升级）</strong> — 重构 parse_json_response 为三层：_try_parse_json（纯解析，防递归）、逐级 LLM 修复循环（haiku→sonnet→opus）、_save_failed_response（原始响应原子写入日志）；同步移除 detailed 模式 top-10 全文下载限制</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>修复 RoboTwin critical_region 残留和距离负值两个 Bug</strong> — Bug 1：在 pickle 后处理阶段显式 pop 掉 critical_region key，绕过基类 get_obs()（line 510）无条件写入；Bug 2：用 np.clip(&hellip;, 0.0, 1.0) 处理曲线轨迹导致的距离进度越界</li>
+<li>✅ <strong>编写 tutorial.md 和 research/CLAUDE.md</strong> — 完整中文使用教程（覆盖安装/命令/模式/学生发现/评分体系/缓存机制）和架构说明（9步 pipeline 流程、关键设计决策、数据模型）</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-奖项数据spotlighthighlightbest-paper无法从-arxiv-或-s2-api-获取传统-api-方案失效">1. 奖项数据（spotlight/highlight/best paper）无法从 ArXiv 或 S2 API 获取，传统 API 方案失效<a hidden class="anchor" aria-hidden="true" href="#1-奖项数据spotlighthighlightbest-paper无法从-arxiv-或-s2-api-获取传统-api-方案失效">#</a></h4>
+<p><strong>解决方案:</strong> 将论文标题+年份+venue 发给 LLM，利用其训练数据中的奖项知识进行识别，返回结构化 JSON</p>
+<p><strong>关键洞察:</strong> LLM 的世界知识可弥补 API 数据缺口，将知识库检索转化为 LLM 推理是一种有效的数据获取新范式，适用于训练数据覆盖范围内的事实查询</p>
+<h4 id="2-robotwin新变量target_endposetarget_joint-等需要未来知识move-结束时的末端状态而数据是逐帧收集的">2. RoboTwin：新变量（target_endpose、target_joint 等）需要「未来知识」（move 结束时的末端状态），而数据是逐帧收集的<a hidden class="anchor" aria-hidden="true" href="#2-robotwin新变量target_endposetarget_joint-等需要未来知识move-结束时的末端状态而数据是逐帧收集的">#</a></h4>
+<p><strong>解决方案:</strong> 采用后处理方案：先正常收集帧，move() 结束后再 patch pkl 文件填入所有新字段；pkl2hdf5.py 使用泛型递归字典转换，无需修改该工具</p>
+<p><strong>关键洞察:</strong> 当变量计算依赖未来状态时，后处理 patch 方案优于实时收集，这种设计解耦了收集与计算，并兼容通用字典转换工具</p>
+<h4 id="3-arxiv-仅返回最近100篇论文以其为主数据源导致历史高引论文大量丢失无法体现完整学术脉络">3. ArXiv 仅返回最近100篇论文，以其为主数据源导致历史高引论文大量丢失，无法体现完整学术脉络<a hidden class="anchor" aria-hidden="true" href="#3-arxiv-仅返回最近100篇论文以其为主数据源导致历史高引论文大量丢失无法体现完整学术脉络">#</a></h4>
+<p><strong>解决方案:</strong> 以 Semantic Scholar 为主数据源（可获取500篇带完整历史的论文），ArXiv 仅用于丰富 arxiv_id/pdf_url 等元数据，两者按标题匹配合并</p>
+<p><strong>关键洞察:</strong> 学术脉络分析要求历史完整性，主数据源选择应优先覆盖范围而非近期性；S2 的历史深度与 ArXiv 的最新性是互补关系</p>
+<h4 id="4-json-解析失败时原始实现仅用-haiku-修复一次后丢失响应且存在递归调用风险修复后输出仍无法解析会触发无限递归">4. JSON 解析失败时原始实现仅用 Haiku 修复一次后丢失响应，且存在递归调用风险（修复后输出仍无法解析会触发无限递归）<a hidden class="anchor" aria-hidden="true" href="#4-json-解析失败时原始实现仅用-haiku-修复一次后丢失响应且存在递归调用风险修复后输出仍无法解析会触发无限递归">#</a></h4>
+<p><strong>解决方案:</strong> 将解析和修复解耦：_try_parse_json 只做纯解析不触发 LLM，逐级循环 haiku→sonnet→opus，全部失败则原子写入日志文件</p>
+<p><strong>关键洞察:</strong> 容错管线中「解析」与「修复」必须分离以防递归；逐级升级平衡成本与成功率；失败响应落盘支持离线调试</p>
+<h4 id="5-robotwin删除-get_critical_region_label-子类-override-后hdf5-文件中-critical_region-字段仍然存在">5. RoboTwin：删除 get_critical_region_label() 子类 override 后，HDF5 文件中 critical_region 字段仍然存在<a hidden class="anchor" aria-hidden="true" href="#5-robotwin删除-get_critical_region_label-子类-override-后hdf5-文件中-critical_region-字段仍然存在">#</a></h4>
+<p><strong>解决方案:</strong> 在 move() 的 pickle 后处理阶段显式调用 pkl_data.pop(&lsquo;critical_region&rsquo;, None) 删除该 key</p>
+<p><strong>关键洞察:</strong> 基类 _base_task.py 的 get_obs()（line 510）无条件写入 critical_region，仅删除子类 override 不够，必须在后处理阶段主动删除；修改子类前必须检查基类隐式行为</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="6-robotwinmanip_progress_distance-出现负值">6. RoboTwin：manip_progress_distance 出现负值<a hidden class="anchor" aria-hidden="true" href="#6-robotwinmanip_progress_distance-出现负值">#</a></h4>
+<p><strong>解决方案:</strong> 用 np.clip(&hellip;, 0.0, 1.0) 将左右手距离进度强制限制在 [0,1] 范围</p>
+<p><strong>关键洞察:</strong> 机器人末端执行器路径为曲线而非直线，中间帧到终点的距离可能大于起点到终点的距离，导致负进度值；基于距离的进度指标在曲线路径下必须 clamp</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="创新方案的提出llm-知识作为数据源--arxiv-html-全文提取">创新方案的提出：LLM 知识作为数据源 &amp; ArXiv HTML 全文提取<a hidden class="anchor" aria-hidden="true" href="#创新方案的提出llm-知识作为数据源--arxiv-html-全文提取">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>直接提出将论文标题列表给 LLM 识别奖项（利用训练数据知识绕过 API 缺失）；同时指出 ArXiv 现支持 HTML 格式，应优先用 HTML 提取全文，无需 PyMuPDF</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>意识到奖项 API 数据缺失后只能列举选项等待决策；初始选择 PDF 下载方案，未考虑 ArXiv HTML 格式的存在</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类在跨域迁移（知识库→LLM推理）和平台最新特性感知上具有直觉优势；AI 方案更保守，停留在传统解决路径上</p>
+<h4 id="算法设计由人类主导ai-负责工程落地">算法设计由人类主导，AI 负责工程落地<a hidden class="anchor" aria-hidden="true" href="#算法设计由人类主导ai-负责工程落地">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>在 RoboTwin 中明确提出5个新变量的计算公式和语义（如距离插值公式 1-</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>将需求映射到具体代码结构（move() override + pkl 后处理方案；_select_papers_by_year 函数），负责工程实现</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 核心算法设计和关键创新均来自人类，AI 主要做工程实现和代码结构设计</p>
+<h4 id="通过实验验证发现-ai-遗漏的边界情况">通过实验验证发现 AI 遗漏的边界情况<a hidden class="anchor" aria-hidden="true" href="#通过实验验证发现-ai-遗漏的边界情况">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>检查实际 HDF5 文件发现 critical_region 残留；检查实际数据发现距离进度负值；运行日志时发现 author_id 被误读为论文数量</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>初次实现时认为删除子类 override 就足够了，未检查基类无条件写入；设计距离进度公式时未考虑曲线路径的边界情况；实现日志时未预见语义歧义</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类通过实验验证敏锐发现 AI 在设计和实现阶段忽视的运行时边界条件与用户体验问题</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>在需要创新方案时（奖项识别数据源、ArXiv HTML 全文提取），AI 只能穷举已知选项等待用户决策，无法主动想到将 LLM 训练知识作为检索源或利用平台最新特性的创新路径，需要用户直接提出才能实现。</li>
+<li>在复杂代码库中初次实现时，易遗漏基类的隐式行为（如 get_obs() 无条件写入 critical_region）以及容错管线中的递归风险（parse_json_response 的 LLM 修复递归）；这两类问题都需要人类通过实验发现后才修复，反映了 AI 在「理解继承体系的隐式副作用」上的系统性盲点。</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>LLM 在长篇复杂中文内容的 JSON 格式化上不稳定（Pieter Abbeel 分析经历4次修复），且在设计阶段未能预见边界条件（曲线路径导致距离进度越界），说明 AI 对运行时异常情况的预判能力仍不足。</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>LLM 的训练数据知识可作为结构化 API 数据的补充来源：奖项信息、关系推断等无法从 API 获取的历史知识，可通过向 LLM 提问获取。这是「将知识库查询转化为 LLM 推理」的新范式，适用于训练数据覆盖范围内的事实查询。</li>
+<li>需要「未来知识」的变量设计应采用后处理 patch 方案：先正常收集帧，操作结束后统一 patch pkl 文件。这种设计解耦了收集与计算，且兼容泛型字典转换工具（无需修改 pkl2hdf5.py）。</li>
+<li>容错管线的分层设计原则：「解析」和「修复」必须分离（用不同函数）以防递归；逐级升级（小模型→大模型）平衡成本与成功率；失败响应落盘支持离线调试。这三点构成 LLM 输出解析的鲁棒性设计模式。</li>
+<li>学术分析工具的数据源策略：历史完整性（S2 500篇带引用数据）比近期性（ArXiv 100篇）更重要；两者配合最佳——S2 提供历史深度和引用数据，ArXiv 提供最新 preprint 和 HTML/PDF 链接。单一数据源无法满足脉络分析需求。</li>
+<li>修改子类前必须检查基类是否有无条件写入该字段的代码，否则仅删除 override 不足以去除字段；基于距离的进度指标在曲线路径下会越界，需 clamp 到 [0,1]。两者都体现了「充分理解基类行为和运行时边界」的重要性。</li>
+<li>顶级学者（Levine/Abbeel）成功的核心在于「数学严谨性+工程实用性+范式转换时机」的三重结合；Sergey Levine 的轨迹揭示 VLA 范式在 2023 年前后的关键转折：以 GPT-4/CLIP 成熟为契机，机器人控制被重新表述为「接地的语言-视觉-动作生成」问题，这是当前 Robotics 领域最重要的技术趋势。</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="gadget-research-tool">Gadget Research Tool<a hidden class="anchor" aria-hidden="true" href="#gadget-research-tool">#</a></h3>
+<p><strong>✅ 从零设计并实现学术研究者分析工具，完成 Levine/Abbeel 深度分析，修复系统性 Bug</strong>
+<em>20:08:05.279 | claude_code</em>
+全天围绕 research 包展开多个会话：架构规划阶段确认14模块分层设计、双数据源策略（S2为主/ArXiv为辅）、Claude CLI 为唯一 LLM 后端、BFS 学生递归探索；实现阶段完成所有模块并通过语法验证；首次运行后发现并修复 S2 日志格式歧义 Bug；重构论文选择逻辑（按年份分组、奖项权重排序），新增 LLM 奖项识别功能（用户创新方案）；对 Sergey Levine（h-index 166）和 Pieter Abbeel（h-index 164）完成 LLM 深度分析，Abbeel 的 JSON 因中文格式问题经4次修复后解析成功；最后修复 JSON 解析容错（haiku→sonnet→opus 逐级升级、防递归重构）和 detailed 模式全文下载限制，并编写 tutorial.md 和 CLAUDE.md。</p>
+<h3 id="robotwin-vla">RoboTwin VLA<a hidden class="anchor" aria-hidden="true" href="#robotwin-vla">#</a></h3>
+<p><strong>✅ 为 Place Dual Shoes 任务添加5个逐帧运动进度变量并修复两个数据 Bug</strong>
+<em>15:34:27.123 | claude_code</em>
+两个会话完成：第一会话广泛探索代码结构（_base_task.py、place_dual_shoes.py 等），设计基于 move() 后处理 patch pkl 的实现方案；第二会话执行计划，添加 manip_progress_time、manip_progress_distance_left/right、target_endpose、target_joint，移除 critical_region override。用户测试后发现两个 Bug：HDF5 仍含 critical_region（基类 get_obs() line 510 无条件写入）和距离进度负值（曲线路径越界），均通过 pkl 后处理 pop 和 np.clip 修复。</p>
+<h3 id="robotwin-tianhe-server">RoboTwin (tianhe server)<a hidden class="anchor" aria-hidden="true" href="#robotwin-tianhe-server">#</a></h3>
+<p><strong>❌ tianhe 超算服务器激活 RefineVLA conda 环境（立即中断）</strong>
+<em>03:18:46.380 | claude_code</em>
+激活 RefineVLA conda 环境后会话立即被用户中断，未进行实质性工作。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>9,052,306</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>17,097</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>56,229</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>946,324</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>8,032,656</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>89.5%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$7.8188</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>10,427</td>
+          <td>27,763</td>
+          <td>532,078</td>
+          <td>5,424,059</td>
+          <td>$6.7837</td>
+          <td>86.8%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>6,664</td>
+          <td>28,443</td>
+          <td>374,166</td>
+          <td>2,573,780</td>
+          <td>$0.8740</td>
+          <td>11.2%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>6</td>
+          <td>23</td>
+          <td>40,080</td>
+          <td>34,817</td>
+          <td>$0.1611</td>
+          <td>2.1%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>MacBook</td>
+          <td>6,061,812</td>
+          <td>8,903</td>
+          <td>37,850</td>
+          <td>$5.5926</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>2,990,494</td>
+          <td>8,194</td>
+          <td>18,379</td>
+          <td>$2.2262</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

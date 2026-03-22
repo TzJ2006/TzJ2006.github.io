@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-20 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="DCC设备完成run_benchmark.py embedding缓存支持并发现STAIG双重归一化bug；Tianhe设备修复BC-RNN观测维度不匹配并启动M12大规模场景生成和M14基线评估。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-02-20/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-02-20/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-02-20/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-20">
+  <meta property="og:description" content="DCC设备完成run_benchmark.py embedding缓存支持并发现STAIG双重归一化bug；Tianhe设备修复BC-RNN观测维度不匹配并启动M12大规模场景生成和M14基线评估。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-20T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-20T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-20">
+  <meta name="twitter:description" content="DCC设备完成run_benchmark.py embedding缓存支持并发现STAIG双重归一化bug；Tianhe设备修复BC-RNN观测维度不匹配并启动M12大规模场景生成和M14基线评估。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "BugJournals",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-20",
+      "item": "https://tzj2006.github.io/bugjournal/2026-02-20/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-20",
+  "name": "Bug Journal 2026-02-20",
+  "description": "DCC设备完成run_benchmark.py embedding缓存支持并发现STAIG双重归一化bug；Tianhe设备修复BC-RNN观测维度不匹配并启动M12大规模场景生成和M14基线评估。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-20 DCC设备完成run_benchmark.py embedding缓存支持并发现STAIG双重归一化bug；Tianhe设备修复BC-RNN观测维度不匹配并启动M12大规模场景生成和M14基线评估。\n今日任务 架构与策略 ✅ run_benchmark.py Embedding 缓存读取支持 — 为run_benchmark.py添加pipeline缓存读取能力：导入CacheManager、gene/vision embedding缓存命中跳过提取、提取后写缓存、放宽–vision_encoder参数限制以支持自定义名称（如scan_uni2）、两处call site传入override参数。语法验证通过，import验证通过，缓存命中测试成功。 🔄 Error Recovery Benchmark M14 基线评估启动 — BC-RNN injection模式已在GPU 0上运行，Pi0/Pi0.5 VLA服务器成功启动（分别在5556/5557端口）。BC-RNN natural capture obs维度bug修复后重启。collector.py已添加save_images选项（M14 S3.2.3完成）。 🔄 SCAN vs UNI2 全 Fusion 对比实验 — 对比SCAN(UNI2)增强的vision embeddings与原始UNI2在所有fusion方法上的效果。staig_fusion对比完成（UNI2_raw ARI=0.3929, SCAN(UNI2) ARI=0.3880，基本持平）。其余fusion方法待通过新的缓存化run_benchmark.py正式运行。发现eval_scan_fusion.py存在双重归一化bug导致结果可能偏低。 🔄 Error Recovery Benchmark M12 大规模场景生成 — 目标≥2000场景（当前458，23%）。BC-RNN injection（GPU 0）正在运行（200 rollout中已过118），BC-RNN natural capture（GPU 1）修复obs维度后重新启动。MimicGen augmentation因mujoco_py依赖问题跳过，改用更多BC-RNN rollout补偿。 实现与修复 ✅ collector.py save_images 选项 — 在RecoveryDataCollector中添加save_images配置项，修改_save_episode()在成功恢复轨迹旁保存相机帧，在3_collect_data.py添加–save_images CLI参数。为M15训练数据准备所需。 ✅ M13 分类论证基础设施 — 检查发现docs/taxonomy_justification.md（M13.1）和scripts/7_classifier_reliability.py、scripts/8_error_type_discriminability.py已存在且完整，无需新增代码。脚本依赖M14评估数据方可运行。 问题与解决方案 关键问题 1. eval_scan_fusion.py存在双重归一化bug：staig_fusion调用未传staig_alignment_config，导致STAIGTrainer内部StandardScaler与上游preprocess_for_encoding的scale重叠，基因特征被归一化两次。 解决方案: 放弃eval_scan_fusion.py，改用run_benchmark.py（已有正确预处理管线），通过新增embedding缓存机制将SCAN embeddings注册为scan_uni2缓存名，直接与所有fusion方法组合。\n关键洞察: 独立评估脚本容易遗漏原有pipeline中的关键参数传递，复用已验证的run_benchmark.py是更安全的方案。\n2. BC-RNN checkpoint期望65维输入（8个物体×7维），但环境只返回37维观测（4个物体×7维），导致obs维度不匹配运行时错误。 解决方案: 修复policy_adapter.py的_to_robosuite_obs()方法，正确从raw robosuite obs中提取’object-state’→‘object’映射；同时修复rollout_generator.py的_capture_single_rollout()使用raw obs初始化，与injection路径保持一致。\n关键洞察: BC-RNN是在8物体任务上训练的，环境当前只有4个物体；StateExtractor的37维obs与BC-RNN期望的65维不同，需要在policy_adapter层做维度适配。\n3. STAIG fusion从未在151673上正式运行过（experiments_log为空），缺乏基准对比数据。 解决方案: 通过临时脚本获得初步结果（ARI~0.39），但认识到结果因双重归一化而可能偏低，计划通过正确管线重新运行。\n关键洞察: 实验日志的缺失本身就是有价值的信息——说明某个方法从未被正式评估过，之前认为的基准实际上是空白。\n一般问题 4. MimicGen的robomimic_utils.py调用create_env_for_data_processing()时传入env_class等额外kwargs，但当前安装的robomimic 0.3.0签名只有5个参数，导致TypeError。 解决方案: 修改robomimic_utils.py使用inspect.signature动态检测函数签名，只传入实际支持的参数。\n关键洞察: robomimic版本依赖问题：MimicGen代码假设了更新版本的API，需要运行时兼容性检测。\n5. MimicGen augmentation最终因环境中mujoco_py缺失完全失败，无法生成增强数据集。 解决方案: 跳过MimicGen路线，改用更多BC-RNN rollout（注入+自然捕获各200次）弥补场景数量缺口。\n关键洞察: mujoco_py在mimicgen_env中安装不完整，robomimic 0.3.0对mujoco版本有隐式依赖。\n6. VLA服务器端口冲突（5556/5557），原有遗留进程未清理，导致新的服务器启动失败。 解决方案: 用lsof -ti :5556/5557 | xargs kill -9清理所有残留进程，确认端口释放后重新启动服务器。两个服务器均成功加载模型并开始监听。\n关键洞察: 多任务并行实验中需要管理端口生命周期，Claude Code重启不自动清理前次遗留的后台进程。\n人类思路 vs AI 思路 战略层面 避免重复造轮子：应使用run_benchmark.py而非自定义脚本 角色 思路 人类 用户直接指出’为什么不直接用原本的benchmark script呢’，立即识别出eval_scan_fusion.py是在重复已有管线的工作，且会引入新bug。 AI AI最初提议修复eval_scan_fusion.py的双重归一化bug，未意识到维护两条代码路径的风险。 差异分析: 用户具有架构层面的简洁性直觉；AI倾向于在现有脚本上打补丁而非退一步重新评估整体方案。\nembedding缓存机制的架构认知 角色 思路 人类 用户提问’什么是重新实例化 vision encoder并且提取embeddings？如果已经有了embedding的话为什么要重新实例化vision encoder呢’，清晰指出run_benchmark.py的低效之处。 AI AI最初回答说run_benchmark.py确实每次重新提取（没有缓存），但错误地认为pipeline缓存和run_benchmark.py是两套独立系统无法共享。 差异分析: 用户的期望（两者应该共享缓存）是合理的架构期望，但AI初始分析过于孤立地看待两套系统。\n实现层面 BC-RNN natural capture的obs修复遗漏 角色 思路 人类 用户隐式的：运行时BC-RNN natural capture报错揭示AI只修复了injection路径而遗漏了capture路径。 AI AI修复了_generate_from_single_rollout中的obs初始化，但遗漏了_capture_single_rollout中相同的问题，需要第二次修复。 差异分析: AI在修复时未做全面的代码路径分析，只修复了最显眼的那条路径。\nAI 局限性 重要局限 AI创建了eval_scan_fusion.py独立脚本来复现run_benchmark.py的功能，但遗漏了关键的staig_alignment_config参数传递，导致STAIG fusion结果因双重归一化而偏低。这是典型的’代码复制但语义遗漏’问题。 一般局限 AI在修复BC-RNN obs维度问题时只修复了injection路径（_generate_from_single_rollout），遗漏了natural capture路径（_capture_single_rollout），导致需要二次修复。 AI对MimicGen的mujoco_py依赖问题诊断不完整：修复了API兼容性问题（robomimic 0.3.0签名），但未提前预警更深层的mujoco_py安装问题，导致用户在等待后才发现增强路线完全不可行。 在STAIG fusion调查中，AI启动了多个并行子Agent探索任务，这些任务结果有时存在冗余或矛盾，导致信息整合困难，最终结论需要通过额外的代码验证才能确认。 今日收获 核心收获 Pipeline缓存架构的一致性原则：不同脚本（run_benchmark.py、pipeline/run_pipeline.py）应共享同一套embeddings_cache，而非各自维护独立的提取逻辑。通过CacheManager统一接口实现这一点，使得任意脚本都能’懒加载’已有embeddings。 STAIG fusion的正确调用路径：必须传递staig_alignment_config（通过build_effective_staig_profile构建），使STAIGTrainer设置align_staig=True跳过内部StandardScaler，否则会与上游preprocess_for_encoding的归一化产生双重归一化问题。 BC-RNN的观测维度依赖训练时的物体数量（8个物体→65维），与当前环境的StateExtractor（4个物体→37维）不匹配。解决方案是在policy_adapter层直接使用raw robosuite obs中的’object-state’键而非StateExtractor的抽象输出。 实践收获 版本兼容性运行时检测模式：对于可能跨版本的API调用，使用inspect.signature动态过滤参数比硬编码版本检查更健壮（如robomimic_utils.py的create_env_for_data_processing适配）。 会话摘要 MIHD ✅ run_benchmark.py Embedding缓存读取功能实现 21:22:59.238 | claude_code 根据用户提出的架构合理性问题（为何已有缓存还要重新提取），AI实现了完整的embedding缓存支持：复用pipeline/cache_manager.py的CacheManager，在gene和vision encoding前检查缓存命中，命中则跳过encoder实例化，提取后自动保存到缓存。同时放宽–vision_encoder参数限制以支持自定义缓存名。所有修改语法验证通过，import测试成功。\n🔄 STAIG Fusion对比实验与双重归一化bug调查 18:06:33.022 | claude_code 用户要求先单独跑STAIG fusion对比（UNI2_raw vs SCAN(UNI2)），结果显示两者ARI基本持平（0.3929 vs 0.3880）。用户追问STAIG fusion的实现细节，AI通过代码调查发现eval_scan_fusion.py存在双重归一化bug（缺少staig_alignment_config）以及STAIG fusion在151673上从未正式运行过。最终决策：放弃独立脚本，改用run_benchmark.py进行正式评估。\nErrorRecoveryBenchmark 🔄 M12大规模生成启动：BC-RNN obs维度修复与VLA服务器部署 02:39:21.478 | claude_code 发现并修复BC-RNN的关键bug：checkpoint期望65维观测（8物体训练）但环境提供37维（4物体），通过修复policy_adapter.py的obs映射和rollout_generator.py的两条obs初始化路径解决。MimicGen因mujoco_py依赖问题放弃，改以更多BC-RNN rollout补偿。成功启动Pi0（5556端口）和Pi0.5（5557端口）VLA服务器，BC-RNN injection正在运行（118/200 rollouts完成，数据库已从454增至458场景）。\n✅ M12-M14里程碑任务盘点与collector.py save_images实现 19:00:40.046 | claude_code AI读取项目全景总结后发现M12（MimicGen config）和M13（taxonomy justification文档）的基础文件均已存在，无需重新创建。重点实现了M14 S3.2.3：在collector.py中添加save_images选项，支持保存成功恢复轨迹的相机帧，为M15训练数据准备服务。\n🔍 M14基线评估现状确认与启动请求 20:11:59.238 | claude_code 用户询问当前进度，AI总结：454个已验证场景，M1-M11全部完成，M14评估基础设施就绪但实验未开始。用户要求开始运行M14基线，AI准备启动评估流程。\n❌ Pi0.5与MimicGen基线脚本请求（中断） 21:01:10.231 | claude_code 用户请求生成一个统一运行Pi0.5和MimicGen基线模型的脚本。会话被用户中断，未完成。\nToken 用量 总览 指标 数值 总 Token 48,685,110 输入 Token 44,193 输出 Token 82,271 Cache 创建 3,450,689 Cache 读取 45,107,957 Cache 命中率 92.9% 总费用 (USD) $35.7807 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 17,087 81,154 2,223,726 34,097,959 $33.0616 92.4% claude-haiku-4-5-20251001 27,101 1,112 1,208,807 10,978,447 $2.6415 7.4% claude-sonnet-4-6 5 5 18,156 31,551 $0.0776 0.2% 各设备用量 设备 总 Token 输入 输出 费用 DCC 11,878,326 11,447 8,263 $7.8720 tianhe 36,806,784 32,746 74,008 $27.9087 ",
+  "wordCount" : "323",
+  "inLanguage": "en",
+  "datePublished": "2026-02-20T00:00:00-05:00",
+  "dateModified": "2026-02-20T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-02-20/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/research/" title="research">
+                    <span>research</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-20
+    </h1>
+    <div class="post-meta"><span title='2026-02-20 00:00:00 -0500 EST'>February 20, 2026</span>&nbsp;·&nbsp;<span>2 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-20">日报 — 2026-02-20<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-20">#</a></h1>
+<blockquote>
+<p>DCC设备完成run_benchmark.py embedding缓存支持并发现STAIG双重归一化bug；Tianhe设备修复BC-RNN观测维度不匹配并启动M12大规模场景生成和M14基线评估。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>run_benchmark.py Embedding 缓存读取支持</strong> — 为run_benchmark.py添加pipeline缓存读取能力：导入CacheManager、gene/vision embedding缓存命中跳过提取、提取后写缓存、放宽&ndash;vision_encoder参数限制以支持自定义名称（如scan_uni2）、两处call site传入override参数。语法验证通过，import验证通过，缓存命中测试成功。</li>
+<li>🔄 <strong>Error Recovery Benchmark M14 基线评估启动</strong> — BC-RNN injection模式已在GPU 0上运行，Pi0/Pi0.5 VLA服务器成功启动（分别在5556/5557端口）。BC-RNN natural capture obs维度bug修复后重启。collector.py已添加save_images选项（M14 S3.2.3完成）。</li>
+<li>🔄 <strong>SCAN vs UNI2 全 Fusion 对比实验</strong> — 对比SCAN(UNI2)增强的vision embeddings与原始UNI2在所有fusion方法上的效果。staig_fusion对比完成（UNI2_raw ARI=0.3929, SCAN(UNI2) ARI=0.3880，基本持平）。其余fusion方法待通过新的缓存化run_benchmark.py正式运行。发现eval_scan_fusion.py存在双重归一化bug导致结果可能偏低。</li>
+<li>🔄 <strong>Error Recovery Benchmark M12 大规模场景生成</strong> — 目标≥2000场景（当前458，23%）。BC-RNN injection（GPU 0）正在运行（200 rollout中已过118），BC-RNN natural capture（GPU 1）修复obs维度后重新启动。MimicGen augmentation因mujoco_py依赖问题跳过，改用更多BC-RNN rollout补偿。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>collector.py save_images 选项</strong> — 在RecoveryDataCollector中添加save_images配置项，修改_save_episode()在成功恢复轨迹旁保存相机帧，在3_collect_data.py添加&ndash;save_images CLI参数。为M15训练数据准备所需。</li>
+<li>✅ <strong>M13 分类论证基础设施</strong> — 检查发现docs/taxonomy_justification.md（M13.1）和scripts/7_classifier_reliability.py、scripts/8_error_type_discriminability.py已存在且完整，无需新增代码。脚本依赖M14评估数据方可运行。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-eval_scan_fusionpy存在双重归一化bugstaig_fusion调用未传staig_alignment_config导致staigtrainer内部standardscaler与上游preprocess_for_encoding的scale重叠基因特征被归一化两次">1. eval_scan_fusion.py存在双重归一化bug：staig_fusion调用未传staig_alignment_config，导致STAIGTrainer内部StandardScaler与上游preprocess_for_encoding的scale重叠，基因特征被归一化两次。<a hidden class="anchor" aria-hidden="true" href="#1-eval_scan_fusionpy存在双重归一化bugstaig_fusion调用未传staig_alignment_config导致staigtrainer内部standardscaler与上游preprocess_for_encoding的scale重叠基因特征被归一化两次">#</a></h4>
+<p><strong>解决方案:</strong> 放弃eval_scan_fusion.py，改用run_benchmark.py（已有正确预处理管线），通过新增embedding缓存机制将SCAN embeddings注册为scan_uni2缓存名，直接与所有fusion方法组合。</p>
+<p><strong>关键洞察:</strong> 独立评估脚本容易遗漏原有pipeline中的关键参数传递，复用已验证的run_benchmark.py是更安全的方案。</p>
+<h4 id="2-bc-rnn-checkpoint期望65维输入8个物体7维但环境只返回37维观测4个物体7维导致obs维度不匹配运行时错误">2. BC-RNN checkpoint期望65维输入（8个物体×7维），但环境只返回37维观测（4个物体×7维），导致obs维度不匹配运行时错误。<a hidden class="anchor" aria-hidden="true" href="#2-bc-rnn-checkpoint期望65维输入8个物体7维但环境只返回37维观测4个物体7维导致obs维度不匹配运行时错误">#</a></h4>
+<p><strong>解决方案:</strong> 修复policy_adapter.py的_to_robosuite_obs()方法，正确从raw robosuite obs中提取&rsquo;object-state&rsquo;→&lsquo;object&rsquo;映射；同时修复rollout_generator.py的_capture_single_rollout()使用raw obs初始化，与injection路径保持一致。</p>
+<p><strong>关键洞察:</strong> BC-RNN是在8物体任务上训练的，环境当前只有4个物体；StateExtractor的37维obs与BC-RNN期望的65维不同，需要在policy_adapter层做维度适配。</p>
+<h4 id="3-staig-fusion从未在151673上正式运行过experiments_log为空缺乏基准对比数据">3. STAIG fusion从未在151673上正式运行过（experiments_log为空），缺乏基准对比数据。<a hidden class="anchor" aria-hidden="true" href="#3-staig-fusion从未在151673上正式运行过experiments_log为空缺乏基准对比数据">#</a></h4>
+<p><strong>解决方案:</strong> 通过临时脚本获得初步结果（ARI~0.39），但认识到结果因双重归一化而可能偏低，计划通过正确管线重新运行。</p>
+<p><strong>关键洞察:</strong> 实验日志的缺失本身就是有价值的信息——说明某个方法从未被正式评估过，之前认为的基准实际上是空白。</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="4-mimicgen的robomimic_utilspy调用create_env_for_data_processing时传入env_class等额外kwargs但当前安装的robomimic-030签名只有5个参数导致typeerror">4. MimicGen的robomimic_utils.py调用create_env_for_data_processing()时传入env_class等额外kwargs，但当前安装的robomimic 0.3.0签名只有5个参数，导致TypeError。<a hidden class="anchor" aria-hidden="true" href="#4-mimicgen的robomimic_utilspy调用create_env_for_data_processing时传入env_class等额外kwargs但当前安装的robomimic-030签名只有5个参数导致typeerror">#</a></h4>
+<p><strong>解决方案:</strong> 修改robomimic_utils.py使用inspect.signature动态检测函数签名，只传入实际支持的参数。</p>
+<p><strong>关键洞察:</strong> robomimic版本依赖问题：MimicGen代码假设了更新版本的API，需要运行时兼容性检测。</p>
+<h4 id="5-mimicgen-augmentation最终因环境中mujoco_py缺失完全失败无法生成增强数据集">5. MimicGen augmentation最终因环境中mujoco_py缺失完全失败，无法生成增强数据集。<a hidden class="anchor" aria-hidden="true" href="#5-mimicgen-augmentation最终因环境中mujoco_py缺失完全失败无法生成增强数据集">#</a></h4>
+<p><strong>解决方案:</strong> 跳过MimicGen路线，改用更多BC-RNN rollout（注入+自然捕获各200次）弥补场景数量缺口。</p>
+<p><strong>关键洞察:</strong> mujoco_py在mimicgen_env中安装不完整，robomimic 0.3.0对mujoco版本有隐式依赖。</p>
+<h4 id="6-vla服务器端口冲突55565557原有遗留进程未清理导致新的服务器启动失败">6. VLA服务器端口冲突（5556/5557），原有遗留进程未清理，导致新的服务器启动失败。<a hidden class="anchor" aria-hidden="true" href="#6-vla服务器端口冲突55565557原有遗留进程未清理导致新的服务器启动失败">#</a></h4>
+<p><strong>解决方案:</strong> 用lsof -ti :5556/5557 | xargs kill -9清理所有残留进程，确认端口释放后重新启动服务器。两个服务器均成功加载模型并开始监听。</p>
+<p><strong>关键洞察:</strong> 多任务并行实验中需要管理端口生命周期，Claude Code重启不自动清理前次遗留的后台进程。</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="避免重复造轮子应使用run_benchmarkpy而非自定义脚本">避免重复造轮子：应使用run_benchmark.py而非自定义脚本<a hidden class="anchor" aria-hidden="true" href="#避免重复造轮子应使用run_benchmarkpy而非自定义脚本">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户直接指出&rsquo;为什么不直接用原本的benchmark script呢&rsquo;，立即识别出eval_scan_fusion.py是在重复已有管线的工作，且会引入新bug。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI最初提议修复eval_scan_fusion.py的双重归一化bug，未意识到维护两条代码路径的风险。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户具有架构层面的简洁性直觉；AI倾向于在现有脚本上打补丁而非退一步重新评估整体方案。</p>
+<h4 id="embedding缓存机制的架构认知">embedding缓存机制的架构认知<a hidden class="anchor" aria-hidden="true" href="#embedding缓存机制的架构认知">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户提问&rsquo;什么是重新实例化 vision encoder并且提取embeddings？如果已经有了embedding的话为什么要重新实例化vision encoder呢&rsquo;，清晰指出run_benchmark.py的低效之处。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI最初回答说run_benchmark.py确实每次重新提取（没有缓存），但错误地认为pipeline缓存和run_benchmark.py是两套独立系统无法共享。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户的期望（两者应该共享缓存）是合理的架构期望，但AI初始分析过于孤立地看待两套系统。</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="bc-rnn-natural-capture的obs修复遗漏">BC-RNN natural capture的obs修复遗漏<a hidden class="anchor" aria-hidden="true" href="#bc-rnn-natural-capture的obs修复遗漏">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户隐式的：运行时BC-RNN natural capture报错揭示AI只修复了injection路径而遗漏了capture路径。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI修复了_generate_from_single_rollout中的obs初始化，但遗漏了_capture_single_rollout中相同的问题，需要第二次修复。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI在修复时未做全面的代码路径分析，只修复了最显眼的那条路径。</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>AI创建了eval_scan_fusion.py独立脚本来复现run_benchmark.py的功能，但遗漏了关键的staig_alignment_config参数传递，导致STAIG fusion结果因双重归一化而偏低。这是典型的&rsquo;代码复制但语义遗漏&rsquo;问题。</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>AI在修复BC-RNN obs维度问题时只修复了injection路径（_generate_from_single_rollout），遗漏了natural capture路径（_capture_single_rollout），导致需要二次修复。</li>
+<li>AI对MimicGen的mujoco_py依赖问题诊断不完整：修复了API兼容性问题（robomimic 0.3.0签名），但未提前预警更深层的mujoco_py安装问题，导致用户在等待后才发现增强路线完全不可行。</li>
+<li>在STAIG fusion调查中，AI启动了多个并行子Agent探索任务，这些任务结果有时存在冗余或矛盾，导致信息整合困难，最终结论需要通过额外的代码验证才能确认。</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>Pipeline缓存架构的一致性原则：不同脚本（run_benchmark.py、pipeline/run_pipeline.py）应共享同一套embeddings_cache，而非各自维护独立的提取逻辑。通过CacheManager统一接口实现这一点，使得任意脚本都能&rsquo;懒加载&rsquo;已有embeddings。</li>
+<li>STAIG fusion的正确调用路径：必须传递staig_alignment_config（通过build_effective_staig_profile构建），使STAIGTrainer设置align_staig=True跳过内部StandardScaler，否则会与上游preprocess_for_encoding的归一化产生双重归一化问题。</li>
+<li>BC-RNN的观测维度依赖训练时的物体数量（8个物体→65维），与当前环境的StateExtractor（4个物体→37维）不匹配。解决方案是在policy_adapter层直接使用raw robosuite obs中的&rsquo;object-state&rsquo;键而非StateExtractor的抽象输出。</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>版本兼容性运行时检测模式：对于可能跨版本的API调用，使用inspect.signature动态过滤参数比硬编码版本检查更健壮（如robomimic_utils.py的create_env_for_data_processing适配）。</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>✅ run_benchmark.py Embedding缓存读取功能实现</strong>
+<em>21:22:59.238 | claude_code</em>
+根据用户提出的架构合理性问题（为何已有缓存还要重新提取），AI实现了完整的embedding缓存支持：复用pipeline/cache_manager.py的CacheManager，在gene和vision encoding前检查缓存命中，命中则跳过encoder实例化，提取后自动保存到缓存。同时放宽&ndash;vision_encoder参数限制以支持自定义缓存名。所有修改语法验证通过，import测试成功。</p>
+<p><strong>🔄 STAIG Fusion对比实验与双重归一化bug调查</strong>
+<em>18:06:33.022 | claude_code</em>
+用户要求先单独跑STAIG fusion对比（UNI2_raw vs SCAN(UNI2)），结果显示两者ARI基本持平（0.3929 vs 0.3880）。用户追问STAIG fusion的实现细节，AI通过代码调查发现eval_scan_fusion.py存在双重归一化bug（缺少staig_alignment_config）以及STAIG fusion在151673上从未正式运行过。最终决策：放弃独立脚本，改用run_benchmark.py进行正式评估。</p>
+<h3 id="errorrecoverybenchmark">ErrorRecoveryBenchmark<a hidden class="anchor" aria-hidden="true" href="#errorrecoverybenchmark">#</a></h3>
+<p><strong>🔄 M12大规模生成启动：BC-RNN obs维度修复与VLA服务器部署</strong>
+<em>02:39:21.478 | claude_code</em>
+发现并修复BC-RNN的关键bug：checkpoint期望65维观测（8物体训练）但环境提供37维（4物体），通过修复policy_adapter.py的obs映射和rollout_generator.py的两条obs初始化路径解决。MimicGen因mujoco_py依赖问题放弃，改以更多BC-RNN rollout补偿。成功启动Pi0（5556端口）和Pi0.5（5557端口）VLA服务器，BC-RNN injection正在运行（118/200 rollouts完成，数据库已从454增至458场景）。</p>
+<p><strong>✅ M12-M14里程碑任务盘点与collector.py save_images实现</strong>
+<em>19:00:40.046 | claude_code</em>
+AI读取项目全景总结后发现M12（MimicGen config）和M13（taxonomy justification文档）的基础文件均已存在，无需重新创建。重点实现了M14 S3.2.3：在collector.py中添加save_images选项，支持保存成功恢复轨迹的相机帧，为M15训练数据准备服务。</p>
+<p><strong>🔍 M14基线评估现状确认与启动请求</strong>
+<em>20:11:59.238 | claude_code</em>
+用户询问当前进度，AI总结：454个已验证场景，M1-M11全部完成，M14评估基础设施就绪但实验未开始。用户要求开始运行M14基线，AI准备启动评估流程。</p>
+<p><strong>❌ Pi0.5与MimicGen基线脚本请求（中断）</strong>
+<em>21:01:10.231 | claude_code</em>
+用户请求生成一个统一运行Pi0.5和MimicGen基线模型的脚本。会话被用户中断，未完成。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>48,685,110</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>44,193</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>82,271</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>3,450,689</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>45,107,957</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>92.9%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$35.7807</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>17,087</td>
+          <td>81,154</td>
+          <td>2,223,726</td>
+          <td>34,097,959</td>
+          <td>$33.0616</td>
+          <td>92.4%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>27,101</td>
+          <td>1,112</td>
+          <td>1,208,807</td>
+          <td>10,978,447</td>
+          <td>$2.6415</td>
+          <td>7.4%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>5</td>
+          <td>5</td>
+          <td>18,156</td>
+          <td>31,551</td>
+          <td>$0.0776</td>
+          <td>0.2%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>11,878,326</td>
+          <td>11,447</td>
+          <td>8,263</td>
+          <td>$7.8720</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>36,806,784</td>
+          <td>32,746</td>
+          <td>74,008</td>
+          <td>$27.9087</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

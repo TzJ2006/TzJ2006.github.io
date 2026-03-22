@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-10 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="深入排查 RoboBrain-Pi 训练 loss 震荡根因（发现 action padding 稀释 56% 与类别不平衡），设计并端到端实现 Error Recovery Benchmark v5.0 Error Skill 模块化 pipeline（修复夹爪归一化/OSC控制器/相位检测三层嵌套 bug，pick_place 达 64.7% 注入成功率），同步修复天河服务器多个 VLA 项目的环境与代码缺陷">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-03-10/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-03-10/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-03-10/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-10">
+  <meta property="og:description" content="深入排查 RoboBrain-Pi 训练 loss 震荡根因（发现 action padding 稀释 56% 与类别不平衡），设计并端到端实现 Error Recovery Benchmark v5.0 Error Skill 模块化 pipeline（修复夹爪归一化/OSC控制器/相位检测三层嵌套 bug，pick_place 达 64.7% 注入成功率），同步修复天河服务器多个 VLA 项目的环境与代码缺陷">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-10T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-10T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-10">
+  <meta name="twitter:description" content="深入排查 RoboBrain-Pi 训练 loss 震荡根因（发现 action padding 稀释 56% 与类别不平衡），设计并端到端实现 Error Recovery Benchmark v5.0 Error Skill 模块化 pipeline（修复夹爪归一化/OSC控制器/相位检测三层嵌套 bug，pick_place 达 64.7% 注入成功率），同步修复天河服务器多个 VLA 项目的环境与代码缺陷">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "BugJournals",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-03-10",
+      "item": "https://tzj2006.github.io/bugjournal/2026-03-10/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-10",
+  "name": "Bug Journal 2026-03-10",
+  "description": "深入排查 RoboBrain-Pi 训练 loss 震荡根因（发现 action padding 稀释 56% 与类别不平衡），设计并端到端实现 Error Recovery Benchmark v5.0 Error Skill 模块化 pipeline（修复夹爪归一化/OSC控制器/相位检测三层嵌套 bug，pick_place 达 64.7% 注入成功率），同步修复天河服务器多个 VLA 项目的环境与代码缺陷",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-10 今日概览 做了什么： 深入排查 RoboBrain-Pi 训练 loss 震荡（发现 padding 稀释 56%、task_pos_weight 在类别不平衡下失效），设计 Error Recovery Benchmark v5.0 Error Skill 模块化架构并完成 GPU 端到端实现，同步修复天河服务器上 CALVIN/libero/RoboTwin 多项 VLA 环境与代码缺陷 怎么做的： 通过 JAX 张量维度链路追踪定位训练 bug，在 A800 GPU 节点上逐层调试夹爪归一化/OSC控制器/相位检测三层嵌套 bug 并以直接 MuJoCo qpos/qvel 操作绕过控制器，以及通过 conda 环境诊断、EGL 设备 ID 同步、代码结构阅读等方法修复服务器配置 有什么用： 发现并修复了 action loss 被 padding 稀释 56% 的关键训练 bug，pick_place 注入成功率达 64.7%（覆盖 15/25 子类型），多个 VLA 训练管线（CALVIN/libero/RoboTwin）恢复正常运行，为后续 VLA 评估奠定数据基础 深入排查 RoboBrain-Pi 训练 loss 震荡根因（发现 action padding 稀释 56% 与类别不平衡），设计并端到端实现 Error Recovery Benchmark v5.0 Error Skill 模块化 pipeline（修复夹爪归一化/OSC控制器/相位检测三层嵌套 bug，pick_place 达 64.7% 注入成功率），同步修复天河服务器多个 VLA 项目的环境与代码缺陷\n今日任务 架构与策略 🔄 Error Recovery Benchmark v5.0 Error Skill 架构设计 — 用户独立提出 Error Skill 模块化框架取代 v4 三层结构，定义 E1-E11 共 11 种错误×D0/D1/D2=26 个子类，四步 pipeline（收集干净轨迹→离线扫描→配额调度→注入）。AI 分析代码复用性，评估 24 种错误类型注入可行性；BC-RNN checkpoints 路径确认、GPU 资源调度等关键问题纳入规划。规划在全景总结更新前被中断 ✅ v5 pipeline 全量实现与 GPU 端到端验证 — 实现 6 阶段 pipeline：修复 create_env 解包/PolicyResult 展开/start_episode/rollout 数等已知 bug，添加 BC-RNN rollout 收集、视频渲染回调（render_fn/annotate_frame/MP4）、run_v5_all_tasks.py master 脚本，更新 config/Makefile，新增 9 个单元测试（共 221 通过）。深度修复三层嵌套 bug：夹爪归一化除零（改用单指绝对值，更新 7 个文件）、Drop OSC 控制器绕过（直接操作 MuJoCo qpos/qvel）、相位检测链路断裂（阈值 0.7→0.05+EEF 距离 fallback，更新 6 个 YAML）、路径一致性修复及 max_per_trajectory（10→50）。最终 pick_place：798 机会/17 子类型→110/170 成功（64.7%）/15 子类型 ✅ RoboBrain-Pi 训练 loss 震荡根因排查与参数调优 — 排查 pi05_put_item_in_drawer 训练 loss 震荡：发现 action_loss 在 32 维上均值但实际动作仅 14 维，56% MSE loss 来自零填充维度；task_pos_weight=1.0 在末尾 20 帧正类、约 1:9 不平衡下导致分类头可能学 trivial 的全负类预测。建议修改 loss 只对前 14 维求均值，task_pos_weight 提升至 5.0，task_loss_weight 保持 0.1 ✅ Task Completion 分类头训练/推理代码全面审查 — 验证 CLS token attention mask、MLP 分类头、loss 广播逻辑和推理路径正确性，确认代码逻辑无误。发现 Pi0.5 任务头缺乏单元测试、LIBERO 配置未传 task_completed 字段、PyTorch 训练版本不支持任务完成功能等潜在问题 • 天河服务器 VLA 项目多项环境修复 — （1）calvin_agent 在 univla 环境中用 –no-deps 重装成功（import 0.0.1 验证通过）；（2）libero/main.py 添加 MUJOCO_EGL_DEVICE_ID=0 修复 CUDA_VISIBLE_DEVICES=6 引发的 EGL 范围错误；（3）RoboTwin 数据转换脚本语言指令固定取第一条改为 np.random.choice 随机选择；（4）Openpi-moe serve_policy.py DNS crash 定位完成，traj_proj 警告确认无害，但 DNS 问题需用户侧处理网络配置 实现与修复 🔄 视频渲染（–render 标志） — 渲染代码已实现，smoke test 生成 5 个 MP4 视频（90-143KB），全量渲染任务在会话末尾被用户中断，未正式开始 🔄 Kubernetes Pod GPU 监控脚本 gpumon.py — 调查 nvidia-smi 进程 [Not Found] 根因（PID 命名空间隔离），创建基于 psutil+pynvml 的监控脚本；第一版终端布局有换行问题，重写时被中断 ✅ ccusage LiteLLM 定价获取问题修复 — Node.js v24 内置 fetch（undici）默认不读取 HTTPS_PROXY，仅加载 46 个模型定价。通过 NODE_OPTIONS=’–use-env-proxy’ 解决，加载完整 2696 个模型定价 问题与解决方案 关键问题 1. 修复夹爪归一化后机会扫描仍显示 drop/collision_holding 机会为 0。根因是三层嵌套 bug 链断裂：get_task_completion_stages() 中 grasp_closed 阈值为 0.7，而 Sawyer 实际持握时归一化值仅约 0.08，导致所有 lift/transport 帧均被 can_inject 拒绝 解决方案: grasp_closed 阈值降至 0.05，增加 EEF-to-object 距离（\u003c8cm）的 lift 阶段 fallback；更新 6 个任务 YAML；修复 scanner 输出路径（加 /{task} 子目录）和 max_per_trajectory（10→50）\n关键洞察: bug 是三层嵌套的：夹爪归一化 → grasp 阈值 → 相位检测 → can_inject 全拒绝。每层修复必须带动对下游依赖的系统性检查\n2. 训练 action loss 被 padding 维度稀释：模型 action_dim=32 但实际动作仅 14 维，56% MSE loss 来自零填充维度，真实动作梯度严重不足；同时 task_pos_weight=1.0 在类别不平衡（末 20 帧正类，约 1:9）下分类头可能学 trivial 的全负类预测 解决方案: loss 计算只对前 14 维求均值（action_loss = jnp.mean(jnp.square(v_t[…, :14] - u_t[…, :14]))）；task_pos_weight 提升至 5.0（约等于 (L-20)/20），task_loss_weight 保持 0.1\n关键洞察: padding 维度归一化后梯度信号接近零，系统性稀释真实动作维度的学习；类别不平衡不加权时负类 loss 占优势，正类梯度近乎为零\n3. Sawyer 夹爪 get_gripper_closed_norm() 恒返回 0，导致所有基于夹爪状态的 can_inject 判断全部失效。根因：两指对称夹爪 qpos=[0.04,-0.04]，mean 恒为 0，除零 bug 解决方案: 改用第一根手指绝对位置归一化：norm = abs(qpos[0]) / abs(close_qpos[0])；同步更新 7 个 error skill 文件的夹爪阈值（0.5/0.7 → 0.05/0.15/0.20）\n关键洞察: 两指对称夹爪的 mean 归一化天然无效；实际持握时 norm≈0.08，全开时≈0.025，与直觉相反\n4. Drop 技能注入后物体不掉落（delta_z≈0），validate 永远失败。根因：robosuite OSC 控制器在零动作下主动维持 EEF 位置，打开夹爪后物体仍停在手指上 解决方案: 直接操作 MuJoCo sim.data.qpos（物体位置偏移 2cm）和 sim.data.qvel（设置 -0.5m/s 下落速度），绕过 OSC 控制器；验证 DROP D0/D2 和 COLLISION_HOLDING delta_z \u003e 2.5cm 通过\n关键洞察: robosuite OSC 是位置控制器，零动作≠无力；需直接物理状态操纵实现自由落体，绕过控制器补偿\n5. CUDA_VISIBLE_DEVICES=6 运行时 EGL 报错：MUJOCO_EGL_DEVICE_ID must be between 0 and 0, got 6 解决方案: 在 main.py 入口添加 os.environ.setdefault(‘MUJOCO_EGL_DEVICE_ID’, ‘0’)，将 EGL 设备 ID 与 CUDA 重映射后的逻辑编号对齐\n关键洞察: CUDA_VISIBLE_DEVICES 重映射 CUDA 设备编号但不影响 EGL 物理设备枚举，两套编号体系独立，必须手动同步\n6. K8s Pod 内 nvidia-smi 显示 GPU 进程 [Not Found] 无法 kill；serve_policy.py 同时出现 traj_proj PyTree 不匹配警告和 socket DNS crash，难以区分严重性 解决方案: K8s：nvidia-smi 报告宿主机 PID，容器 PID 命名空间不同；用 ps aux | grep python 查容器内进程并 kill。serve_policy.py：traj_proj 不匹配为无害警告（allow_partial=True 自动合并），真正 crash 是 DNS 解析失败，需检查网络配置或改用 IP\n关键洞察: containerd K8s Pod 有独立 PID 命名空间，NVIDIA 驱动暴露宿主机 PID；多错误并发时需通过读实现代码（allow_partial 参数）区分严重性，避免被无害警告误导\n一般问题 7. QuotaScheduler 只调度 5/17 子类型（collision_empty 等早期高频 subtype 把 trajectory quota 吃光）；ccusage 无法从 LiteLLM 获取最新定价（仅 46 个模型） 解决方案: max_per_trajectory 10→50，使 total_slots 与 trajectory 数量解耦。ccusage：NODE_OPTIONS=’–use-env-proxy’ npx ccusage@latest 让 undici 读取 HTTPS_PROXY\n关键洞察: 配额分配中 per-trajectory 上限是子类型覆盖的硬瓶颈，需满足 n_traj × max_per_traj ≥ n_subtypes × target；Node.js v24 undici 不自动读取代理环境变量\n8. Windows SSH/tmux 内中文字符显示为下划线；conda 环境中 egg-info 存在但 import 失败；共享服务器 wandb login 影响其他用户 解决方案: 中文渲染：chcp 65001 或改用 Windows Terminal（根因是本地 code page 非 UTF-8）。calvin_agent：在目标 conda 环境中 pip install -e . –no-deps 重装验证。wandb：不修改 ~/.netrc，改用 WANDB_API_KEY 环境变量传递凭证，仅对当前进程有效\n关键洞察: 三个问题均属「看似服务器端但实为客户端/环境隔离」的典型；「同环境他人是否正常」是快速定位根因侧的关键对照实验\n人类思路 vs AI 思路 战略层面 Error Recovery Benchmark v5.0 架构创新来源 角色 思路 人类 用户独立提出 Error Skill 模块化框架、D0/D1/D2 维度分类体系和离线配额调度 pipeline 等全部核心架构创新，是全天最重要的人类创造性贡献 AI AI 梳理现有代码可复用部分，分析 24 种错误类型注入可行性，将用户架构思路细化为可实施方案 差异分析: 全局性架构转型思路完全来自用户，AI 负责可行性分析和方案落地；体现了人类在系统设计层面的主导性\n训练 loss 问题的根因识别与追踪 角色 思路 人类 用户凭直觉提出动作维度处理可能有问题，以及担忧 50 时间步规模失衡风险（方向正确但需定量验证） AI AI 系统性追踪数据变换流，定量发现 padding 稀释 56% 的根因，并通过维度分析澄清 task_loss 规模不存在 50 倍放大、真正瓶颈是 task_pos_weight 差异分析: 用户凭直觉识别问题方向，AI 完成量化根因分析；双方互补推动了完整解决方案\nv5 bug 链路追踪：全局视角 vs 逐点修复 角色 思路 人类 用户通过询问「现在是什么情况，做到哪里了？」推动 AI 关注全局状态而非陷入调试循环，隐含地要求实际执行而非只写代码 AI AI 逐层修复已知 bug（夹爪 norm → can_inject → drop inject），但未预判相位检测也依赖夹爪 norm 的隐含链路，需多次运行失败才逐层发现 差异分析: 人类注重全局执行状态；AI 在局部 fix 上效率高但缺乏对 bug 传播链的提前预判；两者互补才完成了三层嵌套 bug 的修复\nDrop OSC 绕过方案（AI 独立技术发现） 角色 思路 人类 用户通过中断和状态询问提供了研究空间，但未直接提出直接物理操作的方案 AI AI 通过编写 test_drop_direct.py 实验发现直接修改 MuJoCo qpos/qvel 可以成功模拟掉落，是 AI 独立得出的技术解法 差异分析: 在具体物理仿真策略层面 AI 做出了独立贡献；人类提供方向性压力，AI 完成技术路径探索\n服务器渲染与安装问题的根因方向判断 角色 思路 人类 用户主动提出「可能是我本地 SSH 问题」，通过「别人在同一服务器正常而自己不正常」的对照实验快速锁定客户端方向；calvin_agent 安装时直接选择 –no-deps 保护已有 PyTorch AI AI 优先从服务器端（locale、tmux 配置）展开排查，花费多轮才转向客户端；在安装方案上提供多选项但需用户补充上下文才能确定最优 差异分析: 用户对自身工作环境的历史记忆和使用对比是定位「客户端 vs 服务器端」问题的关键优势；AI 的系统化排查在此类场景效率较低\nAI 局限性 重要局限 未预判 bug 的传播链：修复夹爪归一化后没有系统检查所有依赖它的下游逻辑（get_task_completion_stages、grasp 相位、can_inject），需要多次运行失败才逐层发现；参数推荐（task_loss_weight）初期也未充分追踪维度链路，需用户纠正后重做 对 robosuite OSC 控制器行为认知不足：假设「打开夹爪就会掉落」，未预判 OSC 的位置维持特性，导致多次无效的阈值调整才最终发现需要绕过控制器直接操作物理状态 一般局限 在规划类会话中过度依赖交互工具（多次尝试 ExitPlanMode/AskUserQuestion 被用户拒绝），未根据上下文做出合理推断后继续推进；临时调试脚本（test_drop_fix.py 等）未整合进正式单元测试，清理后诊断知识丢失 未在长时 GPU 任务开始前向用户确认（直接发起 ssh an46 渲染被中断）；服务器渲染排查初期偏向服务器端，未优先询问「他人是否正常」这一关键对照问题，导致排查绕远路 今日收获 核心收获 VLA 训练必须 mask padding 维度：flow matching 模型若 action 存在 zero-padding，只对真实维度计算 loss，否则 padding 维度系统性稀释梯度信号（本例 14/32 维只贡献 43.75% loss）。机器人数据分类标签末尾 N 帧为正类会导致严重不平衡，pos_weight 必须根据实际数据分布设置，而非默认值 1.0 Sawyer 两指夹爪 qpos=[0.04,-0.04]，mean 恒为 0，必须用单指绝对值归一化（持握 norm≈0.08，空手≈0.025，与直觉相反）。robosuite OSC 控制器 zero-action 维持 EEF 位置，打开夹爪≠物体下落；需直接操作 MuJoCo sim.data.qpos/qvel 绕过控制器实现自由落体。MuJoCo 接触力是瞬态的，不适合 post-settle 验证，应改用位移/速度等持续性指标 CUDA_VISIBLE_DEVICES 和 MUJOCO_EGL_DEVICE_ID 是两套独立的 GPU 编号体系，前者对 CUDA 运行时重映射物理 GPU，后者枚举 EGL 物理设备；在指定非零 GPU 时必须手动同步，显式设置 MUJOCO_EGL_DEVICE_ID=0。JAX/Flax allow_partial=True 机制允许在已有 checkpoint 上扩展模型架构，缺失键从初始化填充，多余键丢弃 相位检测是多个 error skill 正常工作的隐含前提；底层传感器修复后必须系统检查所有依赖它的上游判断逻辑。QuotaScheduler 的 max_per_trajectory 需满足 total_slots = n_traj × max_per_traj ≥ n_subtypes × target，否则早期高频 subtype 会吃光所有 quota K8s Pod 有独立 PID 命名空间，NVIDIA 驱动暴露宿主机 PID 给所有容器，导致 nvidia-smi 进程名无法解析；需用 psutil+pynvml 在容器内自行实现进程监控。排查渲染/显示类问题时，「同环境其他用户是否正常」是最有效的早期过滤问题，能快速区分客户端与服务器端根因 实践收获 conda egg-info 目录存在不代表当前 Python 环境已安装该包，多环境共享文件系统时必须在目标环境中通过 pip show 和 import 验证。Node.js v24 内置 fetch（undici）默认不读取 HTTPS_PROXY，需 –use-env-proxy 显式开启。wandb 凭证存储在用户级 ~/.netrc，应通过 WANDB_API_KEY 环境变量传递凭证，仅对当前进程有效 会话摘要 RoboBrain-Pi ✅ 训练核心问题：loss 震荡根因分析 + Task Completion 代码审查 + 参数调优 06:36:15.000 | claude_code 深入分析 pi05_put_item_in_drawer 训练配置：追踪数据流发现 action_loss 在全 32 维均值但实际只有 14 维动作（56% loss 来自零填充）；审查 Task Completion 分类头代码确认逻辑正确，发现 Pi0.5 缺乏单元测试等潜在问题；评估 task_loss_weight/task_pos_weight 参数，识别末尾 20 帧正类导致约 9:1 不平衡，建议将 task_pos_weight 从 1.0 提升至 5.0，task_loss_weight 保持 0.1。\n🔄 环境与工具问题：K8s GPU 监控 + wandb 账号隔离 + uv 重装 09:59:33.000 | claude_code 发现 K8s Pod PID 命名空间导致 nvidia-smi 进程不显示，开发 gpumon.py（psutil+pynvml）；第一版终端布局换行，重写时被中断。解决共享服务器 wandb 账号隔离问题（改用 WANDB_API_KEY 环境变量）及 uv 命令缺失（pip install uv 重装）。\nError Recovery Benchmark 🔄 v5.0 架构设计：Error Skill 模块化框架 + 配额制离线 pipeline 规划 05:18:32.000 | claude_code 用户提出 Error Recovery Benchmark v5.0 核心架构创新：Error Skill 模块取代 v4 三层结构，定义 E1-E11×D0/D1/D2=26 个子类，四步 pipeline（收集干净轨迹→离线扫描→配额调度→注入）。AI 分析代码复用性，详细评估 24 种错误类型注入可行性，讨论 BC-RNN checkpoints 可用性和 GPU 资源调度。整体处于规划阶段，为后续实现奠定架构基础。\n✅ 深度调试三层嵌套 bug + pick_place 全量验证（64.7% 成功率） 04:00:00.000 | claude_code 逐层修复 drop/collision_holding 0% 成功率的根因：(1) 夹爪归一化除零（改用单指绝对值，更新 7 个文件阈值）；(2) Drop OSC 控制器绕过（直接操作 MuJoCo qpos/qvel，验证 delta_z\u003e2.5cm）；(3) 相位检测链路断裂（grasp 阈值 0.7→0.05+EEF 距离 fallback，更新 6 个 YAML）；同步修复路径一致性和 max_per_trajectory（10→50）。最终 pick_place：798 机会/17 子类型→110/170 成功（64.7%）/15 子类型，含 drop 和 collision_holding。\n🔄 v5 pipeline 全量代码实现：6 阶段 + BC-RNN + 视频渲染 + master 脚本 15:08:54.367 | claude_code 实现 v5 pipeline 全 6 阶段，修复 4 个已知 bug，添加 BC-RNN rollout 收集、视频渲染、run_v5_all_tasks.py master 脚本。221 单元测试通过后，在 an46 A800 GPU smoke test 生成 5 个 MP4 视频。全量运行时发现子类型覆盖严重不足（25 个中只覆盖约 5 个），drop/collision_holding 成功率 0%，触发深度调试。\nCALVIN 机器人基准 ✅ 诊断并修复 calvin_agent 在 univla 环境中不可导入的问题 03:27:22.435 | claude_code 按 install.sh 安装后仍无法 import calvin_agent。AI 确认 egg-info 是在另一 conda 环境下生成的，当前 univla 环境未安装。用户选择 –no-deps 保护现有 PyTorch，pip install -e . –no-deps 执行后验证 import calvin_agent 0.0.1 成功。\nOpenpi-moe 机器人策略 🔄 诊断 serve_policy.py 双错误：traj_proj 无害警告 + DNS crash + EGL 设备错误修复 08:23:44.180 | claude_code 用户报告两类错误。AI 分析代码确认 traj_proj PyTree 不匹配只是无害警告（allow_partial=True 自动合并），真正 crash 是 socket DNS 解析失败（需用户处理网络配置）。随后报告 EGL MUJOCO_EGL_DEVICE_ID 超出范围错误，AI 识别 CUDA_VISIBLE_DEVICES=6 与 EGL 物理编号不同步，在 main.py 入口添加 setdefault 修复 EGL 问题。\nRoboTwin VLA 数据处理 ✅ 修复数据转换脚本语言指令固定取第一条的缺陷 10:00:13.094 | claude_code 用户发现 convert_robotwin_democlean_to_lerobot.py 所有 episode 语言指令均为 seen 列表第一条。AI 参考 pi05 版本实现，将 [0] 索引改为 np.random.choice(seen_instructions)，每次 load_episode_data() 调用时随机选取指令，提升训练数据多样性。修改成功应用。\nToken 用量 总览 指标 数值 总 Token 49,311,479 输入 Token 86,370 输出 Token 183,702 Cache 创建 3,791,275 Cache 读取 45,250,132 Cache 命中率 92.3% 总费用 (USD) $36.8636 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 51,370 101,526 2,195,460 33,453,290 $33.2433 90.2% claude-haiku-4-5-20251001 35,000 82,176 1,595,815 11,796,842 $3.6203 9.8% ",
+  "wordCount" : "1203",
+  "inLanguage": "en",
+  "datePublished": "2026-03-10T00:00:00-05:00",
+  "dateModified": "2026-03-10T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-03-10/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/research/" title="research">
+                    <span>research</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">BugJournals</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-10
+    </h1>
+    <div class="post-meta"><span title='2026-03-10 00:00:00 -0500 -0500'>March 10, 2026</span>&nbsp;·&nbsp;<span>6 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-10">日报 — 2026-03-10<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-10">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 深入排查 RoboBrain-Pi 训练 loss 震荡（发现 padding 稀释 56%、task_pos_weight 在类别不平衡下失效），设计 Error Recovery Benchmark v5.0 Error Skill 模块化架构并完成 GPU 端到端实现，同步修复天河服务器上 CALVIN/libero/RoboTwin 多项 VLA 环境与代码缺陷</li>
+<li><strong>怎么做的：</strong> 通过 JAX 张量维度链路追踪定位训练 bug，在 A800 GPU 节点上逐层调试夹爪归一化/OSC控制器/相位检测三层嵌套 bug 并以直接 MuJoCo qpos/qvel 操作绕过控制器，以及通过 conda 环境诊断、EGL 设备 ID 同步、代码结构阅读等方法修复服务器配置</li>
+<li><strong>有什么用：</strong> 发现并修复了 action loss 被 padding 稀释 56% 的关键训练 bug，pick_place 注入成功率达 64.7%（覆盖 15/25 子类型），多个 VLA 训练管线（CALVIN/libero/RoboTwin）恢复正常运行，为后续 VLA 评估奠定数据基础</li>
+</ul>
+<blockquote>
+<p>深入排查 RoboBrain-Pi 训练 loss 震荡根因（发现 action padding 稀释 56% 与类别不平衡），设计并端到端实现 Error Recovery Benchmark v5.0 Error Skill 模块化 pipeline（修复夹爪归一化/OSC控制器/相位检测三层嵌套 bug，pick_place 达 64.7% 注入成功率），同步修复天河服务器多个 VLA 项目的环境与代码缺陷</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>🔄 <strong>Error Recovery Benchmark v5.0 Error Skill 架构设计</strong> — 用户独立提出 Error Skill 模块化框架取代 v4 三层结构，定义 E1-E11 共 11 种错误×D0/D1/D2=26 个子类，四步 pipeline（收集干净轨迹→离线扫描→配额调度→注入）。AI 分析代码复用性，评估 24 种错误类型注入可行性；BC-RNN checkpoints 路径确认、GPU 资源调度等关键问题纳入规划。规划在全景总结更新前被中断</li>
+<li>✅ <strong>v5 pipeline 全量实现与 GPU 端到端验证</strong> — 实现 6 阶段 pipeline：修复 create_env 解包/PolicyResult 展开/start_episode/rollout 数等已知 bug，添加 BC-RNN rollout 收集、视频渲染回调（render_fn/annotate_frame/MP4）、run_v5_all_tasks.py master 脚本，更新 config/Makefile，新增 9 个单元测试（共 221 通过）。深度修复三层嵌套 bug：夹爪归一化除零（改用单指绝对值，更新 7 个文件）、Drop OSC 控制器绕过（直接操作 MuJoCo qpos/qvel）、相位检测链路断裂（阈值 0.7→0.05+EEF 距离 fallback，更新 6 个 YAML）、路径一致性修复及 max_per_trajectory（10→50）。最终 pick_place：798 机会/17 子类型→110/170 成功（64.7%）/15 子类型</li>
+<li>✅ <strong>RoboBrain-Pi 训练 loss 震荡根因排查与参数调优</strong> — 排查 pi05_put_item_in_drawer 训练 loss 震荡：发现 action_loss 在 32 维上均值但实际动作仅 14 维，56% MSE loss 来自零填充维度；task_pos_weight=1.0 在末尾 20 帧正类、约 1:9 不平衡下导致分类头可能学 trivial 的全负类预测。建议修改 loss 只对前 14 维求均值，task_pos_weight 提升至 5.0，task_loss_weight 保持 0.1</li>
+<li>✅ <strong>Task Completion 分类头训练/推理代码全面审查</strong> — 验证 CLS token attention mask、MLP 分类头、loss 广播逻辑和推理路径正确性，确认代码逻辑无误。发现 Pi0.5 任务头缺乏单元测试、LIBERO 配置未传 task_completed 字段、PyTorch 训练版本不支持任务完成功能等潜在问题</li>
+<li>• <strong>天河服务器 VLA 项目多项环境修复</strong> — （1）calvin_agent 在 univla 环境中用 &ndash;no-deps 重装成功（import 0.0.1 验证通过）；（2）libero/main.py 添加 MUJOCO_EGL_DEVICE_ID=0 修复 CUDA_VISIBLE_DEVICES=6 引发的 EGL 范围错误；（3）RoboTwin 数据转换脚本语言指令固定取第一条改为 np.random.choice 随机选择；（4）Openpi-moe serve_policy.py DNS crash 定位完成，traj_proj 警告确认无害，但 DNS 问题需用户侧处理网络配置</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>🔄 <strong>视频渲染（&ndash;render 标志）</strong> — 渲染代码已实现，smoke test 生成 5 个 MP4 视频（90-143KB），全量渲染任务在会话末尾被用户中断，未正式开始</li>
+<li>🔄 <strong>Kubernetes Pod GPU 监控脚本 gpumon.py</strong> — 调查 nvidia-smi 进程 [Not Found] 根因（PID 命名空间隔离），创建基于 psutil+pynvml 的监控脚本；第一版终端布局有换行问题，重写时被中断</li>
+<li>✅ <strong>ccusage LiteLLM 定价获取问题修复</strong> — Node.js v24 内置 fetch（undici）默认不读取 HTTPS_PROXY，仅加载 46 个模型定价。通过 NODE_OPTIONS=&rsquo;&ndash;use-env-proxy&rsquo; 解决，加载完整 2696 个模型定价</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-修复夹爪归一化后机会扫描仍显示-dropcollision_holding-机会为-0根因是三层嵌套-bug-链断裂get_task_completion_stages-中-grasp_closed-阈值为-07而-sawyer-实际持握时归一化值仅约-008导致所有-lifttransport-帧均被-can_inject-拒绝">1. 修复夹爪归一化后机会扫描仍显示 drop/collision_holding 机会为 0。根因是三层嵌套 bug 链断裂：get_task_completion_stages() 中 grasp_closed 阈值为 0.7，而 Sawyer 实际持握时归一化值仅约 0.08，导致所有 lift/transport 帧均被 can_inject 拒绝<a hidden class="anchor" aria-hidden="true" href="#1-修复夹爪归一化后机会扫描仍显示-dropcollision_holding-机会为-0根因是三层嵌套-bug-链断裂get_task_completion_stages-中-grasp_closed-阈值为-07而-sawyer-实际持握时归一化值仅约-008导致所有-lifttransport-帧均被-can_inject-拒绝">#</a></h4>
+<p><strong>解决方案:</strong> grasp_closed 阈值降至 0.05，增加 EEF-to-object 距离（&lt;8cm）的 lift 阶段 fallback；更新 6 个任务 YAML；修复 scanner 输出路径（加 /{task} 子目录）和 max_per_trajectory（10→50）</p>
+<p><strong>关键洞察:</strong> bug 是三层嵌套的：夹爪归一化 → grasp 阈值 → 相位检测 → can_inject 全拒绝。每层修复必须带动对下游依赖的系统性检查</p>
+<h4 id="2-训练-action-loss-被-padding-维度稀释模型-action_dim32-但实际动作仅-14-维56-mse-loss-来自零填充维度真实动作梯度严重不足同时-task_pos_weight10-在类别不平衡末-20-帧正类约-19下分类头可能学-trivial-的全负类预测">2. 训练 action loss 被 padding 维度稀释：模型 action_dim=32 但实际动作仅 14 维，56% MSE loss 来自零填充维度，真实动作梯度严重不足；同时 task_pos_weight=1.0 在类别不平衡（末 20 帧正类，约 1:9）下分类头可能学 trivial 的全负类预测<a hidden class="anchor" aria-hidden="true" href="#2-训练-action-loss-被-padding-维度稀释模型-action_dim32-但实际动作仅-14-维56-mse-loss-来自零填充维度真实动作梯度严重不足同时-task_pos_weight10-在类别不平衡末-20-帧正类约-19下分类头可能学-trivial-的全负类预测">#</a></h4>
+<p><strong>解决方案:</strong> loss 计算只对前 14 维求均值（action_loss = jnp.mean(jnp.square(v_t[&hellip;, :14] - u_t[&hellip;, :14]))）；task_pos_weight 提升至 5.0（约等于 (L-20)/20），task_loss_weight 保持 0.1</p>
+<p><strong>关键洞察:</strong> padding 维度归一化后梯度信号接近零，系统性稀释真实动作维度的学习；类别不平衡不加权时负类 loss 占优势，正类梯度近乎为零</p>
+<h4 id="3-sawyer-夹爪-get_gripper_closed_norm-恒返回-0导致所有基于夹爪状态的-can_inject-判断全部失效根因两指对称夹爪-qpos004-004mean-恒为-0除零-bug">3. Sawyer 夹爪 get_gripper_closed_norm() 恒返回 0，导致所有基于夹爪状态的 can_inject 判断全部失效。根因：两指对称夹爪 qpos=[0.04,-0.04]，mean 恒为 0，除零 bug<a hidden class="anchor" aria-hidden="true" href="#3-sawyer-夹爪-get_gripper_closed_norm-恒返回-0导致所有基于夹爪状态的-can_inject-判断全部失效根因两指对称夹爪-qpos004-004mean-恒为-0除零-bug">#</a></h4>
+<p><strong>解决方案:</strong> 改用第一根手指绝对位置归一化：norm = abs(qpos[0]) / abs(close_qpos[0])；同步更新 7 个 error skill 文件的夹爪阈值（0.5/0.7 → 0.05/0.15/0.20）</p>
+<p><strong>关键洞察:</strong> 两指对称夹爪的 mean 归一化天然无效；实际持握时 norm≈0.08，全开时≈0.025，与直觉相反</p>
+<h4 id="4-drop-技能注入后物体不掉落delta_z0validate-永远失败根因robosuite-osc-控制器在零动作下主动维持-eef-位置打开夹爪后物体仍停在手指上">4. Drop 技能注入后物体不掉落（delta_z≈0），validate 永远失败。根因：robosuite OSC 控制器在零动作下主动维持 EEF 位置，打开夹爪后物体仍停在手指上<a hidden class="anchor" aria-hidden="true" href="#4-drop-技能注入后物体不掉落delta_z0validate-永远失败根因robosuite-osc-控制器在零动作下主动维持-eef-位置打开夹爪后物体仍停在手指上">#</a></h4>
+<p><strong>解决方案:</strong> 直接操作 MuJoCo sim.data.qpos（物体位置偏移 2cm）和 sim.data.qvel（设置 -0.5m/s 下落速度），绕过 OSC 控制器；验证 DROP D0/D2 和 COLLISION_HOLDING delta_z &gt; 2.5cm 通过</p>
+<p><strong>关键洞察:</strong> robosuite OSC 是位置控制器，零动作≠无力；需直接物理状态操纵实现自由落体，绕过控制器补偿</p>
+<h4 id="5-cuda_visible_devices6-运行时-egl-报错mujoco_egl_device_id-must-be-between-0-and-0-got-6">5. CUDA_VISIBLE_DEVICES=6 运行时 EGL 报错：MUJOCO_EGL_DEVICE_ID must be between 0 and 0, got 6<a hidden class="anchor" aria-hidden="true" href="#5-cuda_visible_devices6-运行时-egl-报错mujoco_egl_device_id-must-be-between-0-and-0-got-6">#</a></h4>
+<p><strong>解决方案:</strong> 在 main.py 入口添加 os.environ.setdefault(&lsquo;MUJOCO_EGL_DEVICE_ID&rsquo;, &lsquo;0&rsquo;)，将 EGL 设备 ID 与 CUDA 重映射后的逻辑编号对齐</p>
+<p><strong>关键洞察:</strong> CUDA_VISIBLE_DEVICES 重映射 CUDA 设备编号但不影响 EGL 物理设备枚举，两套编号体系独立，必须手动同步</p>
+<h4 id="6-k8s-pod-内-nvidia-smi-显示-gpu-进程-not-found-无法-killserve_policypy-同时出现-traj_proj-pytree-不匹配警告和-socket-dns-crash难以区分严重性">6. K8s Pod 内 nvidia-smi 显示 GPU 进程 [Not Found] 无法 kill；serve_policy.py 同时出现 traj_proj PyTree 不匹配警告和 socket DNS crash，难以区分严重性<a hidden class="anchor" aria-hidden="true" href="#6-k8s-pod-内-nvidia-smi-显示-gpu-进程-not-found-无法-killserve_policypy-同时出现-traj_proj-pytree-不匹配警告和-socket-dns-crash难以区分严重性">#</a></h4>
+<p><strong>解决方案:</strong> K8s：nvidia-smi 报告宿主机 PID，容器 PID 命名空间不同；用 ps aux | grep python 查容器内进程并 kill。serve_policy.py：traj_proj 不匹配为无害警告（allow_partial=True 自动合并），真正 crash 是 DNS 解析失败，需检查网络配置或改用 IP</p>
+<p><strong>关键洞察:</strong> containerd K8s Pod 有独立 PID 命名空间，NVIDIA 驱动暴露宿主机 PID；多错误并发时需通过读实现代码（allow_partial 参数）区分严重性，避免被无害警告误导</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="7-quotascheduler-只调度-517-子类型collision_empty-等早期高频-subtype-把-trajectory-quota-吃光ccusage-无法从-litellm-获取最新定价仅-46-个模型">7. QuotaScheduler 只调度 5/17 子类型（collision_empty 等早期高频 subtype 把 trajectory quota 吃光）；ccusage 无法从 LiteLLM 获取最新定价（仅 46 个模型）<a hidden class="anchor" aria-hidden="true" href="#7-quotascheduler-只调度-517-子类型collision_empty-等早期高频-subtype-把-trajectory-quota-吃光ccusage-无法从-litellm-获取最新定价仅-46-个模型">#</a></h4>
+<p><strong>解决方案:</strong> max_per_trajectory 10→50，使 total_slots 与 trajectory 数量解耦。ccusage：NODE_OPTIONS=&rsquo;&ndash;use-env-proxy&rsquo; npx ccusage@latest 让 undici 读取 HTTPS_PROXY</p>
+<p><strong>关键洞察:</strong> 配额分配中 per-trajectory 上限是子类型覆盖的硬瓶颈，需满足 n_traj × max_per_traj ≥ n_subtypes × target；Node.js v24 undici 不自动读取代理环境变量</p>
+<h4 id="8-windows-sshtmux-内中文字符显示为下划线conda-环境中-egg-info-存在但-import-失败共享服务器-wandb-login-影响其他用户">8. Windows SSH/tmux 内中文字符显示为下划线；conda 环境中 egg-info 存在但 import 失败；共享服务器 wandb login 影响其他用户<a hidden class="anchor" aria-hidden="true" href="#8-windows-sshtmux-内中文字符显示为下划线conda-环境中-egg-info-存在但-import-失败共享服务器-wandb-login-影响其他用户">#</a></h4>
+<p><strong>解决方案:</strong> 中文渲染：chcp 65001 或改用 Windows Terminal（根因是本地 code page 非 UTF-8）。calvin_agent：在目标 conda 环境中 pip install -e . &ndash;no-deps 重装验证。wandb：不修改 ~/.netrc，改用 WANDB_API_KEY 环境变量传递凭证，仅对当前进程有效</p>
+<p><strong>关键洞察:</strong> 三个问题均属「看似服务器端但实为客户端/环境隔离」的典型；「同环境他人是否正常」是快速定位根因侧的关键对照实验</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="error-recovery-benchmark-v50-架构创新来源">Error Recovery Benchmark v5.0 架构创新来源<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark-v50-架构创新来源">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户独立提出 Error Skill 模块化框架、D0/D1/D2 维度分类体系和离线配额调度 pipeline 等全部核心架构创新，是全天最重要的人类创造性贡献</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 梳理现有代码可复用部分，分析 24 种错误类型注入可行性，将用户架构思路细化为可实施方案</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 全局性架构转型思路完全来自用户，AI 负责可行性分析和方案落地；体现了人类在系统设计层面的主导性</p>
+<h4 id="训练-loss-问题的根因识别与追踪">训练 loss 问题的根因识别与追踪<a hidden class="anchor" aria-hidden="true" href="#训练-loss-问题的根因识别与追踪">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户凭直觉提出动作维度处理可能有问题，以及担忧 50 时间步规模失衡风险（方向正确但需定量验证）</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 系统性追踪数据变换流，定量发现 padding 稀释 56% 的根因，并通过维度分析澄清 task_loss 规模不存在 50 倍放大、真正瓶颈是 task_pos_weight</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户凭直觉识别问题方向，AI 完成量化根因分析；双方互补推动了完整解决方案</p>
+<h4 id="v5-bug-链路追踪全局视角-vs-逐点修复">v5 bug 链路追踪：全局视角 vs 逐点修复<a hidden class="anchor" aria-hidden="true" href="#v5-bug-链路追踪全局视角-vs-逐点修复">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户通过询问「现在是什么情况，做到哪里了？」推动 AI 关注全局状态而非陷入调试循环，隐含地要求实际执行而非只写代码</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 逐层修复已知 bug（夹爪 norm → can_inject → drop inject），但未预判相位检测也依赖夹爪 norm 的隐含链路，需多次运行失败才逐层发现</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类注重全局执行状态；AI 在局部 fix 上效率高但缺乏对 bug 传播链的提前预判；两者互补才完成了三层嵌套 bug 的修复</p>
+<h4 id="drop-osc-绕过方案ai-独立技术发现">Drop OSC 绕过方案（AI 独立技术发现）<a hidden class="anchor" aria-hidden="true" href="#drop-osc-绕过方案ai-独立技术发现">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户通过中断和状态询问提供了研究空间，但未直接提出直接物理操作的方案</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 通过编写 test_drop_direct.py 实验发现直接修改 MuJoCo qpos/qvel 可以成功模拟掉落，是 AI 独立得出的技术解法</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 在具体物理仿真策略层面 AI 做出了独立贡献；人类提供方向性压力，AI 完成技术路径探索</p>
+<h4 id="服务器渲染与安装问题的根因方向判断">服务器渲染与安装问题的根因方向判断<a hidden class="anchor" aria-hidden="true" href="#服务器渲染与安装问题的根因方向判断">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户主动提出「可能是我本地 SSH 问题」，通过「别人在同一服务器正常而自己不正常」的对照实验快速锁定客户端方向；calvin_agent 安装时直接选择 &ndash;no-deps 保护已有 PyTorch</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 优先从服务器端（locale、tmux 配置）展开排查，花费多轮才转向客户端；在安装方案上提供多选项但需用户补充上下文才能确定最优</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户对自身工作环境的历史记忆和使用对比是定位「客户端 vs 服务器端」问题的关键优势；AI 的系统化排查在此类场景效率较低</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>未预判 bug 的传播链：修复夹爪归一化后没有系统检查所有依赖它的下游逻辑（get_task_completion_stages、grasp 相位、can_inject），需要多次运行失败才逐层发现；参数推荐（task_loss_weight）初期也未充分追踪维度链路，需用户纠正后重做</li>
+<li>对 robosuite OSC 控制器行为认知不足：假设「打开夹爪就会掉落」，未预判 OSC 的位置维持特性，导致多次无效的阈值调整才最终发现需要绕过控制器直接操作物理状态</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>在规划类会话中过度依赖交互工具（多次尝试 ExitPlanMode/AskUserQuestion 被用户拒绝），未根据上下文做出合理推断后继续推进；临时调试脚本（test_drop_fix.py 等）未整合进正式单元测试，清理后诊断知识丢失</li>
+<li>未在长时 GPU 任务开始前向用户确认（直接发起 ssh an46 渲染被中断）；服务器渲染排查初期偏向服务器端，未优先询问「他人是否正常」这一关键对照问题，导致排查绕远路</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>VLA 训练必须 mask padding 维度：flow matching 模型若 action 存在 zero-padding，只对真实维度计算 loss，否则 padding 维度系统性稀释梯度信号（本例 14/32 维只贡献 43.75% loss）。机器人数据分类标签末尾 N 帧为正类会导致严重不平衡，pos_weight 必须根据实际数据分布设置，而非默认值 1.0</li>
+<li>Sawyer 两指夹爪 qpos=[0.04,-0.04]，mean 恒为 0，必须用单指绝对值归一化（持握 norm≈0.08，空手≈0.025，与直觉相反）。robosuite OSC 控制器 zero-action 维持 EEF 位置，打开夹爪≠物体下落；需直接操作 MuJoCo sim.data.qpos/qvel 绕过控制器实现自由落体。MuJoCo 接触力是瞬态的，不适合 post-settle 验证，应改用位移/速度等持续性指标</li>
+<li>CUDA_VISIBLE_DEVICES 和 MUJOCO_EGL_DEVICE_ID 是两套独立的 GPU 编号体系，前者对 CUDA 运行时重映射物理 GPU，后者枚举 EGL 物理设备；在指定非零 GPU 时必须手动同步，显式设置 MUJOCO_EGL_DEVICE_ID=0。JAX/Flax allow_partial=True 机制允许在已有 checkpoint 上扩展模型架构，缺失键从初始化填充，多余键丢弃</li>
+<li>相位检测是多个 error skill 正常工作的隐含前提；底层传感器修复后必须系统检查所有依赖它的上游判断逻辑。QuotaScheduler 的 max_per_trajectory 需满足 total_slots = n_traj × max_per_traj ≥ n_subtypes × target，否则早期高频 subtype 会吃光所有 quota</li>
+<li>K8s Pod 有独立 PID 命名空间，NVIDIA 驱动暴露宿主机 PID 给所有容器，导致 nvidia-smi 进程名无法解析；需用 psutil+pynvml 在容器内自行实现进程监控。排查渲染/显示类问题时，「同环境其他用户是否正常」是最有效的早期过滤问题，能快速区分客户端与服务器端根因</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>conda egg-info 目录存在不代表当前 Python 环境已安装该包，多环境共享文件系统时必须在目标环境中通过 pip show 和 import 验证。Node.js v24 内置 fetch（undici）默认不读取 HTTPS_PROXY，需 &ndash;use-env-proxy 显式开启。wandb 凭证存储在用户级 ~/.netrc，应通过 WANDB_API_KEY 环境变量传递凭证，仅对当前进程有效</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="robobrain-pi">RoboBrain-Pi<a hidden class="anchor" aria-hidden="true" href="#robobrain-pi">#</a></h3>
+<p><strong>✅ 训练核心问题：loss 震荡根因分析 + Task Completion 代码审查 + 参数调优</strong>
+<em>06:36:15.000 | claude_code</em>
+深入分析 pi05_put_item_in_drawer 训练配置：追踪数据流发现 action_loss 在全 32 维均值但实际只有 14 维动作（56% loss 来自零填充）；审查 Task Completion 分类头代码确认逻辑正确，发现 Pi0.5 缺乏单元测试等潜在问题；评估 task_loss_weight/task_pos_weight 参数，识别末尾 20 帧正类导致约 9:1 不平衡，建议将 task_pos_weight 从 1.0 提升至 5.0，task_loss_weight 保持 0.1。</p>
+<p><strong>🔄 环境与工具问题：K8s GPU 监控 + wandb 账号隔离 + uv 重装</strong>
+<em>09:59:33.000 | claude_code</em>
+发现 K8s Pod PID 命名空间导致 nvidia-smi 进程不显示，开发 gpumon.py（psutil+pynvml）；第一版终端布局换行，重写时被中断。解决共享服务器 wandb 账号隔离问题（改用 WANDB_API_KEY 环境变量）及 uv 命令缺失（pip install uv 重装）。</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 v5.0 架构设计：Error Skill 模块化框架 + 配额制离线 pipeline 规划</strong>
+<em>05:18:32.000 | claude_code</em>
+用户提出 Error Recovery Benchmark v5.0 核心架构创新：Error Skill 模块取代 v4 三层结构，定义 E1-E11×D0/D1/D2=26 个子类，四步 pipeline（收集干净轨迹→离线扫描→配额调度→注入）。AI 分析代码复用性，详细评估 24 种错误类型注入可行性，讨论 BC-RNN checkpoints 可用性和 GPU 资源调度。整体处于规划阶段，为后续实现奠定架构基础。</p>
+<p><strong>✅ 深度调试三层嵌套 bug + pick_place 全量验证（64.7% 成功率）</strong>
+<em>04:00:00.000 | claude_code</em>
+逐层修复 drop/collision_holding 0% 成功率的根因：(1) 夹爪归一化除零（改用单指绝对值，更新 7 个文件阈值）；(2) Drop OSC 控制器绕过（直接操作 MuJoCo qpos/qvel，验证 delta_z&gt;2.5cm）；(3) 相位检测链路断裂（grasp 阈值 0.7→0.05+EEF 距离 fallback，更新 6 个 YAML）；同步修复路径一致性和 max_per_trajectory（10→50）。最终 pick_place：798 机会/17 子类型→110/170 成功（64.7%）/15 子类型，含 drop 和 collision_holding。</p>
+<p><strong>🔄 v5 pipeline 全量代码实现：6 阶段 + BC-RNN + 视频渲染 + master 脚本</strong>
+<em>15:08:54.367 | claude_code</em>
+实现 v5 pipeline 全 6 阶段，修复 4 个已知 bug，添加 BC-RNN rollout 收集、视频渲染、run_v5_all_tasks.py master 脚本。221 单元测试通过后，在 an46 A800 GPU smoke test 生成 5 个 MP4 视频。全量运行时发现子类型覆盖严重不足（25 个中只覆盖约 5 个），drop/collision_holding 成功率 0%，触发深度调试。</p>
+<h3 id="calvin-机器人基准">CALVIN 机器人基准<a hidden class="anchor" aria-hidden="true" href="#calvin-机器人基准">#</a></h3>
+<p><strong>✅ 诊断并修复 calvin_agent 在 univla 环境中不可导入的问题</strong>
+<em>03:27:22.435 | claude_code</em>
+按 install.sh 安装后仍无法 import calvin_agent。AI 确认 egg-info 是在另一 conda 环境下生成的，当前 univla 环境未安装。用户选择 &ndash;no-deps 保护现有 PyTorch，pip install -e . &ndash;no-deps 执行后验证 import calvin_agent 0.0.1 成功。</p>
+<h3 id="openpi-moe-机器人策略">Openpi-moe 机器人策略<a hidden class="anchor" aria-hidden="true" href="#openpi-moe-机器人策略">#</a></h3>
+<p><strong>🔄 诊断 serve_policy.py 双错误：traj_proj 无害警告 + DNS crash + EGL 设备错误修复</strong>
+<em>08:23:44.180 | claude_code</em>
+用户报告两类错误。AI 分析代码确认 traj_proj PyTree 不匹配只是无害警告（allow_partial=True 自动合并），真正 crash 是 socket DNS 解析失败（需用户处理网络配置）。随后报告 EGL MUJOCO_EGL_DEVICE_ID 超出范围错误，AI 识别 CUDA_VISIBLE_DEVICES=6 与 EGL 物理编号不同步，在 main.py 入口添加 setdefault 修复 EGL 问题。</p>
+<h3 id="robotwin-vla-数据处理">RoboTwin VLA 数据处理<a hidden class="anchor" aria-hidden="true" href="#robotwin-vla-数据处理">#</a></h3>
+<p><strong>✅ 修复数据转换脚本语言指令固定取第一条的缺陷</strong>
+<em>10:00:13.094 | claude_code</em>
+用户发现 convert_robotwin_democlean_to_lerobot.py 所有 episode 语言指令均为 seen 列表第一条。AI 参考 pi05 版本实现，将 [0] 索引改为 np.random.choice(seen_instructions)，每次 load_episode_data() 调用时随机选取指令，提升训练数据多样性。修改成功应用。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>49,311,479</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>86,370</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>183,702</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>3,791,275</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>45,250,132</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>92.3%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$36.8636</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>51,370</td>
+          <td>101,526</td>
+          <td>2,195,460</td>
+          <td>33,453,290</td>
+          <td>$33.2433</td>
+          <td>90.2%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>35,000</td>
+          <td>82,176</td>
+          <td>1,595,815</td>
+          <td>11,796,842</td>
+          <td>$3.6203</td>
+          <td>9.8%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
