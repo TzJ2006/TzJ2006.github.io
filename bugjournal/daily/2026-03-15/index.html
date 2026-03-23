@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-15 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="完成 Research Scout &#43; Researcher Profiler &#43; 引用图分析统一集成，将 Error Recovery Benchmark v4 遗留代码全面归档，为 Stack 任务 11 个错误技能生成 demo 视频（修复 MuJoCo body name 系统性缺陷），并解除 VLA-RoboTwin 训练的 LeRobot 数据 shape 阻塞。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-15/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-15/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-15/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-15">
+  <meta property="og:description" content="完成 Research Scout &#43; Researcher Profiler &#43; 引用图分析统一集成，将 Error Recovery Benchmark v4 遗留代码全面归档，为 Stack 任务 11 个错误技能生成 demo 视频（修复 MuJoCo body name 系统性缺陷），并解除 VLA-RoboTwin 训练的 LeRobot 数据 shape 阻塞。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-15T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-15T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-15">
+  <meta name="twitter:description" content="完成 Research Scout &#43; Researcher Profiler &#43; 引用图分析统一集成，将 Error Recovery Benchmark v4 遗留代码全面归档，为 Stack 任务 11 个错误技能生成 demo 视频（修复 MuJoCo body name 系统性缺陷），并解除 VLA-RoboTwin 训练的 LeRobot 数据 shape 阻塞。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Daily Summaries",
+      "item": "https://tzj2006.github.io/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-03-15",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-03-15/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-15",
+  "name": "Bug Journal 2026-03-15",
+  "description": "完成 Research Scout + Researcher Profiler + 引用图分析统一集成，将 Error Recovery Benchmark v4 遗留代码全面归档，为 Stack 任务 11 个错误技能生成 demo 视频（修复 MuJoCo body name 系统性缺陷），并解除 VLA-RoboTwin 训练的 LeRobot 数据 shape 阻塞。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-15 今日概览 做了什么： 将 research 目录下两个独立工具合并为单一 CLI 并新增引用图分析；完成 Error Recovery Benchmark v4 代码归档清理；为 Stack 任务 11 个错误技能生成 demo 视频；修复 VLA-RoboTwin 训练数据 shape 兼容性问题 怎么做的： 扩展 research_scout.py 新增 profile/citations 子命令并重写 llm.py 支持三后端；通过 import 依赖追踪确定 v4/v5 边界后批量归档并内联修复传递依赖；编写 generate_demo_videos.py 并通过逐层调试定位 MuJoCo body name _main 后缀缺陷；统一 LeRobot 特征 shape 定义与 numpy 写入并修正 pi0.py 中的升维错误 有什么用： 研究工具链整合为单一 CLI 入口，v4 遗留代码清除降低维护负担，11 个错误注入 demo 视频在正确任务阶段展示，pi05 训练所需数据转换阻塞得以解除 完成 Research Scout + Researcher Profiler + 引用图分析统一集成，将 Error Recovery Benchmark v4 遗留代码全面归档，为 Stack 任务 11 个错误技能生成 demo 视频（修复 MuJoCo body name 系统性缺陷），并解除 VLA-RoboTwin 训练的 LeRobot 数据 shape 阻塞。\n今日任务 架构与策略 ✅ Research Scout + Researcher Profiler + 引用图分析统一集成 — 删除重复的 New feature/ 目录；向 semantic_scholar.py 添加 get_paper_by_id/citations/references 三个引用图 API；向 research_scout.py 添加 profile 和 citations 子命令；重写 llm.py 支持 claude_cli/anthropic/openai 三后端；在报告管线中集成 Stage 3 引用影响分析（始终对 top-5 论文触发，引用数仅用于排序不影响 composite_score）；更新 generate_report_markdown 渲染引用影响章节 ✅ Stack 任务 11 个错误技能 demo 视频生成（含 MuJoCo body name 修复） — 编写 generate_demo_videos.py，通过 set_sim_state 直接设置仿真状态精确定位各阶段帧，生成带 skill/degree/phase/frame 水印的 MP4 并存储于 outputs/v5/stack/demo_videos/；调试发现 stack.yaml 中 body_name 缺少 _main 后缀导致阶段检测全部失效，修复 yaml 并在 env_wrapper 添加通用 fallback 查找；修复后 11 个视频在正确阶段（pre_reach/reach/grasp/lift/transport）注入 ✅ Error Recovery Benchmark v4 代码全面归档 — 将 19 个框架模块、4 个子目录、15 个 pipeline 脚本、5 个配置文件、6 个测试文件及多个输出目录移至 archive/v4/；发现并修复 policy_adapter.py 对已归档 collector.py 的传递依赖（内联 BasePolicy/PolicyResult）；更新 init.py、Makefile、CLAUDE.md、README.md 为纯 v5 状态；全部 94 个 v5 单元测试通过 ✅ VLA-RoboTwin LeRobot 转换脚本及 pi0.py shape 兼容性修复 — 在转换脚本中添加 manip_progress_time、manip_progress_distance_left/right（shape:[1,]）和 target_endpose（shape:[7,]）、target_joint（shape:[14,]）特征定义及帧级别写入；修复 pi0.py 中 aux_targets 的 [:, None] 冗余升维和 jnp.stack→jnp.concatenate，统一 shape 处理为 (b,2) 实现与修复 ✅ Research 文档更新（CLAUDE.md + TUTORIAL.md 中文化） — 更新 CLAUDE.md 反映双工具统一架构、三阶段管线和新 CLI 子命令；将 TUTORIAL.md 从 10 章扩展为 13 章，新增研究者画像、引用图分析、多源搜索章节，并添加 4 个工作流示例 问题与解决方案 关键问题 1. MuJoCo body name 缺少 _main 后缀（cubeA 应为 cubeA_main），导致 _sim_body_name2id 返回 -1，Python 负索引静默读取错误位置，Stack 任务所有阶段检测失效，首批 11 个 demo 视频全部在 pre_reach 注入 解决方案: 将 stack.yaml 中 body_name 改为 _main 后缀，并在 env_wrapper._sim_body_name2id 中添加通用 fallback（依次尝试 {name}_main 和 {name}_body0），确保所有 task 的 yaml 均兼容\n关键洞察: Python 负索引将 -1 静默转为有效访问而不报错；此类 bug 只能通过输出异常（如阶段分布极度偏斜）才能发现，应在 body name 查找处显式断言返回值有效性\n2. v4 代码归档计划覆盖了主要路径，但遗漏了 policy_adapter.py → collector.py 的传递依赖，导致归档后 v5 框架 import 失败 解决方案: 将 BasePolicy（抽象接口）和 PolicyResult（dataclass）两个轻量类直接内联到 policy_adapter.py，消除对已归档模块的依赖；归档后通过 init.py 导入验证快速发现问题\n关键洞察: 静态 import 追踪可能遗漏传递依赖（A→B→C 链），归档操作后应立即执行 import 验证脚本作为快速检测器\n3. LeRobot 标量特征定义 shape:(1,) 但写入时使用 np.float32(scalar)（0维数组），导致 pi0.py 中 [:, None] 产生 (b,1,1)、jnp.stack 产生 (b,1,2) 等错误形状，训练阻塞 解决方案: 统一写入方式为 np.array([val])（shape:(1,)）；移除 pi0.py 中冗余的 [:, None]；将 jnp.stack 改为 jnp.concatenate(…, axis=-1) 将两个 (b,1) 拼为 (b,2)\n关键洞察: LeRobot features 字典的 shape 定义与实际写入 array 的 shape 必须严格匹配；设计时应统一约定标量特征是 (b,) 还是 (b,1) 并全链路一致\n4. 引用数量与论文评估分数的关系不明确，是否应纳入 composite_score 及何时触发分析 解决方案: 明确决策：引用数仅用于对 top-5 论文排序（tiebreaker），不影响 composite_score（0.4相关性 + 0.3启发性 + 0.3*新颖性）；引用图分析始终触发无需额外 flag\n关键洞察: 引用数衡量传播广度，与研究质量/创新性正交；混入评分会扭曲筛选结果，两个维度应独立维护\n5. Research Scout 的 _call_llm 与 research 包的 call_llm 是两套独立 LLM 封装，合并时无法复用 解决方案: 重写 research 包的 call_llm 增加 backend 参数，与 research_scout.py 的三后端逻辑对齐；保持 research_scout.py 的评估逻辑不变，仅在 profiler 侧补充多后端能力\n关键洞察: monolithic 脚本与模块化包集成时，以 monolithic 脚本作为 CLI 入口、用 lazy import 引用模块化包，可避免大规模重构风险\n人类思路 vs AI 思路 战略层面 demo 视频问题诊断与 MuJoCo 调试策略 角色 思路 人类 人类仅提出需求（为每个 error 生成 demo 视频），未参与调试过程 AI AI 先分析现有场景机会地图，写脚本后发现全部 pre_reach 注入异常，通过 _debug_phases.py 和 _debug_bodynames.py 逐层排查，最终定位到 body name _main 后缀缺失这一底层系统性缺陷 差异分析: AI 通过「现象→原因排查→根本原因」的调试方法论自主发现了与原始请求无关的隐藏系统性 bug；任务的价值不仅在于完成视频生成，更在于暴露了影响所有 task 配置的通用问题\nv4 归档范围与依赖分析 角色 思路 人类 人类预先通过 import 追踪完成详细的模块分类表，明确指定 v5 使用的 13 个框架模块 vs v4 专属的 ~20 个模块，并标注了可能在 v5 评估阶段重新启用的模块（metrics.py 等） AI AI 按计划执行移动操作，在验证阶段通过实际 import 运行捕获了计划未覆盖的传递依赖（policy_adapter.py → collector.py），并提出内联解决方案 差异分析: 人类的静态分析覆盖了主要路径但遗漏了间接依赖；AI 通过实际运行验证弥补了静态分析的盲区，两者互补性强\n引用数量处理方式与集成架构决策 角色 思路 人类 人类有清晰的业务直觉：引用数衡量传播广度、与研究质量正交，明确要求仅用于排序且分析始终触发；并预先给出了比 AI 任何建议都更精细的完整 9 步集成计划 AI AI 准备了多个架构选项（重写 monolithic/modular、双入口、hybrid）和引用数处理选项（纳入评分 vs 独立分析）供用户选择 差异分析: 在有明确需求规格时，AI 的规划层面价值有限；用户的领域直觉直接给出了最优方案，AI 的核心价值在于精确实现\nLeRobot 特征 shape 设计与双侧修复 角色 思路 人类 人类将标量特征 shape 定义为 (1,)，但实际写入使用 np.float32(scalar)（0维数组），未严格对齐 LeRobot 的 shape 契约 AI AI 识别到 shape 定义与写入不一致，并追踪到 pi0.py 中因此产生的双重升维错误，在数据侧和模型侧同步修复 差异分析: AI 在修复时做到了数据与模型的双侧对齐，避免了单侧修复产生的残留隐患\nAI 局限性 重要局限 pi0.py 中原始 aux_targets 形状处理错误（[:, None] 和 jnp.stack 使用不当）是 AI 在之前对话中写的代码缺陷，说明 AI 对数据流 shape 的端到端跟踪存在系统性盲区 未进行充分的预验证（task yaml body_name 配置正确性、framework 完整 import 依赖图），直接执行导致产生错误的第一批 demo 视频和遗漏的归档依赖，均需额外 debug 轮次 一般局限 在有明确规格说明时，AI 仍倾向于先提供多个选项或主动发起探索性操作（如 /init 时的 bash 列目录），增加了不必要的交互轮次 今日收获 核心收获 MuJoCo robosuite 环境的对象 body name 通常带有 _main 后缀（如 cubeA_main），但 task config 逻辑名可能不带；_sim_body_name2id 返回 -1 时 Python 负索引静默读取最后一个 body 而不报错——应在 body name 查找处显式断言或添加 fallback，并以输出分布极度偏斜作为此类 bug 的早期信号 引用数量与研究质量是正交维度：高引用反映传播广度/时间影响，不代表研究创新性；在论文评估中应分离两个维度（引用数仅排序，composite_score 评估研究质量） LeRobot 数据集中 shape:(1,) 特征批量加载后为 (b,1) 而非 (b,)；数据写入（np.array([val])）与特征定义（shape:(1,)）必须严格匹配，且模型侧不得再做额外升维 代码归档前需进行完整的传递依赖分析（A→B→C 链式依赖），仅静态依赖列表可能遗漏间接依赖；归档后立即执行 import 验证脚本可快速捕获遗漏；import 追踪是划定版本边界的可靠方法 monolithic 脚本与模块化包的集成最佳实践：以 monolithic 脚本为 CLI 入口，用 lazy import（函数内 import）引用模块化包，避免循环依赖且无需重构现有逻辑 Semantic Scholar API 支持 /paper/{id}/citations 和 /paper/{id}/references 端点，字段含 paperId、title、year、citationCount、authors、abstract，无需 API Key（有限速）；支持 arXiv ID 和 DOI 解析 对于 BC-RNN 等带历史的策略，action-replay 方式重放轨迹时动作会累计漂移；用 set_sim_state 直接设置仿真状态才能精确重现训练轨迹的每一帧 会话摘要 Research Scout ✅ Research Scout + Researcher Profiler + 引用图分析统一集成（9步计划）及文档更新 02:16:04.409 | claude_code 用户提供详细的 9 步集成计划，AI 完整实现：删除重复目录、向 semantic_scholar.py 添加三个引用图 API、向 research_scout.py 添加 profile 和 citations 子命令、重写 llm.py 支持三后端、在报告管线中集成 Stage 3 引用影响分析（始终对 top-5 触发、引用数仅排序）。随后更新 CLAUDE.md 反映新架构，将 TUTORIAL.md 从 10 章扩展为 13 章并全面中文化。所有文件通过 Python 语法检查，新 CLI 子命令可正常运行。（早期 /init 因 bash 工具调用被拒而中断，无文件变更。）\nError Recovery Benchmark ✅ 为 Stack 任务 11 个 Error Skill 生成 demo 视频，修复 MuJoCo body name 系统性缺陷 01:50:09.327 | claude_code 用户请求为 Stack 任务每个 error 生成 demo 视频。AI 编写 generate_demo_videos.py（set_sim_state 方式），首批 11 个视频全部在 pre_reach 阶段注入，阶段检测失效。通过 _debug_phases.py 和 _debug_bodynames.py 逐层排查，定位到 stack.yaml 中 body_name 缺少 MuJoCo 要求的 _main 后缀（cubeA 应为 cubeA_main），导致 body_xpos[-1] 静默读取错误位置。修复 yaml 后缀并在 env_wrapper 添加通用 fallback 查找（覆盖 coffee.yaml、stack_three.yaml 等所有 task），重新生成 11 个视频在正确阶段注入。\n✅ v4 代码全面归档（规划 + 执行）及 v5-only 文档更新 01:50:09.327 | claude_code 第一阶段（规划）：通过 import 追踪确定 v5 使用的 13 个核心模块 vs v4 专属的 ~20 个模块，制定将约 50 个文件移入 archive/v4/ 的详细计划，标注 metrics.py 等可能在 v5 评估阶段重新启用的模块。第二阶段（执行）：创建 archive/v4/ 目录结构并批量移动所有文件；发现 policy_adapter.py 对已归档 collector.py 的传递依赖，通过内联 BasePolicy/PolicyResult 解决；更新 init.py、Makefile、CLAUDE.md、README.md 和项目全景总结.md 为纯 v5 状态；全部 94 个 v5 单元测试通过。\nVLA-RoboTwin ✅ 修复 LeRobot 转换脚本和 pi0.py 以支持进度预测训练字段 01:40:13.957 | claude_code 训练因数据缺少 manip_progress_time 等字段报错。AI 检查 HDF5 结构后，在转换脚本中添加 5 个新特征（manip_progress_time、manip_progress_distance_left/right、target_endpose、target_joint）的定义和帧级别写入。随后发现 shape 不匹配：标量特征定义为 shape:(1,) 但写入 0 维 np.float32，导致 pi0.py 中 [:, None] 和 jnp.stack 产生错误形状；修复写入方式（np.array([val])）和 pi0.py 中 tensor 操作（去掉冗余 [:, None]，jnp.stack→jnp.concatenate），解除训练阻塞。\nToken 用量 总览 指标 数值 总 Token 17,483,898 输入 Token 7,230 输出 Token 57,677 Cache 创建 1,037,143 Cache 读取 16,381,848 Cache 命中率 94.0% 总费用 (USD) $11.4734 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 5,353 29,524 578,779 11,843,530 $10.3040 89.8% claude-haiku-4-5-20251001 1,877 28,153 458,364 4,538,318 $1.1694 10.2% ",
+  "wordCount" : "872",
+  "inLanguage": "en",
+  "datePublished": "2026-03-15T00:00:00-05:00",
+  "dateModified": "2026-03-15T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-03-15/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/daily/">Daily Summaries</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-15
+    </h1>
+    <div class="post-meta"><span title='2026-03-15 00:00:00 -0500 -0500'>March 15, 2026</span>&nbsp;·&nbsp;<span>5 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-15">日报 — 2026-03-15<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-15">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 将 research 目录下两个独立工具合并为单一 CLI 并新增引用图分析；完成 Error Recovery Benchmark v4 代码归档清理；为 Stack 任务 11 个错误技能生成 demo 视频；修复 VLA-RoboTwin 训练数据 shape 兼容性问题</li>
+<li><strong>怎么做的：</strong> 扩展 research_scout.py 新增 profile/citations 子命令并重写 llm.py 支持三后端；通过 import 依赖追踪确定 v4/v5 边界后批量归档并内联修复传递依赖；编写 generate_demo_videos.py 并通过逐层调试定位 MuJoCo body name _main 后缀缺陷；统一 LeRobot 特征 shape 定义与 numpy 写入并修正 pi0.py 中的升维错误</li>
+<li><strong>有什么用：</strong> 研究工具链整合为单一 CLI 入口，v4 遗留代码清除降低维护负担，11 个错误注入 demo 视频在正确任务阶段展示，pi05 训练所需数据转换阻塞得以解除</li>
+</ul>
+<blockquote>
+<p>完成 Research Scout + Researcher Profiler + 引用图分析统一集成，将 Error Recovery Benchmark v4 遗留代码全面归档，为 Stack 任务 11 个错误技能生成 demo 视频（修复 MuJoCo body name 系统性缺陷），并解除 VLA-RoboTwin 训练的 LeRobot 数据 shape 阻塞。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>Research Scout + Researcher Profiler + 引用图分析统一集成</strong> — 删除重复的 New feature/ 目录；向 semantic_scholar.py 添加 get_paper_by_id/citations/references 三个引用图 API；向 research_scout.py 添加 profile 和 citations 子命令；重写 llm.py 支持 claude_cli/anthropic/openai 三后端；在报告管线中集成 Stage 3 引用影响分析（始终对 top-5 论文触发，引用数仅用于排序不影响 composite_score）；更新 generate_report_markdown 渲染引用影响章节</li>
+<li>✅ <strong>Stack 任务 11 个错误技能 demo 视频生成（含 MuJoCo body name 修复）</strong> — 编写 generate_demo_videos.py，通过 set_sim_state 直接设置仿真状态精确定位各阶段帧，生成带 skill/degree/phase/frame 水印的 MP4 并存储于 outputs/v5/stack/demo_videos/；调试发现 stack.yaml 中 body_name 缺少 _main 后缀导致阶段检测全部失效，修复 yaml 并在 env_wrapper 添加通用 fallback 查找；修复后 11 个视频在正确阶段（pre_reach/reach/grasp/lift/transport）注入</li>
+<li>✅ <strong>Error Recovery Benchmark v4 代码全面归档</strong> — 将 19 个框架模块、4 个子目录、15 个 pipeline 脚本、5 个配置文件、6 个测试文件及多个输出目录移至 archive/v4/；发现并修复 policy_adapter.py 对已归档 collector.py 的传递依赖（内联 BasePolicy/PolicyResult）；更新 <strong>init</strong>.py、Makefile、CLAUDE.md、README.md 为纯 v5 状态；全部 94 个 v5 单元测试通过</li>
+<li>✅ <strong>VLA-RoboTwin LeRobot 转换脚本及 pi0.py shape 兼容性修复</strong> — 在转换脚本中添加 manip_progress_time、manip_progress_distance_left/right（shape:[1,]）和 target_endpose（shape:[7,]）、target_joint（shape:[14,]）特征定义及帧级别写入；修复 pi0.py 中 aux_targets 的 [:, None] 冗余升维和 jnp.stack→jnp.concatenate，统一 shape 处理为 (b,2)</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>Research 文档更新（CLAUDE.md + TUTORIAL.md 中文化）</strong> — 更新 CLAUDE.md 反映双工具统一架构、三阶段管线和新 CLI 子命令；将 TUTORIAL.md 从 10 章扩展为 13 章，新增研究者画像、引用图分析、多源搜索章节，并添加 4 个工作流示例</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-mujoco-body-name-缺少-_main-后缀cubea-应为-cubea_main导致-_sim_body_name2id-返回--1python-负索引静默读取错误位置stack-任务所有阶段检测失效首批-11-个-demo-视频全部在-pre_reach-注入">1. MuJoCo body name 缺少 _main 后缀（cubeA 应为 cubeA_main），导致 _sim_body_name2id 返回 -1，Python 负索引静默读取错误位置，Stack 任务所有阶段检测失效，首批 11 个 demo 视频全部在 pre_reach 注入<a hidden class="anchor" aria-hidden="true" href="#1-mujoco-body-name-缺少-_main-后缀cubea-应为-cubea_main导致-_sim_body_name2id-返回--1python-负索引静默读取错误位置stack-任务所有阶段检测失效首批-11-个-demo-视频全部在-pre_reach-注入">#</a></h4>
+<p><strong>解决方案:</strong> 将 stack.yaml 中 body_name 改为 _main 后缀，并在 env_wrapper._sim_body_name2id 中添加通用 fallback（依次尝试 {name}_main 和 {name}_body0），确保所有 task 的 yaml 均兼容</p>
+<p><strong>关键洞察:</strong> Python 负索引将 -1 静默转为有效访问而不报错；此类 bug 只能通过输出异常（如阶段分布极度偏斜）才能发现，应在 body name 查找处显式断言返回值有效性</p>
+<h4 id="2-v4-代码归档计划覆盖了主要路径但遗漏了-policy_adapterpy--collectorpy-的传递依赖导致归档后-v5-框架-import-失败">2. v4 代码归档计划覆盖了主要路径，但遗漏了 policy_adapter.py → collector.py 的传递依赖，导致归档后 v5 框架 import 失败<a hidden class="anchor" aria-hidden="true" href="#2-v4-代码归档计划覆盖了主要路径但遗漏了-policy_adapterpy--collectorpy-的传递依赖导致归档后-v5-框架-import-失败">#</a></h4>
+<p><strong>解决方案:</strong> 将 BasePolicy（抽象接口）和 PolicyResult（dataclass）两个轻量类直接内联到 policy_adapter.py，消除对已归档模块的依赖；归档后通过 <strong>init</strong>.py 导入验证快速发现问题</p>
+<p><strong>关键洞察:</strong> 静态 import 追踪可能遗漏传递依赖（A→B→C 链），归档操作后应立即执行 import 验证脚本作为快速检测器</p>
+<h4 id="3-lerobot-标量特征定义-shape1-但写入时使用-npfloat32scalar0维数组导致-pi0py-中--none-产生-b11jnpstack-产生-b12-等错误形状训练阻塞">3. LeRobot 标量特征定义 shape:(1,) 但写入时使用 np.float32(scalar)（0维数组），导致 pi0.py 中 [:, None] 产生 (b,1,1)、jnp.stack 产生 (b,1,2) 等错误形状，训练阻塞<a hidden class="anchor" aria-hidden="true" href="#3-lerobot-标量特征定义-shape1-但写入时使用-npfloat32scalar0维数组导致-pi0py-中--none-产生-b11jnpstack-产生-b12-等错误形状训练阻塞">#</a></h4>
+<p><strong>解决方案:</strong> 统一写入方式为 np.array([val])（shape:(1,)）；移除 pi0.py 中冗余的 [:, None]；将 jnp.stack 改为 jnp.concatenate(&hellip;, axis=-1) 将两个 (b,1) 拼为 (b,2)</p>
+<p><strong>关键洞察:</strong> LeRobot features 字典的 shape 定义与实际写入 array 的 shape 必须严格匹配；设计时应统一约定标量特征是 (b,) 还是 (b,1) 并全链路一致</p>
+<h4 id="4-引用数量与论文评估分数的关系不明确是否应纳入-composite_score-及何时触发分析">4. 引用数量与论文评估分数的关系不明确，是否应纳入 composite_score 及何时触发分析<a hidden class="anchor" aria-hidden="true" href="#4-引用数量与论文评估分数的关系不明确是否应纳入-composite_score-及何时触发分析">#</a></h4>
+<p><strong>解决方案:</strong> 明确决策：引用数仅用于对 top-5 论文排序（tiebreaker），不影响 composite_score（0.4<em>相关性 + 0.3</em>启发性 + 0.3*新颖性）；引用图分析始终触发无需额外 flag</p>
+<p><strong>关键洞察:</strong> 引用数衡量传播广度，与研究质量/创新性正交；混入评分会扭曲筛选结果，两个维度应独立维护</p>
+<h4 id="5-research-scout-的-_call_llm-与-research-包的-call_llm-是两套独立-llm-封装合并时无法复用">5. Research Scout 的 _call_llm 与 research 包的 call_llm 是两套独立 LLM 封装，合并时无法复用<a hidden class="anchor" aria-hidden="true" href="#5-research-scout-的-_call_llm-与-research-包的-call_llm-是两套独立-llm-封装合并时无法复用">#</a></h4>
+<p><strong>解决方案:</strong> 重写 research 包的 call_llm 增加 backend 参数，与 research_scout.py 的三后端逻辑对齐；保持 research_scout.py 的评估逻辑不变，仅在 profiler 侧补充多后端能力</p>
+<p><strong>关键洞察:</strong> monolithic 脚本与模块化包集成时，以 monolithic 脚本作为 CLI 入口、用 lazy import 引用模块化包，可避免大规模重构风险</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="demo-视频问题诊断与-mujoco-调试策略">demo 视频问题诊断与 MuJoCo 调试策略<a hidden class="anchor" aria-hidden="true" href="#demo-视频问题诊断与-mujoco-调试策略">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类仅提出需求（为每个 error 生成 demo 视频），未参与调试过程</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 先分析现有场景机会地图，写脚本后发现全部 pre_reach 注入异常，通过 _debug_phases.py 和 _debug_bodynames.py 逐层排查，最终定位到 body name _main 后缀缺失这一底层系统性缺陷</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI 通过「现象→原因排查→根本原因」的调试方法论自主发现了与原始请求无关的隐藏系统性 bug；任务的价值不仅在于完成视频生成，更在于暴露了影响所有 task 配置的通用问题</p>
+<h4 id="v4-归档范围与依赖分析">v4 归档范围与依赖分析<a hidden class="anchor" aria-hidden="true" href="#v4-归档范围与依赖分析">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类预先通过 import 追踪完成详细的模块分类表，明确指定 v5 使用的 13 个框架模块 vs v4 专属的 ~20 个模块，并标注了可能在 v5 评估阶段重新启用的模块（metrics.py 等）</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 按计划执行移动操作，在验证阶段通过实际 import 运行捕获了计划未覆盖的传递依赖（policy_adapter.py → collector.py），并提出内联解决方案</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类的静态分析覆盖了主要路径但遗漏了间接依赖；AI 通过实际运行验证弥补了静态分析的盲区，两者互补性强</p>
+<h4 id="引用数量处理方式与集成架构决策">引用数量处理方式与集成架构决策<a hidden class="anchor" aria-hidden="true" href="#引用数量处理方式与集成架构决策">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类有清晰的业务直觉：引用数衡量传播广度、与研究质量正交，明确要求仅用于排序且分析始终触发；并预先给出了比 AI 任何建议都更精细的完整 9 步集成计划</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 准备了多个架构选项（重写 monolithic/modular、双入口、hybrid）和引用数处理选项（纳入评分 vs 独立分析）供用户选择</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 在有明确需求规格时，AI 的规划层面价值有限；用户的领域直觉直接给出了最优方案，AI 的核心价值在于精确实现</p>
+<h4 id="lerobot-特征-shape-设计与双侧修复">LeRobot 特征 shape 设计与双侧修复<a hidden class="anchor" aria-hidden="true" href="#lerobot-特征-shape-设计与双侧修复">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类将标量特征 shape 定义为 (1,)，但实际写入使用 np.float32(scalar)（0维数组），未严格对齐 LeRobot 的 shape 契约</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 识别到 shape 定义与写入不一致，并追踪到 pi0.py 中因此产生的双重升维错误，在数据侧和模型侧同步修复</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI 在修复时做到了数据与模型的双侧对齐，避免了单侧修复产生的残留隐患</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>pi0.py 中原始 aux_targets 形状处理错误（[:, None] 和 jnp.stack 使用不当）是 AI 在之前对话中写的代码缺陷，说明 AI 对数据流 shape 的端到端跟踪存在系统性盲区</li>
+<li>未进行充分的预验证（task yaml body_name 配置正确性、framework 完整 import 依赖图），直接执行导致产生错误的第一批 demo 视频和遗漏的归档依赖，均需额外 debug 轮次</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>在有明确规格说明时，AI 仍倾向于先提供多个选项或主动发起探索性操作（如 /init 时的 bash 列目录），增加了不必要的交互轮次</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>MuJoCo robosuite 环境的对象 body name 通常带有 _main 后缀（如 cubeA_main），但 task config 逻辑名可能不带；_sim_body_name2id 返回 -1 时 Python 负索引静默读取最后一个 body 而不报错——应在 body name 查找处显式断言或添加 fallback，并以输出分布极度偏斜作为此类 bug 的早期信号</li>
+<li>引用数量与研究质量是正交维度：高引用反映传播广度/时间影响，不代表研究创新性；在论文评估中应分离两个维度（引用数仅排序，composite_score 评估研究质量）</li>
+<li>LeRobot 数据集中 shape:(1,) 特征批量加载后为 (b,1) 而非 (b,)；数据写入（np.array([val])）与特征定义（shape:(1,)）必须严格匹配，且模型侧不得再做额外升维</li>
+<li>代码归档前需进行完整的传递依赖分析（A→B→C 链式依赖），仅静态依赖列表可能遗漏间接依赖；归档后立即执行 import 验证脚本可快速捕获遗漏；import 追踪是划定版本边界的可靠方法</li>
+<li>monolithic 脚本与模块化包的集成最佳实践：以 monolithic 脚本为 CLI 入口，用 lazy import（函数内 import）引用模块化包，避免循环依赖且无需重构现有逻辑</li>
+<li>Semantic Scholar API 支持 /paper/{id}/citations 和 /paper/{id}/references 端点，字段含 paperId、title、year、citationCount、authors、abstract，无需 API Key（有限速）；支持 arXiv ID 和 DOI 解析</li>
+<li>对于 BC-RNN 等带历史的策略，action-replay 方式重放轨迹时动作会累计漂移；用 set_sim_state 直接设置仿真状态才能精确重现训练轨迹的每一帧</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="research-scout">Research Scout<a hidden class="anchor" aria-hidden="true" href="#research-scout">#</a></h3>
+<p><strong>✅ Research Scout + Researcher Profiler + 引用图分析统一集成（9步计划）及文档更新</strong>
+<em>02:16:04.409 | claude_code</em>
+用户提供详细的 9 步集成计划，AI 完整实现：删除重复目录、向 semantic_scholar.py 添加三个引用图 API、向 research_scout.py 添加 profile 和 citations 子命令、重写 llm.py 支持三后端、在报告管线中集成 Stage 3 引用影响分析（始终对 top-5 触发、引用数仅排序）。随后更新 CLAUDE.md 反映新架构，将 TUTORIAL.md 从 10 章扩展为 13 章并全面中文化。所有文件通过 Python 语法检查，新 CLI 子命令可正常运行。（早期 /init 因 bash 工具调用被拒而中断，无文件变更。）</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>✅ 为 Stack 任务 11 个 Error Skill 生成 demo 视频，修复 MuJoCo body name 系统性缺陷</strong>
+<em>01:50:09.327 | claude_code</em>
+用户请求为 Stack 任务每个 error 生成 demo 视频。AI 编写 generate_demo_videos.py（set_sim_state 方式），首批 11 个视频全部在 pre_reach 阶段注入，阶段检测失效。通过 _debug_phases.py 和 _debug_bodynames.py 逐层排查，定位到 stack.yaml 中 body_name 缺少 MuJoCo 要求的 _main 后缀（cubeA 应为 cubeA_main），导致 body_xpos[-1] 静默读取错误位置。修复 yaml 后缀并在 env_wrapper 添加通用 fallback 查找（覆盖 coffee.yaml、stack_three.yaml 等所有 task），重新生成 11 个视频在正确阶段注入。</p>
+<p><strong>✅ v4 代码全面归档（规划 + 执行）及 v5-only 文档更新</strong>
+<em>01:50:09.327 | claude_code</em>
+第一阶段（规划）：通过 import 追踪确定 v5 使用的 13 个核心模块 vs v4 专属的 ~20 个模块，制定将约 50 个文件移入 archive/v4/ 的详细计划，标注 metrics.py 等可能在 v5 评估阶段重新启用的模块。第二阶段（执行）：创建 archive/v4/ 目录结构并批量移动所有文件；发现 policy_adapter.py 对已归档 collector.py 的传递依赖，通过内联 BasePolicy/PolicyResult 解决；更新 <strong>init</strong>.py、Makefile、CLAUDE.md、README.md 和项目全景总结.md 为纯 v5 状态；全部 94 个 v5 单元测试通过。</p>
+<h3 id="vla-robotwin">VLA-RoboTwin<a hidden class="anchor" aria-hidden="true" href="#vla-robotwin">#</a></h3>
+<p><strong>✅ 修复 LeRobot 转换脚本和 pi0.py 以支持进度预测训练字段</strong>
+<em>01:40:13.957 | claude_code</em>
+训练因数据缺少 manip_progress_time 等字段报错。AI 检查 HDF5 结构后，在转换脚本中添加 5 个新特征（manip_progress_time、manip_progress_distance_left/right、target_endpose、target_joint）的定义和帧级别写入。随后发现 shape 不匹配：标量特征定义为 shape:(1,) 但写入 0 维 np.float32，导致 pi0.py 中 [:, None] 和 jnp.stack 产生错误形状；修复写入方式（np.array([val])）和 pi0.py 中 tensor 操作（去掉冗余 [:, None]，jnp.stack→jnp.concatenate），解除训练阻塞。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>17,483,898</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>7,230</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>57,677</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>1,037,143</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>16,381,848</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>94.0%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$11.4734</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>5,353</td>
+          <td>29,524</td>
+          <td>578,779</td>
+          <td>11,843,530</td>
+          <td>$10.3040</td>
+          <td>89.8%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>1,877</td>
+          <td>28,153</td>
+          <td>458,364</td>
+          <td>4,538,318</td>
+          <td>$1.1694</td>
+          <td>10.2%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

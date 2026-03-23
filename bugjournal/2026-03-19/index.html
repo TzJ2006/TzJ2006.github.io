@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-19 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="跨DCC/tianhe/MacBook/TzJsDesktop四台设备全天并行推进：MIHD空间转录组Harmony实验证明batch指标与niche检索指标反向变化、Error Recovery Benchmark建立训练/评估双池架构并修复warping核心bug与模型推理冗余、Life Copilot完成多意图路由重构&#43;代码审计清理&#43;多处核心bug修复、gadget日报pipeline完成初始化与export修复。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-03-19/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-03-19/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-03-19/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-19">
+  <meta property="og:description" content="跨DCC/tianhe/MacBook/TzJsDesktop四台设备全天并行推进：MIHD空间转录组Harmony实验证明batch指标与niche检索指标反向变化、Error Recovery Benchmark建立训练/评估双池架构并修复warping核心bug与模型推理冗余、Life Copilot完成多意图路由重构&#43;代码审计清理&#43;多处核心bug修复、gadget日报pipeline完成初始化与export修复。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-19T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-19T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-19">
+  <meta name="twitter:description" content="跨DCC/tianhe/MacBook/TzJsDesktop四台设备全天并行推进：MIHD空间转录组Harmony实验证明batch指标与niche检索指标反向变化、Error Recovery Benchmark建立训练/评估双池架构并修复warping核心bug与模型推理冗余、Life Copilot完成多意图路由重构&#43;代码审计清理&#43;多处核心bug修复、gadget日报pipeline完成初始化与export修复。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-03-19",
+      "item": "https://tzj2006.github.io/bugjournal/2026-03-19/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-19",
+  "name": "Bug Journal 2026-03-19",
+  "description": "跨DCC/tianhe/MacBook/TzJsDesktop四台设备全天并行推进：MIHD空间转录组Harmony实验证明batch指标与niche检索指标反向变化、Error Recovery Benchmark建立训练/评估双池架构并修复warping核心bug与模型推理冗余、Life Copilot完成多意图路由重构+代码审计清理+多处核心bug修复、gadget日报pipeline完成初始化与export修复。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-19 今日概览 做了什么： 四台设备并行推进三个研究/工程项目：DCC与tianhe侧推进MIHD空间转录组多模态融合实验和Error Recovery Benchmark训练管线建设；MacBook完成采集环境搭建与代码库同步；TzJsDesktop全天聚焦Life Copilot的多意图路由重构、代码审计清理与多处核心bug修复。 怎么做的： MIHD通过post-fusion Harmony实验量化batch metrics与niche检索指标的反向关系，为Joint联合训练提供实验依据；Error Recovery通过ControlledRng均匀采样、warping bug修复、pos_weight BCE loss三个关键改进打通训练管线；Life Copilot通过import graph双格式审计+归档、MultiIntentAnalyzer替代keyword hack、fromisoformat时间格式bug修复消除工程债务。 有什么用： MIHD实验确立Joint STAIG联合训练的必要性；Error Recovery建立了10-demo→1000条训练数据的可复现扩充路径，warping修复使MimicGen augmentation真正有效；Life Copilot测试套件从无限挂起变为373个全通过、清理约2400行孤立代码、修复重复餐食和日历查询等多个用户可见bug；gadget export pipeline bug修复保障历史数据完整重导。 DCC 做了什么： 完成gadget首次初始化（批量导出23个日期）、四轮MIHD研究（UNI2调试→Harmony实现→ARI策略讨论）、Claude Code demo方案准备。 怎么做的： pip install -e .修复common模块依赖，benchmark_rm_ideal.py添加–harmony参数，三路并行Agent探索MIHD代码库和SOTA文献，Plan Mode规划Harmony实现方案。 有什么用： 量化post-fusion Harmony效果（ASW_batch↑36% vs Spearman r↓88%），确定消融实验优先策略，为周五demo准备完整演讲稿。 MacBook 做了什么： 修复daily_summary.py export _finalized默认值bug、完成git分叉合并推送54个文件，以及从tianhe下载部署error recovery可移植目录并完成SpaceMouse调试。 怎么做的： 代码审查修复export阶段_finalized默认True bug，git stash+rebase解决分叉；killall 3DxNLServer终止3Dconnexion驱动释放HID设备，macros_private.py配置正确product_id。 有什么用： 修复旧log被错误跳过的隐蔽bug，MacBook可作为遥操作采集终端使用，代码库与GitHub完全同步。 TzJsDesktop 做了什么： 全天聚焦Life Copilot：多意图分析器实现与CLI修复、pytest挂起修复与dev.py热重启工具、代码库全量审计与约2400行孤立代码归档、重复餐食bug修复与53条脏数据清理、品牌名称统一（CalendarPro→Life Copilot）、日历查询三层bug修复。 怎么做的： Claude CLI替代7层keyword hack实现MultiIntentAnalyzer；pytest-timeout+skipif修复外部依赖挂起；双格式（绝对+相对）import graph搜索识别孤立模块；fromisoformat时间格式修复；批量文本替换15+文件约80处。 有什么用： 测试套件从无限挂起变为373个全通过，清理约2400行孤立代码，消除日历53个重复餐食事件，完成品牌统一，日历本周/明天查询正确路由。 tianhe 做了什么： 完成Error Recovery Benchmark：task completion head训练loss修复、推理VLM单次前向优化、遥操作收集脚本bug修复与portable打包；实现training scenes均匀magnitude生成脚本；修复MimicGen warping核心bug；规划三池数据架构；更新gadget代码库。 怎么做的： pos_weight=10加权BCE loss平衡4%正样本；sample_actions_with_completion()复用VLM prefix前向消除约50%冗余计算；ControlledRng劫持uniform()实现均匀magnitude插值；pos_delta分摊到接近阶段action序列；HTTPS+代理解决SSH无法连接GitHub。 有什么用： 训练层解决梯度淹没，推理延迟降约50%，完成可跨机器部署的portable目录，warping修复使MimicGen扩充真正有效，训练/评估数据池架构清晰分离。 跨DCC/tianhe/MacBook/TzJsDesktop四台设备全天并行推进：MIHD空间转录组Harmony实验证明batch指标与niche检索指标反向变化、Error Recovery Benchmark建立训练/评估双池架构并修复warping核心bug与模型推理冗余、Life Copilot完成多意图路由重构+代码审计清理+多处核心bug修复、gadget日报pipeline完成初始化与export修复。\n今日任务 架构与策略 ✅ MIHD - post-fusion Harmony对齐实验：量化batch指标与niche检索指标的反向变化 — 在benchmark_rm_ideal.py添加–harmony参数，完成7处代码改动并修复output_dir未创建bug，成功运行实验。关键结果：ASW_batch从0.377升至0.514（+36%），但平均Spearman r从0.189跌至0.023（-88%），Layer_3/Layer_6出现强负相关（r≈-0.55至-0.68）。结论：STAIG逐section独立GCN训练产生非线性维度错位，线性Harmony无法解决，需Joint联合训练。 ✅ Error Recovery Benchmark - RoboBrain Pi0 completion head训练与推理改进 — 修复task completion head训练loss不平衡（4%正样本，采用保守的pos_weight=10而非理论最优24加权BCE loss，正样本梯度贡献比例提升至~30%）；实现sample_actions_with_completion()方法复用VLM prefix前向，消除约50%冗余计算，Policy自动检测并选择最优方法。 ✅ Error Recovery Benchmark - 修复MimicGen warping核心bug（pos_delta未应用） — _replay_with_warping()计算了pos_delta但从未应用到action序列，augmentation实际上只是加5mm随机噪声。修复：将pos_delta按接近阶段步数平均分摊到position actions前三维，使轨迹真正向目标物体位置平移。 🔄 Life Copilot - 多意图分析器（MultiIntentAnalyzer）实现与架构重构设计 — 实现MultiIntentAnalyzer替代7层keyword hack：Claude CLI为主分类器返回JSON数组，启发式快速判断，失败回退dual verify；修复CLI flag错误（–settings-file→–settings+stdin传入）；新增周日程查询功能；30个新增测试用例，424个测试全通过。完整多意图路由重构设计方案已创建，正式实施尚未开始。 ✅ Life Copilot - 修复重复餐食事件bug并清理53个脏数据 — 定位两处独立bug：_check_meal_exists用显示格式'08:00’导致fromisoformat解析失败（应用start_iso字段），以及get_today_events()默认不含已过去事件。修复后创建cli/cleanup_meals.py，dry-run验证后删除53个重复事件（18 Breakfast + 18 Lunch + 17 Dinner）。 ✅ Life Copilot - 修复日历查询三层bug（本周/明天总返回今天无事） — 三处修复：①BASE_SYSTEM_PROMPT补充query_type分类对照表（INTENT_PROMPT_FRAGMENTS不作用于主分类流程）；②_handle_query()加关键词回退检测（这周/明天/后天等）；③get_today_events()添加include_past=True参数；同时新增Discord侧日历API错误反馈机制。71个测试全通过。 🔄 MIHD - ARI改进与跨样本batch effect根因分析及消融策略制定 — 发现clustering ARI=0.475 vs SOTA 0.66+（GatorST等），cross-sample patch query存在严重batch effect。三路并行Agent探索代码库和SOTA文献，发现GatorST主要改进来自对比元学习+soft K-means伪标签、GAT替代GCN。确定先消融后诊断策略，待下一步实施。 ✅ Error Recovery Benchmark - 遥操作收集脚本bug修复与portable目录打包 — 修复script_utils.py（PROJECT_ROOT硬编码→动态__file__解析）和2_collect_recovery_demos.py（SpaceMouse构造参数错误、手动动作映射→input2action()、缺少env.render()和device.start_control()）；创建setup_env.sh、run_collection.sh、TUTORIAL.md，139项单元测试全通过，打包171MB portable目录。 ✅ Error Recovery Benchmark - 实现generate_training_scenes.py（均匀magnitude训练场景生成） — 实现ControlledRng包装器（uniform()返回线性插值值，randn()/randint()保持随机），select_diverse_opportunities()从不同轨迹round-robin选取，每task×subtype生成10个fraction从0/9到9/9均匀分布的训练场景，输出至v5_training/独立目录，同步更新Makefile和项目总结文档。 🔄 Error Recovery Benchmark - 三池数据架构规划（training/augmentation/evaluation） — 确立数据流：10 training scenes/subtype→人类遥操作录demo→MimicGen扩充约1000条（10×100target×50%成功率）；200 augmentation scenes/subtype作为replay目标；100+ evaluation scenes仅用于测试。三池独立生成防止数据污染。 ✅ Life Copilot - 代码库全量审计与约2400行孤立代码归档清理 — 通过双格式（绝对+相对）import graph分析，识别并归档8个孤立模块（约2400行）+9个关联测试+1个调试脚本至archive/；合并重复parse_datetime函数；删除broker_models.py死代码和3个孤立config字段；修复web_research_service破损浏览器导入。373个测试全通过，CLAUDE.md同步更新（新增Agent/Wave执行系统、Thoughts系统等4个新增架构章节）。 ✅ Life Copilot - 品牌名称统一（CalendarPro→Life Copilot） — 修改15+文件约80处：显示层（discord_bot.py中文称谓、skills/tests/docs字符串）和基础设施层（conda环境名lifecopilot、启动脚本、DEPLOYMENT.md服务名、workspace CLAUDE.md）全部统一为lifecopilot/life-copilot。提供Discord Developer Portal手动改名步骤（需手动操作）。 实现与修复 ✅ Life Copilot - pytest测试套件修复与dev.py热重启工具 — 安装pytest-timeout设全局30s超时，将test_semantic_routing等3个诊断脚本中被误收集的test()函数改名或加skipif自动检测外部依赖（HuggingFace模型、Claude CLI、Playwright），399用例全通过；实现watchfiles.run_process()监控src/*.py变化的进程级热重启工具，在main.py添加–dev入口。 ✅ gadget日报pipeline维护：DCC初始化、export bug修复、finalized异常排查 — DCC首次运行pip install -e .修复common模块缺失，成功导出23个日期；修复export阶段_finalized默认True bug（改为False）并添加–force参数；排查到MacBook(03-03/03-07)、TzJsDesktop(03-07)、tianhe(03-15)四个日期源log含_finalized:false，用户通过各设备重新export解决，export输出新增finalized状态显示行。 ✅ Error Recovery Benchmark - MacBook采集环境搭建与SpaceMouse调试 — 创建recovery_collect conda环境，修复EnvWrapper.env属性缺失bug（_env私有属性缺少公开别名self.env），通过killall终止3Dconnexion驱动解决SpaceMouse HID独占问题，配置正确product_id=0xc63a，验证pipeline端到端可运行。 ✅ Claude Code live demo方案准备（周五lab meeting） — 为Prof. Zhang团队设计30分钟demo，6段结构（安全设置→Plan Mode→代码审查→CLAUDE.md→过度自信反例→总结），数据选用DLPFC 151676空间转录组。生成完整演讲稿demo_script.md和项目规范CLAUDE.md，最终提供terminal命令集合供用户自行执行。 ✅ gadget代码库多设备同步 — MacBook：git stash+rebase合并分叉，提交bugJournal(03-0403-15)、summarize logs/reports(03-0803-15)等54个文件并推送。tianhe：SSH连接GitHub失败，改用HTTPS+代理（127.0.0.1:10087）成功拉取，更新352个文件至3a795b6。 问题与解决方案 关键问题 1. Post-fusion Harmony改善batch metrics（ASW_batch +36%）但显著恶化跨样本niche检索（Spearman r -88%，Layer_3/Layer_6出现强负相关） 解决方案: 实验结论：STAIG fusion需要Joint联合训练而非post-hoc对齐。Harmony是线性平移校正，无法处理逐section独立GCN训练造成的embedding维度非线性错位\n关键洞察: Embedding的全局分布对齐与局部语义一致性是两个独立维度——ASW_batch改善不等于下游任务质量改善。各section的64维embedding每个维度在不同section间编码了不同生物学意义，强行拉近分布反而破坏偶然对齐的维度\n2. task completion head训练loss在~0.035平台期停滞，4%正样本梯度被96%负样本淹没 解决方案: 引入pos_weight=10加权BCE loss（而非理论最优24，避免训练初期剧烈震荡），有效正样本梯度贡献比例从4%提升至~30%\n关键洞察: total loss被负样本主导锁定在低值不代表正样本预测准确；pos_weight合理范围通常远小于理论最优值，需独立监控正样本recall/precision；加权后loss初始值升高、随后正确收敛才是有效学习信号\n3. 推理时completion head独立调用导致VLM prefix被计算两次，延迟约翻倍 解决方案: 新增sample_actions_with_completion()方法，捕获sample_actions的prefix_out直接传给completion head，单次VLM前向同时输出动作和完成概率，Policy自动检测并选择最优方法\n关键洞察: flow matching的prefix特征已包含全部VLM语义信息，completion head不需要独立前向；这类计算复用机会需要从整体计算图角度主动识别，而非只关注功能实现\n4. MimicGen warping中pos_delta计算正确但从未应用到action序列，augmentation实际上只是加5mm随机噪声，成功率极低 解决方案: 修复_replay_with_warping()：将pos_delta按接近阶段步数平均分摊到position actions前三维，使轨迹真正向目标物体位置平移，再叠加噪声\n关键洞察: Silent bug——代码逻辑看似完整（计算了delta），关键步骤（应用delta）被遗漏，无报错但成功率极低。真正的MimicGen做object-centric trajectory transfer，D0（纯位移）成功率高，D1/D2（含旋转）还需rotation warping\n5. Life Copilot日历查询只返回’今天没有事’，无法查本周或明天日程，且刚创建的事件也不可见 解决方案: 三层修复：①BASE_SYSTEM_PROMPT补充query_type分类对照表；②_handle_query()加关键词回退（这周/明天等）；③get_today_events()添加include_past=True。关键：INTENT_PROMPT_FRAGMENTS只给multi_intent.py用，主分类流程走BASE_SYSTEM_PROMPT，在错误位置加prompt无效\n关键洞察: CalendarPro中INTENT_PROMPT_FRAGMENTS和BASE_SYSTEM_PROMPT是两套互不相关的提示系统，修改任一时要先确认使用方；LLM稳定输出正确结构化数据需要在系统提示里提供具体的词汇→类型→数据字段对照表\n6. _check_meal_exists始终返回False，每次调度都重复创建餐食事件，日历中积累53个重复 解决方案: 将event.get(‘start_time’)改为优先使用event.get(‘start_iso’)（完整ISO 8601字符串可被fromisoformat正确解析）；调用改为get_today_events(include_past=True)确保已过去的早餐等事件参与去重检查\n关键洞察: 显示层格式（‘08:00’）与存储层格式（ISO 8601）共存于同一event dict；include_past=False是合理的显示行为，但用于存在性检查时会造成调度盲区——同一API参数在不同用途下需要不同默认值\n7. 搜索模块使用情况只用绝对导入格式（from src.browser），漏掉所有相对导入文件，误判browser模块为孤立 解决方案: 同时搜索’from src.browser’和’from ..browser’/‘from .browser’两种格式，发现executor.py通过相对导入使用browser模块\n关键洞察: 搜索「某模块是否被使用」必须同时覆盖绝对导入和相对导入两种格式；仅有tests/引用不算运行时使用；孤立模块识别可靠流程：①查__init__.py→②双格式grep→③仅tests/引用则可安全归档\n一般问题 8. pytest完整测试套件无限挂起，无法完成CI 解决方案: 全局timeout=30 + 将诊断脚本（test_semantic_routing等）中被pytest误收集的test()函数改名为run_test()或加skipif自动检测外部依赖\n关键洞察: Typer CLI工具中test()函数名会被pytest自动收集为测试用例；改名即可修复，删除文件反而损失诊断工具\n9. nvidia-smi显示GPU 2/3进程[Not Found]但显存被占，kill和gpu-reset均失败 解决方案: 遍历/proc/*/fd寻找持有/dev/nvidia6、/dev/nvidia7句柄的活跃进程，定位到PID 97668（exp5_run1训练，功耗仅70W表明挂起），lsof/fuser不可用情况下这是唯一有效方法\n关键洞察: nvidia-smi进程列表依赖/proc路径解析；进程异常退出但文件描述符未释放时会出现[Not Found]假象；/proc/PID/fd遍历比lsof/fuser更可靠且在集群上普遍可用\n10. gadget export阶段_finalized默认值True导致旧log被视为完成而跳过重新导出 解决方案: 将data.get(’_finalized’, True)改为data.get(’_finalized’, False)，并添加–force强制覆盖参数\n关键洞察: export阶段和merge阶段对_finalized字段的语义要求相反：export默认False（旧log可重新导出），merge默认True（旧log无需重复处理）；两阶段共用同一默认值造成隐蔽bug\n11. macOS 3Dconnexion系统驱动独占SpaceMouse物理HID设备，hidapi无法直接访问（OSError: open failed） 解决方案: killall 3DxNLServer 3DxRadialMenu 3DconnexionHelper等进程终止系统驱动，在macros_private.py配置SPACEMOUSE_PRODUCT_ID=0xc63a\n关键洞察: 3Dconnexion驱动通过系统服务独占物理HID设备并创建虚拟设备供应用使用；需终止驱动才能让hidapi直接访问，这与Linux的udev权限问题是不同的驱动架构层面机制\n人类思路 vs AI 思路 战略层面 训练/评估数据集分离及均匀magnitude覆盖 角色 思路 人类 明确指出error scenes是evaluation用的，training需要独立的小规模pool（10 scenes/subtype）；要求均匀magnitude分布而非随机，将training scenes输出至独立目录避免数据污染 AI AI初始未主动区分两种用途，从现有代码结构推断设计意图，分析集中于数量不均匀问题而非数据集划分正确性 差异分析: 用户具有ML数据管理的全局意识，能从pipeline设计之初确立边界；这次纠正从根本上改变了数据架构设计方向。AI需被明确纠正才能对齐\n推理链路中VLM双次前向冗余的识别 角色 思路 人类 用户敏锐追问「为什么会做两次VLM前向？不能在第一次时就把特征拿出来吗？」 AI AI初始实现了分离的predict_task_completion()方法，未主动考虑计算复用，默认完成功能而忽视性能 差异分析: 人类从系统效率角度提出AI设计中的冗余，推动了sample_actions_with_completion()的融合方案；AI缺乏对整体计算图效率的主动审视\n多意图路由问题的诊断框架 角色 思路 人类 从实际使用痛点直接指向架构缺陷：「一段话可能有多个任务同时进行，不能用一个分类模型判断」 AI AI分析代码后停留在「dual verify准确性不足」的框架，未主动识别单Intent返回类型是根本限制 差异分析: 用户从产品场景到架构结论一步到位；AI从代码出发绕了一圈才理解——问题不是准确率，而是返回结构设计\n命名统一的边界划定（技术标识符vs展示名） 角色 思路 人类 预先制定精确改名计划，明确列出每个文件每一行，专门标注哪些不该改（目录名、conda env技术标识符、路径引用等） AI AI执行效率高，额外扫描发现计划未覆盖的遗漏项，但无法独立判断技术标识符与品牌展示名的区别 差异分析: 「什么该改、什么不改」的业务判断需要人类预先规划；AI善于执行和查漏补缺，但依赖明确规则输入才能区分标识符类型\nCross-sample batch effect根因的归属与分析策略 角色 思路 人类 列出四种可能根因保持开放态度，最终确认「先消融后诊断」策略 AI 通过代码探索和SOTA文献搜索系统收集信息，提出结构化诊断优先级，倾向于快速缩小假设空间 差异分析: 人类的问题框架更开放和科学；AI提供系统化分析但有时过早收敛。两者结合产生了「先诊断再治疗」的有效策略\n实现层面 修复策略选择：代码改动vs一次性手动操作 角色 思路 人类 对gadget finalized历史遗留问题选择手动各设备重新export；对RecoverySegmenter必要性听完解释后直接决定「弄mimicgen就可以了」 AI AI倾向于修改merge代码（让’日期已过’自动触发finalize）和详尽解释现有模块，将代码视为首选解决方案 差异分析: 人类以奥卡姆剃刀原则快速砍掉不必要复杂度；AI应先判断问题是历史遗留还是持续性问题，再决定是否需要代码改动\nAI 局限性 重要局限 多次未主动识别训练/评估数据分离需求：在Error Recovery Benchmark中未区分error scenes的两种用途；在training scenes需求分析中也未主动提出train/test分离设计。AI倾向于从现有代码结构推断设计意图，而非主动询问数据流定位。 推理链路设计时未主动识别VLM双次前向冗余，默认完成功能而忽视性能；分析多意图问题时初步停留在「准确性不足」框架，未主动识别单Intent返回类型是根本架构限制。共同模式：AI缺乏对整体系统效率和架构设计的主动审视。 搜索模块使用情况时只用绝对导入格式，漏掉相对导入，对browser模块做出错误的「孤立」判断；代码分析必须同时覆盖绝对和相对两种导入格式。 在INTENT_PROMPT_FRAGMENTS里添加’query’条目，后来才发现这个dict根本不被主分类流程使用；创建multi_intent.py时未参照ClaudeProvider.py的CLI调用方式导致flag错误。创建新模块时应主动参考同类已有实现，修改提示时应先确认实际使用方。 CUDA错误根因诊断不足：面对UNI2 CUDA illegal memory access，只尝试降低batch_size（无效），未深入诊断频域滤波可能产生异常tensor值（NaN/Inf）的根本原因，导致多次无效重试。 一般局限 多次触发ExitPlanMode和并行Explore agent被用户拒绝，以及对空目录启动无意义探查；pos_weight按理论类别比例给出24而缺少工程稳定性考量。对用户偏好的工作节奏和工程折中经验判断不准确。 今日收获 核心收获 Batch metrics与下游任务指标可以反向变化：post-fusion Harmony使ASW_batch+36%但Spearman r-88%。Embedding的全局分布对齐与局部语义一致性是两个独立维度，STAIG各section独立GCN训练产生非线性维度错位，线性校正无法解决，需Joint联合训练。 MimicGen augmentation成败取决于warping质量：仅加随机噪声≠trajectory transfer。正确做法是将source→target物体位置差（pos_delta）分摊到接近阶段的action序列，使整条轨迹在目标物体坐标系重放。D0（纯位移）成功率高，D1/D2（含旋转）还需rotation warping。 Error Recovery Benchmark三池架构：training pool（10 scenes/subtype）→人类录seed demos→MimicGen扩充约1000条；augmentation pool（200 scenes）作为replay目标；evaluation pool（100+）仅用于测试。ControlledRng通过劫持uniform()实现无侵入式均匀magnitude控制（fraction线性插值，randn()/randint()保持随机）。 调度逻辑的存在性检查必须使用ISO 8601存储格式（start_iso），而非显示格式时间字符串（start_time）；include_past=False在查询显示数据时合理，但用于逻辑判断时会造成调度盲区——同一API参数在不同用途下需要不同默认值。 CalendarPro中INTENT_PROMPT_FRAGMENTS和BASE_SYSTEM_PROMPT是两套互不相关的提示系统：前者只给multi_intent.py用，后者才是主分类流程的system prompt。LLM稳定输出正确结构化数据需要在系统提示里提供具体的词汇→类型→数据字段对照表。 搜索「某模块是否被使用」必须同时覆盖绝对导入（from src.X）和相对导入（from ..X、from .X）两种格式；仅有tests/引用不算运行时使用。孤立模块识别可靠流程：①查__init__.py是否导出→②双格式grep整个src/→③仅tests/引用则可安全归档。 极度类别不平衡（正样本\u003c5%）时total loss被负样本主导，不反映正样本学习质量；pos_weight合理范围通常远小于理论最优值（如96/4=24），保守值（10）能避免训练初期震荡；需独立监控正样本recall/precision。 模型推理链路设计时应检查计算图中是否有可复用的中间特征；VLM prefix特征在flow matching和classification head间共享，通过方法组合消除约50%的prefix计算开销。 watchfiles.run_process(target_type=‘function’)通过multiprocessing.spawn实现真正进程级重启——所有单例自然重置，是Windows ProactorEventLoop下唯一可行的开发热重载方案；Python importlib.reload不适用于有Discord连接和50+单例的bot架构。 实践收获 gadget export阶段_finalized应默认False（旧log可重导），merge阶段应默认True（旧log无需重复处理）；_finalized写在JSON文件内部并随rclone同步传播，多设备共享finalize状态零成本。集群SSH→GitHub常失败，改用HTTPS+显式指定代理（git -c http.proxy=…）更可靠。 macOS上3Dconnexion驱动独占物理HID设备，需killall驱动才能让hidapi直接访问；跨机器部署仿真pipeline时PROJECT_ROOT必须用动态__file__解析替代硬编码路径；nvidia-smi进程[Not Found]时遍历/proc/*/fd是定位真正持有GPU句柄进程的最可靠方法。 会话摘要 MIHD 🔄 UNI2 CUDA调试受阻→Harmony方案制定与实现→发现batch指标与niche检索反向变化→ARI策略讨论 01:06:49.127 | claude_code UNI2 staig_strict推理在RTX 2080 Ti持续CUDA illegal memory access（降batch_size无效），回退至UNI v1。随后探查代码结构制定post-fusion Harmony方案，完成7处代码改动并修复output_dir bug，成功运行实验：ASW_batch+36%但Spearman r-88%，Layer_3/Layer_6出现强负相关（r≈-0.55至-0.68），确立Joint联合训练的必要性。随后三路并行Agent探索SOTA文献，发现GatorST(0.66-0.69)等已大幅超越当前ARI=0.475，确定先消融后诊断的研究策略。\nError Recovery Benchmark 🔄 收集脚本修复打包、warping bug修复、training scenes生成实现、三池架构确立 02:57:31.000 | claude_code 修复遥操作收集脚本多处bug（SpaceMouse构造参数、动作映射→input2action()、缺少render/start_control），打包171MB portable目录，139项测试全通过。用户明确三池架构（training/augmentation/evaluation独立生成）；发现并修复MimicGen warping中pos_delta从未应用的silent bug（augmentation成功率极低的根因）；实现generate_training_scenes.py（ControlledRng线性插值+round-robin选取，每subtype 10个均匀magnitude场景输出至v5_training/）。\nRoboBrain Pi0 ✅ task completion head训练loss不平衡修复与推理VLM双次前向优化 02:31:09.000 | claude_code 分析训练loss在Step 6000-9900间停滞（4%正样本梯度被淹没），采用pos_weight=10加权BCE loss（保守值而非理论最优24），提交commit 2dc3f7d。随后用户指出存在VLM双次前向冗余，设计sample_actions_with_completion()方法捕获prefix_out直接传给completion head，消除约50%冗余VLM计算，Policy自动检测并选择最优方法。\nLife Copilot 🔄 全天工程改进：多意图实现、测试修复、代码审计清理、bug修复、品牌统一、日历查询修复 00:24:31.209 | claude_code 多个会话覆盖全天工作：①实现MultiIntentAnalyzer替代7层keyword hack，修复CLI flag错误（–settings-file→–settings+stdin），新增周日程查询，424个测试通过；②设计完整多意图路由重构方案（尚未实施）；③pytest-timeout修复测试无限挂起，实现watchfiles进程级热重启工具dev.py；④代码审计归档8个孤立模块约2400行，373个测试通过，CLAUDE.md补充4个新架构章节；⑤修复重复餐食bug（fromisoformat格式错误+include_past缺失），干净删除53个脏数据；⑥CalendarPro→Life Copilot批量重命名15+文件约80处；⑦修复日历查询三层bug（BASE_SYSTEM_PROMPT分类表+关键词回退+include_past），71个测试通过。\ngadget ✅ 多设备维护：DCC初始化批量导出、export bug修复、git同步、finalized异常排查 03:24:45.000 | claude_code DCC首次运行pip install -e .修复common模块缺失，导出23个日期（2026-02-16至03-19）记录。MacBook修复_finalized默认True bug并添加–force参数，git stash+rebase合并分叉，提交54个文件（bugJournal 03-04~03-15、summarize logs/reports等）并推送。tianhe通过HTTPS+代理更新352个文件至3a795b6。排查4个日期report的finalized:false根因（3设备源log问题），用户通过各设备重新export解决，export输出新增finalized状态显示行。\nClaude Demo ✅ 为周五lab meeting准备Claude Code live demo（DLPFC空间转录组） 02:49:08.000 | claude_code 为Prof. Zhang团队设计30分钟demo，6段结构覆盖安全设置、Plan Mode、代码审查、CLAUDE.md、过度自信反例等。数据选用DLPFC 151676空间转录组，生成完整演讲稿demo_script.md和项目规范CLAUDE.md。用户指出只需terminal命令供自己执行（而非AI直接操作），AI转而提供包含环境检查、目录创建、数据下载等完整命令集合。\nToken 用量 总览 指标 数值 总 Token 25,545,971 输入 Token 39,796 输出 Token 88,024 Cache 创建 2,197,444 Cache 读取 23,220,707 Cache 命中率 91.4% 总费用 (USD) $19.9887 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 29,064 41,132 1,143,112 14,301,067 $15.4686 77.4% claude-haiku-4-5-20251001 2,350 38,242 648,918 4,178,378 $1.4225 7.1% claude-sonnet-4-6 8,382 8,650 405,414 4,741,262 $3.0976 15.5% 各设备用量 设备 总 Token 输入 输出 费用 DCC 3,054,824 13,026 24,496 $3.5443 MacBook 2,268,887 1,280 6,494 $1.9555 tianhe 17,837,380 18,163 50,555 $12.2601 TzJsDesktop 2,384,880 7,327 6,479 $2.2288 ",
+  "wordCount" : "684",
+  "inLanguage": "en",
+  "datePublished": "2026-03-19T00:00:00-05:00",
+  "dateModified": "2026-03-19T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-03-19/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-19
+    </h1>
+    <div class="post-meta"><span title='2026-03-19 00:00:00 -0500 -0500'>March 19, 2026</span>&nbsp;·&nbsp;<span>4 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-19">日报 — 2026-03-19<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-19">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 四台设备并行推进三个研究/工程项目：DCC与tianhe侧推进MIHD空间转录组多模态融合实验和Error Recovery Benchmark训练管线建设；MacBook完成采集环境搭建与代码库同步；TzJsDesktop全天聚焦Life Copilot的多意图路由重构、代码审计清理与多处核心bug修复。</li>
+<li><strong>怎么做的：</strong> MIHD通过post-fusion Harmony实验量化batch metrics与niche检索指标的反向关系，为Joint联合训练提供实验依据；Error Recovery通过ControlledRng均匀采样、warping bug修复、pos_weight BCE loss三个关键改进打通训练管线；Life Copilot通过import graph双格式审计+归档、MultiIntentAnalyzer替代keyword hack、fromisoformat时间格式bug修复消除工程债务。</li>
+<li><strong>有什么用：</strong> MIHD实验确立Joint STAIG联合训练的必要性；Error Recovery建立了10-demo→1000条训练数据的可复现扩充路径，warping修复使MimicGen augmentation真正有效；Life Copilot测试套件从无限挂起变为373个全通过、清理约2400行孤立代码、修复重复餐食和日历查询等多个用户可见bug；gadget export pipeline bug修复保障历史数据完整重导。</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成gadget首次初始化（批量导出23个日期）、四轮MIHD研究（UNI2调试→Harmony实现→ARI策略讨论）、Claude Code demo方案准备。</li>
+<li><strong>怎么做的：</strong> pip install -e .修复common模块依赖，benchmark_rm_ideal.py添加&ndash;harmony参数，三路并行Agent探索MIHD代码库和SOTA文献，Plan Mode规划Harmony实现方案。</li>
+<li><strong>有什么用：</strong> 量化post-fusion Harmony效果（ASW_batch↑36% vs Spearman r↓88%），确定消融实验优先策略，为周五demo准备完整演讲稿。</li>
+</ul>
+<h3 id="macbook">MacBook<a hidden class="anchor" aria-hidden="true" href="#macbook">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 修复daily_summary.py export _finalized默认值bug、完成git分叉合并推送54个文件，以及从tianhe下载部署error recovery可移植目录并完成SpaceMouse调试。</li>
+<li><strong>怎么做的：</strong> 代码审查修复export阶段_finalized默认True bug，git stash+rebase解决分叉；killall 3DxNLServer终止3Dconnexion驱动释放HID设备，macros_private.py配置正确product_id。</li>
+<li><strong>有什么用：</strong> 修复旧log被错误跳过的隐蔽bug，MacBook可作为遥操作采集终端使用，代码库与GitHub完全同步。</li>
+</ul>
+<h3 id="tzjsdesktop">TzJsDesktop<a hidden class="anchor" aria-hidden="true" href="#tzjsdesktop">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 全天聚焦Life Copilot：多意图分析器实现与CLI修复、pytest挂起修复与dev.py热重启工具、代码库全量审计与约2400行孤立代码归档、重复餐食bug修复与53条脏数据清理、品牌名称统一（CalendarPro→Life Copilot）、日历查询三层bug修复。</li>
+<li><strong>怎么做的：</strong> Claude CLI替代7层keyword hack实现MultiIntentAnalyzer；pytest-timeout+skipif修复外部依赖挂起；双格式（绝对+相对）import graph搜索识别孤立模块；fromisoformat时间格式修复；批量文本替换15+文件约80处。</li>
+<li><strong>有什么用：</strong> 测试套件从无限挂起变为373个全通过，清理约2400行孤立代码，消除日历53个重复餐食事件，完成品牌统一，日历本周/明天查询正确路由。</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成Error Recovery Benchmark：task completion head训练loss修复、推理VLM单次前向优化、遥操作收集脚本bug修复与portable打包；实现training scenes均匀magnitude生成脚本；修复MimicGen warping核心bug；规划三池数据架构；更新gadget代码库。</li>
+<li><strong>怎么做的：</strong> pos_weight=10加权BCE loss平衡4%正样本；sample_actions_with_completion()复用VLM prefix前向消除约50%冗余计算；ControlledRng劫持uniform()实现均匀magnitude插值；pos_delta分摊到接近阶段action序列；HTTPS+代理解决SSH无法连接GitHub。</li>
+<li><strong>有什么用：</strong> 训练层解决梯度淹没，推理延迟降约50%，完成可跨机器部署的portable目录，warping修复使MimicGen扩充真正有效，训练/评估数据池架构清晰分离。</li>
+</ul>
+<blockquote>
+<p>跨DCC/tianhe/MacBook/TzJsDesktop四台设备全天并行推进：MIHD空间转录组Harmony实验证明batch指标与niche检索指标反向变化、Error Recovery Benchmark建立训练/评估双池架构并修复warping核心bug与模型推理冗余、Life Copilot完成多意图路由重构+代码审计清理+多处核心bug修复、gadget日报pipeline完成初始化与export修复。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>MIHD - post-fusion Harmony对齐实验：量化batch指标与niche检索指标的反向变化</strong> — 在benchmark_rm_ideal.py添加&ndash;harmony参数，完成7处代码改动并修复output_dir未创建bug，成功运行实验。关键结果：ASW_batch从0.377升至0.514（+36%），但平均Spearman r从0.189跌至0.023（-88%），Layer_3/Layer_6出现强负相关（r≈-0.55至-0.68）。结论：STAIG逐section独立GCN训练产生非线性维度错位，线性Harmony无法解决，需Joint联合训练。</li>
+<li>✅ <strong>Error Recovery Benchmark - RoboBrain Pi0 completion head训练与推理改进</strong> — 修复task completion head训练loss不平衡（4%正样本，采用保守的pos_weight=10而非理论最优24加权BCE loss，正样本梯度贡献比例提升至~30%）；实现sample_actions_with_completion()方法复用VLM prefix前向，消除约50%冗余计算，Policy自动检测并选择最优方法。</li>
+<li>✅ <strong>Error Recovery Benchmark - 修复MimicGen warping核心bug（pos_delta未应用）</strong> — _replay_with_warping()计算了pos_delta但从未应用到action序列，augmentation实际上只是加5mm随机噪声。修复：将pos_delta按接近阶段步数平均分摊到position actions前三维，使轨迹真正向目标物体位置平移。</li>
+<li>🔄 <strong>Life Copilot - 多意图分析器（MultiIntentAnalyzer）实现与架构重构设计</strong> — 实现MultiIntentAnalyzer替代7层keyword hack：Claude CLI为主分类器返回JSON数组，启发式快速判断，失败回退dual verify；修复CLI flag错误（&ndash;settings-file→&ndash;settings+stdin传入）；新增周日程查询功能；30个新增测试用例，424个测试全通过。完整多意图路由重构设计方案已创建，正式实施尚未开始。</li>
+<li>✅ <strong>Life Copilot - 修复重复餐食事件bug并清理53个脏数据</strong> — 定位两处独立bug：_check_meal_exists用显示格式'08:00&rsquo;导致fromisoformat解析失败（应用start_iso字段），以及get_today_events()默认不含已过去事件。修复后创建cli/cleanup_meals.py，dry-run验证后删除53个重复事件（18 Breakfast + 18 Lunch + 17 Dinner）。</li>
+<li>✅ <strong>Life Copilot - 修复日历查询三层bug（本周/明天总返回今天无事）</strong> — 三处修复：①BASE_SYSTEM_PROMPT补充query_type分类对照表（INTENT_PROMPT_FRAGMENTS不作用于主分类流程）；②_handle_query()加关键词回退检测（这周/明天/后天等）；③get_today_events()添加include_past=True参数；同时新增Discord侧日历API错误反馈机制。71个测试全通过。</li>
+<li>🔄 <strong>MIHD - ARI改进与跨样本batch effect根因分析及消融策略制定</strong> — 发现clustering ARI=0.475 vs SOTA 0.66+（GatorST等），cross-sample patch query存在严重batch effect。三路并行Agent探索代码库和SOTA文献，发现GatorST主要改进来自对比元学习+soft K-means伪标签、GAT替代GCN。确定先消融后诊断策略，待下一步实施。</li>
+<li>✅ <strong>Error Recovery Benchmark - 遥操作收集脚本bug修复与portable目录打包</strong> — 修复script_utils.py（PROJECT_ROOT硬编码→动态__file__解析）和2_collect_recovery_demos.py（SpaceMouse构造参数错误、手动动作映射→input2action()、缺少env.render()和device.start_control()）；创建setup_env.sh、run_collection.sh、TUTORIAL.md，139项单元测试全通过，打包171MB portable目录。</li>
+<li>✅ <strong>Error Recovery Benchmark - 实现generate_training_scenes.py（均匀magnitude训练场景生成）</strong> — 实现ControlledRng包装器（uniform()返回线性插值值，randn()/randint()保持随机），select_diverse_opportunities()从不同轨迹round-robin选取，每task×subtype生成10个fraction从0/9到9/9均匀分布的训练场景，输出至v5_training/独立目录，同步更新Makefile和项目总结文档。</li>
+<li>🔄 <strong>Error Recovery Benchmark - 三池数据架构规划（training/augmentation/evaluation）</strong> — 确立数据流：10 training scenes/subtype→人类遥操作录demo→MimicGen扩充约1000条（10×100target×50%成功率）；200 augmentation scenes/subtype作为replay目标；100+ evaluation scenes仅用于测试。三池独立生成防止数据污染。</li>
+<li>✅ <strong>Life Copilot - 代码库全量审计与约2400行孤立代码归档清理</strong> — 通过双格式（绝对+相对）import graph分析，识别并归档8个孤立模块（约2400行）+9个关联测试+1个调试脚本至archive/；合并重复parse_datetime函数；删除broker_models.py死代码和3个孤立config字段；修复web_research_service破损浏览器导入。373个测试全通过，CLAUDE.md同步更新（新增Agent/Wave执行系统、Thoughts系统等4个新增架构章节）。</li>
+<li>✅ <strong>Life Copilot - 品牌名称统一（CalendarPro→Life Copilot）</strong> — 修改15+文件约80处：显示层（discord_bot.py中文称谓、skills/tests/docs字符串）和基础设施层（conda环境名lifecopilot、启动脚本、DEPLOYMENT.md服务名、workspace CLAUDE.md）全部统一为lifecopilot/life-copilot。提供Discord Developer Portal手动改名步骤（需手动操作）。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>Life Copilot - pytest测试套件修复与dev.py热重启工具</strong> — 安装pytest-timeout设全局30s超时，将test_semantic_routing等3个诊断脚本中被误收集的test()函数改名或加skipif自动检测外部依赖（HuggingFace模型、Claude CLI、Playwright），399用例全通过；实现watchfiles.run_process()监控src/*.py变化的进程级热重启工具，在main.py添加&ndash;dev入口。</li>
+<li>✅ <strong>gadget日报pipeline维护：DCC初始化、export bug修复、finalized异常排查</strong> — DCC首次运行pip install -e .修复common模块缺失，成功导出23个日期；修复export阶段_finalized默认True bug（改为False）并添加&ndash;force参数；排查到MacBook(03-03/03-07)、TzJsDesktop(03-07)、tianhe(03-15)四个日期源log含_finalized:false，用户通过各设备重新export解决，export输出新增finalized状态显示行。</li>
+<li>✅ <strong>Error Recovery Benchmark - MacBook采集环境搭建与SpaceMouse调试</strong> — 创建recovery_collect conda环境，修复EnvWrapper.env属性缺失bug（_env私有属性缺少公开别名self.env），通过killall终止3Dconnexion驱动解决SpaceMouse HID独占问题，配置正确product_id=0xc63a，验证pipeline端到端可运行。</li>
+<li>✅ <strong>Claude Code live demo方案准备（周五lab meeting）</strong> — 为Prof. Zhang团队设计30分钟demo，6段结构（安全设置→Plan Mode→代码审查→CLAUDE.md→过度自信反例→总结），数据选用DLPFC 151676空间转录组。生成完整演讲稿demo_script.md和项目规范CLAUDE.md，最终提供terminal命令集合供用户自行执行。</li>
+<li>✅ <strong>gadget代码库多设备同步</strong> — MacBook：git stash+rebase合并分叉，提交bugJournal(03-04<del>03-15)、summarize logs/reports(03-08</del>03-15)等54个文件并推送。tianhe：SSH连接GitHub失败，改用HTTPS+代理（127.0.0.1:10087）成功拉取，更新352个文件至3a795b6。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-post-fusion-harmony改善batch-metricsasw_batch-36但显著恶化跨样本niche检索spearman-r--88layer_3layer_6出现强负相关">1. Post-fusion Harmony改善batch metrics（ASW_batch +36%）但显著恶化跨样本niche检索（Spearman r -88%，Layer_3/Layer_6出现强负相关）<a hidden class="anchor" aria-hidden="true" href="#1-post-fusion-harmony改善batch-metricsasw_batch-36但显著恶化跨样本niche检索spearman-r--88layer_3layer_6出现强负相关">#</a></h4>
+<p><strong>解决方案:</strong> 实验结论：STAIG fusion需要Joint联合训练而非post-hoc对齐。Harmony是线性平移校正，无法处理逐section独立GCN训练造成的embedding维度非线性错位</p>
+<p><strong>关键洞察:</strong> Embedding的全局分布对齐与局部语义一致性是两个独立维度——ASW_batch改善不等于下游任务质量改善。各section的64维embedding每个维度在不同section间编码了不同生物学意义，强行拉近分布反而破坏偶然对齐的维度</p>
+<h4 id="2-task-completion-head训练loss在0035平台期停滞4正样本梯度被96负样本淹没">2. task completion head训练loss在~0.035平台期停滞，4%正样本梯度被96%负样本淹没<a hidden class="anchor" aria-hidden="true" href="#2-task-completion-head训练loss在0035平台期停滞4正样本梯度被96负样本淹没">#</a></h4>
+<p><strong>解决方案:</strong> 引入pos_weight=10加权BCE loss（而非理论最优24，避免训练初期剧烈震荡），有效正样本梯度贡献比例从4%提升至~30%</p>
+<p><strong>关键洞察:</strong> total loss被负样本主导锁定在低值不代表正样本预测准确；pos_weight合理范围通常远小于理论最优值，需独立监控正样本recall/precision；加权后loss初始值升高、随后正确收敛才是有效学习信号</p>
+<h4 id="3-推理时completion-head独立调用导致vlm-prefix被计算两次延迟约翻倍">3. 推理时completion head独立调用导致VLM prefix被计算两次，延迟约翻倍<a hidden class="anchor" aria-hidden="true" href="#3-推理时completion-head独立调用导致vlm-prefix被计算两次延迟约翻倍">#</a></h4>
+<p><strong>解决方案:</strong> 新增sample_actions_with_completion()方法，捕获sample_actions的prefix_out直接传给completion head，单次VLM前向同时输出动作和完成概率，Policy自动检测并选择最优方法</p>
+<p><strong>关键洞察:</strong> flow matching的prefix特征已包含全部VLM语义信息，completion head不需要独立前向；这类计算复用机会需要从整体计算图角度主动识别，而非只关注功能实现</p>
+<h4 id="4-mimicgen-warping中pos_delta计算正确但从未应用到action序列augmentation实际上只是加5mm随机噪声成功率极低">4. MimicGen warping中pos_delta计算正确但从未应用到action序列，augmentation实际上只是加5mm随机噪声，成功率极低<a hidden class="anchor" aria-hidden="true" href="#4-mimicgen-warping中pos_delta计算正确但从未应用到action序列augmentation实际上只是加5mm随机噪声成功率极低">#</a></h4>
+<p><strong>解决方案:</strong> 修复_replay_with_warping()：将pos_delta按接近阶段步数平均分摊到position actions前三维，使轨迹真正向目标物体位置平移，再叠加噪声</p>
+<p><strong>关键洞察:</strong> Silent bug——代码逻辑看似完整（计算了delta），关键步骤（应用delta）被遗漏，无报错但成功率极低。真正的MimicGen做object-centric trajectory transfer，D0（纯位移）成功率高，D1/D2（含旋转）还需rotation warping</p>
+<h4 id="5-life-copilot日历查询只返回今天没有事无法查本周或明天日程且刚创建的事件也不可见">5. Life Copilot日历查询只返回&rsquo;今天没有事&rsquo;，无法查本周或明天日程，且刚创建的事件也不可见<a hidden class="anchor" aria-hidden="true" href="#5-life-copilot日历查询只返回今天没有事无法查本周或明天日程且刚创建的事件也不可见">#</a></h4>
+<p><strong>解决方案:</strong> 三层修复：①BASE_SYSTEM_PROMPT补充query_type分类对照表；②_handle_query()加关键词回退（这周/明天等）；③get_today_events()添加include_past=True。关键：INTENT_PROMPT_FRAGMENTS只给multi_intent.py用，主分类流程走BASE_SYSTEM_PROMPT，在错误位置加prompt无效</p>
+<p><strong>关键洞察:</strong> CalendarPro中INTENT_PROMPT_FRAGMENTS和BASE_SYSTEM_PROMPT是两套互不相关的提示系统，修改任一时要先确认使用方；LLM稳定输出正确结构化数据需要在系统提示里提供具体的词汇→类型→数据字段对照表</p>
+<h4 id="6-_check_meal_exists始终返回false每次调度都重复创建餐食事件日历中积累53个重复">6. _check_meal_exists始终返回False，每次调度都重复创建餐食事件，日历中积累53个重复<a hidden class="anchor" aria-hidden="true" href="#6-_check_meal_exists始终返回false每次调度都重复创建餐食事件日历中积累53个重复">#</a></h4>
+<p><strong>解决方案:</strong> 将event.get(&lsquo;start_time&rsquo;)改为优先使用event.get(&lsquo;start_iso&rsquo;)（完整ISO 8601字符串可被fromisoformat正确解析）；调用改为get_today_events(include_past=True)确保已过去的早餐等事件参与去重检查</p>
+<p><strong>关键洞察:</strong> 显示层格式（&lsquo;08:00&rsquo;）与存储层格式（ISO 8601）共存于同一event dict；include_past=False是合理的显示行为，但用于存在性检查时会造成调度盲区——同一API参数在不同用途下需要不同默认值</p>
+<h4 id="7-搜索模块使用情况只用绝对导入格式from-srcbrowser漏掉所有相对导入文件误判browser模块为孤立">7. 搜索模块使用情况只用绝对导入格式（from src.browser），漏掉所有相对导入文件，误判browser模块为孤立<a hidden class="anchor" aria-hidden="true" href="#7-搜索模块使用情况只用绝对导入格式from-srcbrowser漏掉所有相对导入文件误判browser模块为孤立">#</a></h4>
+<p><strong>解决方案:</strong> 同时搜索&rsquo;from src.browser&rsquo;和&rsquo;from ..browser&rsquo;/&lsquo;from .browser&rsquo;两种格式，发现executor.py通过相对导入使用browser模块</p>
+<p><strong>关键洞察:</strong> 搜索「某模块是否被使用」必须同时覆盖绝对导入和相对导入两种格式；仅有tests/引用不算运行时使用；孤立模块识别可靠流程：①查__init__.py→②双格式grep→③仅tests/引用则可安全归档</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="8-pytest完整测试套件无限挂起无法完成ci">8. pytest完整测试套件无限挂起，无法完成CI<a hidden class="anchor" aria-hidden="true" href="#8-pytest完整测试套件无限挂起无法完成ci">#</a></h4>
+<p><strong>解决方案:</strong> 全局timeout=30 + 将诊断脚本（test_semantic_routing等）中被pytest误收集的test()函数改名为run_test()或加skipif自动检测外部依赖</p>
+<p><strong>关键洞察:</strong> Typer CLI工具中test()函数名会被pytest自动收集为测试用例；改名即可修复，删除文件反而损失诊断工具</p>
+<h4 id="9-nvidia-smi显示gpu-23进程not-found但显存被占kill和gpu-reset均失败">9. nvidia-smi显示GPU 2/3进程[Not Found]但显存被占，kill和gpu-reset均失败<a hidden class="anchor" aria-hidden="true" href="#9-nvidia-smi显示gpu-23进程not-found但显存被占kill和gpu-reset均失败">#</a></h4>
+<p><strong>解决方案:</strong> 遍历/proc/*/fd寻找持有/dev/nvidia6、/dev/nvidia7句柄的活跃进程，定位到PID 97668（exp5_run1训练，功耗仅70W表明挂起），lsof/fuser不可用情况下这是唯一有效方法</p>
+<p><strong>关键洞察:</strong> nvidia-smi进程列表依赖/proc路径解析；进程异常退出但文件描述符未释放时会出现[Not Found]假象；/proc/PID/fd遍历比lsof/fuser更可靠且在集群上普遍可用</p>
+<h4 id="10-gadget-export阶段_finalized默认值true导致旧log被视为完成而跳过重新导出">10. gadget export阶段_finalized默认值True导致旧log被视为完成而跳过重新导出<a hidden class="anchor" aria-hidden="true" href="#10-gadget-export阶段_finalized默认值true导致旧log被视为完成而跳过重新导出">#</a></h4>
+<p><strong>解决方案:</strong> 将data.get(&rsquo;_finalized&rsquo;, True)改为data.get(&rsquo;_finalized&rsquo;, False)，并添加&ndash;force强制覆盖参数</p>
+<p><strong>关键洞察:</strong> export阶段和merge阶段对_finalized字段的语义要求相反：export默认False（旧log可重新导出），merge默认True（旧log无需重复处理）；两阶段共用同一默认值造成隐蔽bug</p>
+<h4 id="11-macos-3dconnexion系统驱动独占spacemouse物理hid设备hidapi无法直接访问oserror-open-failed">11. macOS 3Dconnexion系统驱动独占SpaceMouse物理HID设备，hidapi无法直接访问（OSError: open failed）<a hidden class="anchor" aria-hidden="true" href="#11-macos-3dconnexion系统驱动独占spacemouse物理hid设备hidapi无法直接访问oserror-open-failed">#</a></h4>
+<p><strong>解决方案:</strong> killall 3DxNLServer 3DxRadialMenu 3DconnexionHelper等进程终止系统驱动，在macros_private.py配置SPACEMOUSE_PRODUCT_ID=0xc63a</p>
+<p><strong>关键洞察:</strong> 3Dconnexion驱动通过系统服务独占物理HID设备并创建虚拟设备供应用使用；需终止驱动才能让hidapi直接访问，这与Linux的udev权限问题是不同的驱动架构层面机制</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="训练评估数据集分离及均匀magnitude覆盖">训练/评估数据集分离及均匀magnitude覆盖<a hidden class="anchor" aria-hidden="true" href="#训练评估数据集分离及均匀magnitude覆盖">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>明确指出error scenes是evaluation用的，training需要独立的小规模pool（10 scenes/subtype）；要求均匀magnitude分布而非随机，将training scenes输出至独立目录避免数据污染</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI初始未主动区分两种用途，从现有代码结构推断设计意图，分析集中于数量不均匀问题而非数据集划分正确性</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户具有ML数据管理的全局意识，能从pipeline设计之初确立边界；这次纠正从根本上改变了数据架构设计方向。AI需被明确纠正才能对齐</p>
+<h4 id="推理链路中vlm双次前向冗余的识别">推理链路中VLM双次前向冗余的识别<a hidden class="anchor" aria-hidden="true" href="#推理链路中vlm双次前向冗余的识别">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户敏锐追问「为什么会做两次VLM前向？不能在第一次时就把特征拿出来吗？」</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI初始实现了分离的predict_task_completion()方法，未主动考虑计算复用，默认完成功能而忽视性能</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类从系统效率角度提出AI设计中的冗余，推动了sample_actions_with_completion()的融合方案；AI缺乏对整体计算图效率的主动审视</p>
+<h4 id="多意图路由问题的诊断框架">多意图路由问题的诊断框架<a hidden class="anchor" aria-hidden="true" href="#多意图路由问题的诊断框架">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>从实际使用痛点直接指向架构缺陷：「一段话可能有多个任务同时进行，不能用一个分类模型判断」</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI分析代码后停留在「dual verify准确性不足」的框架，未主动识别单Intent返回类型是根本限制</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户从产品场景到架构结论一步到位；AI从代码出发绕了一圈才理解——问题不是准确率，而是返回结构设计</p>
+<h4 id="命名统一的边界划定技术标识符vs展示名">命名统一的边界划定（技术标识符vs展示名）<a hidden class="anchor" aria-hidden="true" href="#命名统一的边界划定技术标识符vs展示名">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>预先制定精确改名计划，明确列出每个文件每一行，专门标注哪些不该改（目录名、conda env技术标识符、路径引用等）</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI执行效率高，额外扫描发现计划未覆盖的遗漏项，但无法独立判断技术标识符与品牌展示名的区别</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 「什么该改、什么不改」的业务判断需要人类预先规划；AI善于执行和查漏补缺，但依赖明确规则输入才能区分标识符类型</p>
+<h4 id="cross-sample-batch-effect根因的归属与分析策略">Cross-sample batch effect根因的归属与分析策略<a hidden class="anchor" aria-hidden="true" href="#cross-sample-batch-effect根因的归属与分析策略">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>列出四种可能根因保持开放态度，最终确认「先消融后诊断」策略</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>通过代码探索和SOTA文献搜索系统收集信息，提出结构化诊断优先级，倾向于快速缩小假设空间</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类的问题框架更开放和科学；AI提供系统化分析但有时过早收敛。两者结合产生了「先诊断再治疗」的有效策略</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="修复策略选择代码改动vs一次性手动操作">修复策略选择：代码改动vs一次性手动操作<a hidden class="anchor" aria-hidden="true" href="#修复策略选择代码改动vs一次性手动操作">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>对gadget finalized历史遗留问题选择手动各设备重新export；对RecoverySegmenter必要性听完解释后直接决定「弄mimicgen就可以了」</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI倾向于修改merge代码（让&rsquo;日期已过&rsquo;自动触发finalize）和详尽解释现有模块，将代码视为首选解决方案</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类以奥卡姆剃刀原则快速砍掉不必要复杂度；AI应先判断问题是历史遗留还是持续性问题，再决定是否需要代码改动</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>多次未主动识别训练/评估数据分离需求：在Error Recovery Benchmark中未区分error scenes的两种用途；在training scenes需求分析中也未主动提出train/test分离设计。AI倾向于从现有代码结构推断设计意图，而非主动询问数据流定位。</li>
+<li>推理链路设计时未主动识别VLM双次前向冗余，默认完成功能而忽视性能；分析多意图问题时初步停留在「准确性不足」框架，未主动识别单Intent返回类型是根本架构限制。共同模式：AI缺乏对整体系统效率和架构设计的主动审视。</li>
+<li>搜索模块使用情况时只用绝对导入格式，漏掉相对导入，对browser模块做出错误的「孤立」判断；代码分析必须同时覆盖绝对和相对两种导入格式。</li>
+<li>在INTENT_PROMPT_FRAGMENTS里添加&rsquo;query&rsquo;条目，后来才发现这个dict根本不被主分类流程使用；创建multi_intent.py时未参照ClaudeProvider.py的CLI调用方式导致flag错误。创建新模块时应主动参考同类已有实现，修改提示时应先确认实际使用方。</li>
+<li>CUDA错误根因诊断不足：面对UNI2 CUDA illegal memory access，只尝试降低batch_size（无效），未深入诊断频域滤波可能产生异常tensor值（NaN/Inf）的根本原因，导致多次无效重试。</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>多次触发ExitPlanMode和并行Explore agent被用户拒绝，以及对空目录启动无意义探查；pos_weight按理论类别比例给出24而缺少工程稳定性考量。对用户偏好的工作节奏和工程折中经验判断不准确。</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>Batch metrics与下游任务指标可以反向变化：post-fusion Harmony使ASW_batch+36%但Spearman r-88%。Embedding的全局分布对齐与局部语义一致性是两个独立维度，STAIG各section独立GCN训练产生非线性维度错位，线性校正无法解决，需Joint联合训练。</li>
+<li>MimicGen augmentation成败取决于warping质量：仅加随机噪声≠trajectory transfer。正确做法是将source→target物体位置差（pos_delta）分摊到接近阶段的action序列，使整条轨迹在目标物体坐标系重放。D0（纯位移）成功率高，D1/D2（含旋转）还需rotation warping。</li>
+<li>Error Recovery Benchmark三池架构：training pool（10 scenes/subtype）→人类录seed demos→MimicGen扩充约1000条；augmentation pool（200 scenes）作为replay目标；evaluation pool（100+）仅用于测试。ControlledRng通过劫持uniform()实现无侵入式均匀magnitude控制（fraction线性插值，randn()/randint()保持随机）。</li>
+<li>调度逻辑的存在性检查必须使用ISO 8601存储格式（start_iso），而非显示格式时间字符串（start_time）；include_past=False在查询显示数据时合理，但用于逻辑判断时会造成调度盲区——同一API参数在不同用途下需要不同默认值。</li>
+<li>CalendarPro中INTENT_PROMPT_FRAGMENTS和BASE_SYSTEM_PROMPT是两套互不相关的提示系统：前者只给multi_intent.py用，后者才是主分类流程的system prompt。LLM稳定输出正确结构化数据需要在系统提示里提供具体的词汇→类型→数据字段对照表。</li>
+<li>搜索「某模块是否被使用」必须同时覆盖绝对导入（from src.X）和相对导入（from ..X、from .X）两种格式；仅有tests/引用不算运行时使用。孤立模块识别可靠流程：①查__init__.py是否导出→②双格式grep整个src/→③仅tests/引用则可安全归档。</li>
+<li>极度类别不平衡（正样本&lt;5%）时total loss被负样本主导，不反映正样本学习质量；pos_weight合理范围通常远小于理论最优值（如96/4=24），保守值（10）能避免训练初期震荡；需独立监控正样本recall/precision。</li>
+<li>模型推理链路设计时应检查计算图中是否有可复用的中间特征；VLM prefix特征在flow matching和classification head间共享，通过方法组合消除约50%的prefix计算开销。</li>
+<li>watchfiles.run_process(target_type=&lsquo;function&rsquo;)通过multiprocessing.spawn实现真正进程级重启——所有单例自然重置，是Windows ProactorEventLoop下唯一可行的开发热重载方案；Python importlib.reload不适用于有Discord连接和50+单例的bot架构。</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>gadget export阶段_finalized应默认False（旧log可重导），merge阶段应默认True（旧log无需重复处理）；_finalized写在JSON文件内部并随rclone同步传播，多设备共享finalize状态零成本。集群SSH→GitHub常失败，改用HTTPS+显式指定代理（git -c http.proxy=&hellip;）更可靠。</li>
+<li>macOS上3Dconnexion驱动独占物理HID设备，需killall驱动才能让hidapi直接访问；跨机器部署仿真pipeline时PROJECT_ROOT必须用动态__file__解析替代硬编码路径；nvidia-smi进程[Not Found]时遍历/proc/*/fd是定位真正持有GPU句柄进程的最可靠方法。</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>🔄 UNI2 CUDA调试受阻→Harmony方案制定与实现→发现batch指标与niche检索反向变化→ARI策略讨论</strong>
+<em>01:06:49.127 | claude_code</em>
+UNI2 staig_strict推理在RTX 2080 Ti持续CUDA illegal memory access（降batch_size无效），回退至UNI v1。随后探查代码结构制定post-fusion Harmony方案，完成7处代码改动并修复output_dir bug，成功运行实验：ASW_batch+36%但Spearman r-88%，Layer_3/Layer_6出现强负相关（r≈-0.55至-0.68），确立Joint联合训练的必要性。随后三路并行Agent探索SOTA文献，发现GatorST(0.66-0.69)等已大幅超越当前ARI=0.475，确定先消融后诊断的研究策略。</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 收集脚本修复打包、warping bug修复、training scenes生成实现、三池架构确立</strong>
+<em>02:57:31.000 | claude_code</em>
+修复遥操作收集脚本多处bug（SpaceMouse构造参数、动作映射→input2action()、缺少render/start_control），打包171MB portable目录，139项测试全通过。用户明确三池架构（training/augmentation/evaluation独立生成）；发现并修复MimicGen warping中pos_delta从未应用的silent bug（augmentation成功率极低的根因）；实现generate_training_scenes.py（ControlledRng线性插值+round-robin选取，每subtype 10个均匀magnitude场景输出至v5_training/）。</p>
+<h3 id="robobrain-pi0">RoboBrain Pi0<a hidden class="anchor" aria-hidden="true" href="#robobrain-pi0">#</a></h3>
+<p><strong>✅ task completion head训练loss不平衡修复与推理VLM双次前向优化</strong>
+<em>02:31:09.000 | claude_code</em>
+分析训练loss在Step 6000-9900间停滞（4%正样本梯度被淹没），采用pos_weight=10加权BCE loss（保守值而非理论最优24），提交commit 2dc3f7d。随后用户指出存在VLM双次前向冗余，设计sample_actions_with_completion()方法捕获prefix_out直接传给completion head，消除约50%冗余VLM计算，Policy自动检测并选择最优方法。</p>
+<h3 id="life-copilot">Life Copilot<a hidden class="anchor" aria-hidden="true" href="#life-copilot">#</a></h3>
+<p><strong>🔄 全天工程改进：多意图实现、测试修复、代码审计清理、bug修复、品牌统一、日历查询修复</strong>
+<em>00:24:31.209 | claude_code</em>
+多个会话覆盖全天工作：①实现MultiIntentAnalyzer替代7层keyword hack，修复CLI flag错误（&ndash;settings-file→&ndash;settings+stdin），新增周日程查询，424个测试通过；②设计完整多意图路由重构方案（尚未实施）；③pytest-timeout修复测试无限挂起，实现watchfiles进程级热重启工具dev.py；④代码审计归档8个孤立模块约2400行，373个测试通过，CLAUDE.md补充4个新架构章节；⑤修复重复餐食bug（fromisoformat格式错误+include_past缺失），干净删除53个脏数据；⑥CalendarPro→Life Copilot批量重命名15+文件约80处；⑦修复日历查询三层bug（BASE_SYSTEM_PROMPT分类表+关键词回退+include_past），71个测试通过。</p>
+<h3 id="gadget">gadget<a hidden class="anchor" aria-hidden="true" href="#gadget">#</a></h3>
+<p><strong>✅ 多设备维护：DCC初始化批量导出、export bug修复、git同步、finalized异常排查</strong>
+<em>03:24:45.000 | claude_code</em>
+DCC首次运行pip install -e .修复common模块缺失，导出23个日期（2026-02-16至03-19）记录。MacBook修复_finalized默认True bug并添加&ndash;force参数，git stash+rebase合并分叉，提交54个文件（bugJournal 03-04~03-15、summarize logs/reports等）并推送。tianhe通过HTTPS+代理更新352个文件至3a795b6。排查4个日期report的finalized:false根因（3设备源log问题），用户通过各设备重新export解决，export输出新增finalized状态显示行。</p>
+<h3 id="claude-demo">Claude Demo<a hidden class="anchor" aria-hidden="true" href="#claude-demo">#</a></h3>
+<p><strong>✅ 为周五lab meeting准备Claude Code live demo（DLPFC空间转录组）</strong>
+<em>02:49:08.000 | claude_code</em>
+为Prof. Zhang团队设计30分钟demo，6段结构覆盖安全设置、Plan Mode、代码审查、CLAUDE.md、过度自信反例等。数据选用DLPFC 151676空间转录组，生成完整演讲稿demo_script.md和项目规范CLAUDE.md。用户指出只需terminal命令供自己执行（而非AI直接操作），AI转而提供包含环境检查、目录创建、数据下载等完整命令集合。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>25,545,971</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>39,796</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>88,024</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>2,197,444</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>23,220,707</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>91.4%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$19.9887</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>29,064</td>
+          <td>41,132</td>
+          <td>1,143,112</td>
+          <td>14,301,067</td>
+          <td>$15.4686</td>
+          <td>77.4%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>2,350</td>
+          <td>38,242</td>
+          <td>648,918</td>
+          <td>4,178,378</td>
+          <td>$1.4225</td>
+          <td>7.1%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>8,382</td>
+          <td>8,650</td>
+          <td>405,414</td>
+          <td>4,741,262</td>
+          <td>$3.0976</td>
+          <td>15.5%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>3,054,824</td>
+          <td>13,026</td>
+          <td>24,496</td>
+          <td>$3.5443</td>
+      </tr>
+      <tr>
+          <td>MacBook</td>
+          <td>2,268,887</td>
+          <td>1,280</td>
+          <td>6,494</td>
+          <td>$1.9555</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>17,837,380</td>
+          <td>18,163</td>
+          <td>50,555</td>
+          <td>$12.2601</td>
+      </tr>
+      <tr>
+          <td>TzJsDesktop</td>
+          <td>2,384,880</td>
+          <td>7,327</td>
+          <td>6,479</td>
+          <td>$2.2288</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

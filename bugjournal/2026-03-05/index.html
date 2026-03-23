@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-05 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="跨四台设备并行推进：DCC完成MIHD跨样本RM-IDEAL评估与叙事精炼，tianhe/an53完成ZhaoGanlong 9任务训练环境搭建（Diffusion Policy和Pi0.5成功启动）、Openpi-moe静默归一化bug修复和Phoenix/FLARE仓库拆分规划，TzJsDesktop完成CalendarPro个人管家系统全面升级（16新文件、utterance自动增广闭环、321个测试通过），MacBook完成2月月报生成和Claude Code使用指南编写。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-03-05/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-03-05/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-03-05/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-05">
+  <meta property="og:description" content="跨四台设备并行推进：DCC完成MIHD跨样本RM-IDEAL评估与叙事精炼，tianhe/an53完成ZhaoGanlong 9任务训练环境搭建（Diffusion Policy和Pi0.5成功启动）、Openpi-moe静默归一化bug修复和Phoenix/FLARE仓库拆分规划，TzJsDesktop完成CalendarPro个人管家系统全面升级（16新文件、utterance自动增广闭环、321个测试通过），MacBook完成2月月报生成和Claude Code使用指南编写。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-05T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-05T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-05">
+  <meta name="twitter:description" content="跨四台设备并行推进：DCC完成MIHD跨样本RM-IDEAL评估与叙事精炼，tianhe/an53完成ZhaoGanlong 9任务训练环境搭建（Diffusion Policy和Pi0.5成功启动）、Openpi-moe静默归一化bug修复和Phoenix/FLARE仓库拆分规划，TzJsDesktop完成CalendarPro个人管家系统全面升级（16新文件、utterance自动增广闭环、321个测试通过），MacBook完成2月月报生成和Claude Code使用指南编写。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-03-05",
+      "item": "https://tzj2006.github.io/bugjournal/2026-03-05/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-05",
+  "name": "Bug Journal 2026-03-05",
+  "description": "跨四台设备并行推进：DCC完成MIHD跨样本RM-IDEAL评估与叙事精炼，tianhe/an53完成ZhaoGanlong 9任务训练环境搭建（Diffusion Policy和Pi0.5成功启动）、Openpi-moe静默归一化bug修复和Phoenix/FLARE仓库拆分规划，TzJsDesktop完成CalendarPro个人管家系统全面升级（16新文件、utterance自动增广闭环、321个测试通过），MacBook完成2月月报生成和Claude Code使用指南编写。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-05 今日概览 做了什么： 跨四台设备并行推进机器人VLA工程（an53训练环境搭建、Openpi-moe bug修复、Phoenix/FLARE仓库重组）、MIHD空间转录组跨样本评估与叙事精炼、CalendarPro个人管家系统全面升级，以及月度总结生成和Claude Code指南编写。 怎么做的： DCC通过异步benchmark计算和多轮对话精炼叙事；an53通过SSH远程调试逐层排查环境依赖和pdb断点，FSDP多卡分片解决OOM；tianhe通过并行Agent追踪数据流定位静默bug；TzJsDesktop通过探索成熟框架（OpenClaw/GSD）提炼设计模式，4个并行后台Agent并发创建新服务文件；MacBook通过monthly_summary.py处理月报并行研究Agent编写指南。 有什么用： 建立MIHD跨样本融合embedding层级差异评估基准；an53成功启动两条训练线（Diffusion Policy loss下降中，Pi0.5稳定至24k步）；修复多处静默训练bug（norm_stats缺失、.testc.命名错误）；CalendarPro从被动响应升级为具备自主感知能力的管家系统（321测试通过），并建立utterance持续学习闭环；完成2月全月研究进展归档和Claude Code完整参考文档。 DCC 做了什么： 运行MIHD跨样本RM-IDEAL benchmark（151673↔151508双向），精炼项目核心叙事（zero-shot + medical knowledge transfer），并启动Layer_3可视化和RM-IDEAL GPU加速探索。 怎么做的： 通过benchmark_rm_ideal.py后台计算14组WWL+Wasserstein分数，监控rm_cache目录追踪进度；多轮对话迭代精炼5句话叙事；子Agent分析rm_ideal.py源码后规划GPU Sinkhorn替换方案。 有什么用： 完成151673↔151508全量评估：Layer_1（ρ=0.62）和Layer_5（ρ=0.46-0.50）跨样本结构保留最佳，Layer_3/6出现负相关（ρ≈-0.21～-0.36）；确立以zero-shot和医学知识迁移为核心的差异化叙事框架。 MacBook 做了什么： 运行gadget/summarize工具生成并合并2026年2月月度总结，以及编写676行Claude Code综合使用指南。 怎么做的： monthly_summary.py分两段处理2月数据后合并；并行启动3个研究Agent收集资料，完成指南写作。 有什么用： 完成2月全月MIHD/ErrorRecoveryBenchmark/Pi0.5 Phoenix等项目进展结构化归档；产出涵盖10个主题的Claude Code完整参考文档。 TzJsDesktop 做了什么： 完成CalendarPro个人管家系统全面升级：架构设计（研究OpenClaw/GSD框架）、utterance外部化与自动增广、Personal Butler System 31子目标实现（16新文件）、BackgroundCoordinator启动修复、9个Discord handler补全、321个测试通过，以及16处危险静默异常修复和CLAUDE.md重写。 怎么做的： 探索OpenClaw（Hook/Cron/Plugin模式）和get-shit-done（STATE.md/层级上下文/多Agent协作）提炼设计模式；4个并行后台Agent并发创建独立服务文件；系统性扫描TODO/NotImplementedError/except-pass发现遗留问题；通过/init分析代码库重写CLAUDE.md。 有什么用： CalendarPro具备自主智能引擎（GapAnalyzer、AutonomousExecutor等7个后台服务正式激活）；utterance增广建立mismatch→学习→热重载的持续学习闭环（7条历史mismatch全部正确归类）；321个测试全部通过，16处静默异常被消除。 tianhe 做了什么： 在an53上完成ZhaoGanlong框架9任务数据准备全流程并启动两条训练线；在RefineVLA环境完成curobo CUDA安装；排查并修复Openpi-moe中prev_actions未归一化的静默训练bug；启动Phoenix/FLARE双项目代码库分离迁移工程。 怎么做的： SSH远程调试an53，逐层排查pdb断点、缺失模块（clip/hydra）、路径不匹配和OOM问题，手动复制conda依赖包，FSDP 2GPU分片解决Pi0.5显存瓶颈；通过并行Agent追踪transforms.py→data_loader.py→pi0_moe.py数据流定位静默bug；rsync+symlink策略分离~1TB代码和数据。 有什么用： Diffusion Policy（GPU 0，loss 0.62下降中）和Pi0.5（GPU 2+3 FSDP，24k/100k步稳定运行）成功启动；1,034,176条llava_motion.json和9个任务渲染图像全部生成；修复norm_stats缺失prev_actions的隐式scale不匹配bug；Phoenix/FLARE拆分计划就绪，迁移进行中。 跨四台设备并行推进：DCC完成MIHD跨样本RM-IDEAL评估与叙事精炼，tianhe/an53完成ZhaoGanlong 9任务训练环境搭建（Diffusion Policy和Pi0.5成功启动）、Openpi-moe静默归一化bug修复和Phoenix/FLARE仓库拆分规划，TzJsDesktop完成CalendarPro个人管家系统全面升级（16新文件、utterance自动增广闭环、321个测试通过），MacBook完成2月月报生成和Claude Code使用指南编写。\n今日任务 架构与策略 ✅ CalendarPro Personal Butler System 31子目标全面升级 — 按31子目标计划创建16个新服务文件（SituationMonitor、AutonomousExecutor、GapAnalyzer、ReminderEvaluator、GoalTracker、WaveExecutor、ConversationSummarizer、DietService、ExerciseService等）并修改20+现有文件（EventBus/Config/Models/ContextAssembler/BackgroundCoordinator等）；4个并行后台Agent并发开发瓶颈模块；196个自动化测试全部通过。 ✅ MIHD跨样本RM-IDEAL Benchmark（151673↔151508） — 运行PCA+UNI2+STAIG_fusion在两个DLPFC切片间的双向RM-IDEAL评估，计算14组Spearman相关、P@K和SL@K指标。结果：Layer_1（ρ=0.62）和Layer_5（ρ=0.46-0.50）跨样本结构保留最佳，Layer_3/6出现负相关（ρ≈-0.21～-0.36），P@K全为零（跨样本场景必然），结果保存至summary.csv和detailed_results.json。 ✅ Openpi-moe norm_stats缺失prev_actions问题排查与修复 — 通过三路并行Agent追踪normalize.py→transforms.py→data_loader.py→pi0_moe.py数据流，发现apply_tree(strict=False)静默跳过未命中key，导致hist_actions（未归一化delta）与actions（已归一化）在VAE中scale不一致。修改compute_norm_stats.py动态追加prev_actions统计量，修复向后兼容。 ✅ CalendarPro个人管家系统架构设计（研究OpenClaw/GSD框架） — 探索OpenClaw（Hook生命周期/Cron+Delivery/Session路由/ACP Spawn等6个核心模式）和get-shit-done（STATE.md持久记忆/层级上下文组装/多Agent协作/波次执行等7个核心模式），融合设计含19个新文件、5批实施顺序、31子目标的完整管家升级计划，保存至docs/butler-plan.md。 ✅ MIHD项目核心叙事精炼（zero-shot + medical knowledge transfer框架） — 通过多轮对话将项目描述精炼为以「临床愿景→zero-shot必要性→与STAIG范式对比→系统benchmark→发现价值」为主线的5句话结构，确立差异化叙事框架并压缩句子长度。 ✅ Claude Code综合使用指南编写 — 三个并行研究Agent收集资料，编写676行Markdown指南，涵盖定义、安装、功能、IDE集成、命令参考、能力边界、最佳实践和定价10个主题，附快速参考卡片。 ✅ ZhaoGanlong an53数据准备全流程与训练脚本修复 — 修改4个数据准备脚本（启用9任务、移除8处pdb断点、修复.testc.命名bug、改h5py写模式为w）和2个JSON映射文件；在an53完成Step 0-4全流程（5Hz标注→速度数据集→1,034,176条llava_motion.json→~1M张渲染图像）；创建训练编排脚本zhaoganlong_train_an53.sh；更新项目全景总结.md至v4.20。 ✅ Pi0.5训练启动（an53 GPU 2+3 FSDP） — 解决OPENPI_DATA_HOME symlink resolve路径不匹配和单卡OOM（batch_size=64/8均不足）后，以–fsdp-devices 2 –batch-size 16成功启动，速度~1.5s/step，稳定运行至24.5k/100k步（剩余约31h）。 🔄 Phoenix/FLARE双项目代码库梳理与分离迁移 — 识别Motion-based-Self-Reflection-Framework仓库内嵌套Phoenix（MPM/MCM）和FLARE（Retry/Reset）两个独立框架；制定含完整目录结构、文件归属矩阵和rsync+symlink策略（code复制+~1TB data symlink）的拆分计划；部分rsync操作已后台执行，会话中断前未完成所有步骤。 ✅ CalendarPro utterance外部化与自动增广实现 — 将21个路由452条utterances迁移至data/intent_utterances.json；实现JSON动态加载+硬编码fallback；新建UtteranceAugmenter从mismatch日志按llm_intent分组追加utterance（7条历史mismatch全部正确归类）；注册每日2AM cron任务；SemanticRouter支持热重载；48个现有测试全部通过。 ✅ CalendarPro BackgroundCoordinator启动修复 + 9个Discord handler补全 + 测试扩展至321个 — 在discord_bot.py on_ready()中添加coordinator.start_all()调用，激活GapAnalyzer等7个后台服务；为SET_GOAL/QUERY_GOALS/REVIEW_DECISIONS/INCUBATE_THOUGHT/QUERY_INCUBATION/LOG_MEAL/QUERY_DIET/LOG_EXERCISE/QUERY_EXERCISE实现9个handler并接入对应服务；创建conftest.py共享fixtures + 20个测试文件，测试从约196个扩展至321个全部通过。 🔄 MIHD RM-IDEAL Layer_3空间可视化与GPU加速方案规划 — Layer_3可视化脚本（三面板：GT标注+RM-IDEAL热力图+嵌入余弦相似度）开始编写但未完成；GPU加速方案（PyTorch Sinkhorn替换POT库emd2，批处理+ε正则化近似+CPU回退）完成规划，实现未启动。 ✅ Diffusion Policy训练启动（an53 GPU 0） — 解决hydra模块缺失（VLA PYTHONPATH回退）和trajectory_data.py/multi_train.py中pdb断点阻塞后成功启动，epoch 1 loss从1.16降至0.62。 ❌ LLaVA MPM训练启动（an53 GPU 1） — zero3.json相对路径→绝对路径已修复；liuhaotian/llava-v1.5-7b未缓存且集群无网络，发现本地副本位于/XYFS01/…/cpx2/3D-LLaVA/llava-v1.5-7b/，会话结束时–model_name_or_path修复未完成。 实现与修复 ✅ CalendarPro 16处危险静默异常修复与CLAUDE.md重写 — 将6个文件中16处except Exception: pass替换为logger.error/warning；移除executor.py死代码循环；实现get_progress()和learn_from_history()；通过/init命令重写CLAUDE.md，新增系统启动链、EventBus架构、数据持久化等关键章节，修正intent类型数量（11→21）；319个测试全部通过。 ✅ curobo安装到RefineVLA conda环境 — 定位CUDA headers至targets/x86_64-linux/include/（conda CUDA toolkit非标准路径），设置CPLUS_INCLUDE_PATH/C_INCLUDE_PATH后pip install -e . –no-build-isolation，验证import curobo和CUDA扩展geom_cu均可正常加载。 ✅ 2026年2月月度总结生成与合并 — MacBook上分两段运行monthly_summary.py处理2月全月日报，合并为完整月报，覆盖MIHD、ErrorRecoveryBenchmark、Pi0.5 Phoenix等项目进展（含scGPT silent bug修复、训练-评估任务不匹配发现等里程碑）。 问题与解决方案 关键问题 1. CalendarPro：BackgroundCoordinator虽已实例化但start_all()从未被调用，7个后台服务（GapAnalyzer、AutonomousExecutor等）从未运行；9个IntentType有路由定义但无Discord handler，触发后静默fallback 解决方案: 在discord_bot.py on_ready()中添加await coordinator.start_all()；在_handle_intent()中添加9个elif分支并实现对应handler接入各相关服务\n关键洞察: 整个自主智能引擎依赖后台服务启动，功能测试无法覆盖此类时序问题；intent路由层和展示层需要契约验证机制，添加新Intent时需同步检查handler覆盖\n2. Openpi-moe：norm_stats.json缺少prev_actions键但训练无任何报错，hist_actions与actions在VAE中scale不一致 解决方案: 定位到apply_tree(strict=False)静默跳过未命中key，修改compute_norm_stats.py动态追加prev_actions统计量（向后兼容）\n关键洞察: apply_tree遍历数据key而非stats key，未命中时静默返回原值是隐式bug而非报错；关键训练路径应使用strict=True或显式日志告警，normalize统计量必须覆盖模型实际使用的所有张量\n3. MIHD：Layer_3/6的Spearman相关出现负值（ρ≈-0.21～-0.36），嵌入余弦相似度排名与RM-IDEAL结构相似度排名方向相反 解决方案: 分析为DLPFC中间层在多模态嵌入空间中与相邻层存在混淆——嵌入认为相邻层更相似，但RM-IDEAL基于ground-truth拓扑认为同层更相似；启动Layer_3空间可视化进行验证\n关键洞察: 负相关揭示中间层在多模态嵌入空间的连续性特征；P@K在跨样本场景下必然为零（无位置对应关系），应以Spearman ρ和SL@K作为主要指标\n4. ZhaoGanlong：数据准备脚本遗留pdb断点（6个文件共8处）及.testc.命名bug（输出后缀与下游读取不匹配），导致自动化运行挂起或跨步骤静默失败 解决方案: 全局grep移除所有pdb.set_trace()；删除save_path中.testc.后缀使下游脚本能正确读取\n关键洞察: 科研代码pdb断点往往散布多文件，需全局扫描而非逐文件检查；命名bug造成pipeline跨步骤静默断裂，执行前必须代码审查\n5. ZhaoGanlong：Pi0.5单卡（A800 80GB）OOM（batch_size=8也需~64GB），且pathlib.Path.resolve()展开symlink导致路径边界检查失败 解决方案: –fsdp-devices 2将模型分片到2张GPU（batch_size=16，每卡~33GB）；设置OPENPI_DATA_HOME指向真实路径绕过symlink边界检查\n关键洞察: Pi0.5（gemma_2b_lora + gemma_300m_lora双模型）即使LoRA也必须FSDP多卡；pathlib.resolve()会展开symlink，代码对cache_dir做相对路径判断时需注意\n6. CalendarPro：utterances全部硬编码在Python中，mismatch日志记录的纠正信号从未被利用；services/init.py eager import导致循环依赖 解决方案: JSON外部化（基础+增广双字段）+ UtteranceAugmenter定时自动增广 + SemanticRouter热重载；init.py移除所有eager imports改为lazy import\n关键洞察: mismatch日志是最高质量的训练信号——LLM纠正的case代表用户真实表达，比AI生成变体更精准；Python包__init__.py不应做eager import以防循环依赖\n7. ZhaoGanlong：LLaVA MPM需要liuhaotian/llava-v1.5-7b，集群无网络且HF cache未找到；Diffusion Policy因hydra模块缺失无法启动 解决方案: 广泛搜索发现llava-v1.5-7b本地副本位于/XYFS01/…/cpx2/3D-LLaVA/，可用–model_name_or_path直接指向；将vla环境site-packages和bin加入PYTHONPATH/PATH作为hydra回退\n关键洞察: 封闭集群中大型模型以非标准路径存放，需搜索config.json/tokenizer.model等特征文件定位；PYTHONPATH跨环境回退比复制包更高效\n一般问题 8. curobo：CUDA headers不在标准$CUDA_HOME/include/路径，导致CUDA扩展编译失败 解决方案: 发现headers位于targets/x86_64-linux/include/（conda CUDA toolkit非标准路径），设置CPLUS_INCLUDE_PATH/C_INCLUDE_PATH后重新安装\n关键洞察: conda安装的CUDA toolkit将headers置于targets/x86_64-linux/include/而非标准路径，编译CUDA扩展需手动告知编译器\n人类思路 vs AI 思路 战略层面 项目叙事与架构差异化定位 角色 思路 人类 人类引入关键差异化维度：MIHD叙事中引入zero-shot vs 需训练范式对比、STAIG对比、医学知识跨患者迁移；CalendarPro设计中主动指引参考OpenClaw和get-shit-done具体repo AI AI初始从通用benchmark角度描述MIHD，从内部知识库设计CalendarPro初版计划，均未能主动发现与同类工作/框架的本质区别 差异分析: 差异化定位需要外部视角和领域关注，是人类的主导贡献；AI在既定框架内的语言优化和代码执行能力强，但无法自主发现叙事切入点或主动调研外部优质实现\n代码仓库隐含结构识别（Phoenix vs FLARE双框架） 角色 思路 人类 用户掌握文献背景知识，主动指出Motion-based-Self-Reflection-Framework仓库嵌套Phoenix（MPM/MCM）和FLARE（retry/reset）两个独立框架，引导AI梳理目录归属 AI AI在整个实施过程中将整个仓库当作一个项目处理，只能从目录结构推断，需要人类提示才能正确归类 差异分析: 文献/项目背景知识是识别同仓库多论文代码混合的关键，AI无法仅从代码结构独立发现这一架构特征\n静默异常现象的直觉识别与根因挖掘 角色 思路 人类 用户凭直觉察觉「没有prev_actions也不报错是很奇怪的事情」，明确提出why no error + 实际如何处理两个具体问题，推动了一个原本不会被发现的隐式bug曝光 AI AI通过并行Agent多路径探查代码，完整还原数据流，找出apply_tree(strict=False)根因，发现scale不一致的潜在训练风险 差异分析: 人类用直觉识别「异常现象」，AI用系统性代码追踪找出根因；两者协作暴露了隐式训练bug\n训练pipeline数据就绪性判断 角色 思路 人类 用户明确指出「你得先run data prep之类的吧」，清楚哪些阶段可以并行（Pi0.5独立数据集）、哪些必须串行（Diffusion Policy依赖Step 4完成） AI AI在data prep Step 4渲染进行到78%时就尝试启动Diffusion Policy，倾向于立即执行能执行的步骤而忽视数据就绪性校验 差异分析: 人类对pipeline依赖关系有整体把握，AI缺乏主动校验前置条件的逻辑\nchatbot系统的集成测试策略 角色 思路 人类 人类认为对话机器人的真正测试应通过Discord Bot发消息、观察端到端行为；明确要求测试包含每个场景的期望结果 AI AI默认创建68个pytest单元测试（mock各依赖），遗漏手动集成测试维度，需用户显式纠正后才重新设计包含Discord交互验证的测试框架 差异分析: AI对「完整测试」的理解过于技术化，忽视用户体验层验证；单元测试适合捕获回归，但无法验证AI意图分类、上下文传递和完整对话流程\n代码可维护性主动识别（utterance外部化） 角色 思路 人类 用户在旁观实现过程中注意到utterances全部硬编码，主动提出「可以写在json file中进行读取，方便以后增加」 AI AI在设计管家系统计划和实现utterance功能时均未主动考虑外部化和可维护性，将452条utterances直接写入新文件 差异分析: 用户对代码迭代便利性更敏感，在看到实现细节后立即识别改进点；AI倾向于先完成功能再考虑工程质量\n大规模升级计划的架构设计与执行分工 角色 思路 人类 人类提供极为详尽的31子目标计划（含每个文件功能、EventBus事件名、CronScheduler格式、依赖关系和测试要求）；用户多次拒绝AI的ExitPlanMode提案，希望先完整审查计划再授权执行 AI AI先读取现有代码模式发现多数文件已有基础结构，专注增量实现，用4个并行Agent加速瓶颈模块；主动发现BackgroundCoordinator未启动这一计划中未提及的集成缺陷 差异分析: 人类负责架构决策和全局设计，AI负责代码模式识别和并行执行优化；AI在执行中能发现人类计划遗漏的集成缺陷，但在大规模修改场景下需要更保守的确认策略\nAI 局限性 重要局限 关键集成点检查不主动：BackgroundCoordinator未启动这一关键缺陷在第二个会话才被发现，未在实现过程中主动验证setup_hook()完整性；pdb断点也是多次逐一发现而非在启动前全局grep扫描一次性清理 叙事/架构设计缺乏差异化意识：在MIHD叙事和CalendarPro架构设计初稿中均未主动提炼与同类工作/框架的本质区别，需用户多轮纠正或明确指引才引入核心差异化要素；也未主动提出调研外部优质框架 chatbot系统测试策略理解偏技术化：默认创建单元测试，遗漏Discord Bot手动端到端交互测试这一关键验证维度，需用户显式纠正 Pipeline数据就绪性校验缺失：在ZhaoGanlong训练启动中，数据准备78%时即尝试启动依赖数据的训练任务，缺乏主动验证前置条件的习惯 未能主动识别同一代码仓库中包含两个不同研究框架（Phoenix和FLARE）的结构，需人类提示才能梳理；计划文件中也引入了事实性错误（an49节点名）未自行发现 代码可维护性设计意识不足：utterance功能实现时未主动考虑外部化；创建大量新文件时引入services/init.py循环导入问题，说明大规模文件创建前未全面验证导入链 一般局限 ExitPlanMode时机判断不准确：多次在用户还有补充需求或尚未完整审查计划时尝试退出计划模式（多达3-4次被拒），大规模修改场景需更保守的确认策略 工具调用参数错误和环境命令兼容性问题：TaskOutput的block/timeout传入字符串而非正确类型；使用了conda run –no-banner（该版本不支持）；tmux中shell变量嵌套引号转义多次出错需改用独立launcher脚本 今日收获 核心收获 BackgroundCoordinator服务注册模式需配套明确的启动协议：start_all()需显式调用，setup_hook和main.py均易遗漏；功能测试无法覆盖此类时序问题，应在架构层面添加启动时断言或集成测试。整个自主智能引擎全部依赖后台服务启动，未启动意味着所有新功能是死代码 apply_tree(strict=False)是危险的「静默忽略」模式：遍历数据key而非stats key，未命中时直接返回原值不报错。导致Openpi-moe中hist_actions（未归一化delta）与actions（已归一化）在VAE中scale不一致，是隐式训练bug。关键训练路径应使用strict=True或显式日志告警；normalize统计量计算脚本必须覆盖模型实际使用的所有张量 GSD的STATE.md持久记忆模式是解决AI管家context rot的核心：记录用户偏好、历史决策、未完成任务，每次AI调用前强制读取，保持跨session记忆连贯。是任何需要「记住用户」的AI系统的核心设计模式 对于聊天机器人系统，集成验证的最有效方式是通过真实消息接口（Discord Bot）进行手动端到端测试——单元测试适合捕获回归，但无法验证AI意图分类、上下文传递和完整对话流程 Motion-based-Self-Reflection-Framework仓库同时包含两个独立框架：Phoenix（MPM→Codebook→Diffusion Policy→MCM动作指令纠正循环，代码在diffusion_policy_for_action/和llava_for_motion_instruction/）和FLARE（VLM失败案例分析→reset技能优先级排序，代码在failure_case_analysis/和reset_collect_demo/） Zero-shot多模态融合与需训练方法的本质区别：STAIG等需对每个样本微调，embedding是样本特异的；zero-shot基础模型embedding天然跨样本可比，是实现patch query医学知识迁移的必要前提——这是MIHD项目最核心的定位差异 Semantic Router的utterance自动增广闭环：SR误分类→LLM纠正→mismatch日志→自动追加utterance→路由热重载。这是低成本高质量的持续学习机制，mismatch日志中LLM纠正的case代表用户真实表达方式，比AI生成合成数据更精准可靠 跨样本RM-IDEAL评估揭示DLPFC层级结构的嵌入模态特异性：Layer_1/5跨样本结构保留最佳（ρ=0.42-0.62，SL@50高达0.94-1.0），Layer_3/6出现负相关（ρ≈-0.21～-0.36），可能反映中间层在多模态嵌入空间中与相邻层的连续性特征。P@K在跨样本场景下必然为零，应以Spearman ρ和SL@K为主要指标 Pi0.5（pi05_base，gemma_2b_lora + gemma_300m_lora双模型）在单张A800 80GB上无法运行（batch_size=8也OOM），必须使用–fsdp-devices 2 + batch_size=16分片到两张卡，每卡显存约33GB 多Agent并行实施策略（同时spawn 4-6个background agents创建独立文件）在大型架构实施中显著提升速度，适用于相互独立的基础设施文件创建；AI应在动手前先读取现有代码模式，避免重复工作 所有except Exception: pass都是危险的静默失败模式，在生产环境中会吞掉真实错误极难调试；正确做法是始终用logger.error/warning记录异常详情，尤其在服务初始化和数据持久化路径上 封闭集群环境的依赖和模型管理：从同用户组其他conda环境复制缺失包或设置跨环境PYTHONPATH；大型预训练权重以非标准路径存放，需搜索config.json/tokenizer.model等特征文件定位后用–model_name_or_path直接指向本地路径绕过Hub下载 参考同类型成熟代码库（openclaw的多智能体ACP模式、get-shit-done的波次执行和检查点机制）能显著提升架构质量，避免重复发明轮子；intent路由层和展示层需要契约验证机制，添加新Intent时需同步检查handler覆盖 实践收获 conda安装的CUDA toolkit将headers置于targets/x86_64-linux/include/而非标准$CUDA_HOME/include/，编译依赖CUDA的Python扩展时需手动设置CPLUS_INCLUDE_PATH/C_INCLUDE_PATH 大型仓库拆分策略：先用du -sh评估数据量，rsync –exclude排除大数据目录，code复制+data symlink是高效可维护的解法（避免~1TB数据重复存储） 会话摘要 MIHD 🔄 跨样本RM-IDEAL Benchmark评估、项目叙事精炼、可视化与GPU加速规划 15:49:09.672 | claude_code 运行151673↔151508双向RM-IDEAL全量评估（14组），发现Layer_1/5跨样本结构保留最佳（ρ=0.62/0.46-0.50），Layer_3/6出现负相关（ρ≈-0.21～-0.36），P@K全为零（跨样本场景必然）。修正Section ID 151608→151508，通过监控rm_cache缓存文件追踪进度。同步通过3轮对话将项目叙事精炼为「临床愿景→zero-shot必要性→STAIG对比→benchmark→发现价值」主线（人类引入差异化框架，AI负责语言优化）。启动Layer_3三面板空间可视化脚本编写和PyTorch Sinkhorn GPU OT加速方案规划，两者均未完成。确认UNI/UNI2 forward()均含F.normalize() L2归一化。\ngadget/summarize + Claude Code指南 ✅ 2月月度总结生成合并（MacBook）与Claude Code综合使用指南编写 06:01:36.563 | claude_code MacBook上分两段运行monthly_summary.py处理2月全月日报数据，合并为覆盖MIHD（concat ARI=0.387全量验证）、ErrorRecoveryBenchmark（M14全量基线评估）、Pi0.5 Phoenix等项目的完整月报。并行启动3个研究Agent收集资料，编写676行Claude Code综合使用指南（10个主题）。\nZhaoGanlong Self-Reflection (an53 训练实施) 🔄 an53 9任务数据准备全流程执行与Diffusion Policy/Pi0.5训练启动 04:04:27.702 | claude_code 修改4个数据准备脚本（启用9任务、移除8处pdb断点、修复.testc.命名bug）和2个JSON映射文件；在an53完成Step 0-4全流程（1,034,176条llava_motion.json + ~1M张渲染图像）。逐一解决CLIP模块缺失（从vla环境复制包）、Pi0.5单卡OOM（→FSDP 2 GPU）、OPENPI_DATA_HOME symlink路径不匹配、hydra缺失（PYTHONPATH回退）等问题。Diffusion Policy（GPU 0，loss 0.62）和Pi0.5（GPU 2+3，24.5k/100k步）成功启动；LLaVA MPM因llava-v1.5-7b未缓存暂时阻塞，发现本地副本路径。用户指出仓库包含Phoenix/FLARE两个独立框架，修正计划文件中an49→an53。\nOpenpi-moe (chenjunye) ✅ norm_stats缺失prev_actions静默bug排查与修复 04:20:57.933 | claude_code 用户凭直觉察觉「无prev_actions也不报错很奇怪」，AI通过三路并行Agent完整追踪数据流：apply_tree(strict=False)静默跳过未命中key；prev_actions经DeltaActions但跳过normalize，以原始delta进入模型；VAE中hist_actions（未归一化）与actions（已归一化）concat存在scale不一致风险。修改compute_norm_stats.py动态追加prev_actions统计量，修复向后兼容，消除隐式训练质量风险。\nRoboTwin / curobo ✅ 在RefineVLA conda环境中安装curobo CUDA扩展 10:08:54.172 | claude_code 定位CUDA headers至targets/x86_64-linux/include/（conda CUDA toolkit非标准路径），设置CPLUS_INCLUDE_PATH/C_INCLUDE_PATH后重新安装，验证import curobo和扩展geom_cu均可正常加载。\nMotion-based-Self-Reflection-Framework (Phoenix/FLARE) 🔄 Phoenix/FLARE双项目拆分计划制定与执行 17:02:47.926 | claude_code 通过/init命令分析仓库，多路Agent识别出Phoenix（MPM/MCM，代码在diffusion_policy_for_action/和llava_for_motion_instruction/）和FLARE（Retry Reset，代码在failure_case_analysis/和reset_collect_demo/）两个独立项目交织存放。用户提供大数据处理（~1TB data symlink）和归属问题的关键决策后，制定含完整目录结构、文件归属矩阵和rsync+symlink策略的拆分计划，部分rsync操作后台执行，会话中断前未完成所有步骤。\nCalendarPro ✅ Personal Butler System 31子目标全面升级实现与遗留问题修复（196→321测试通过） 17:17:36.460 | claude_code 按31子目标计划创建16个新服务文件（SituationMonitor、AutonomousExecutor、GapAnalyzer、WaveExecutor、GoalTracker、DietService等）并修改20+现有文件（EventBus/Config/Models/ContextAssembler等）；4个并行后台Agent并发开发瓶颈模块，196个测试通过。随后修复BackgroundCoordinator启动缺失（所有后台服务从未运行）、补全9个缺失Discord handler（SET_GOAL/LOG_MEAL等），通过conftest.py+20个测试文件将测试扩展至321个全部通过。修复16处危险静默异常（except-pass→logger）、移除executor.py死代码、实现get_progress()，通过/init重写CLAUDE.md。审计还发现executor空循环等遗留问题，制定修复计划（多次ExitPlanMode被用户拒绝，待后续执行）。\n✅ 个人管家系统架构设计与utterance外部化自动增广实现 15:35:31.287 | claude_code 探索OpenClaw（Hook/Cron/ACP Spawn等6个核心模式）和get-shit-done（STATE.md持久记忆/层级上下文组装/波次执行等7个核心模式），融合设计含19个新文件、5批实施顺序、31子目标的完整管家升级计划并保存至docs/butler-plan.md。用户在实施中发现utterances硬编码问题，完整实现utterance外部化方案：452条utterances迁移至data/intent_utterances.json，UtteranceAugmenter处理7条历史mismatch（全部正确归类），每日2AM cron任务，SemanticRouter热重载，48个测试通过。\nToken 用量 总览 指标 数值 总 Token 94,300,633 输入 Token 163,949 输出 Token 363,166 Cache 创建 6,712,195 Cache 读取 87,061,323 Cache 命中率 92.8% 总费用 (USD) $63.6866 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 43,920 145,763 3,506,612 57,626,667 $54.5933 85.7% claude-haiku-4-5-20251001 106,137 200,131 2,946,559 28,996,188 $7.6896 12.1% claude-sonnet-4-6 13,892 17,272 259,024 438,468 $1.4036 2.2% 各设备用量 设备 总 Token 输入 输出 费用 DCC 2,410,657 883 11,431 $2.7439 MacBook 1,817,282 13,958 25,303 $2.5690 tianhe 27,219,255 44,761 83,775 $16.8247 TzJsDesktop 62,853,439 104,347 242,657 $41.5491 ",
+  "wordCount" : "606",
+  "inLanguage": "en",
+  "datePublished": "2026-03-05T00:00:00-05:00",
+  "dateModified": "2026-03-05T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-03-05/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-05
+    </h1>
+    <div class="post-meta"><span title='2026-03-05 00:00:00 -0500 EST'>March 5, 2026</span>&nbsp;·&nbsp;<span>3 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-05">日报 — 2026-03-05<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-05">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 跨四台设备并行推进机器人VLA工程（an53训练环境搭建、Openpi-moe bug修复、Phoenix/FLARE仓库重组）、MIHD空间转录组跨样本评估与叙事精炼、CalendarPro个人管家系统全面升级，以及月度总结生成和Claude Code指南编写。</li>
+<li><strong>怎么做的：</strong> DCC通过异步benchmark计算和多轮对话精炼叙事；an53通过SSH远程调试逐层排查环境依赖和pdb断点，FSDP多卡分片解决OOM；tianhe通过并行Agent追踪数据流定位静默bug；TzJsDesktop通过探索成熟框架（OpenClaw/GSD）提炼设计模式，4个并行后台Agent并发创建新服务文件；MacBook通过monthly_summary.py处理月报并行研究Agent编写指南。</li>
+<li><strong>有什么用：</strong> 建立MIHD跨样本融合embedding层级差异评估基准；an53成功启动两条训练线（Diffusion Policy loss下降中，Pi0.5稳定至24k步）；修复多处静默训练bug（norm_stats缺失、.testc.命名错误）；CalendarPro从被动响应升级为具备自主感知能力的管家系统（321测试通过），并建立utterance持续学习闭环；完成2月全月研究进展归档和Claude Code完整参考文档。</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 运行MIHD跨样本RM-IDEAL benchmark（151673↔151508双向），精炼项目核心叙事（zero-shot + medical knowledge transfer），并启动Layer_3可视化和RM-IDEAL GPU加速探索。</li>
+<li><strong>怎么做的：</strong> 通过benchmark_rm_ideal.py后台计算14组WWL+Wasserstein分数，监控rm_cache目录追踪进度；多轮对话迭代精炼5句话叙事；子Agent分析rm_ideal.py源码后规划GPU Sinkhorn替换方案。</li>
+<li><strong>有什么用：</strong> 完成151673↔151508全量评估：Layer_1（ρ=0.62）和Layer_5（ρ=0.46-0.50）跨样本结构保留最佳，Layer_3/6出现负相关（ρ≈-0.21～-0.36）；确立以zero-shot和医学知识迁移为核心的差异化叙事框架。</li>
+</ul>
+<h3 id="macbook">MacBook<a hidden class="anchor" aria-hidden="true" href="#macbook">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 运行gadget/summarize工具生成并合并2026年2月月度总结，以及编写676行Claude Code综合使用指南。</li>
+<li><strong>怎么做的：</strong> monthly_summary.py分两段处理2月数据后合并；并行启动3个研究Agent收集资料，完成指南写作。</li>
+<li><strong>有什么用：</strong> 完成2月全月MIHD/ErrorRecoveryBenchmark/Pi0.5 Phoenix等项目进展结构化归档；产出涵盖10个主题的Claude Code完整参考文档。</li>
+</ul>
+<h3 id="tzjsdesktop">TzJsDesktop<a hidden class="anchor" aria-hidden="true" href="#tzjsdesktop">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成CalendarPro个人管家系统全面升级：架构设计（研究OpenClaw/GSD框架）、utterance外部化与自动增广、Personal Butler System 31子目标实现（16新文件）、BackgroundCoordinator启动修复、9个Discord handler补全、321个测试通过，以及16处危险静默异常修复和CLAUDE.md重写。</li>
+<li><strong>怎么做的：</strong> 探索OpenClaw（Hook/Cron/Plugin模式）和get-shit-done（STATE.md/层级上下文/多Agent协作）提炼设计模式；4个并行后台Agent并发创建独立服务文件；系统性扫描TODO/NotImplementedError/except-pass发现遗留问题；通过/init分析代码库重写CLAUDE.md。</li>
+<li><strong>有什么用：</strong> CalendarPro具备自主智能引擎（GapAnalyzer、AutonomousExecutor等7个后台服务正式激活）；utterance增广建立mismatch→学习→热重载的持续学习闭环（7条历史mismatch全部正确归类）；321个测试全部通过，16处静默异常被消除。</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 在an53上完成ZhaoGanlong框架9任务数据准备全流程并启动两条训练线；在RefineVLA环境完成curobo CUDA安装；排查并修复Openpi-moe中prev_actions未归一化的静默训练bug；启动Phoenix/FLARE双项目代码库分离迁移工程。</li>
+<li><strong>怎么做的：</strong> SSH远程调试an53，逐层排查pdb断点、缺失模块（clip/hydra）、路径不匹配和OOM问题，手动复制conda依赖包，FSDP 2GPU分片解决Pi0.5显存瓶颈；通过并行Agent追踪transforms.py→data_loader.py→pi0_moe.py数据流定位静默bug；rsync+symlink策略分离~1TB代码和数据。</li>
+<li><strong>有什么用：</strong> Diffusion Policy（GPU 0，loss 0.62下降中）和Pi0.5（GPU 2+3 FSDP，24k/100k步稳定运行）成功启动；1,034,176条llava_motion.json和9个任务渲染图像全部生成；修复norm_stats缺失prev_actions的隐式scale不匹配bug；Phoenix/FLARE拆分计划就绪，迁移进行中。</li>
+</ul>
+<blockquote>
+<p>跨四台设备并行推进：DCC完成MIHD跨样本RM-IDEAL评估与叙事精炼，tianhe/an53完成ZhaoGanlong 9任务训练环境搭建（Diffusion Policy和Pi0.5成功启动）、Openpi-moe静默归一化bug修复和Phoenix/FLARE仓库拆分规划，TzJsDesktop完成CalendarPro个人管家系统全面升级（16新文件、utterance自动增广闭环、321个测试通过），MacBook完成2月月报生成和Claude Code使用指南编写。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>CalendarPro Personal Butler System 31子目标全面升级</strong> — 按31子目标计划创建16个新服务文件（SituationMonitor、AutonomousExecutor、GapAnalyzer、ReminderEvaluator、GoalTracker、WaveExecutor、ConversationSummarizer、DietService、ExerciseService等）并修改20+现有文件（EventBus/Config/Models/ContextAssembler/BackgroundCoordinator等）；4个并行后台Agent并发开发瓶颈模块；196个自动化测试全部通过。</li>
+<li>✅ <strong>MIHD跨样本RM-IDEAL Benchmark（151673↔151508）</strong> — 运行PCA+UNI2+STAIG_fusion在两个DLPFC切片间的双向RM-IDEAL评估，计算14组Spearman相关、P@K和SL@K指标。结果：Layer_1（ρ=0.62）和Layer_5（ρ=0.46-0.50）跨样本结构保留最佳，Layer_3/6出现负相关（ρ≈-0.21～-0.36），P@K全为零（跨样本场景必然），结果保存至summary.csv和detailed_results.json。</li>
+<li>✅ <strong>Openpi-moe norm_stats缺失prev_actions问题排查与修复</strong> — 通过三路并行Agent追踪normalize.py→transforms.py→data_loader.py→pi0_moe.py数据流，发现apply_tree(strict=False)静默跳过未命中key，导致hist_actions（未归一化delta）与actions（已归一化）在VAE中scale不一致。修改compute_norm_stats.py动态追加prev_actions统计量，修复向后兼容。</li>
+<li>✅ <strong>CalendarPro个人管家系统架构设计（研究OpenClaw/GSD框架）</strong> — 探索OpenClaw（Hook生命周期/Cron+Delivery/Session路由/ACP Spawn等6个核心模式）和get-shit-done（STATE.md持久记忆/层级上下文组装/多Agent协作/波次执行等7个核心模式），融合设计含19个新文件、5批实施顺序、31子目标的完整管家升级计划，保存至docs/butler-plan.md。</li>
+<li>✅ <strong>MIHD项目核心叙事精炼（zero-shot + medical knowledge transfer框架）</strong> — 通过多轮对话将项目描述精炼为以「临床愿景→zero-shot必要性→与STAIG范式对比→系统benchmark→发现价值」为主线的5句话结构，确立差异化叙事框架并压缩句子长度。</li>
+<li>✅ <strong>Claude Code综合使用指南编写</strong> — 三个并行研究Agent收集资料，编写676行Markdown指南，涵盖定义、安装、功能、IDE集成、命令参考、能力边界、最佳实践和定价10个主题，附快速参考卡片。</li>
+<li>✅ <strong>ZhaoGanlong an53数据准备全流程与训练脚本修复</strong> — 修改4个数据准备脚本（启用9任务、移除8处pdb断点、修复.testc.命名bug、改h5py写模式为w）和2个JSON映射文件；在an53完成Step 0-4全流程（5Hz标注→速度数据集→1,034,176条llava_motion.json→~1M张渲染图像）；创建训练编排脚本zhaoganlong_train_an53.sh；更新项目全景总结.md至v4.20。</li>
+<li>✅ <strong>Pi0.5训练启动（an53 GPU 2+3 FSDP）</strong> — 解决OPENPI_DATA_HOME symlink resolve路径不匹配和单卡OOM（batch_size=64/8均不足）后，以&ndash;fsdp-devices 2 &ndash;batch-size 16成功启动，速度~1.5s/step，稳定运行至24.5k/100k步（剩余约31h）。</li>
+<li>🔄 <strong>Phoenix/FLARE双项目代码库梳理与分离迁移</strong> — 识别Motion-based-Self-Reflection-Framework仓库内嵌套Phoenix（MPM/MCM）和FLARE（Retry/Reset）两个独立框架；制定含完整目录结构、文件归属矩阵和rsync+symlink策略（code复制+~1TB data symlink）的拆分计划；部分rsync操作已后台执行，会话中断前未完成所有步骤。</li>
+<li>✅ <strong>CalendarPro utterance外部化与自动增广实现</strong> — 将21个路由452条utterances迁移至data/intent_utterances.json；实现JSON动态加载+硬编码fallback；新建UtteranceAugmenter从mismatch日志按llm_intent分组追加utterance（7条历史mismatch全部正确归类）；注册每日2AM cron任务；SemanticRouter支持热重载；48个现有测试全部通过。</li>
+<li>✅ <strong>CalendarPro BackgroundCoordinator启动修复 + 9个Discord handler补全 + 测试扩展至321个</strong> — 在discord_bot.py on_ready()中添加coordinator.start_all()调用，激活GapAnalyzer等7个后台服务；为SET_GOAL/QUERY_GOALS/REVIEW_DECISIONS/INCUBATE_THOUGHT/QUERY_INCUBATION/LOG_MEAL/QUERY_DIET/LOG_EXERCISE/QUERY_EXERCISE实现9个handler并接入对应服务；创建conftest.py共享fixtures + 20个测试文件，测试从约196个扩展至321个全部通过。</li>
+<li>🔄 <strong>MIHD RM-IDEAL Layer_3空间可视化与GPU加速方案规划</strong> — Layer_3可视化脚本（三面板：GT标注+RM-IDEAL热力图+嵌入余弦相似度）开始编写但未完成；GPU加速方案（PyTorch Sinkhorn替换POT库emd2，批处理+ε正则化近似+CPU回退）完成规划，实现未启动。</li>
+<li>✅ <strong>Diffusion Policy训练启动（an53 GPU 0）</strong> — 解决hydra模块缺失（VLA PYTHONPATH回退）和trajectory_data.py/multi_train.py中pdb断点阻塞后成功启动，epoch 1 loss从1.16降至0.62。</li>
+<li>❌ <strong>LLaVA MPM训练启动（an53 GPU 1）</strong> — zero3.json相对路径→绝对路径已修复；liuhaotian/llava-v1.5-7b未缓存且集群无网络，发现本地副本位于/XYFS01/&hellip;/cpx2/3D-LLaVA/llava-v1.5-7b/，会话结束时&ndash;model_name_or_path修复未完成。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>CalendarPro 16处危险静默异常修复与CLAUDE.md重写</strong> — 将6个文件中16处except Exception: pass替换为logger.error/warning；移除executor.py死代码循环；实现get_progress()和learn_from_history()；通过/init命令重写CLAUDE.md，新增系统启动链、EventBus架构、数据持久化等关键章节，修正intent类型数量（11→21）；319个测试全部通过。</li>
+<li>✅ <strong>curobo安装到RefineVLA conda环境</strong> — 定位CUDA headers至targets/x86_64-linux/include/（conda CUDA toolkit非标准路径），设置CPLUS_INCLUDE_PATH/C_INCLUDE_PATH后pip install -e . &ndash;no-build-isolation，验证import curobo和CUDA扩展geom_cu均可正常加载。</li>
+<li>✅ <strong>2026年2月月度总结生成与合并</strong> — MacBook上分两段运行monthly_summary.py处理2月全月日报，合并为完整月报，覆盖MIHD、ErrorRecoveryBenchmark、Pi0.5 Phoenix等项目进展（含scGPT silent bug修复、训练-评估任务不匹配发现等里程碑）。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-calendarprobackgroundcoordinator虽已实例化但start_all从未被调用7个后台服务gapanalyzerautonomousexecutor等从未运行9个intenttype有路由定义但无discord-handler触发后静默fallback">1. CalendarPro：BackgroundCoordinator虽已实例化但start_all()从未被调用，7个后台服务（GapAnalyzer、AutonomousExecutor等）从未运行；9个IntentType有路由定义但无Discord handler，触发后静默fallback<a hidden class="anchor" aria-hidden="true" href="#1-calendarprobackgroundcoordinator虽已实例化但start_all从未被调用7个后台服务gapanalyzerautonomousexecutor等从未运行9个intenttype有路由定义但无discord-handler触发后静默fallback">#</a></h4>
+<p><strong>解决方案:</strong> 在discord_bot.py on_ready()中添加await coordinator.start_all()；在_handle_intent()中添加9个elif分支并实现对应handler接入各相关服务</p>
+<p><strong>关键洞察:</strong> 整个自主智能引擎依赖后台服务启动，功能测试无法覆盖此类时序问题；intent路由层和展示层需要契约验证机制，添加新Intent时需同步检查handler覆盖</p>
+<h4 id="2-openpi-moenorm_statsjson缺少prev_actions键但训练无任何报错hist_actions与actions在vae中scale不一致">2. Openpi-moe：norm_stats.json缺少prev_actions键但训练无任何报错，hist_actions与actions在VAE中scale不一致<a hidden class="anchor" aria-hidden="true" href="#2-openpi-moenorm_statsjson缺少prev_actions键但训练无任何报错hist_actions与actions在vae中scale不一致">#</a></h4>
+<p><strong>解决方案:</strong> 定位到apply_tree(strict=False)静默跳过未命中key，修改compute_norm_stats.py动态追加prev_actions统计量（向后兼容）</p>
+<p><strong>关键洞察:</strong> apply_tree遍历数据key而非stats key，未命中时静默返回原值是隐式bug而非报错；关键训练路径应使用strict=True或显式日志告警，normalize统计量必须覆盖模型实际使用的所有张量</p>
+<h4 id="3-mihdlayer_36的spearman相关出现负值ρ-021-036嵌入余弦相似度排名与rm-ideal结构相似度排名方向相反">3. MIHD：Layer_3/6的Spearman相关出现负值（ρ≈-0.21～-0.36），嵌入余弦相似度排名与RM-IDEAL结构相似度排名方向相反<a hidden class="anchor" aria-hidden="true" href="#3-mihdlayer_36的spearman相关出现负值ρ-021-036嵌入余弦相似度排名与rm-ideal结构相似度排名方向相反">#</a></h4>
+<p><strong>解决方案:</strong> 分析为DLPFC中间层在多模态嵌入空间中与相邻层存在混淆——嵌入认为相邻层更相似，但RM-IDEAL基于ground-truth拓扑认为同层更相似；启动Layer_3空间可视化进行验证</p>
+<p><strong>关键洞察:</strong> 负相关揭示中间层在多模态嵌入空间的连续性特征；P@K在跨样本场景下必然为零（无位置对应关系），应以Spearman ρ和SL@K作为主要指标</p>
+<h4 id="4-zhaoganlong数据准备脚本遗留pdb断点6个文件共8处及testc命名bug输出后缀与下游读取不匹配导致自动化运行挂起或跨步骤静默失败">4. ZhaoGanlong：数据准备脚本遗留pdb断点（6个文件共8处）及.testc.命名bug（输出后缀与下游读取不匹配），导致自动化运行挂起或跨步骤静默失败<a hidden class="anchor" aria-hidden="true" href="#4-zhaoganlong数据准备脚本遗留pdb断点6个文件共8处及testc命名bug输出后缀与下游读取不匹配导致自动化运行挂起或跨步骤静默失败">#</a></h4>
+<p><strong>解决方案:</strong> 全局grep移除所有pdb.set_trace()；删除save_path中.testc.后缀使下游脚本能正确读取</p>
+<p><strong>关键洞察:</strong> 科研代码pdb断点往往散布多文件，需全局扫描而非逐文件检查；命名bug造成pipeline跨步骤静默断裂，执行前必须代码审查</p>
+<h4 id="5-zhaoganlongpi05单卡a800-80gboombatch_size8也需64gb且pathlibpathresolve展开symlink导致路径边界检查失败">5. ZhaoGanlong：Pi0.5单卡（A800 80GB）OOM（batch_size=8也需~64GB），且pathlib.Path.resolve()展开symlink导致路径边界检查失败<a hidden class="anchor" aria-hidden="true" href="#5-zhaoganlongpi05单卡a800-80gboombatch_size8也需64gb且pathlibpathresolve展开symlink导致路径边界检查失败">#</a></h4>
+<p><strong>解决方案:</strong> &ndash;fsdp-devices 2将模型分片到2张GPU（batch_size=16，每卡~33GB）；设置OPENPI_DATA_HOME指向真实路径绕过symlink边界检查</p>
+<p><strong>关键洞察:</strong> Pi0.5（gemma_2b_lora + gemma_300m_lora双模型）即使LoRA也必须FSDP多卡；pathlib.resolve()会展开symlink，代码对cache_dir做相对路径判断时需注意</p>
+<h4 id="6-calendarproutterances全部硬编码在python中mismatch日志记录的纠正信号从未被利用servicesinitpy-eager-import导致循环依赖">6. CalendarPro：utterances全部硬编码在Python中，mismatch日志记录的纠正信号从未被利用；services/<strong>init</strong>.py eager import导致循环依赖<a hidden class="anchor" aria-hidden="true" href="#6-calendarproutterances全部硬编码在python中mismatch日志记录的纠正信号从未被利用servicesinitpy-eager-import导致循环依赖">#</a></h4>
+<p><strong>解决方案:</strong> JSON外部化（基础+增广双字段）+ UtteranceAugmenter定时自动增广 + SemanticRouter热重载；<strong>init</strong>.py移除所有eager imports改为lazy import</p>
+<p><strong>关键洞察:</strong> mismatch日志是最高质量的训练信号——LLM纠正的case代表用户真实表达，比AI生成变体更精准；Python包__init__.py不应做eager import以防循环依赖</p>
+<h4 id="7-zhaoganlongllava-mpm需要liuhaotianllava-v15-7b集群无网络且hf-cache未找到diffusion-policy因hydra模块缺失无法启动">7. ZhaoGanlong：LLaVA MPM需要liuhaotian/llava-v1.5-7b，集群无网络且HF cache未找到；Diffusion Policy因hydra模块缺失无法启动<a hidden class="anchor" aria-hidden="true" href="#7-zhaoganlongllava-mpm需要liuhaotianllava-v15-7b集群无网络且hf-cache未找到diffusion-policy因hydra模块缺失无法启动">#</a></h4>
+<p><strong>解决方案:</strong> 广泛搜索发现llava-v1.5-7b本地副本位于/XYFS01/&hellip;/cpx2/3D-LLaVA/，可用&ndash;model_name_or_path直接指向；将vla环境site-packages和bin加入PYTHONPATH/PATH作为hydra回退</p>
+<p><strong>关键洞察:</strong> 封闭集群中大型模型以非标准路径存放，需搜索config.json/tokenizer.model等特征文件定位；PYTHONPATH跨环境回退比复制包更高效</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="8-curobocuda-headers不在标准cuda_homeinclude路径导致cuda扩展编译失败">8. curobo：CUDA headers不在标准$CUDA_HOME/include/路径，导致CUDA扩展编译失败<a hidden class="anchor" aria-hidden="true" href="#8-curobocuda-headers不在标准cuda_homeinclude路径导致cuda扩展编译失败">#</a></h4>
+<p><strong>解决方案:</strong> 发现headers位于targets/x86_64-linux/include/（conda CUDA toolkit非标准路径），设置CPLUS_INCLUDE_PATH/C_INCLUDE_PATH后重新安装</p>
+<p><strong>关键洞察:</strong> conda安装的CUDA toolkit将headers置于targets/x86_64-linux/include/而非标准路径，编译CUDA扩展需手动告知编译器</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="项目叙事与架构差异化定位">项目叙事与架构差异化定位<a hidden class="anchor" aria-hidden="true" href="#项目叙事与架构差异化定位">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类引入关键差异化维度：MIHD叙事中引入zero-shot vs 需训练范式对比、STAIG对比、医学知识跨患者迁移；CalendarPro设计中主动指引参考OpenClaw和get-shit-done具体repo</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI初始从通用benchmark角度描述MIHD，从内部知识库设计CalendarPro初版计划，均未能主动发现与同类工作/框架的本质区别</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 差异化定位需要外部视角和领域关注，是人类的主导贡献；AI在既定框架内的语言优化和代码执行能力强，但无法自主发现叙事切入点或主动调研外部优质实现</p>
+<h4 id="代码仓库隐含结构识别phoenix-vs-flare双框架">代码仓库隐含结构识别（Phoenix vs FLARE双框架）<a hidden class="anchor" aria-hidden="true" href="#代码仓库隐含结构识别phoenix-vs-flare双框架">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户掌握文献背景知识，主动指出Motion-based-Self-Reflection-Framework仓库嵌套Phoenix（MPM/MCM）和FLARE（retry/reset）两个独立框架，引导AI梳理目录归属</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI在整个实施过程中将整个仓库当作一个项目处理，只能从目录结构推断，需要人类提示才能正确归类</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 文献/项目背景知识是识别同仓库多论文代码混合的关键，AI无法仅从代码结构独立发现这一架构特征</p>
+<h4 id="静默异常现象的直觉识别与根因挖掘">静默异常现象的直觉识别与根因挖掘<a hidden class="anchor" aria-hidden="true" href="#静默异常现象的直觉识别与根因挖掘">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户凭直觉察觉「没有prev_actions也不报错是很奇怪的事情」，明确提出why no error + 实际如何处理两个具体问题，推动了一个原本不会被发现的隐式bug曝光</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI通过并行Agent多路径探查代码，完整还原数据流，找出apply_tree(strict=False)根因，发现scale不一致的潜在训练风险</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类用直觉识别「异常现象」，AI用系统性代码追踪找出根因；两者协作暴露了隐式训练bug</p>
+<h4 id="训练pipeline数据就绪性判断">训练pipeline数据就绪性判断<a hidden class="anchor" aria-hidden="true" href="#训练pipeline数据就绪性判断">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户明确指出「你得先run data prep之类的吧」，清楚哪些阶段可以并行（Pi0.5独立数据集）、哪些必须串行（Diffusion Policy依赖Step 4完成）</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI在data prep Step 4渲染进行到78%时就尝试启动Diffusion Policy，倾向于立即执行能执行的步骤而忽视数据就绪性校验</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类对pipeline依赖关系有整体把握，AI缺乏主动校验前置条件的逻辑</p>
+<h4 id="chatbot系统的集成测试策略">chatbot系统的集成测试策略<a hidden class="anchor" aria-hidden="true" href="#chatbot系统的集成测试策略">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类认为对话机器人的真正测试应通过Discord Bot发消息、观察端到端行为；明确要求测试包含每个场景的期望结果</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI默认创建68个pytest单元测试（mock各依赖），遗漏手动集成测试维度，需用户显式纠正后才重新设计包含Discord交互验证的测试框架</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI对「完整测试」的理解过于技术化，忽视用户体验层验证；单元测试适合捕获回归，但无法验证AI意图分类、上下文传递和完整对话流程</p>
+<h4 id="代码可维护性主动识别utterance外部化">代码可维护性主动识别（utterance外部化）<a hidden class="anchor" aria-hidden="true" href="#代码可维护性主动识别utterance外部化">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户在旁观实现过程中注意到utterances全部硬编码，主动提出「可以写在json file中进行读取，方便以后增加」</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI在设计管家系统计划和实现utterance功能时均未主动考虑外部化和可维护性，将452条utterances直接写入新文件</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户对代码迭代便利性更敏感，在看到实现细节后立即识别改进点；AI倾向于先完成功能再考虑工程质量</p>
+<h4 id="大规模升级计划的架构设计与执行分工">大规模升级计划的架构设计与执行分工<a hidden class="anchor" aria-hidden="true" href="#大规模升级计划的架构设计与执行分工">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类提供极为详尽的31子目标计划（含每个文件功能、EventBus事件名、CronScheduler格式、依赖关系和测试要求）；用户多次拒绝AI的ExitPlanMode提案，希望先完整审查计划再授权执行</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI先读取现有代码模式发现多数文件已有基础结构，专注增量实现，用4个并行Agent加速瓶颈模块；主动发现BackgroundCoordinator未启动这一计划中未提及的集成缺陷</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类负责架构决策和全局设计，AI负责代码模式识别和并行执行优化；AI在执行中能发现人类计划遗漏的集成缺陷，但在大规模修改场景下需要更保守的确认策略</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>关键集成点检查不主动：BackgroundCoordinator未启动这一关键缺陷在第二个会话才被发现，未在实现过程中主动验证setup_hook()完整性；pdb断点也是多次逐一发现而非在启动前全局grep扫描一次性清理</li>
+<li>叙事/架构设计缺乏差异化意识：在MIHD叙事和CalendarPro架构设计初稿中均未主动提炼与同类工作/框架的本质区别，需用户多轮纠正或明确指引才引入核心差异化要素；也未主动提出调研外部优质框架</li>
+<li>chatbot系统测试策略理解偏技术化：默认创建单元测试，遗漏Discord Bot手动端到端交互测试这一关键验证维度，需用户显式纠正</li>
+<li>Pipeline数据就绪性校验缺失：在ZhaoGanlong训练启动中，数据准备78%时即尝试启动依赖数据的训练任务，缺乏主动验证前置条件的习惯</li>
+<li>未能主动识别同一代码仓库中包含两个不同研究框架（Phoenix和FLARE）的结构，需人类提示才能梳理；计划文件中也引入了事实性错误（an49节点名）未自行发现</li>
+<li>代码可维护性设计意识不足：utterance功能实现时未主动考虑外部化；创建大量新文件时引入services/<strong>init</strong>.py循环导入问题，说明大规模文件创建前未全面验证导入链</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>ExitPlanMode时机判断不准确：多次在用户还有补充需求或尚未完整审查计划时尝试退出计划模式（多达3-4次被拒），大规模修改场景需更保守的确认策略</li>
+<li>工具调用参数错误和环境命令兼容性问题：TaskOutput的block/timeout传入字符串而非正确类型；使用了conda run &ndash;no-banner（该版本不支持）；tmux中shell变量嵌套引号转义多次出错需改用独立launcher脚本</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>BackgroundCoordinator服务注册模式需配套明确的启动协议：start_all()需显式调用，setup_hook和main.py均易遗漏；功能测试无法覆盖此类时序问题，应在架构层面添加启动时断言或集成测试。整个自主智能引擎全部依赖后台服务启动，未启动意味着所有新功能是死代码</li>
+<li>apply_tree(strict=False)是危险的「静默忽略」模式：遍历数据key而非stats key，未命中时直接返回原值不报错。导致Openpi-moe中hist_actions（未归一化delta）与actions（已归一化）在VAE中scale不一致，是隐式训练bug。关键训练路径应使用strict=True或显式日志告警；normalize统计量计算脚本必须覆盖模型实际使用的所有张量</li>
+<li>GSD的STATE.md持久记忆模式是解决AI管家context rot的核心：记录用户偏好、历史决策、未完成任务，每次AI调用前强制读取，保持跨session记忆连贯。是任何需要「记住用户」的AI系统的核心设计模式</li>
+<li>对于聊天机器人系统，集成验证的最有效方式是通过真实消息接口（Discord Bot）进行手动端到端测试——单元测试适合捕获回归，但无法验证AI意图分类、上下文传递和完整对话流程</li>
+<li>Motion-based-Self-Reflection-Framework仓库同时包含两个独立框架：Phoenix（MPM→Codebook→Diffusion Policy→MCM动作指令纠正循环，代码在diffusion_policy_for_action/和llava_for_motion_instruction/）和FLARE（VLM失败案例分析→reset技能优先级排序，代码在failure_case_analysis/和reset_collect_demo/）</li>
+<li>Zero-shot多模态融合与需训练方法的本质区别：STAIG等需对每个样本微调，embedding是样本特异的；zero-shot基础模型embedding天然跨样本可比，是实现patch query医学知识迁移的必要前提——这是MIHD项目最核心的定位差异</li>
+<li>Semantic Router的utterance自动增广闭环：SR误分类→LLM纠正→mismatch日志→自动追加utterance→路由热重载。这是低成本高质量的持续学习机制，mismatch日志中LLM纠正的case代表用户真实表达方式，比AI生成合成数据更精准可靠</li>
+<li>跨样本RM-IDEAL评估揭示DLPFC层级结构的嵌入模态特异性：Layer_1/5跨样本结构保留最佳（ρ=0.42-0.62，SL@50高达0.94-1.0），Layer_3/6出现负相关（ρ≈-0.21～-0.36），可能反映中间层在多模态嵌入空间中与相邻层的连续性特征。P@K在跨样本场景下必然为零，应以Spearman ρ和SL@K为主要指标</li>
+<li>Pi0.5（pi05_base，gemma_2b_lora + gemma_300m_lora双模型）在单张A800 80GB上无法运行（batch_size=8也OOM），必须使用&ndash;fsdp-devices 2 + batch_size=16分片到两张卡，每卡显存约33GB</li>
+<li>多Agent并行实施策略（同时spawn 4-6个background agents创建独立文件）在大型架构实施中显著提升速度，适用于相互独立的基础设施文件创建；AI应在动手前先读取现有代码模式，避免重复工作</li>
+<li>所有<code>except Exception: pass</code>都是危险的静默失败模式，在生产环境中会吞掉真实错误极难调试；正确做法是始终用logger.error/warning记录异常详情，尤其在服务初始化和数据持久化路径上</li>
+<li>封闭集群环境的依赖和模型管理：从同用户组其他conda环境复制缺失包或设置跨环境PYTHONPATH；大型预训练权重以非标准路径存放，需搜索config.json/tokenizer.model等特征文件定位后用&ndash;model_name_or_path直接指向本地路径绕过Hub下载</li>
+<li>参考同类型成熟代码库（openclaw的多智能体ACP模式、get-shit-done的波次执行和检查点机制）能显著提升架构质量，避免重复发明轮子；intent路由层和展示层需要契约验证机制，添加新Intent时需同步检查handler覆盖</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>conda安装的CUDA toolkit将headers置于targets/x86_64-linux/include/而非标准$CUDA_HOME/include/，编译依赖CUDA的Python扩展时需手动设置CPLUS_INCLUDE_PATH/C_INCLUDE_PATH</li>
+<li>大型仓库拆分策略：先用du -sh评估数据量，rsync &ndash;exclude排除大数据目录，code复制+data symlink是高效可维护的解法（避免~1TB数据重复存储）</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>🔄 跨样本RM-IDEAL Benchmark评估、项目叙事精炼、可视化与GPU加速规划</strong>
+<em>15:49:09.672 | claude_code</em>
+运行151673↔151508双向RM-IDEAL全量评估（14组），发现Layer_1/5跨样本结构保留最佳（ρ=0.62/0.46-0.50），Layer_3/6出现负相关（ρ≈-0.21～-0.36），P@K全为零（跨样本场景必然）。修正Section ID 151608→151508，通过监控rm_cache缓存文件追踪进度。同步通过3轮对话将项目叙事精炼为「临床愿景→zero-shot必要性→STAIG对比→benchmark→发现价值」主线（人类引入差异化框架，AI负责语言优化）。启动Layer_3三面板空间可视化脚本编写和PyTorch Sinkhorn GPU OT加速方案规划，两者均未完成。确认UNI/UNI2 forward()均含F.normalize() L2归一化。</p>
+<h3 id="gadgetsummarize--claude-code指南">gadget/summarize + Claude Code指南<a hidden class="anchor" aria-hidden="true" href="#gadgetsummarize--claude-code指南">#</a></h3>
+<p><strong>✅ 2月月度总结生成合并（MacBook）与Claude Code综合使用指南编写</strong>
+<em>06:01:36.563 | claude_code</em>
+MacBook上分两段运行monthly_summary.py处理2月全月日报数据，合并为覆盖MIHD（concat ARI=0.387全量验证）、ErrorRecoveryBenchmark（M14全量基线评估）、Pi0.5 Phoenix等项目的完整月报。并行启动3个研究Agent收集资料，编写676行Claude Code综合使用指南（10个主题）。</p>
+<h3 id="zhaoganlong-self-reflection-an53-训练实施">ZhaoGanlong Self-Reflection (an53 训练实施)<a hidden class="anchor" aria-hidden="true" href="#zhaoganlong-self-reflection-an53-训练实施">#</a></h3>
+<p><strong>🔄 an53 9任务数据准备全流程执行与Diffusion Policy/Pi0.5训练启动</strong>
+<em>04:04:27.702 | claude_code</em>
+修改4个数据准备脚本（启用9任务、移除8处pdb断点、修复.testc.命名bug）和2个JSON映射文件；在an53完成Step 0-4全流程（1,034,176条llava_motion.json + ~1M张渲染图像）。逐一解决CLIP模块缺失（从vla环境复制包）、Pi0.5单卡OOM（→FSDP 2 GPU）、OPENPI_DATA_HOME symlink路径不匹配、hydra缺失（PYTHONPATH回退）等问题。Diffusion Policy（GPU 0，loss 0.62）和Pi0.5（GPU 2+3，24.5k/100k步）成功启动；LLaVA MPM因llava-v1.5-7b未缓存暂时阻塞，发现本地副本路径。用户指出仓库包含Phoenix/FLARE两个独立框架，修正计划文件中an49→an53。</p>
+<h3 id="openpi-moe-chenjunye">Openpi-moe (chenjunye)<a hidden class="anchor" aria-hidden="true" href="#openpi-moe-chenjunye">#</a></h3>
+<p><strong>✅ norm_stats缺失prev_actions静默bug排查与修复</strong>
+<em>04:20:57.933 | claude_code</em>
+用户凭直觉察觉「无prev_actions也不报错很奇怪」，AI通过三路并行Agent完整追踪数据流：apply_tree(strict=False)静默跳过未命中key；prev_actions经DeltaActions但跳过normalize，以原始delta进入模型；VAE中hist_actions（未归一化）与actions（已归一化）concat存在scale不一致风险。修改compute_norm_stats.py动态追加prev_actions统计量，修复向后兼容，消除隐式训练质量风险。</p>
+<h3 id="robotwin--curobo">RoboTwin / curobo<a hidden class="anchor" aria-hidden="true" href="#robotwin--curobo">#</a></h3>
+<p><strong>✅ 在RefineVLA conda环境中安装curobo CUDA扩展</strong>
+<em>10:08:54.172 | claude_code</em>
+定位CUDA headers至targets/x86_64-linux/include/（conda CUDA toolkit非标准路径），设置CPLUS_INCLUDE_PATH/C_INCLUDE_PATH后重新安装，验证import curobo和扩展geom_cu均可正常加载。</p>
+<h3 id="motion-based-self-reflection-framework-phoenixflare">Motion-based-Self-Reflection-Framework (Phoenix/FLARE)<a hidden class="anchor" aria-hidden="true" href="#motion-based-self-reflection-framework-phoenixflare">#</a></h3>
+<p><strong>🔄 Phoenix/FLARE双项目拆分计划制定与执行</strong>
+<em>17:02:47.926 | claude_code</em>
+通过/init命令分析仓库，多路Agent识别出Phoenix（MPM/MCM，代码在diffusion_policy_for_action/和llava_for_motion_instruction/）和FLARE（Retry Reset，代码在failure_case_analysis/和reset_collect_demo/）两个独立项目交织存放。用户提供大数据处理（~1TB data symlink）和归属问题的关键决策后，制定含完整目录结构、文件归属矩阵和rsync+symlink策略的拆分计划，部分rsync操作后台执行，会话中断前未完成所有步骤。</p>
+<h3 id="calendarpro">CalendarPro<a hidden class="anchor" aria-hidden="true" href="#calendarpro">#</a></h3>
+<p><strong>✅ Personal Butler System 31子目标全面升级实现与遗留问题修复（196→321测试通过）</strong>
+<em>17:17:36.460 | claude_code</em>
+按31子目标计划创建16个新服务文件（SituationMonitor、AutonomousExecutor、GapAnalyzer、WaveExecutor、GoalTracker、DietService等）并修改20+现有文件（EventBus/Config/Models/ContextAssembler等）；4个并行后台Agent并发开发瓶颈模块，196个测试通过。随后修复BackgroundCoordinator启动缺失（所有后台服务从未运行）、补全9个缺失Discord handler（SET_GOAL/LOG_MEAL等），通过conftest.py+20个测试文件将测试扩展至321个全部通过。修复16处危险静默异常（except-pass→logger）、移除executor.py死代码、实现get_progress()，通过/init重写CLAUDE.md。审计还发现executor空循环等遗留问题，制定修复计划（多次ExitPlanMode被用户拒绝，待后续执行）。</p>
+<p><strong>✅ 个人管家系统架构设计与utterance外部化自动增广实现</strong>
+<em>15:35:31.287 | claude_code</em>
+探索OpenClaw（Hook/Cron/ACP Spawn等6个核心模式）和get-shit-done（STATE.md持久记忆/层级上下文组装/波次执行等7个核心模式），融合设计含19个新文件、5批实施顺序、31子目标的完整管家升级计划并保存至docs/butler-plan.md。用户在实施中发现utterances硬编码问题，完整实现utterance外部化方案：452条utterances迁移至data/intent_utterances.json，UtteranceAugmenter处理7条历史mismatch（全部正确归类），每日2AM cron任务，SemanticRouter热重载，48个测试通过。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>94,300,633</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>163,949</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>363,166</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>6,712,195</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>87,061,323</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>92.8%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$63.6866</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>43,920</td>
+          <td>145,763</td>
+          <td>3,506,612</td>
+          <td>57,626,667</td>
+          <td>$54.5933</td>
+          <td>85.7%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>106,137</td>
+          <td>200,131</td>
+          <td>2,946,559</td>
+          <td>28,996,188</td>
+          <td>$7.6896</td>
+          <td>12.1%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>13,892</td>
+          <td>17,272</td>
+          <td>259,024</td>
+          <td>438,468</td>
+          <td>$1.4036</td>
+          <td>2.2%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>2,410,657</td>
+          <td>883</td>
+          <td>11,431</td>
+          <td>$2.7439</td>
+      </tr>
+      <tr>
+          <td>MacBook</td>
+          <td>1,817,282</td>
+          <td>13,958</td>
+          <td>25,303</td>
+          <td>$2.5690</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>27,219,255</td>
+          <td>44,761</td>
+          <td>83,775</td>
+          <td>$16.8247</td>
+      </tr>
+      <tr>
+          <td>TzJsDesktop</td>
+          <td>62,853,439</td>
+          <td>104,347</td>
+          <td>242,657</td>
+          <td>$41.5491</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

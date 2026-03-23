@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-22 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="在DCC完成MIHD项目代码清理重组和Vision Refinement两步融合实验（首轮ARI=0.313，低于直接concat的0.387，揭示单模态与多模态优化目标不对齐），在MacBook批量归档2026-02-02~02-21历史日报并补全gadget工具文档，在tianhe推进Error Recovery Phase II（M14基线评估启动、VLA评估因checkpoint战略问题暂停）并搭建Pi0.5 Phoenix CVPR复现管线（4500 demo转换完成，训练待启动）。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-02-22/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-02-22/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-02-22/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-22">
+  <meta property="og:description" content="在DCC完成MIHD项目代码清理重组和Vision Refinement两步融合实验（首轮ARI=0.313，低于直接concat的0.387，揭示单模态与多模态优化目标不对齐），在MacBook批量归档2026-02-02~02-21历史日报并补全gadget工具文档，在tianhe推进Error Recovery Phase II（M14基线评估启动、VLA评估因checkpoint战略问题暂停）并搭建Pi0.5 Phoenix CVPR复现管线（4500 demo转换完成，训练待启动）。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-22T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-22T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-22">
+  <meta name="twitter:description" content="在DCC完成MIHD项目代码清理重组和Vision Refinement两步融合实验（首轮ARI=0.313，低于直接concat的0.387，揭示单模态与多模态优化目标不对齐），在MacBook批量归档2026-02-02~02-21历史日报并补全gadget工具文档，在tianhe推进Error Recovery Phase II（M14基线评估启动、VLA评估因checkpoint战略问题暂停）并搭建Pi0.5 Phoenix CVPR复现管线（4500 demo转换完成，训练待启动）。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-22",
+      "item": "https://tzj2006.github.io/bugjournal/2026-02-22/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-22",
+  "name": "Bug Journal 2026-02-22",
+  "description": "在DCC完成MIHD项目代码清理重组和Vision Refinement两步融合实验（首轮ARI=0.313，低于直接concat的0.387，揭示单模态与多模态优化目标不对齐），在MacBook批量归档2026-02-02~02-21历史日报并补全gadget工具文档，在tianhe推进Error Recovery Phase II（M14基线评估启动、VLA评估因checkpoint战略问题暂停）并搭建Pi0.5 Phoenix CVPR复现管线（4500 demo转换完成，训练待启动）。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-22 今日概览 做了什么： 三台设备同步推进：DCC完成MIHD代码重组与Vision Refinement两步融合架构实验，MacBook处理历史日报归档并修复gadget文档缺口，tianhe完成Error Recovery Phase II启动（M14基线评估+Pi0.5 Phoenix管线搭建+集群访问规范化）。 怎么做的： 通过系统性文件清理、参数化pipeline扩展、LLM批量分析、hf-mirror绕过代理、datasets版本降级等多种工程手段在三台设备上并行推进；通过srun –overlap解决Slurm集群访问问题并更新CLAUDE.md规范；用户两次拒绝ExitPlanMode审批流程，直接提交计划文本执行。 有什么用： MIHD代码库减少约3k行冗余，Vision Refinement两步架构功能可用但首轮实验性能未提升；历史日报归档覆盖至02-21；M14 sanity check验证通过，全量评估后台运行；Pi0.5 Phoenix数据就绪（1034K帧）但VLA评估因checkpoint战略决策问题暂停，需用户明确意图后继续。 DCC 做了什么： 完成MIHD项目文件清理重组（删除冗余脚本约3146行、重建docs目录），实现Vision Refinement两阶段融合功能，分析151673 image-only基线性能，运行全fusion对比实验。 怎么做的： 并行Task agent探索项目结构后执行清理；在run_benchmark.py插入–vision_refine参数和精炼逻辑（scan_cluster/stego_refine/byol_spatial）；批量通过conda parallel运行7种多模态fusion对比实验。 有什么用： 代码库结构清晰化；Vision Refinement两步pipeline功能可用，首轮实验ARI=0.313（vs 直接concat ARI=0.387），发现单模态优化表征与多模态融合目标不对齐；多fusion实验数据为后续调参提供基准。 MacBook 做了什么： 批量处理2026-02-02至2026-02-21共6个历史日期的AI对话日报，补全gadget项目CLAUDE.md和README.md中website/工具的文档缺口。 怎么做的： 通过gadget summarize工具多轮调用LLM分析历史会话并合并去重；通过/init命令系统化扫描代码库发现文档缺口，读取update.sh和config.yml后补充相应章节。 有什么用： 建立了2026-02-02~02-21的完整历史日报归档体系；消除了gadget中website/的文档缺口，为后续AI实例提供更完整的项目上下文；git commit因会话中断未完成。 tianhe 做了什么： 推进Error Recovery Phase II：完成M14基线评估启动（sanity check通过+全量后台运行），VLA评估因checkpoint战略问题暂停；搭建Pi0.5 Phoenix CVPR复现管线（数据下载+格式转换+训练配置）；改造benchmark可视化脚本并修复force相关bug；将集群GPU访问从SSH切换至Slurm规范。 怎么做的： 通过srun –overlap访问tianhe 8×A800集群；用hf-mirror.com绕过代理下载18.4GB MimicGen数据；datasets降级至3.6.0解决lerobot兼容性；通过SLURM background jobs并行处理长时任务。 有什么用： M14 sanity check验证pipeline完整正确（60 episodes，SR=0%符合预期），全量649场景评估已后台启动；Pi0.5 Phoenix数据就绪（4500 demo，1034K帧），距训练启动仅差norm stats计算；VLA评估暂停待checkpoint决策；集群访问规范（srun –jobid –overlap）写入CLAUDE.md，SSH直连明确禁止。 在DCC完成MIHD项目代码清理重组和Vision Refinement两步融合实验（首轮ARI=0.313，低于直接concat的0.387，揭示单模态与多模态优化目标不对齐），在MacBook批量归档2026-02-02~02-21历史日报并补全gadget工具文档，在tianhe推进Error Recovery Phase II（M14基线评估启动、VLA评估因checkpoint战略问题暂停）并搭建Pi0.5 Phoenix CVPR复现管线（4500 demo转换完成，训练待启动）。\n今日任务 架构与策略 🔄 Vision Refinement两阶段融合功能实现与初步实验 — 在run_benchmark.py中实现–vision_refine参数，支持scan_cluster/stego_refine/byol_spatial精炼视觉embedding后再做多模态融合；更新结果路径/缓存键（refine_{name}后缀）/实验命名/日志，在experiment_logger.py新增CSV列，添加参数验证逻辑。首轮实验（scan_cluster refine + concat）ARI=0.313（嵌入维度306=256精炼+50 PCA），低于无refine的ARI=0.387，发现单模态聚类优化目标与多模态融合目标不对齐。已批量启动7种fusion对比实验，qformer仍在运行中。 🔄 M14基线评估启动（Random + BC-RNN） — 完成10场景×60 episodes sanity check（约7分钟），验证pipeline完整正确（SR=0%符合预期，collector resume、episodes.jsonl、detected_errors.jsonl格式全部正确）；在GPU 0后台启动649场景×2策略×3 seeds全量评估，预计6-7小时完成；性能基准：每场景约36秒（Random 15s + BC-RNN 21s）。 ❌ VLA评估服务器启动（Pi0/Pi0.5） — Pi0 server因port 5555被占用导致bind失败（模型加载约2.5分钟后才发现）；Pi0.5 server在GPU 2成功加载（6.2GiB），但用户识别出checkpoint选择问题（pi0_libero为LIBERO任务微调版，pi05_base为通用基础模型，均未针对PickPlace/RoboMimic微调），评估流程暂停待明确实验意图。此前tianhe集群也有Pi0.5因OOM（12GB模型）被阻塞的历史记录。 • Pi0.5 Phoenix CVPR复现管线搭建（Step 0-1） — 创建convert_mimicgen_to_lerobot.py（支持flat/nested目录，84×84图像，7D delta OSC_POSE action），通过hf-mirror.com下载9个MimicGen任务数据（18.4GB），datasets降级至3.6.0解决lerobot兼容性后成功转换4500 demo（1034K帧）；在config.py添加pi05_base_mimicgen_phoenix训练配置；创建evaluate_mimicgen.py评估脚本；确认CUDA_VISIBLE_DEVICES=0,1,3,4的4-GPU JAX并行训练方案（batch_size=64整除4 GPU）。norm stats未计算，训练未启动。 ✅ Error Recovery Phase II执行计划设计与项目文档更新 — 分析G1-G7/M12-M15依赖拓扑，识别M14为解锁后续目标的关键瓶颈；设计以M14→M13→M15为关键路径的6-step执行计划（含Slurm GPU动态调度策略，显存剩余≥50%才分配）；将拓扑图写入项目全景总结.md §4.1.1；更新文档至v4.11，新增M16 Pi0.5 Phoenix里程碑。 实现与修复 • MIHD项目文件清理重组 — 删除3个冗余脚本（约3146行）、清理所有__pycache__和空目录、将5个pipeline_*.log移至outputs/logs/、删除16个碎片summary文件、重建docs/目录结构（research/experiments/archived子目录）、创建docs/plans.md（合并ENHANCEMENT_PLAN双文件）、更新CLAUDE.md引用。核心脚本验证正常。第一次会话因用户中断ExitPlanMode审批流程，第二次直接提交计划执行，但文档合并和部分CLAUDE.md更新因会话截断未完成。 • Error Recovery集群访问规范更新与可视化脚本改造 — CLAUDE.md中将SSH直连GPU节点替换为三步Slurm工作流（source set-XY-I.sh → squeue → srun –jobid –overlap），同步更新MEMORY.md；2_visualize_scene.py新增–force_override/–duration_override/–settle_steps三个CLI参数，Phase 3改为neutral action+力清零逻辑（用户进一步增强inf支持和每步re-apply）；benchmark_v4.yaml更新force_norm_range=[15.0,45.0]/force_clip=60.0；impulse.py修复force_clip配置读取。视频生成因无法获取GPU节点权限受阻。 ✅ 批量生成历史日报（2026-02-02至2026-02-21） — 在MacBook上使用gadget summarize工具处理6个历史日期（02-02、02-05、02-10、02-18、02-19、02-21）的跨设备AI对话记录，生成结构化日报并合并去重。内容涵盖MIHD多模态融合实验演进、STAIG对齐修复与E2E融合、image-only聚类三方法实现（SCAN最优ARI=0.303）、Error Recovery M12-M14基础设施、Pi0.5评估流水线等多个项目历史工作。 ✅ MIHD 151673基线性能分析 — 整理151673全部image-only和多模态实验结果：UNI2直接聚类ARI=0.251，scan_cluster最佳ARI=0.303，PCA gene-only ARI=0.312，直接concat最佳多模态ARI=0.387；识别出7种未在151673测试的多模态fusion方法，为Vision Refinement两步方案提供了基准数据点。 ❌ gadget文档补全（CLAUDE.md + README.md）与git提交 — 通过/init命令发现CLAUDE.md缺少website/工具文档，读取update.sh和config.yml后补充相关内容（含–no-save/–info标志、增量媒体压缩架构说明）；同步更新README.md工具一览表和详情章节。git commit因用户中断会话未完成。 问题与解决方案 关键问题 1. VLA评估多重阻塞：Pi0.5 OOM（12GB模型显存不足）、Pi0 server port 5555被占用（模型加载2.5分钟后bind失败），以及checkpoint战略选择失误（pi0_libero为LIBERO任务微调版，pi05_base为通用基础模型，均未针对PickPlace/RoboMimic任务微调） 解决方案: Pi0.5 OOM需更换大显存节点（A800）或探索量化方案；port占用需换用空闲端口；checkpoint问题由用户主动识别后中断，需明确评估意图（通用基线 vs 任务特定微调）后再决定是否继续\n关键洞察: VLA基线评估的checkpoint选择是影响论文结论有效性的战略性决策，必须在实验设计阶段明确而非按默认配置执行；服务启动前应先检查端口占用和资源可用性\n2. Vision Refinement首个实验（scan_cluster refine + concat）ARI=0.313，低于无refine的直接concat ARI=0.387，两步pipeline未能提升性能 解决方案: 调整精炼方向：增大hidden_dim（默认256可能过小）、尝试attention等非concat融合策略、对比byol_spatial/stego_refine精炼效果\n关键洞察: 为单模态聚类优化的视觉表征（scan_cluster 256d）与为多模态融合优化的表征存在目标不对齐——自监督聚类损失并不最大化跨模态互补信息；image-only ARI的提升不等于多模态融合质量的提升\n3. tianhe集群SSH连接Slurm GPU节点不稳定（Bad file descriptor、pam_slurm_adopt策略冲突），以及srun直接调用命令超时（不加–overlap时新命令会排队无限挂起） 解决方案: 改用srun –jobid= –overlap附着到已有交互式Slurm作业；在CLAUDE.md中明确禁止SSH直连，规范化为三步工作流（source set-XY-I.sh → squeue → srun –jobid –overlap）\n关键洞察: HPC集群SSH直连计算节点在pam_slurm_adopt策略下本质不稳定；Slurm交互式job上追加命令需要–overlap标志，否则会排队挂起\n4. ExitPlanMode审批流程与用户偏好摩擦：用户在MIHD整理和Phoenix微调方案两次会话中均拒绝了AI主导的计划审批环节 解决方案: 用户在后续会话中通过’Implement the following plan:‘直接提交完整计划文本，跳过审批流程立即进入执行阶段\n关键洞察: 用户偏好「我定计划、你执行」的直接协作模式；AI主导的plan-first审批工作流在用户已有明确计划时产生不必要摩擦，应识别并适应这种协作模式\n一般问题 5. Pi0.5 Phoenix数据管线兼容性：HuggingFace Python客户端遭代理503拦截，以及datasets 4.4.1与lerobot 0.1.0不兼容（torch.stack()收到Column对象而非Tensor tuple） 解决方案: 改用wget+hf-mirror.com镜像站下载18.4GB数据集；将datasets从4.4.1降级至3.6.0，清空旧缓存后重新转换\n关键洞察: lerobot 0.1.0要求datasets\u003c4.0；datasets 4.x将列访问从list改为Column对象，破坏了lerobot的假设；工具链安装时应pin依赖版本\n6. 实验进度监控可靠性：conda run批量实验stdout被缓冲（/tmp/output文件始终0字节），以及在后台转换任务未完成时（3247/4500 episodes）误判timestamp校验为真bug 解决方案: 通过检查实验结果目录中文件是否存在来判断完成状态（比依赖stdout更可靠）；后台任务完成后重新验证即可确认timestamp是假警报\n关键洞察: 文件系统原子写入比进程stdout更可靠作为实验完成标志；验证数据集前应先确认后台生产任务已完成\n人类思路 vs AI 思路 战略层面 Vision Refinement两步融合架构创新提出 角色 思路 人类 用户主动提出先用image-only自监督方法（scan_cluster等）精炼视觉embedding再做多模态融合的两步方案，将两种独立优化阶段串联为一个流水线——这是对现有pipeline架构的系统性扩展 AI AI此前将scan_cluster/stego_refine/byol_spatial视为终止性的image-only融合策略，未考虑将其作为视觉特征预处理步骤与多模态融合组合的可能性 差异分析: 用户从模块化架构角度思考了两个独立优化目标的串联组合；AI受限于现有单步pipeline设计框架，在用户提出构想后负责设计具体实现方案\nVLA checkpoint适用性与实验设计有效性 角色 思路 人类 在AI已启动VLA server的过程中，用户主动中断并提问checkpoint来源，识别出当前checkpoint均未在PickPlace任务上微调，对实验设计的有效性提出质疑 AI AI按Makefile默认配置直接启动，未主动核查checkpoint是否适合目标任务，专注于执行流程而忽略了影响论文结论有效性的关键决策点 差异分析: 用户具有更强的实验设计意识，能在执行中识别战略性问题；AI倾向于按既有配置推进而不主动质疑实验假设\nPi0.5 Phoenix管线技术约束的完整预设 角色 思路 人类 用户完整预设了4步管线的所有技术细节：84×84图像分辨率、7D action格式、500 demo/task数量、LeRobot API约束、需复用的现有代码路径，以及action_horizon=10/extra_delta_transform=False等具体超参 AI AI负责读取参考文件、实现代码、执行下载和转换流程、解决运行时兼容性问题，基本没有主动提出架构级建议 差异分析: 策略规划和技术约束完全来自用户，AI主要负责执行和debug；用户的计划精度极高，体现了对领域和工具链的深度掌握\n用户主导计划控制权vs AI计划审批流程 角色 思路 人类 用户在MIHD整理和Phoenix微调方案两次会话中均拒绝了AI自动生成的计划审批流程，通过直接提交完整计划文本或中断ExitPlanMode来掌控计划内容 AI AI遵循「先规划后审批」的标准工作流，通过ExitPlanMode提交审批后再执行，认为复杂任务需要用户确认 差异分析: AI的plan-first工作流在用户已有明确目标时产生额外摩擦；用户方式更高效且计划质量由用户直接负责，AI应识别并适应这种协作模式\n资源最大化利用意识 角色 思路 人类 用户分别指出「可以使用所有没有被使用的GPU」和「可以让4个GPU同时训练」，主动要求充分利用tianhe 8×A800的计算资源 AI AI在启动评估和训练配置时默认使用保守的单GPU方案（GPU 0），未主动规划利用空闲GPU并行化多任务 差异分析: 用户有更强的资源最大化意识，倾向于动态利用所有可用资源；AI倾向于保守确定性的资源分配，需要用户明确指示才会考虑并行化加速\nAI 局限性 重要局限 对实验设计的战略性假设缺乏主动质疑：未在启动VLA评估前核查checkpoint适用性，未能预见scan_cluster refine会导致多模态性能下降（缺乏前置理论分析），均需人类介入才发现关键问题 ExitPlanMode审批工作流与用户「直接执行」偏好不匹配，在MIHD整理和Phoenix微调两个场景中均产生了不必要的摩擦和额外交互成本 资源规划缺乏主动性：GPU资源发现后默认使用单GPU，未主动建议利用空闲GPU并行化；启动服务前未检查端口占用；未预先确认datasets版本兼容性约束，导致事后降级重转 一般局限 验证时机和前置检查缺位：在后台转换任务未完成时误判timestamp错误为真bug触发不必要排查；未用小样本先验证端到端流程再全量运行；sinfo输出为空时无法自行判断需通过AskUserQuestion询问 进度监控方式欠优：依赖stdout缓冲（conda run）或频繁sleep轮询监控后台任务，未优先采用文件系统状态检查或TaskOutput等待通知等更可靠的方式 今日收获 核心收获 VLA基线评估的checkpoint选择是影响论文结论有效性的战略性决策：domain-specific微调版（pi0_libero）与通用基础模型（pi05_base）对PickPlace任务的SR结果有根本性差异，必须在实验设计阶段明确意图，不能按默认配置执行 单模态优化表征不等于有利于多模态融合：scan_cluster为单模态聚类优化的256维表征降低了多模态融合ARI（0.313 vs 0.387），自监督聚类损失并不最大化跨模态互补信息；image-only ARI的提升不代表该表征能提升多模态融合质量，两者优化目标存在根本性差异 Slurm集群GPU访问规范：SSH直连计算节点在pam_slurm_adopt策略下本质不稳定；正确工作流为source set-XY-I.sh → squeue查看活跃job → srun –jobid= –overlap附着执行；–overlap是在已有job上追加命令的必要标志，不加时新srun会排队无限挂起 Pi0.5/VLA大模型资源规划：Pi0.5需要约12GB显存（通用A800节点可满足）；MimicGen HDF5图像分辨率为84×84（Phoenix训练通过OpenPI ResizeImages上采样到224×224）；OpenPI已有convert_mimicgen_data_to_lerobot.py可直接复用，无需从头编写 OpenPI/LeRobot工具链关键约束：JAX自动检测所有可见GPU（CUDA_VISIBLE_DEVICES设置即可），batch_size整除GPU数即可线性加速；lerobot 0.1.0要求datasets\u003c4.0（4.x将列访问从list改为Column对象破坏torch.stack调用）；hf-mirror.com在代理拦截时是可靠的HF镜像 M14 pipeline性能基准：每场景约36秒（Random 15s + BC-RNN 21s），649场景全量评估约6.5小时；sanity check SR=0%完全符合预期（tip_over错误场景难以自动恢复） 实践收获 工具文档同步与历史日报归档实践：/init命令是检测单一文档缺口的有效手段，但多文档（CLAUDE.md/README.md）的一致性需要人工关注；批量历史日报生成中merge步骤不可省略，否则同一天工作会碎片化分布在多个JSON段落中，降低回溯效率 会话摘要 MIHD空间转录组 🔄 项目文件清理重组 + 151673基线分析 + Vision Refinement两阶段融合实现与实验 20:08:42.462 | claude_code 通过两个会话完成MIHD项目清理（删除约3146行冗余脚本、重建docs/目录结构、更新CLAUDE.md），第一次因ExitPlanMode中断后用户在第二次直接提交计划文本执行；分析151673 image-only基线（scan_cluster最佳ARI=0.303，直接concat最佳多模态ARI=0.387）；在run_benchmark.py实现Vision Refinement两步pipeline（–vision_refine参数，精炼逻辑~60行，缓存/命名/日志更新）并批量启动7种fusion对比实验；首轮scan_cluster refine+concat ARI=0.313，低于无refine基线，揭示单模态与多模态优化目标不对齐。\nError Recovery Benchmark 🔄 Phase II执行计划设计、M14基线评估启动、VLA评估因checkpoint问题暂停、集群访问规范更新、可视化脚本改造 19:38:46.031 | claude_code 分析Phase II目标依赖拓扑（M14为关键瓶颈），将拓扑图写入项目文档并设计6-step执行计划；M14 sanity check（60 episodes）验证pipeline完整正确，全量649场景评估在GPU 0后台启动；Pi0 server因port 5555被占用启动失败，Pi0.5 server加载成功（6.2GiB）但用户识别出checkpoint均未针对PickPlace微调，评估流程暂停；CLAUDE.md将SSH直连替换为Slurm三步工作流（srun –jobid –overlap）；2_visualize_scene.py新增3个CLI参数并修复force相关配置，但视频生成因GPU节点权限受阻。\nError Recovery Benchmark - Phoenix pi0.5微调 🔄 Pi0.5 Phoenix CVPR 2025复现管线完整搭建（数据下载+转换+训练配置+评估脚本） 20:29:19.464 | claude_code 用户提供完整4步方案，AI创建数据转换脚本（convert_mimicgen_to_lerobot.py）、评估脚本（evaluate_mimicgen.py）、在config.py添加pi05_base_mimicgen_phoenix训练配置，更新文档至v4.11（新增M16里程碑）；通过hf-mirror.com下载9个MimicGen任务数据（18.4GB），datasets降级至3.6.0解决lerobot兼容性后完成4500 demo/1034K帧转换；确认CUDA_VISIBLE_DEVICES=0,1,3,4的4-GPU JAX并行训练方案；norm stats未计算，训练待启动。\ngadget 🔄 批量处理2026-02-02~02-21历史日报 + CLAUDE.md/README.md文档补全 20:15:16.225 | claude_code 在MacBook上批量处理6个历史日期（02-02、02-05、02-10、02-18、02-19、02-21）的跨设备AI对话记录，生成结构化日报并合并去重；内容涵盖MIHD多模态融合实验演进、Error Recovery M12-M14基础设施、Pi0.5评估流水线等多个项目历史工作。同次通过/init发现CLAUDE.md缺少website/工具文档，读取update.sh和config.yml后补充相关内容；用户要求同步更新README.md，两个文档均已更新；git commit因会话中断未完成。\nRoboBrain-Pi ❌ tianhe集群API登录失败 07:52:35.086 | claude_code 用户在tianhe的robobrain-pi目录打招呼，遭遇API 403 Forbidden错误，会话未产生任何实质性工作。\nToken 用量 总览 指标 数值 总 Token 20,937,189 输入 Token 46,134 输出 Token 19,975 Cache 创建 1,654,974 Cache 读取 19,216,106 Cache 命中率 92.1% 总费用 (USD) $13.9062 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 5,904 18,959 440,878 13,342,217 $9.9301 71.4% claude-haiku-4-5-20251001 40,161 932 530,050 5,300,325 $1.2374 8.9% claude-sonnet-4-6 69 84 684,046 573,564 $2.7387 19.7% 各设备用量 设备 总 Token 输入 输出 费用 DCC 16,466,798 45,719 16,283 $9.2818 MacBook 4,470,391 415 3,692 $4.6244 tianhe 0 0 0 $0.0000 ",
+  "wordCount" : "511",
+  "inLanguage": "en",
+  "datePublished": "2026-02-22T00:00:00-05:00",
+  "dateModified": "2026-02-22T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-02-22/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-22
+    </h1>
+    <div class="post-meta"><span title='2026-02-22 00:00:00 -0500 EST'>February 22, 2026</span>&nbsp;·&nbsp;<span>3 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-22">日报 — 2026-02-22<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-22">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 三台设备同步推进：DCC完成MIHD代码重组与Vision Refinement两步融合架构实验，MacBook处理历史日报归档并修复gadget文档缺口，tianhe完成Error Recovery Phase II启动（M14基线评估+Pi0.5 Phoenix管线搭建+集群访问规范化）。</li>
+<li><strong>怎么做的：</strong> 通过系统性文件清理、参数化pipeline扩展、LLM批量分析、hf-mirror绕过代理、datasets版本降级等多种工程手段在三台设备上并行推进；通过srun &ndash;overlap解决Slurm集群访问问题并更新CLAUDE.md规范；用户两次拒绝ExitPlanMode审批流程，直接提交计划文本执行。</li>
+<li><strong>有什么用：</strong> MIHD代码库减少约3k行冗余，Vision Refinement两步架构功能可用但首轮实验性能未提升；历史日报归档覆盖至02-21；M14 sanity check验证通过，全量评估后台运行；Pi0.5 Phoenix数据就绪（1034K帧）但VLA评估因checkpoint战略决策问题暂停，需用户明确意图后继续。</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成MIHD项目文件清理重组（删除冗余脚本约3146行、重建docs目录），实现Vision Refinement两阶段融合功能，分析151673 image-only基线性能，运行全fusion对比实验。</li>
+<li><strong>怎么做的：</strong> 并行Task agent探索项目结构后执行清理；在run_benchmark.py插入&ndash;vision_refine参数和精炼逻辑（scan_cluster/stego_refine/byol_spatial）；批量通过conda parallel运行7种多模态fusion对比实验。</li>
+<li><strong>有什么用：</strong> 代码库结构清晰化；Vision Refinement两步pipeline功能可用，首轮实验ARI=0.313（vs 直接concat ARI=0.387），发现单模态优化表征与多模态融合目标不对齐；多fusion实验数据为后续调参提供基准。</li>
+</ul>
+<h3 id="macbook">MacBook<a hidden class="anchor" aria-hidden="true" href="#macbook">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 批量处理2026-02-02至2026-02-21共6个历史日期的AI对话日报，补全gadget项目CLAUDE.md和README.md中website/工具的文档缺口。</li>
+<li><strong>怎么做的：</strong> 通过gadget summarize工具多轮调用LLM分析历史会话并合并去重；通过/init命令系统化扫描代码库发现文档缺口，读取update.sh和config.yml后补充相应章节。</li>
+<li><strong>有什么用：</strong> 建立了2026-02-02~02-21的完整历史日报归档体系；消除了gadget中website/的文档缺口，为后续AI实例提供更完整的项目上下文；git commit因会话中断未完成。</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 推进Error Recovery Phase II：完成M14基线评估启动（sanity check通过+全量后台运行），VLA评估因checkpoint战略问题暂停；搭建Pi0.5 Phoenix CVPR复现管线（数据下载+格式转换+训练配置）；改造benchmark可视化脚本并修复force相关bug；将集群GPU访问从SSH切换至Slurm规范。</li>
+<li><strong>怎么做的：</strong> 通过srun &ndash;overlap访问tianhe 8×A800集群；用hf-mirror.com绕过代理下载18.4GB MimicGen数据；datasets降级至3.6.0解决lerobot兼容性；通过SLURM background jobs并行处理长时任务。</li>
+<li><strong>有什么用：</strong> M14 sanity check验证pipeline完整正确（60 episodes，SR=0%符合预期），全量649场景评估已后台启动；Pi0.5 Phoenix数据就绪（4500 demo，1034K帧），距训练启动仅差norm stats计算；VLA评估暂停待checkpoint决策；集群访问规范（srun &ndash;jobid &ndash;overlap）写入CLAUDE.md，SSH直连明确禁止。</li>
+</ul>
+<blockquote>
+<p>在DCC完成MIHD项目代码清理重组和Vision Refinement两步融合实验（首轮ARI=0.313，低于直接concat的0.387，揭示单模态与多模态优化目标不对齐），在MacBook批量归档2026-02-02~02-21历史日报并补全gadget工具文档，在tianhe推进Error Recovery Phase II（M14基线评估启动、VLA评估因checkpoint战略问题暂停）并搭建Pi0.5 Phoenix CVPR复现管线（4500 demo转换完成，训练待启动）。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>🔄 <strong>Vision Refinement两阶段融合功能实现与初步实验</strong> — 在run_benchmark.py中实现&ndash;vision_refine参数，支持scan_cluster/stego_refine/byol_spatial精炼视觉embedding后再做多模态融合；更新结果路径/缓存键（refine_{name}后缀）/实验命名/日志，在experiment_logger.py新增CSV列，添加参数验证逻辑。首轮实验（scan_cluster refine + concat）ARI=0.313（嵌入维度306=256精炼+50 PCA），低于无refine的ARI=0.387，发现单模态聚类优化目标与多模态融合目标不对齐。已批量启动7种fusion对比实验，qformer仍在运行中。</li>
+<li>🔄 <strong>M14基线评估启动（Random + BC-RNN）</strong> — 完成10场景×60 episodes sanity check（约7分钟），验证pipeline完整正确（SR=0%符合预期，collector resume、episodes.jsonl、detected_errors.jsonl格式全部正确）；在GPU 0后台启动649场景×2策略×3 seeds全量评估，预计6-7小时完成；性能基准：每场景约36秒（Random 15s + BC-RNN 21s）。</li>
+<li>❌ <strong>VLA评估服务器启动（Pi0/Pi0.5）</strong> — Pi0 server因port 5555被占用导致bind失败（模型加载约2.5分钟后才发现）；Pi0.5 server在GPU 2成功加载（6.2GiB），但用户识别出checkpoint选择问题（pi0_libero为LIBERO任务微调版，pi05_base为通用基础模型，均未针对PickPlace/RoboMimic微调），评估流程暂停待明确实验意图。此前tianhe集群也有Pi0.5因OOM（12GB模型）被阻塞的历史记录。</li>
+<li>• <strong>Pi0.5 Phoenix CVPR复现管线搭建（Step 0-1）</strong> — 创建convert_mimicgen_to_lerobot.py（支持flat/nested目录，84×84图像，7D delta OSC_POSE action），通过hf-mirror.com下载9个MimicGen任务数据（18.4GB），datasets降级至3.6.0解决lerobot兼容性后成功转换4500 demo（1034K帧）；在config.py添加pi05_base_mimicgen_phoenix训练配置；创建evaluate_mimicgen.py评估脚本；确认CUDA_VISIBLE_DEVICES=0,1,3,4的4-GPU JAX并行训练方案（batch_size=64整除4 GPU）。norm stats未计算，训练未启动。</li>
+<li>✅ <strong>Error Recovery Phase II执行计划设计与项目文档更新</strong> — 分析G1-G7/M12-M15依赖拓扑，识别M14为解锁后续目标的关键瓶颈；设计以M14→M13→M15为关键路径的6-step执行计划（含Slurm GPU动态调度策略，显存剩余≥50%才分配）；将拓扑图写入项目全景总结.md §4.1.1；更新文档至v4.11，新增M16 Pi0.5 Phoenix里程碑。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>• <strong>MIHD项目文件清理重组</strong> — 删除3个冗余脚本（约3146行）、清理所有__pycache__和空目录、将5个pipeline_*.log移至outputs/logs/、删除16个碎片summary文件、重建docs/目录结构（research/experiments/archived子目录）、创建docs/plans.md（合并ENHANCEMENT_PLAN双文件）、更新CLAUDE.md引用。核心脚本验证正常。第一次会话因用户中断ExitPlanMode审批流程，第二次直接提交计划执行，但文档合并和部分CLAUDE.md更新因会话截断未完成。</li>
+<li>• <strong>Error Recovery集群访问规范更新与可视化脚本改造</strong> — CLAUDE.md中将SSH直连GPU节点替换为三步Slurm工作流（source set-XY-I.sh → squeue → srun &ndash;jobid &ndash;overlap），同步更新MEMORY.md；2_visualize_scene.py新增&ndash;force_override/&ndash;duration_override/&ndash;settle_steps三个CLI参数，Phase 3改为neutral action+力清零逻辑（用户进一步增强inf支持和每步re-apply）；benchmark_v4.yaml更新force_norm_range=[15.0,45.0]/force_clip=60.0；impulse.py修复force_clip配置读取。视频生成因无法获取GPU节点权限受阻。</li>
+<li>✅ <strong>批量生成历史日报（2026-02-02至2026-02-21）</strong> — 在MacBook上使用gadget summarize工具处理6个历史日期（02-02、02-05、02-10、02-18、02-19、02-21）的跨设备AI对话记录，生成结构化日报并合并去重。内容涵盖MIHD多模态融合实验演进、STAIG对齐修复与E2E融合、image-only聚类三方法实现（SCAN最优ARI=0.303）、Error Recovery M12-M14基础设施、Pi0.5评估流水线等多个项目历史工作。</li>
+<li>✅ <strong>MIHD 151673基线性能分析</strong> — 整理151673全部image-only和多模态实验结果：UNI2直接聚类ARI=0.251，scan_cluster最佳ARI=0.303，PCA gene-only ARI=0.312，直接concat最佳多模态ARI=0.387；识别出7种未在151673测试的多模态fusion方法，为Vision Refinement两步方案提供了基准数据点。</li>
+<li>❌ <strong>gadget文档补全（CLAUDE.md + README.md）与git提交</strong> — 通过/init命令发现CLAUDE.md缺少website/工具文档，读取update.sh和config.yml后补充相关内容（含&ndash;no-save/&ndash;info标志、增量媒体压缩架构说明）；同步更新README.md工具一览表和详情章节。git commit因用户中断会话未完成。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-vla评估多重阻塞pi05-oom12gb模型显存不足pi0-server-port-5555被占用模型加载25分钟后bind失败以及checkpoint战略选择失误pi0_libero为libero任务微调版pi05_base为通用基础模型均未针对pickplacerobomimic任务微调">1. VLA评估多重阻塞：Pi0.5 OOM（12GB模型显存不足）、Pi0 server port 5555被占用（模型加载2.5分钟后bind失败），以及checkpoint战略选择失误（pi0_libero为LIBERO任务微调版，pi05_base为通用基础模型，均未针对PickPlace/RoboMimic任务微调）<a hidden class="anchor" aria-hidden="true" href="#1-vla评估多重阻塞pi05-oom12gb模型显存不足pi0-server-port-5555被占用模型加载25分钟后bind失败以及checkpoint战略选择失误pi0_libero为libero任务微调版pi05_base为通用基础模型均未针对pickplacerobomimic任务微调">#</a></h4>
+<p><strong>解决方案:</strong> Pi0.5 OOM需更换大显存节点（A800）或探索量化方案；port占用需换用空闲端口；checkpoint问题由用户主动识别后中断，需明确评估意图（通用基线 vs 任务特定微调）后再决定是否继续</p>
+<p><strong>关键洞察:</strong> VLA基线评估的checkpoint选择是影响论文结论有效性的战略性决策，必须在实验设计阶段明确而非按默认配置执行；服务启动前应先检查端口占用和资源可用性</p>
+<h4 id="2-vision-refinement首个实验scan_cluster-refine--concatari0313低于无refine的直接concat-ari0387两步pipeline未能提升性能">2. Vision Refinement首个实验（scan_cluster refine + concat）ARI=0.313，低于无refine的直接concat ARI=0.387，两步pipeline未能提升性能<a hidden class="anchor" aria-hidden="true" href="#2-vision-refinement首个实验scan_cluster-refine--concatari0313低于无refine的直接concat-ari0387两步pipeline未能提升性能">#</a></h4>
+<p><strong>解决方案:</strong> 调整精炼方向：增大hidden_dim（默认256可能过小）、尝试attention等非concat融合策略、对比byol_spatial/stego_refine精炼效果</p>
+<p><strong>关键洞察:</strong> 为单模态聚类优化的视觉表征（scan_cluster 256d）与为多模态融合优化的表征存在目标不对齐——自监督聚类损失并不最大化跨模态互补信息；image-only ARI的提升不等于多模态融合质量的提升</p>
+<h4 id="3-tianhe集群ssh连接slurm-gpu节点不稳定bad-file-descriptorpam_slurm_adopt策略冲突以及srun直接调用命令超时不加overlap时新命令会排队无限挂起">3. tianhe集群SSH连接Slurm GPU节点不稳定（Bad file descriptor、pam_slurm_adopt策略冲突），以及srun直接调用命令超时（不加&ndash;overlap时新命令会排队无限挂起）<a hidden class="anchor" aria-hidden="true" href="#3-tianhe集群ssh连接slurm-gpu节点不稳定bad-file-descriptorpam_slurm_adopt策略冲突以及srun直接调用命令超时不加overlap时新命令会排队无限挂起">#</a></h4>
+<p><strong>解决方案:</strong> 改用srun &ndash;jobid=<JOBID> &ndash;overlap附着到已有交互式Slurm作业；在CLAUDE.md中明确禁止SSH直连，规范化为三步工作流（source set-XY-I.sh → squeue → srun &ndash;jobid &ndash;overlap）</p>
+<p><strong>关键洞察:</strong> HPC集群SSH直连计算节点在pam_slurm_adopt策略下本质不稳定；Slurm交互式job上追加命令需要&ndash;overlap标志，否则会排队挂起</p>
+<h4 id="4-exitplanmode审批流程与用户偏好摩擦用户在mihd整理和phoenix微调方案两次会话中均拒绝了ai主导的计划审批环节">4. ExitPlanMode审批流程与用户偏好摩擦：用户在MIHD整理和Phoenix微调方案两次会话中均拒绝了AI主导的计划审批环节<a hidden class="anchor" aria-hidden="true" href="#4-exitplanmode审批流程与用户偏好摩擦用户在mihd整理和phoenix微调方案两次会话中均拒绝了ai主导的计划审批环节">#</a></h4>
+<p><strong>解决方案:</strong> 用户在后续会话中通过&rsquo;Implement the following plan:&lsquo;直接提交完整计划文本，跳过审批流程立即进入执行阶段</p>
+<p><strong>关键洞察:</strong> 用户偏好「我定计划、你执行」的直接协作模式；AI主导的plan-first审批工作流在用户已有明确计划时产生不必要摩擦，应识别并适应这种协作模式</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="5-pi05-phoenix数据管线兼容性huggingface-python客户端遭代理503拦截以及datasets-441与lerobot-010不兼容torchstack收到column对象而非tensor-tuple">5. Pi0.5 Phoenix数据管线兼容性：HuggingFace Python客户端遭代理503拦截，以及datasets 4.4.1与lerobot 0.1.0不兼容（torch.stack()收到Column对象而非Tensor tuple）<a hidden class="anchor" aria-hidden="true" href="#5-pi05-phoenix数据管线兼容性huggingface-python客户端遭代理503拦截以及datasets-441与lerobot-010不兼容torchstack收到column对象而非tensor-tuple">#</a></h4>
+<p><strong>解决方案:</strong> 改用wget+hf-mirror.com镜像站下载18.4GB数据集；将datasets从4.4.1降级至3.6.0，清空旧缓存后重新转换</p>
+<p><strong>关键洞察:</strong> lerobot 0.1.0要求datasets&lt;4.0；datasets 4.x将列访问从list改为Column对象，破坏了lerobot的假设；工具链安装时应pin依赖版本</p>
+<h4 id="6-实验进度监控可靠性conda-run批量实验stdout被缓冲tmpoutput文件始终0字节以及在后台转换任务未完成时32474500-episodes误判timestamp校验为真bug">6. 实验进度监控可靠性：conda run批量实验stdout被缓冲（/tmp/output文件始终0字节），以及在后台转换任务未完成时（3247/4500 episodes）误判timestamp校验为真bug<a hidden class="anchor" aria-hidden="true" href="#6-实验进度监控可靠性conda-run批量实验stdout被缓冲tmpoutput文件始终0字节以及在后台转换任务未完成时32474500-episodes误判timestamp校验为真bug">#</a></h4>
+<p><strong>解决方案:</strong> 通过检查实验结果目录中文件是否存在来判断完成状态（比依赖stdout更可靠）；后台任务完成后重新验证即可确认timestamp是假警报</p>
+<p><strong>关键洞察:</strong> 文件系统原子写入比进程stdout更可靠作为实验完成标志；验证数据集前应先确认后台生产任务已完成</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="vision-refinement两步融合架构创新提出">Vision Refinement两步融合架构创新提出<a hidden class="anchor" aria-hidden="true" href="#vision-refinement两步融合架构创新提出">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户主动提出先用image-only自监督方法（scan_cluster等）精炼视觉embedding再做多模态融合的两步方案，将两种独立优化阶段串联为一个流水线——这是对现有pipeline架构的系统性扩展</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI此前将scan_cluster/stego_refine/byol_spatial视为终止性的image-only融合策略，未考虑将其作为视觉特征预处理步骤与多模态融合组合的可能性</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户从模块化架构角度思考了两个独立优化目标的串联组合；AI受限于现有单步pipeline设计框架，在用户提出构想后负责设计具体实现方案</p>
+<h4 id="vla-checkpoint适用性与实验设计有效性">VLA checkpoint适用性与实验设计有效性<a hidden class="anchor" aria-hidden="true" href="#vla-checkpoint适用性与实验设计有效性">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>在AI已启动VLA server的过程中，用户主动中断并提问checkpoint来源，识别出当前checkpoint均未在PickPlace任务上微调，对实验设计的有效性提出质疑</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI按Makefile默认配置直接启动，未主动核查checkpoint是否适合目标任务，专注于执行流程而忽略了影响论文结论有效性的关键决策点</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户具有更强的实验设计意识，能在执行中识别战略性问题；AI倾向于按既有配置推进而不主动质疑实验假设</p>
+<h4 id="pi05-phoenix管线技术约束的完整预设">Pi0.5 Phoenix管线技术约束的完整预设<a hidden class="anchor" aria-hidden="true" href="#pi05-phoenix管线技术约束的完整预设">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户完整预设了4步管线的所有技术细节：84×84图像分辨率、7D action格式、500 demo/task数量、LeRobot API约束、需复用的现有代码路径，以及action_horizon=10/extra_delta_transform=False等具体超参</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI负责读取参考文件、实现代码、执行下载和转换流程、解决运行时兼容性问题，基本没有主动提出架构级建议</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 策略规划和技术约束完全来自用户，AI主要负责执行和debug；用户的计划精度极高，体现了对领域和工具链的深度掌握</p>
+<h4 id="用户主导计划控制权vs-ai计划审批流程">用户主导计划控制权vs AI计划审批流程<a hidden class="anchor" aria-hidden="true" href="#用户主导计划控制权vs-ai计划审批流程">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户在MIHD整理和Phoenix微调方案两次会话中均拒绝了AI自动生成的计划审批流程，通过直接提交完整计划文本或中断ExitPlanMode来掌控计划内容</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI遵循「先规划后审批」的标准工作流，通过ExitPlanMode提交审批后再执行，认为复杂任务需要用户确认</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI的plan-first工作流在用户已有明确目标时产生额外摩擦；用户方式更高效且计划质量由用户直接负责，AI应识别并适应这种协作模式</p>
+<h4 id="资源最大化利用意识">资源最大化利用意识<a hidden class="anchor" aria-hidden="true" href="#资源最大化利用意识">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户分别指出「可以使用所有没有被使用的GPU」和「可以让4个GPU同时训练」，主动要求充分利用tianhe 8×A800的计算资源</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI在启动评估和训练配置时默认使用保守的单GPU方案（GPU 0），未主动规划利用空闲GPU并行化多任务</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户有更强的资源最大化意识，倾向于动态利用所有可用资源；AI倾向于保守确定性的资源分配，需要用户明确指示才会考虑并行化加速</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>对实验设计的战略性假设缺乏主动质疑：未在启动VLA评估前核查checkpoint适用性，未能预见scan_cluster refine会导致多模态性能下降（缺乏前置理论分析），均需人类介入才发现关键问题</li>
+<li>ExitPlanMode审批工作流与用户「直接执行」偏好不匹配，在MIHD整理和Phoenix微调两个场景中均产生了不必要的摩擦和额外交互成本</li>
+<li>资源规划缺乏主动性：GPU资源发现后默认使用单GPU，未主动建议利用空闲GPU并行化；启动服务前未检查端口占用；未预先确认datasets版本兼容性约束，导致事后降级重转</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>验证时机和前置检查缺位：在后台转换任务未完成时误判timestamp错误为真bug触发不必要排查；未用小样本先验证端到端流程再全量运行；sinfo输出为空时无法自行判断需通过AskUserQuestion询问</li>
+<li>进度监控方式欠优：依赖stdout缓冲（conda run）或频繁sleep轮询监控后台任务，未优先采用文件系统状态检查或TaskOutput等待通知等更可靠的方式</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>VLA基线评估的checkpoint选择是影响论文结论有效性的战略性决策：domain-specific微调版（pi0_libero）与通用基础模型（pi05_base）对PickPlace任务的SR结果有根本性差异，必须在实验设计阶段明确意图，不能按默认配置执行</li>
+<li>单模态优化表征不等于有利于多模态融合：scan_cluster为单模态聚类优化的256维表征降低了多模态融合ARI（0.313 vs 0.387），自监督聚类损失并不最大化跨模态互补信息；image-only ARI的提升不代表该表征能提升多模态融合质量，两者优化目标存在根本性差异</li>
+<li>Slurm集群GPU访问规范：SSH直连计算节点在pam_slurm_adopt策略下本质不稳定；正确工作流为source set-XY-I.sh → squeue查看活跃job → srun &ndash;jobid=<JOBID> &ndash;overlap附着执行；&ndash;overlap是在已有job上追加命令的必要标志，不加时新srun会排队无限挂起</li>
+<li>Pi0.5/VLA大模型资源规划：Pi0.5需要约12GB显存（通用A800节点可满足）；MimicGen HDF5图像分辨率为84×84（Phoenix训练通过OpenPI ResizeImages上采样到224×224）；OpenPI已有convert_mimicgen_data_to_lerobot.py可直接复用，无需从头编写</li>
+<li>OpenPI/LeRobot工具链关键约束：JAX自动检测所有可见GPU（CUDA_VISIBLE_DEVICES设置即可），batch_size整除GPU数即可线性加速；lerobot 0.1.0要求datasets&lt;4.0（4.x将列访问从list改为Column对象破坏torch.stack调用）；hf-mirror.com在代理拦截时是可靠的HF镜像</li>
+<li>M14 pipeline性能基准：每场景约36秒（Random 15s + BC-RNN 21s），649场景全量评估约6.5小时；sanity check SR=0%完全符合预期（tip_over错误场景难以自动恢复）</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>工具文档同步与历史日报归档实践：/init命令是检测单一文档缺口的有效手段，但多文档（CLAUDE.md/README.md）的一致性需要人工关注；批量历史日报生成中merge步骤不可省略，否则同一天工作会碎片化分布在多个JSON段落中，降低回溯效率</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd空间转录组">MIHD空间转录组<a hidden class="anchor" aria-hidden="true" href="#mihd空间转录组">#</a></h3>
+<p><strong>🔄 项目文件清理重组 + 151673基线分析 + Vision Refinement两阶段融合实现与实验</strong>
+<em>20:08:42.462 | claude_code</em>
+通过两个会话完成MIHD项目清理（删除约3146行冗余脚本、重建docs/目录结构、更新CLAUDE.md），第一次因ExitPlanMode中断后用户在第二次直接提交计划文本执行；分析151673 image-only基线（scan_cluster最佳ARI=0.303，直接concat最佳多模态ARI=0.387）；在run_benchmark.py实现Vision Refinement两步pipeline（&ndash;vision_refine参数，精炼逻辑~60行，缓存/命名/日志更新）并批量启动7种fusion对比实验；首轮scan_cluster refine+concat ARI=0.313，低于无refine基线，揭示单模态与多模态优化目标不对齐。</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 Phase II执行计划设计、M14基线评估启动、VLA评估因checkpoint问题暂停、集群访问规范更新、可视化脚本改造</strong>
+<em>19:38:46.031 | claude_code</em>
+分析Phase II目标依赖拓扑（M14为关键瓶颈），将拓扑图写入项目文档并设计6-step执行计划；M14 sanity check（60 episodes）验证pipeline完整正确，全量649场景评估在GPU 0后台启动；Pi0 server因port 5555被占用启动失败，Pi0.5 server加载成功（6.2GiB）但用户识别出checkpoint均未针对PickPlace微调，评估流程暂停；CLAUDE.md将SSH直连替换为Slurm三步工作流（srun &ndash;jobid &ndash;overlap）；2_visualize_scene.py新增3个CLI参数并修复force相关配置，但视频生成因GPU节点权限受阻。</p>
+<h3 id="error-recovery-benchmark---phoenix-pi05微调">Error Recovery Benchmark - Phoenix pi0.5微调<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark---phoenix-pi05微调">#</a></h3>
+<p><strong>🔄 Pi0.5 Phoenix CVPR 2025复现管线完整搭建（数据下载+转换+训练配置+评估脚本）</strong>
+<em>20:29:19.464 | claude_code</em>
+用户提供完整4步方案，AI创建数据转换脚本（convert_mimicgen_to_lerobot.py）、评估脚本（evaluate_mimicgen.py）、在config.py添加pi05_base_mimicgen_phoenix训练配置，更新文档至v4.11（新增M16里程碑）；通过hf-mirror.com下载9个MimicGen任务数据（18.4GB），datasets降级至3.6.0解决lerobot兼容性后完成4500 demo/1034K帧转换；确认CUDA_VISIBLE_DEVICES=0,1,3,4的4-GPU JAX并行训练方案；norm stats未计算，训练待启动。</p>
+<h3 id="gadget">gadget<a hidden class="anchor" aria-hidden="true" href="#gadget">#</a></h3>
+<p><strong>🔄 批量处理2026-02-02~02-21历史日报 + CLAUDE.md/README.md文档补全</strong>
+<em>20:15:16.225 | claude_code</em>
+在MacBook上批量处理6个历史日期（02-02、02-05、02-10、02-18、02-19、02-21）的跨设备AI对话记录，生成结构化日报并合并去重；内容涵盖MIHD多模态融合实验演进、Error Recovery M12-M14基础设施、Pi0.5评估流水线等多个项目历史工作。同次通过/init发现CLAUDE.md缺少website/工具文档，读取update.sh和config.yml后补充相关内容；用户要求同步更新README.md，两个文档均已更新；git commit因会话中断未完成。</p>
+<h3 id="robobrain-pi">RoboBrain-Pi<a hidden class="anchor" aria-hidden="true" href="#robobrain-pi">#</a></h3>
+<p><strong>❌ tianhe集群API登录失败</strong>
+<em>07:52:35.086 | claude_code</em>
+用户在tianhe的robobrain-pi目录打招呼，遭遇API 403 Forbidden错误，会话未产生任何实质性工作。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>20,937,189</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>46,134</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>19,975</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>1,654,974</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>19,216,106</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>92.1%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$13.9062</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>5,904</td>
+          <td>18,959</td>
+          <td>440,878</td>
+          <td>13,342,217</td>
+          <td>$9.9301</td>
+          <td>71.4%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>40,161</td>
+          <td>932</td>
+          <td>530,050</td>
+          <td>5,300,325</td>
+          <td>$1.2374</td>
+          <td>8.9%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>69</td>
+          <td>84</td>
+          <td>684,046</td>
+          <td>573,564</td>
+          <td>$2.7387</td>
+          <td>19.7%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>16,466,798</td>
+          <td>45,719</td>
+          <td>16,283</td>
+          <td>$9.2818</td>
+      </tr>
+      <tr>
+          <td>MacBook</td>
+          <td>4,470,391</td>
+          <td>415</td>
+          <td>3,692</td>
+          <td>$4.6244</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>$0.0000</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

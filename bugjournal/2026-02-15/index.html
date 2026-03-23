@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-15 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="跨DCC、tianhe、MacBook、TzJsDesktop四台设备全面推进：DCC完成MIHD 240&#43;实验与VLA迁移调研，tianhe修复可视化OSC核心bug并完成60个演示视频&#43;118条场景&#43;策略注入框架v4.1.0&#43;多类型场景扩展&#43;错误检测系统规划，MacBook发布3篇日报，TzJsDesktop将gadget/summarize升级为多设备自动化协作流水线">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-02-15/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-02-15/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-02-15/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-15">
+  <meta property="og:description" content="跨DCC、tianhe、MacBook、TzJsDesktop四台设备全面推进：DCC完成MIHD 240&#43;实验与VLA迁移调研，tianhe修复可视化OSC核心bug并完成60个演示视频&#43;118条场景&#43;策略注入框架v4.1.0&#43;多类型场景扩展&#43;错误检测系统规划，MacBook发布3篇日报，TzJsDesktop将gadget/summarize升级为多设备自动化协作流水线">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-15T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-15T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-15">
+  <meta name="twitter:description" content="跨DCC、tianhe、MacBook、TzJsDesktop四台设备全面推进：DCC完成MIHD 240&#43;实验与VLA迁移调研，tianhe修复可视化OSC核心bug并完成60个演示视频&#43;118条场景&#43;策略注入框架v4.1.0&#43;多类型场景扩展&#43;错误检测系统规划，MacBook发布3篇日报，TzJsDesktop将gadget/summarize升级为多设备自动化协作流水线">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-15",
+      "item": "https://tzj2006.github.io/bugjournal/2026-02-15/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-15",
+  "name": "Bug Journal 2026-02-15",
+  "description": "跨DCC、tianhe、MacBook、TzJsDesktop四台设备全面推进：DCC完成MIHD 240+实验与VLA迁移调研，tianhe修复可视化OSC核心bug并完成60个演示视频+118条场景+策略注入框架v4.1.0+多类型场景扩展+错误检测系统规划，MacBook发布3篇日报，TzJsDesktop将gadget/summarize升级为多设备自动化协作流水线",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-15 今日概览 做了什么： 跨四台设备同步推进：MIHD空间组学benchmark（240+实验+VLA迁移调研）、机器人错误恢复benchmark（可视化OSC根因修复+60个视频+118条场景+策略注入框架v4.1.0+多类型场景扩展+错误检测系统规划）、Hugo博客日报发布、gadget/summarize多设备协作工作流全面升级 怎么做的： HPC集群多进程并行实验调度、OSC控制器补偿机制分析与neutral action修复、8×A800多GPU并行渲染、robomimic适配器模式封装策略接口、tempfile原子写入+rclone分层同步构建多设备流水线 有什么用： 三条技术线全面突破：MIHD完成核心240+实验并建立VLA迁移框架；error-recovery-benchmark从可视化不可用升级为60个视频+118条场景+完整策略注入能力，进度从1.5%提升至15%；gadget/summarize升级为跨设备自动化协作流水线 DCC 做了什么： 管理MIHD benchmark 286个实验并行执行，调研VLA方法对空间转录组融合的适用性 怎么做的： 识别Q-Former为调度瓶颈后重组实验队列，先完成49个快速实验再并行Q-Former+scGPT；系统爬取博客及arXiv进行VLA技术迁移分析 有什么用： 完成240+实验（所有非Q-Former组全部完成），Q-Former后台运行至8/11；产出VLA→空间组学技术迁移研究报告 MacBook 做了什么： 将2026-02-12/13/14三篇AI对话日报发布到Hugo博客bugJournal栏目 怎么做的： 提取报告摘要生成Hugo前置元数据，运行update.sh完成增量压缩、Hugo构建（139页面）和GitHub Pages部署 有什么用： 三篇日报正式公开发布，个人知识库与工作记录同步到网站 TzJsDesktop 做了什么： 对gadget/summarize工具进行大规模功能增强：原子写入、LLM结构化输出、多设备rclone分层同步、_merged_devices智能去重、test/子模块迁移、ccusage修复 怎么做的： 连续六个会话迭代实现，plan-mode规划后实施，daily_summary.py从约1300行增长至约1500行 有什么用： gadget/summarize从单机手动工作流升级为多设备自动化协作流水线，任意设备可独立export/merge，rclone自动分层同步，重复API调用被智能去重 tianhe 做了什么： 完成可视化OSC根因修复+60个演示视频，实现策略注入框架v4.1.0（场景库扩至118条），扩展多类型场景生成，规划策略错误检测系统，更新项目文档至v4.2.0 怎么做的： 分析OSC控制器补偿机制引入neutral action修复可视化，多GPU批量渲染，适配器模式封装robomimic策略，修改检测器生成混合候选，7篇论文文献调研支撑规划 有什么用： 可视化系统完全可用（物体位移0→90mm+），60个视频完成，场景库118条覆盖3种注入类型，策略注入框架端到端打通，25种错误类型检测系统规划完成 跨DCC、tianhe、MacBook、TzJsDesktop四台设备全面推进：DCC完成MIHD 240+实验与VLA迁移调研，tianhe修复可视化OSC核心bug并完成60个演示视频+118条场景+策略注入框架v4.1.0+多类型场景扩展+错误检测系统规划，MacBook发布3篇日报，TzJsDesktop将gadget/summarize升级为多设备自动化协作流水线\n今日任务 架构与策略 ✅ 可视化脚本neutral action修复（OSC根因） — 第一轮修复MuJoCo xfrc_applied每步清零（循环re-apply力），通过数值验证但目视仍无效。深层根因：OSC控制器（kp=150）在每个物理子步产生的校正力矩远大于15-20N外力，将机械臂强制拉回demo轨迹。第二轮将Phase 3改为neutral action注入窗口+沉降窗口+demo恢复三子阶段，三组测试验证物体位移达90mm+，新增–settle_steps参数（默认20）。 ✅ 策略注入框架v4.1.0全量实现 — 新建policy_adapter.py（PolicyAdapter/RandomPolicyAdapter/RobomimicPolicyAdapter），扩展rollout_generator.py增加generate_from_policy()，更新collector.py/database.py/init.py，新建CLI脚本和配置，更新Makefile。实现中发现并修复BCPolicy._ensure_loaded()半初始化bug。41个单元测试全程通过。 ✅ P1.3+P2.3多类型场景生成扩展 — 修改ProximityDetector新增pose_perturb候选，修改CollisionDetector新增friction和pose_perturb候选，在_create_trigger_result()中扩展候选列表；更新benchmark_v4.yaml将max_scenes_per_demo从3调大到10。41个单元测试全部通过，场景类型从单一impulse扩展至impulse/pose_perturb/friction三种。 🔄 策略驱动误差注入架构规划 — 研究robomimic v0.3.1可用检查点和Pi0/Pi0.5可行性，核心设计明确：仅替换action来源（demo_actions[step]→policy.predict(obs).action），检测→注入→验证管线完全复用，适配器模式统一Random/BC-RNN/VLA接口。中文规划已写入plan文件，基础框架已在v4.1.0实现，Pi0/VLA策略集成待启动。 🔄 策略错误检测与分类系统综合规划 — 调研RoboFail/GROOT等7篇论文，梳理两套现有注入框架，经多轮对话确认双层架构（规则分类器+VLM）和双模态输入（state+video），撰写543行全中文嵌套大纲规划（25种错误类型三大家族、规则分类器体系、VLM分析层、collector集成路径）。规划完成，实现待启动。 ✅ gadget/summarize多设备rclone同步工作流(–sync) — 六项改动：无子命令默认export（不调API）；_rclone_upload增加subdirectory参数（export→logs/，merge→reports/）；新增_rclone_download_logs函数（带日期过滤）；merge新增–sync标志和nargs=*的log_files；_config_show显示结构化路径；顶层parser补充–summarize参数。 ✅ MIHD benchmark 240+实验调度完成 — 识别Q-Former（90min/section）为调度瓶颈后重组队列：先13分钟完成49个快速实验，再并行启动scGPT提取（11/11 sections）和评估（65/77成功，12个OOM失败），Q-Former后台运行至8/11。总计完成240+实验。 ✅ 全量场景生成118条+BC策略接入与轨迹保存 — 对pick_place全部10个demo运行生成管线，场景库从32扩至118条（含1个策略rollout场景）。修复3_collect_data.py中BC策略加载逻辑（区分null路径与缺失配置，给出明确操作引导）；修复collector.py轨迹NPZ保存TODO，实现actions/rewards/eef_pos/object_pos等字段完整保存。smoke test验证轨迹文件正确生成。 ✅ _merged_devices智能跳过机制 — Export阶段：提前计算输出路径并读取已有文件的_merged_devices列表，当前设备已在其中则跳过API调用复用已有device_summary；否则调API后将设备名加入列表。device_summary改为{device_name: summary_dict}格式；cmd_merge以_merged_devices字段存在性兼容新旧格式。 🔄 VLA方法对MIHD适用性研究 — 系统爬取用户博客获取VLA认知（FAST、diffusion transformer、data scarcity），结合arXiv调研Flow Matching、Register Tokens+AdaLN等方法，发现VLA与空间组学正在独立技术趋同，产出分层迁移建议报告。用户拒绝了深入三个子方向的跟进研究。 实现与修复 ✅ gadget/summarize原子写入+LLM结构化输出 — 实现_atomic_write（tempfile.mkstemp+os.replace），替换5处open(‘w’)写入点（Hugo post、Markdown/JSON报告、export log、config写入）。Anthropic使用tool_use+submit_report schema+tool_choice强制结构化输出；OpenAI使用response_format=json_object。均保留_parse_json_response作为fallback。 ✅ test/子模块迁移+ccusage修复+文档全面更新 — git submodule转普通文件（git rm –cached→删.gitmodules→clone→rm -rf .git→git add）；修复ccusage返回list导致的AttributeError（isinstance包装为{daily: data}）；全面更新README/tutorial.md/CLAUDE.md，移除单机模式说明，新增完整多设备工作流示例和rclone配置说明。 ✅ 批量生成60个可视化视频 — 新建batch_visualize.py多GPU并行渲染，支持baseline和1x-2x随机增强两组模式，生成30 baseline + 30 randomized视频，覆盖全部30个场景（修复select_scenes边界bug后手动补跑缺失场景），产出baseline 21MB + randomized 26MB，覆盖3个demo和全部力大小（3N/15N/20N）。 🔄 MIHD Q-Former后台持续运行 — pca_uni2_qformer每section约90分钟，DCC GPU节点后台运行；截至会话结束已完成8/11 sections；scgpt_uni2_qformer待pca Q-Former完成后跑。 ✅ 发布3篇日报到Hugo bugJournal — 为2026-02-12/13/14三篇日报添加Hugo前置元数据，运行update.sh成功部署到GitHub Pages（139页面）。 ✅ 项目全景总结文档v4.2.0更新 — 系统性更新10处内容：版本号/日期、里程碑状态（M5进行中/M7已验证）、场景数量3→30、P1/P3任务打勾、差距分析、关键发现等。 问题与解决方案 关键问题 1. 可视化视频中机械臂完全无位移：第一轮修复（每步重新施加力）通过数值验证（body position变化15mm）但用户目视确认仍无效果；根本原因是demo actions通过OSC控制器（kp=150）在每个物理子步产生校正力矩，远大于注入的15-20N外力，将机械臂强制拉回demo轨迹 解决方案: 在力注入窗口改用neutral actions（零动作向量），让控制器仅维持当前关节位置而非追踪demo轨迹；增加settle_steps让物体在力清除后自由运动。验证代码（drop.py:145-157）本来就用neutral actions——解法是将可视化与验证逻辑对齐\n关键洞察: 机器人OSC控制器闭环增益（kp=150）产生的关节力矩远大于外力，MuJoCo每物理步还会清零xfrc_applied。两个叠加效应使得demo actions执行期间注入外力几乎无效。数值日志中的position变化（15mm）来自随机噪声而非外力，目视检查不可替代数值验证。\n2. ProximityDetector和CollisionDetector只生成impulse spec，所有30个场景均为impulse/tip_over，ProximityDetector还消耗了全部max_scenes配额导致其他注入类型无法出现 解决方案: 在ProximityDetector新增_generate_mixed_specs()同时提议impulse+pose_perturb候选；在CollisionDetector新增_generate_friction_specs()和_generate_pose_perturb_specs()；将max_scenes_per_demo从3调大到10\n关键洞察: 检测器应当生成多种候选而非单一类型，GraspPrecondDetector已有此模式；配额分配和候选多样性需在生成阶段一并设计，否则一个检测器会独占所有场景槽位\n3. rclone所有文件上传到同一flat目录，logs和reports混在一起；merge时无法从远端下载其他设备的export log；多设备分别merge会互相覆盖最终报告 解决方案: _rclone_upload增加subdirectory参数，export上传到remote/logs/，merge上传到remote/reports/；新增_rclone_download_logs函数用–include过滤当天文件；merge –sync在合并前自动拉取其他设备log；无子命令默认只export不调API\n关键洞察: 多设备协作需要pull-before-merge机制，而不只是push；目录分层让logs和最终报告互不干扰；下载路径设计为幂等（重复下载无副作用）\n4. Q-Former每section约90分钟，串行运行时阻塞所有后续快速实验（286个实验中Q-Former只有11个section但耗时\u003e16小时） 解决方案: 停止当前pipeline，拆分为独立实验组qformer_benchmark；先用general_fast组跑完49个非Q-Former实验（13分钟），再并行启动Q-Former（后台）和scGPT\n关键洞察: HPC实验调度应按时间成本排序：慢速实验独立后台运行，不应与快速实验混合串行；时序调度比强行并行更稳健，同时可避免GPU OOM（两个Q-Former并行各需~21GB超过单卡32GB上限）\n5. _merged_devices数据结构设计错误：AI首次实现时用单个_summarized_by字符串字段，无法支持多设备各自保存device_summary，且cmd_merge的兼容逻辑基于all()类型检查过于复杂 解决方案: 将device_summary改为{device_name: summary_dict} dict，_merged_devices列表单独追踪哪些设备已summarize；cmd_merge以_merged_devices字段存在性作为格式版本标志，替代复杂的类型检查\n关键洞察: 多设备场景下状态追踪应以设备为key而非单值字段；用字段存在性作为格式版本标志比运行时类型检查更简洁可靠\n6. 随机策略rollout生成的场景yield极低（10 rollouts仅产生1个场景），用户不清楚这是预期行为还是bug 解决方案: 明确解释原因：随机策略缺乏到达物理交互关键状态的能力，demo天然覆盖操作区域；后续用BC/VLA策略可显著提高覆盖率\n关键洞察: 错误注入时机依赖策略是否经过操作相关物理状态；随机策略代表最差情况参考，不代表有意义的策略错误样本；随机策略适合验证管线正确性，不适合生成有代表性的错误场景\n一般问题 7. ccusage在某些版本/环境下返回list而非期望的{daily: […]} dict，导致data.get(‘daily’, [])报AttributeError崩溃 解决方案: 在fetch_ccusage()中json.loads之后增加isinstance(data, list)检查，若为list则包装为{‘daily’: data, ’totals’: {}}\n关键洞察: 外部工具的输出格式可能因版本而异，不能假设固定结构；防御性包装比修改外部工具更可靠，需在与外部工具交互的边界处做格式归一化\n8. BCPolicy._ensure_loaded()将self._adapter先于start_episode()赋值，checkpoint加载失败时adapter已赋值但处于损坏状态，后续predict()调用报错而非回退至零向量 解决方案: 改为先将RobomimicPolicyAdapter创建到局部变量，调用start_episode()成功后再赋值self._adapter；异常时只设_fallback=True\n关键洞察: 惰性初始化模式要在所有初始化步骤全部成功后才提交状态，不能在初始化过程中提前暴露半初始化对象；robomimic FileUtils实际文件读取在start_episode()时触发，而非构造时\n9. subprocess.run()中用相对路径调用子进程，导致58个实验成功执行但npz文件保存到错误位置 解决方案: 改用绝对路径构建脚本路径（Path(file).parent.parent），显式设置cwd=project_root，output_dir转为绝对路径\n关键洞察: Python subprocess继承父进程cwd，但当通过绝对路径调用父脚本时，子进程中的相对路径解析失败；必须同时固定脚本路径和工作目录，output路径在传给subprocess前须转为绝对路径\n人类思路 vs AI 思路 战略层面 可视化bug根因定位：OSC控制器补偿 vs 数值验证 角色 思路 人类 目视检查视频发现机械臂明显无位移，拒绝被AI报告的数值变化（15mm）说服；进一步直接指出根因：demo actions通过OSC控制器补偿了外力，并提供验证代码（drop.py:145-157）中使用neutral actions的直接证据 AI 第一轮修复方向错误（每步重新施加力），聚焦于力是否被持续施加；第二轮以exit code 0+日志body position数值变化作为「修复成功」依据，未做目视验证；需要人类目视检查和明确指出根因后才能定向修复 差异分析: 人类熟悉机器人控制系统闭环补偿特性，AI只从「力的施加量」角度分析缺乏对控制器底层机制的理解；AI将数字变化等同于视觉效果，人类通过直觉发现数值验证不充分——目视检查不可替代\n策略注入设计：最小改动原则 vs 过度抽象 角色 思路 人类 预先撰写完整8步实现计划明确适配器模式和复用边界（Seg 2）；同时直接指出「就是换action来源」暗示这是最小改动（Seg 3）；架构层决策（模式选型、文件拆分、复用策略）完全由人类设计 AI 按计划分步实现处理接口细节（Seg 2）；初稿设计了复杂的PolicyAdapter抽象层和多种adapter类型，需要人类反问才回归简洁（Seg 3）；在实现过程中额外发现了BCPolicy bug 差异分析: 人类同时掌握「完整架构蓝图」和「最小改动直觉」；AI在无详细计划时倾向过度工程化，在有计划时能精确执行并发现实现细节问题\n策略错误检测技术路线：VLM层优先级 角色 思路 人类 指定双层架构（rule-based+VLM）和双模态输入（state+video），在AI把VLM层降级为「未来扩展」后明确纠正；对VLM集成的战略重要性判断与AI不同 AI 调研7篇论文提出25种错误分类体系，但初版将VLM置于次要位置且仅考虑state输入，需要通过交互才能对齐架构优先级 差异分析: AI擅长文献综合和分类体系构建，但对具体工程中哪些层次应优先投入缺乏判断；技术路线的战略优先级需要领域视角，不能纯由文献调研决定\n多设备同步需求与工具设计 角色 思路 人类 明确要求任意设备merge –sync能自动从远端下载其他设备log（pull-before-merge）；要求per-device dict存储device_summary；主动提出无参数时只export不summarize（UX和成本考虑） AI 理解多设备协作场景需要3轮提问，首次提问方向偏差（问目录结构而非核心需求）；首次实现_merged_devices用单值字段而非per-device dict；实现rclone时只关注上传逻辑，忽略了下载需求 差异分析: 人类从「多设备协作整体工作流」角度出发，AI从「逐个功能点实现」角度出发；用户体验和使用成本的判断需要领域经验，AI缺乏主动推理整体工作流的能力\nVLA研究切入点：模糊线索 vs 系统探索 角色 思路 人类 提供个人博客URL作为VLA理解来源，实际首页没有直接VLA内容，线索不够精确 AI 系统性爬取网站结构，在bugjournal中找到相关内容（FAST、unified world models、data scarcity），结合arXiv文献独立构建了VLA→空间组学技术迁移分析框架 差异分析: 人类提供模糊线索，AI通过系统探索弥补；最终研究框架（两领域独立趋同、Flow Matching/Register Tokens为优先迁移方向）主要由AI构建，展示了AI在文献综合和主题提取上的优势\nAI 局限性 重要局限 对机器人控制系统缺乏系统认知：未主动考虑OSC控制器闭环补偿会完全抵消注入外力；以数值变化（body position 15mm）替代目视验证，错误报告「修复完成」。需要人类目视确认和明确指出根因后才能定向修复，导致多消耗一轮修复迭代。 策略注入初稿过度工程化（PolicyAdapter抽象层+8步实现+多种adapter类型），需要人类直接指出「就是换action来源」才回归最小改动原则。AI在无详细计划时倾向设计复杂抽象，而非从最小差异出发。 策略错误检测规划将VLM层降级为「未来扩展」，未能主动识别用户对VLM集成的优先级判断；技术文档默认输出中英混合格式，无法感知用户对全中文嵌套大纲的偏好，需两轮明确纠正。架构优先级和文档格式均需显式指令才能对齐。 _merged_devices数据结构首次设计错误（单值字段而非per-device dict），cmd_merge兼容逻辑初版基于all()类型检查过于复杂，需两次迭代才收敛到正确设计，多消耗一个会话。 一般局限 subprocess路径管理失误：批量脚本中使用相对路径，导致58个实验成功执行但输出文件保存到错误位置；select_scenes()边界条件bug（n=30时返回29个）需人工发现并补跑。两者均属应在初次实现时规避的基础错误。 多次提前尝试调用ExitPlanMode被用户中断（Segs 3、4均出现），说明AI判断「任务完成」的时机与用户预期不同步——用户还有后续问题需要在plan mode内讨论，AI应等待用户明确确认计划内容后再退出。 今日收获 核心收获 MuJoCo机器人力注入的完整机制：xfrc_applied每物理步自动清零（单次施力仅产生15N×0.002s=0.03 N·s冲量），且demo actions通过OSC控制器（kp=150）产生的校正力矩远大于外力，将机械臂强制拉回轨迹。正确做法：在力注入窗口切换为neutral actions（零动作向量），结束后加settle_steps让物体自由运动，与validators/drop.py的collect_rollout_stats()保持一致。验证代码与可视化代码必须使用相同的action类型。 策略驱动误差注入的核心只是替换action来源：demo_actions[step]→policy.predict(obs).action，检测→注入→验证管线完全复用，不需要复杂抽象层。适配器模式（PolicyAdapter）可以统一Random/BC-RNN/VLA的接口差异，配合TYPE_CHECKING避免循环导入，是扩展异构策略支持的有效设计范式。 _merged_devices幂等模式：在JSON文件中维护「已处理设备」列表，实现多设备操作的幂等性，任意设备重复运行都能正确跳过已完成工作；rclone remote用子目录分层存储（remote/logs/ vs remote/reports/），–include参数支持通配符过滤特定日期文件；pull-before-merge是多设备协作同步的必要机制。 VLA与空间组学架构趋同：两个领域正在独立收敛到相同技术创新（Diffusion Transformer、模态tokens、对比对齐），最值得迁移的是Flow Matching融合（连续空间生成embedding）和Register Tokens+AdaLN（模态标记+自适应归一化）。 规则分类器+VLM双层架构是机器人操作错误检测的合理工程选择：规则层提供速度和确定性，VLM层提供自然语言解释和边界案例处理；双模态输入（state+video）比单模态更鲁棒，VLM层应从初始阶段集成而非作为「未来扩展」。 随机策略rollout yield极低（~10%）：随机策略缺乏到达操作关键区域的能力，demo回放天然覆盖关键物理交互区域。随机策略适合验证管线正确性，BC/VLA策略才能产生有代表性的错误场景；HPC实验调度应将慢速任务（Q-Former ~90min/section）独立后台运行，不与快速实验混合串行。 实践收获 os.replace在同一文件系统上是原子操作：结合tempfile.mkstemp写入同目录可完全消除写入中断导致文件损坏的风险；使用BaseException确保Ctrl+C也能清理临时文件。Anthropic tool_use的tool_choice参数可强制模型调用指定工具返回结构化JSON，比prompt描述格式更可靠。 git submodule转普通文件标准流程：git rm –cached →删.gitmodules→clone→rm -rf .git→git add；Windows保留设备名（CON/PRN/AUX/NUL）无法作为普通文件操作，bash重定向\u003enul不创建文件而是写入设备，只能用.gitignore处理。 会话摘要 MIHD 🔄 MIHD benchmark 286个实验调度（240+完成）+ VLA方法迁移适用性调研 00:01:07.460 | claude_code DCC上管理MIHD benchmark实验调度：发现Q-Former（90min/section）阻塞快速实验后停止pipeline并重组为独立实验组，13分钟内完成49个快速实验，并行启动scGPT提取（11/11 sections）和评估（65/77成功，12个OOM失败）；至会话结束完成240+实验，Q-Former后台运行至8/11。同日，用户提供博客URL作为VLA理解来源，AI系统性爬取bugjournal找到FAST/unified world models/data scarcity等内容，结合arXiv文献调研发现VLA与空间组学正在独立趋同（Diffusion Transformer、模态tokens），产出分层迁移建议报告（Flow Matching和Register Tokens+AdaLN为优先方向）；用户拒绝了深入三个子方向的跟进研究。\nError Recovery Benchmark 🔄 可视化修复（OSC根因）→60个视频→v4.1.0策略注入→118条场景→多类型扩展→错误检测规划 00:05:51.186 | claude_code 全天多轮会话完整推进error-recovery-benchmark各阶段：①可视化修复：第一轮re-apply力通过数值验证但目视无效，深层根因为OSC控制器补偿；第二轮neutral action方案完成三组测试（位移90mm+），批量生成60个视频（baseline+randomized，修复select_scenes边界bug），项目文档更新至v4.2.0。②策略注入框架v4.1.0：人类提供8步实现计划，AI完成policy_adapter.py/rollout_generator.py/collector.py等全量实现，发现并修复BCPolicy半初始化bug，41个单元测试全通过，pick_place全量生成场景库扩至118条，修复BC策略接入和轨迹NPZ保存。③多类型场景扩展（P1.3+P2.3）：修改ProximityDetector/CollisionDetector生成impulse/pose_perturb/friction三种候选，调大max_scenes_per_demo参数，41个测试全通过。④策略错误检测系统规划：调研7篇论文，确认双层架构（规则+VLM）和双模态输入（state+video），撰写543行全中文嵌套大纲规划（25种错误类型），规划完成待实现。\ngadget/summarize ✅ 工具使用（生成MIHD/CalendarPro日报）+ 大规模功能开发（多设备协作流水线） 02:10:33.066 | claude_code 工具使用：DCC上运行daily_summary.py对MIHD 2026-02-13对话生成结构化日报；TzJsDesktop上对CalendarPro 2026-02-13生成日报（含time_utils共享模块提取、循环任务等内容）。功能开发：TzJsDesktop连续六个会话完成大规模升级——实现_atomic_write（tempfile+os.replace）替换5处写入点；Anthropic/OpenAI两端实现结构化JSON输出；规划并实现多设备rclone分层同步（–sync，export→logs/，merge→reports/，新增_rclone_download_logs，默认行为改为export）；实现_merged_devices智能跳过（per-device dict，以字段存在性区分新旧格式）；完成test/子模块迁移（git rm→clone→rm .git）；修复ccusage list/dict格式变化AttributeError；全面更新三份文档（README/tutorial.md/CLAUDE.md）。daily_summary.py从约1300行增长至约1500行，实现完整多设备协作能力。\nGadget/Website ✅ 将2026-02-12/13/14日报发布到Hugo bugJournal并部署到GitHub Pages 05:16:45.089 | claude_code MacBook上为三篇日报添加Hugo前置元数据（title、date、keywords、summary字段），创建三个bugJournal条目，运行update.sh完成增量图片处理、Hugo构建（139页面）和GitHub Pages推送。确认gadget repo无未提交改动，website目录本身不是独立git仓库，公共内容已通过public/子目录push。\nToken 用量 总览 指标 数值 总 Token 14,727,647 输入 Token 52,119 输出 Token 1,732 Cache 创建 1,565,133 Cache 读取 13,108,663 Cache 命中率 89.3% 总费用 (USD) $8.0074 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 26,335 1,107 315,031 2,395,301 $3.3259 41.5% claude-haiku-4-5-20251001 23,790 444 848,634 5,667,553 $1.6536 20.7% claude-sonnet-4-5-20250929 1,994 181 401,468 5,045,809 $3.0279 37.8% 各设备用量 设备 总 Token 输入 输出 费用 DCC 4,203,500 35,004 1,166 $3.4369 MacBook 573,936 176 80 $0.4099 tianhe 9,950,211 16,939 486 $4.1606 ",
+  "wordCount" : "480",
+  "inLanguage": "en",
+  "datePublished": "2026-02-15T00:00:00-05:00",
+  "dateModified": "2026-02-15T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-02-15/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-15
+    </h1>
+    <div class="post-meta"><span title='2026-02-15 00:00:00 -0500 EST'>February 15, 2026</span>&nbsp;·&nbsp;<span>3 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-15">日报 — 2026-02-15<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-15">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 跨四台设备同步推进：MIHD空间组学benchmark（240+实验+VLA迁移调研）、机器人错误恢复benchmark（可视化OSC根因修复+60个视频+118条场景+策略注入框架v4.1.0+多类型场景扩展+错误检测系统规划）、Hugo博客日报发布、gadget/summarize多设备协作工作流全面升级</li>
+<li><strong>怎么做的：</strong> HPC集群多进程并行实验调度、OSC控制器补偿机制分析与neutral action修复、8×A800多GPU并行渲染、robomimic适配器模式封装策略接口、tempfile原子写入+rclone分层同步构建多设备流水线</li>
+<li><strong>有什么用：</strong> 三条技术线全面突破：MIHD完成核心240+实验并建立VLA迁移框架；error-recovery-benchmark从可视化不可用升级为60个视频+118条场景+完整策略注入能力，进度从1.5%提升至15%；gadget/summarize升级为跨设备自动化协作流水线</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 管理MIHD benchmark 286个实验并行执行，调研VLA方法对空间转录组融合的适用性</li>
+<li><strong>怎么做的：</strong> 识别Q-Former为调度瓶颈后重组实验队列，先完成49个快速实验再并行Q-Former+scGPT；系统爬取博客及arXiv进行VLA技术迁移分析</li>
+<li><strong>有什么用：</strong> 完成240+实验（所有非Q-Former组全部完成），Q-Former后台运行至8/11；产出VLA→空间组学技术迁移研究报告</li>
+</ul>
+<h3 id="macbook">MacBook<a hidden class="anchor" aria-hidden="true" href="#macbook">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 将2026-02-12/13/14三篇AI对话日报发布到Hugo博客bugJournal栏目</li>
+<li><strong>怎么做的：</strong> 提取报告摘要生成Hugo前置元数据，运行update.sh完成增量压缩、Hugo构建（139页面）和GitHub Pages部署</li>
+<li><strong>有什么用：</strong> 三篇日报正式公开发布，个人知识库与工作记录同步到网站</li>
+</ul>
+<h3 id="tzjsdesktop">TzJsDesktop<a hidden class="anchor" aria-hidden="true" href="#tzjsdesktop">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 对gadget/summarize工具进行大规模功能增强：原子写入、LLM结构化输出、多设备rclone分层同步、_merged_devices智能去重、test/子模块迁移、ccusage修复</li>
+<li><strong>怎么做的：</strong> 连续六个会话迭代实现，plan-mode规划后实施，daily_summary.py从约1300行增长至约1500行</li>
+<li><strong>有什么用：</strong> gadget/summarize从单机手动工作流升级为多设备自动化协作流水线，任意设备可独立export/merge，rclone自动分层同步，重复API调用被智能去重</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成可视化OSC根因修复+60个演示视频，实现策略注入框架v4.1.0（场景库扩至118条），扩展多类型场景生成，规划策略错误检测系统，更新项目文档至v4.2.0</li>
+<li><strong>怎么做的：</strong> 分析OSC控制器补偿机制引入neutral action修复可视化，多GPU批量渲染，适配器模式封装robomimic策略，修改检测器生成混合候选，7篇论文文献调研支撑规划</li>
+<li><strong>有什么用：</strong> 可视化系统完全可用（物体位移0→90mm+），60个视频完成，场景库118条覆盖3种注入类型，策略注入框架端到端打通，25种错误类型检测系统规划完成</li>
+</ul>
+<blockquote>
+<p>跨DCC、tianhe、MacBook、TzJsDesktop四台设备全面推进：DCC完成MIHD 240+实验与VLA迁移调研，tianhe修复可视化OSC核心bug并完成60个演示视频+118条场景+策略注入框架v4.1.0+多类型场景扩展+错误检测系统规划，MacBook发布3篇日报，TzJsDesktop将gadget/summarize升级为多设备自动化协作流水线</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>可视化脚本neutral action修复（OSC根因）</strong> — 第一轮修复MuJoCo xfrc_applied每步清零（循环re-apply力），通过数值验证但目视仍无效。深层根因：OSC控制器（kp=150）在每个物理子步产生的校正力矩远大于15-20N外力，将机械臂强制拉回demo轨迹。第二轮将Phase 3改为neutral action注入窗口+沉降窗口+demo恢复三子阶段，三组测试验证物体位移达90mm+，新增&ndash;settle_steps参数（默认20）。</li>
+<li>✅ <strong>策略注入框架v4.1.0全量实现</strong> — 新建policy_adapter.py（PolicyAdapter/RandomPolicyAdapter/RobomimicPolicyAdapter），扩展rollout_generator.py增加generate_from_policy()，更新collector.py/database.py/<strong>init</strong>.py，新建CLI脚本和配置，更新Makefile。实现中发现并修复BCPolicy._ensure_loaded()半初始化bug。41个单元测试全程通过。</li>
+<li>✅ <strong>P1.3+P2.3多类型场景生成扩展</strong> — 修改ProximityDetector新增pose_perturb候选，修改CollisionDetector新增friction和pose_perturb候选，在_create_trigger_result()中扩展候选列表；更新benchmark_v4.yaml将max_scenes_per_demo从3调大到10。41个单元测试全部通过，场景类型从单一impulse扩展至impulse/pose_perturb/friction三种。</li>
+<li>🔄 <strong>策略驱动误差注入架构规划</strong> — 研究robomimic v0.3.1可用检查点和Pi0/Pi0.5可行性，核心设计明确：仅替换action来源（demo_actions[step]→policy.predict(obs).action），检测→注入→验证管线完全复用，适配器模式统一Random/BC-RNN/VLA接口。中文规划已写入plan文件，基础框架已在v4.1.0实现，Pi0/VLA策略集成待启动。</li>
+<li>🔄 <strong>策略错误检测与分类系统综合规划</strong> — 调研RoboFail/GROOT等7篇论文，梳理两套现有注入框架，经多轮对话确认双层架构（规则分类器+VLM）和双模态输入（state+video），撰写543行全中文嵌套大纲规划（25种错误类型三大家族、规则分类器体系、VLM分析层、collector集成路径）。规划完成，实现待启动。</li>
+<li>✅ <strong>gadget/summarize多设备rclone同步工作流(&ndash;sync)</strong> — 六项改动：无子命令默认export（不调API）；_rclone_upload增加subdirectory参数（export→logs/，merge→reports/）；新增_rclone_download_logs函数（带日期过滤）；merge新增&ndash;sync标志和nargs=*的log_files；_config_show显示结构化路径；顶层parser补充&ndash;summarize参数。</li>
+<li>✅ <strong>MIHD benchmark 240+实验调度完成</strong> — 识别Q-Former（90min/section）为调度瓶颈后重组队列：先13分钟完成49个快速实验，再并行启动scGPT提取（11/11 sections）和评估（65/77成功，12个OOM失败），Q-Former后台运行至8/11。总计完成240+实验。</li>
+<li>✅ <strong>全量场景生成118条+BC策略接入与轨迹保存</strong> — 对pick_place全部10个demo运行生成管线，场景库从32扩至118条（含1个策略rollout场景）。修复3_collect_data.py中BC策略加载逻辑（区分null路径与缺失配置，给出明确操作引导）；修复collector.py轨迹NPZ保存TODO，实现actions/rewards/eef_pos/object_pos等字段完整保存。smoke test验证轨迹文件正确生成。</li>
+<li>✅ <strong>_merged_devices智能跳过机制</strong> — Export阶段：提前计算输出路径并读取已有文件的_merged_devices列表，当前设备已在其中则跳过API调用复用已有device_summary；否则调API后将设备名加入列表。device_summary改为{device_name: summary_dict}格式；cmd_merge以_merged_devices字段存在性兼容新旧格式。</li>
+<li>🔄 <strong>VLA方法对MIHD适用性研究</strong> — 系统爬取用户博客获取VLA认知（FAST、diffusion transformer、data scarcity），结合arXiv调研Flow Matching、Register Tokens+AdaLN等方法，发现VLA与空间组学正在独立技术趋同，产出分层迁移建议报告。用户拒绝了深入三个子方向的跟进研究。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>gadget/summarize原子写入+LLM结构化输出</strong> — 实现_atomic_write（tempfile.mkstemp+os.replace），替换5处open(&lsquo;w&rsquo;)写入点（Hugo post、Markdown/JSON报告、export log、config写入）。Anthropic使用tool_use+submit_report schema+tool_choice强制结构化输出；OpenAI使用response_format=json_object。均保留_parse_json_response作为fallback。</li>
+<li>✅ <strong>test/子模块迁移+ccusage修复+文档全面更新</strong> — git submodule转普通文件（git rm &ndash;cached→删.gitmodules→clone→rm -rf .git→git add）；修复ccusage返回list导致的AttributeError（isinstance包装为{daily: data}）；全面更新README/tutorial.md/CLAUDE.md，移除单机模式说明，新增完整多设备工作流示例和rclone配置说明。</li>
+<li>✅ <strong>批量生成60个可视化视频</strong> — 新建batch_visualize.py多GPU并行渲染，支持baseline和1x-2x随机增强两组模式，生成30 baseline + 30 randomized视频，覆盖全部30个场景（修复select_scenes边界bug后手动补跑缺失场景），产出baseline 21MB + randomized 26MB，覆盖3个demo和全部力大小（3N/15N/20N）。</li>
+<li>🔄 <strong>MIHD Q-Former后台持续运行</strong> — pca_uni2_qformer每section约90分钟，DCC GPU节点后台运行；截至会话结束已完成8/11 sections；scgpt_uni2_qformer待pca Q-Former完成后跑。</li>
+<li>✅ <strong>发布3篇日报到Hugo bugJournal</strong> — 为2026-02-12/13/14三篇日报添加Hugo前置元数据，运行update.sh成功部署到GitHub Pages（139页面）。</li>
+<li>✅ <strong>项目全景总结文档v4.2.0更新</strong> — 系统性更新10处内容：版本号/日期、里程碑状态（M5进行中/M7已验证）、场景数量3→30、P1/P3任务打勾、差距分析、关键发现等。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-可视化视频中机械臂完全无位移第一轮修复每步重新施加力通过数值验证body-position变化15mm但用户目视确认仍无效果根本原因是demo-actions通过osc控制器kp150在每个物理子步产生校正力矩远大于注入的15-20n外力将机械臂强制拉回demo轨迹">1. 可视化视频中机械臂完全无位移：第一轮修复（每步重新施加力）通过数值验证（body position变化15mm）但用户目视确认仍无效果；根本原因是demo actions通过OSC控制器（kp=150）在每个物理子步产生校正力矩，远大于注入的15-20N外力，将机械臂强制拉回demo轨迹<a hidden class="anchor" aria-hidden="true" href="#1-可视化视频中机械臂完全无位移第一轮修复每步重新施加力通过数值验证body-position变化15mm但用户目视确认仍无效果根本原因是demo-actions通过osc控制器kp150在每个物理子步产生校正力矩远大于注入的15-20n外力将机械臂强制拉回demo轨迹">#</a></h4>
+<p><strong>解决方案:</strong> 在力注入窗口改用neutral actions（零动作向量），让控制器仅维持当前关节位置而非追踪demo轨迹；增加settle_steps让物体在力清除后自由运动。验证代码（drop.py:145-157）本来就用neutral actions——解法是将可视化与验证逻辑对齐</p>
+<p><strong>关键洞察:</strong> 机器人OSC控制器闭环增益（kp=150）产生的关节力矩远大于外力，MuJoCo每物理步还会清零xfrc_applied。两个叠加效应使得demo actions执行期间注入外力几乎无效。数值日志中的position变化（15mm）来自随机噪声而非外力，目视检查不可替代数值验证。</p>
+<h4 id="2-proximitydetector和collisiondetector只生成impulse-spec所有30个场景均为impulsetip_overproximitydetector还消耗了全部max_scenes配额导致其他注入类型无法出现">2. ProximityDetector和CollisionDetector只生成impulse spec，所有30个场景均为impulse/tip_over，ProximityDetector还消耗了全部max_scenes配额导致其他注入类型无法出现<a hidden class="anchor" aria-hidden="true" href="#2-proximitydetector和collisiondetector只生成impulse-spec所有30个场景均为impulsetip_overproximitydetector还消耗了全部max_scenes配额导致其他注入类型无法出现">#</a></h4>
+<p><strong>解决方案:</strong> 在ProximityDetector新增_generate_mixed_specs()同时提议impulse+pose_perturb候选；在CollisionDetector新增_generate_friction_specs()和_generate_pose_perturb_specs()；将max_scenes_per_demo从3调大到10</p>
+<p><strong>关键洞察:</strong> 检测器应当生成多种候选而非单一类型，GraspPrecondDetector已有此模式；配额分配和候选多样性需在生成阶段一并设计，否则一个检测器会独占所有场景槽位</p>
+<h4 id="3-rclone所有文件上传到同一flat目录logs和reports混在一起merge时无法从远端下载其他设备的export-log多设备分别merge会互相覆盖最终报告">3. rclone所有文件上传到同一flat目录，logs和reports混在一起；merge时无法从远端下载其他设备的export log；多设备分别merge会互相覆盖最终报告<a hidden class="anchor" aria-hidden="true" href="#3-rclone所有文件上传到同一flat目录logs和reports混在一起merge时无法从远端下载其他设备的export-log多设备分别merge会互相覆盖最终报告">#</a></h4>
+<p><strong>解决方案:</strong> _rclone_upload增加subdirectory参数，export上传到remote/logs/，merge上传到remote/reports/；新增_rclone_download_logs函数用&ndash;include过滤当天文件；merge &ndash;sync在合并前自动拉取其他设备log；无子命令默认只export不调API</p>
+<p><strong>关键洞察:</strong> 多设备协作需要pull-before-merge机制，而不只是push；目录分层让logs和最终报告互不干扰；下载路径设计为幂等（重复下载无副作用）</p>
+<h4 id="4-q-former每section约90分钟串行运行时阻塞所有后续快速实验286个实验中q-former只有11个section但耗时16小时">4. Q-Former每section约90分钟，串行运行时阻塞所有后续快速实验（286个实验中Q-Former只有11个section但耗时&gt;16小时）<a hidden class="anchor" aria-hidden="true" href="#4-q-former每section约90分钟串行运行时阻塞所有后续快速实验286个实验中q-former只有11个section但耗时16小时">#</a></h4>
+<p><strong>解决方案:</strong> 停止当前pipeline，拆分为独立实验组qformer_benchmark；先用general_fast组跑完49个非Q-Former实验（13分钟），再并行启动Q-Former（后台）和scGPT</p>
+<p><strong>关键洞察:</strong> HPC实验调度应按时间成本排序：慢速实验独立后台运行，不应与快速实验混合串行；时序调度比强行并行更稳健，同时可避免GPU OOM（两个Q-Former并行各需~21GB超过单卡32GB上限）</p>
+<h4 id="5-_merged_devices数据结构设计错误ai首次实现时用单个_summarized_by字符串字段无法支持多设备各自保存device_summary且cmd_merge的兼容逻辑基于all类型检查过于复杂">5. _merged_devices数据结构设计错误：AI首次实现时用单个_summarized_by字符串字段，无法支持多设备各自保存device_summary，且cmd_merge的兼容逻辑基于all()类型检查过于复杂<a hidden class="anchor" aria-hidden="true" href="#5-_merged_devices数据结构设计错误ai首次实现时用单个_summarized_by字符串字段无法支持多设备各自保存device_summary且cmd_merge的兼容逻辑基于all类型检查过于复杂">#</a></h4>
+<p><strong>解决方案:</strong> 将device_summary改为{device_name: summary_dict} dict，_merged_devices列表单独追踪哪些设备已summarize；cmd_merge以_merged_devices字段存在性作为格式版本标志，替代复杂的类型检查</p>
+<p><strong>关键洞察:</strong> 多设备场景下状态追踪应以设备为key而非单值字段；用字段存在性作为格式版本标志比运行时类型检查更简洁可靠</p>
+<h4 id="6-随机策略rollout生成的场景yield极低10-rollouts仅产生1个场景用户不清楚这是预期行为还是bug">6. 随机策略rollout生成的场景yield极低（10 rollouts仅产生1个场景），用户不清楚这是预期行为还是bug<a hidden class="anchor" aria-hidden="true" href="#6-随机策略rollout生成的场景yield极低10-rollouts仅产生1个场景用户不清楚这是预期行为还是bug">#</a></h4>
+<p><strong>解决方案:</strong> 明确解释原因：随机策略缺乏到达物理交互关键状态的能力，demo天然覆盖操作区域；后续用BC/VLA策略可显著提高覆盖率</p>
+<p><strong>关键洞察:</strong> 错误注入时机依赖策略是否经过操作相关物理状态；随机策略代表最差情况参考，不代表有意义的策略错误样本；随机策略适合验证管线正确性，不适合生成有代表性的错误场景</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="7-ccusage在某些版本环境下返回list而非期望的daily--dict导致datagetdaily-报attributeerror崩溃">7. ccusage在某些版本/环境下返回list而非期望的{daily: [&hellip;]} dict，导致data.get(&lsquo;daily&rsquo;, [])报AttributeError崩溃<a hidden class="anchor" aria-hidden="true" href="#7-ccusage在某些版本环境下返回list而非期望的daily--dict导致datagetdaily-报attributeerror崩溃">#</a></h4>
+<p><strong>解决方案:</strong> 在fetch_ccusage()中json.loads之后增加isinstance(data, list)检查，若为list则包装为{&lsquo;daily&rsquo;: data, &rsquo;totals&rsquo;: {}}</p>
+<p><strong>关键洞察:</strong> 外部工具的输出格式可能因版本而异，不能假设固定结构；防御性包装比修改外部工具更可靠，需在与外部工具交互的边界处做格式归一化</p>
+<h4 id="8-bcpolicy_ensure_loaded将self_adapter先于start_episode赋值checkpoint加载失败时adapter已赋值但处于损坏状态后续predict调用报错而非回退至零向量">8. BCPolicy._ensure_loaded()将self._adapter先于start_episode()赋值，checkpoint加载失败时adapter已赋值但处于损坏状态，后续predict()调用报错而非回退至零向量<a hidden class="anchor" aria-hidden="true" href="#8-bcpolicy_ensure_loaded将self_adapter先于start_episode赋值checkpoint加载失败时adapter已赋值但处于损坏状态后续predict调用报错而非回退至零向量">#</a></h4>
+<p><strong>解决方案:</strong> 改为先将RobomimicPolicyAdapter创建到局部变量，调用start_episode()成功后再赋值self._adapter；异常时只设_fallback=True</p>
+<p><strong>关键洞察:</strong> 惰性初始化模式要在所有初始化步骤全部成功后才提交状态，不能在初始化过程中提前暴露半初始化对象；robomimic FileUtils实际文件读取在start_episode()时触发，而非构造时</p>
+<h4 id="9-subprocessrun中用相对路径调用子进程导致58个实验成功执行但npz文件保存到错误位置">9. subprocess.run()中用相对路径调用子进程，导致58个实验成功执行但npz文件保存到错误位置<a hidden class="anchor" aria-hidden="true" href="#9-subprocessrun中用相对路径调用子进程导致58个实验成功执行但npz文件保存到错误位置">#</a></h4>
+<p><strong>解决方案:</strong> 改用绝对路径构建脚本路径（Path(<strong>file</strong>).parent.parent），显式设置cwd=project_root，output_dir转为绝对路径</p>
+<p><strong>关键洞察:</strong> Python subprocess继承父进程cwd，但当通过绝对路径调用父脚本时，子进程中的相对路径解析失败；必须同时固定脚本路径和工作目录，output路径在传给subprocess前须转为绝对路径</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="可视化bug根因定位osc控制器补偿-vs-数值验证">可视化bug根因定位：OSC控制器补偿 vs 数值验证<a hidden class="anchor" aria-hidden="true" href="#可视化bug根因定位osc控制器补偿-vs-数值验证">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>目视检查视频发现机械臂明显无位移，拒绝被AI报告的数值变化（15mm）说服；进一步直接指出根因：demo actions通过OSC控制器补偿了外力，并提供验证代码（drop.py:145-157）中使用neutral actions的直接证据</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>第一轮修复方向错误（每步重新施加力），聚焦于力是否被持续施加；第二轮以exit code 0+日志body position数值变化作为「修复成功」依据，未做目视验证；需要人类目视检查和明确指出根因后才能定向修复</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类熟悉机器人控制系统闭环补偿特性，AI只从「力的施加量」角度分析缺乏对控制器底层机制的理解；AI将数字变化等同于视觉效果，人类通过直觉发现数值验证不充分——目视检查不可替代</p>
+<h4 id="策略注入设计最小改动原则-vs-过度抽象">策略注入设计：最小改动原则 vs 过度抽象<a hidden class="anchor" aria-hidden="true" href="#策略注入设计最小改动原则-vs-过度抽象">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>预先撰写完整8步实现计划明确适配器模式和复用边界（Seg 2）；同时直接指出「就是换action来源」暗示这是最小改动（Seg 3）；架构层决策（模式选型、文件拆分、复用策略）完全由人类设计</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>按计划分步实现处理接口细节（Seg 2）；初稿设计了复杂的PolicyAdapter抽象层和多种adapter类型，需要人类反问才回归简洁（Seg 3）；在实现过程中额外发现了BCPolicy bug</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类同时掌握「完整架构蓝图」和「最小改动直觉」；AI在无详细计划时倾向过度工程化，在有计划时能精确执行并发现实现细节问题</p>
+<h4 id="策略错误检测技术路线vlm层优先级">策略错误检测技术路线：VLM层优先级<a hidden class="anchor" aria-hidden="true" href="#策略错误检测技术路线vlm层优先级">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>指定双层架构（rule-based+VLM）和双模态输入（state+video），在AI把VLM层降级为「未来扩展」后明确纠正；对VLM集成的战略重要性判断与AI不同</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>调研7篇论文提出25种错误分类体系，但初版将VLM置于次要位置且仅考虑state输入，需要通过交互才能对齐架构优先级</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI擅长文献综合和分类体系构建，但对具体工程中哪些层次应优先投入缺乏判断；技术路线的战略优先级需要领域视角，不能纯由文献调研决定</p>
+<h4 id="多设备同步需求与工具设计">多设备同步需求与工具设计<a hidden class="anchor" aria-hidden="true" href="#多设备同步需求与工具设计">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>明确要求任意设备merge &ndash;sync能自动从远端下载其他设备log（pull-before-merge）；要求per-device dict存储device_summary；主动提出无参数时只export不summarize（UX和成本考虑）</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>理解多设备协作场景需要3轮提问，首次提问方向偏差（问目录结构而非核心需求）；首次实现_merged_devices用单值字段而非per-device dict；实现rclone时只关注上传逻辑，忽略了下载需求</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类从「多设备协作整体工作流」角度出发，AI从「逐个功能点实现」角度出发；用户体验和使用成本的判断需要领域经验，AI缺乏主动推理整体工作流的能力</p>
+<h4 id="vla研究切入点模糊线索-vs-系统探索">VLA研究切入点：模糊线索 vs 系统探索<a hidden class="anchor" aria-hidden="true" href="#vla研究切入点模糊线索-vs-系统探索">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>提供个人博客URL作为VLA理解来源，实际首页没有直接VLA内容，线索不够精确</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>系统性爬取网站结构，在bugjournal中找到相关内容（FAST、unified world models、data scarcity），结合arXiv文献独立构建了VLA→空间组学技术迁移分析框架</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类提供模糊线索，AI通过系统探索弥补；最终研究框架（两领域独立趋同、Flow Matching/Register Tokens为优先迁移方向）主要由AI构建，展示了AI在文献综合和主题提取上的优势</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>对机器人控制系统缺乏系统认知：未主动考虑OSC控制器闭环补偿会完全抵消注入外力；以数值变化（body position 15mm）替代目视验证，错误报告「修复完成」。需要人类目视确认和明确指出根因后才能定向修复，导致多消耗一轮修复迭代。</li>
+<li>策略注入初稿过度工程化（PolicyAdapter抽象层+8步实现+多种adapter类型），需要人类直接指出「就是换action来源」才回归最小改动原则。AI在无详细计划时倾向设计复杂抽象，而非从最小差异出发。</li>
+<li>策略错误检测规划将VLM层降级为「未来扩展」，未能主动识别用户对VLM集成的优先级判断；技术文档默认输出中英混合格式，无法感知用户对全中文嵌套大纲的偏好，需两轮明确纠正。架构优先级和文档格式均需显式指令才能对齐。</li>
+<li>_merged_devices数据结构首次设计错误（单值字段而非per-device dict），cmd_merge兼容逻辑初版基于all()类型检查过于复杂，需两次迭代才收敛到正确设计，多消耗一个会话。</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>subprocess路径管理失误：批量脚本中使用相对路径，导致58个实验成功执行但输出文件保存到错误位置；select_scenes()边界条件bug（n=30时返回29个）需人工发现并补跑。两者均属应在初次实现时规避的基础错误。</li>
+<li>多次提前尝试调用ExitPlanMode被用户中断（Segs 3、4均出现），说明AI判断「任务完成」的时机与用户预期不同步——用户还有后续问题需要在plan mode内讨论，AI应等待用户明确确认计划内容后再退出。</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>MuJoCo机器人力注入的完整机制：xfrc_applied每物理步自动清零（单次施力仅产生15N×0.002s=0.03 N·s冲量），且demo actions通过OSC控制器（kp=150）产生的校正力矩远大于外力，将机械臂强制拉回轨迹。正确做法：在力注入窗口切换为neutral actions（零动作向量），结束后加settle_steps让物体自由运动，与validators/drop.py的collect_rollout_stats()保持一致。验证代码与可视化代码必须使用相同的action类型。</li>
+<li>策略驱动误差注入的核心只是替换action来源：demo_actions[step]→policy.predict(obs).action，检测→注入→验证管线完全复用，不需要复杂抽象层。适配器模式（PolicyAdapter）可以统一Random/BC-RNN/VLA的接口差异，配合TYPE_CHECKING避免循环导入，是扩展异构策略支持的有效设计范式。</li>
+<li>_merged_devices幂等模式：在JSON文件中维护「已处理设备」列表，实现多设备操作的幂等性，任意设备重复运行都能正确跳过已完成工作；rclone remote用子目录分层存储（remote/logs/ vs remote/reports/），&ndash;include参数支持通配符过滤特定日期文件；pull-before-merge是多设备协作同步的必要机制。</li>
+<li>VLA与空间组学架构趋同：两个领域正在独立收敛到相同技术创新（Diffusion Transformer、模态tokens、对比对齐），最值得迁移的是Flow Matching融合（连续空间生成embedding）和Register Tokens+AdaLN（模态标记+自适应归一化）。</li>
+<li>规则分类器+VLM双层架构是机器人操作错误检测的合理工程选择：规则层提供速度和确定性，VLM层提供自然语言解释和边界案例处理；双模态输入（state+video）比单模态更鲁棒，VLM层应从初始阶段集成而非作为「未来扩展」。</li>
+<li>随机策略rollout yield极低（~10%）：随机策略缺乏到达操作关键区域的能力，demo回放天然覆盖关键物理交互区域。随机策略适合验证管线正确性，BC/VLA策略才能产生有代表性的错误场景；HPC实验调度应将慢速任务（Q-Former ~90min/section）独立后台运行，不与快速实验混合串行。</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>os.replace在同一文件系统上是原子操作：结合tempfile.mkstemp写入同目录可完全消除写入中断导致文件损坏的风险；使用BaseException确保Ctrl+C也能清理临时文件。Anthropic tool_use的tool_choice参数可强制模型调用指定工具返回结构化JSON，比prompt描述格式更可靠。</li>
+<li>git submodule转普通文件标准流程：git rm &ndash;cached <dir>→删.gitmodules→clone→rm -rf .git→git add；Windows保留设备名（CON/PRN/AUX/NUL）无法作为普通文件操作，bash重定向&gt;nul不创建文件而是写入设备，只能用.gitignore处理。</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>🔄 MIHD benchmark 286个实验调度（240+完成）+ VLA方法迁移适用性调研</strong>
+<em>00:01:07.460 | claude_code</em>
+DCC上管理MIHD benchmark实验调度：发现Q-Former（90min/section）阻塞快速实验后停止pipeline并重组为独立实验组，13分钟内完成49个快速实验，并行启动scGPT提取（11/11 sections）和评估（65/77成功，12个OOM失败）；至会话结束完成240+实验，Q-Former后台运行至8/11。同日，用户提供博客URL作为VLA理解来源，AI系统性爬取bugjournal找到FAST/unified world models/data scarcity等内容，结合arXiv文献调研发现VLA与空间组学正在独立趋同（Diffusion Transformer、模态tokens），产出分层迁移建议报告（Flow Matching和Register Tokens+AdaLN为优先方向）；用户拒绝了深入三个子方向的跟进研究。</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 可视化修复（OSC根因）→60个视频→v4.1.0策略注入→118条场景→多类型扩展→错误检测规划</strong>
+<em>00:05:51.186 | claude_code</em>
+全天多轮会话完整推进error-recovery-benchmark各阶段：①可视化修复：第一轮re-apply力通过数值验证但目视无效，深层根因为OSC控制器补偿；第二轮neutral action方案完成三组测试（位移90mm+），批量生成60个视频（baseline+randomized，修复select_scenes边界bug），项目文档更新至v4.2.0。②策略注入框架v4.1.0：人类提供8步实现计划，AI完成policy_adapter.py/rollout_generator.py/collector.py等全量实现，发现并修复BCPolicy半初始化bug，41个单元测试全通过，pick_place全量生成场景库扩至118条，修复BC策略接入和轨迹NPZ保存。③多类型场景扩展（P1.3+P2.3）：修改ProximityDetector/CollisionDetector生成impulse/pose_perturb/friction三种候选，调大max_scenes_per_demo参数，41个测试全通过。④策略错误检测系统规划：调研7篇论文，确认双层架构（规则+VLM）和双模态输入（state+video），撰写543行全中文嵌套大纲规划（25种错误类型），规划完成待实现。</p>
+<h3 id="gadgetsummarize">gadget/summarize<a hidden class="anchor" aria-hidden="true" href="#gadgetsummarize">#</a></h3>
+<p><strong>✅ 工具使用（生成MIHD/CalendarPro日报）+ 大规模功能开发（多设备协作流水线）</strong>
+<em>02:10:33.066 | claude_code</em>
+工具使用：DCC上运行daily_summary.py对MIHD 2026-02-13对话生成结构化日报；TzJsDesktop上对CalendarPro 2026-02-13生成日报（含time_utils共享模块提取、循环任务等内容）。功能开发：TzJsDesktop连续六个会话完成大规模升级——实现_atomic_write（tempfile+os.replace）替换5处写入点；Anthropic/OpenAI两端实现结构化JSON输出；规划并实现多设备rclone分层同步（&ndash;sync，export→logs/，merge→reports/，新增_rclone_download_logs，默认行为改为export）；实现_merged_devices智能跳过（per-device dict，以字段存在性区分新旧格式）；完成test/子模块迁移（git rm→clone→rm .git）；修复ccusage list/dict格式变化AttributeError；全面更新三份文档（README/tutorial.md/CLAUDE.md）。daily_summary.py从约1300行增长至约1500行，实现完整多设备协作能力。</p>
+<h3 id="gadgetwebsite">Gadget/Website<a hidden class="anchor" aria-hidden="true" href="#gadgetwebsite">#</a></h3>
+<p><strong>✅ 将2026-02-12/13/14日报发布到Hugo bugJournal并部署到GitHub Pages</strong>
+<em>05:16:45.089 | claude_code</em>
+MacBook上为三篇日报添加Hugo前置元数据（title、date、keywords、summary字段），创建三个bugJournal条目，运行update.sh完成增量图片处理、Hugo构建（139页面）和GitHub Pages推送。确认gadget repo无未提交改动，website目录本身不是独立git仓库，公共内容已通过public/子目录push。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>14,727,647</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>52,119</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>1,732</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>1,565,133</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>13,108,663</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>89.3%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$8.0074</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>26,335</td>
+          <td>1,107</td>
+          <td>315,031</td>
+          <td>2,395,301</td>
+          <td>$3.3259</td>
+          <td>41.5%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>23,790</td>
+          <td>444</td>
+          <td>848,634</td>
+          <td>5,667,553</td>
+          <td>$1.6536</td>
+          <td>20.7%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-5-20250929</td>
+          <td>1,994</td>
+          <td>181</td>
+          <td>401,468</td>
+          <td>5,045,809</td>
+          <td>$3.0279</td>
+          <td>37.8%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>4,203,500</td>
+          <td>35,004</td>
+          <td>1,166</td>
+          <td>$3.4369</td>
+      </tr>
+      <tr>
+          <td>MacBook</td>
+          <td>573,936</td>
+          <td>176</td>
+          <td>80</td>
+          <td>$0.4099</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>9,950,211</td>
+          <td>16,939</td>
+          <td>486</td>
+          <td>$4.1606</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

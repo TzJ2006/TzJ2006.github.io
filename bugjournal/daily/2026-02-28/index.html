@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-28 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="跨三个项目完成关键进展：MIHD修复scGPT关键checkpoint加载bug（ARI提升44.4%）并完整实现Visium HD数据集成；Desktop Video新增壁纸历史记录功能并修复多显示器支持；ErrorRecoveryBenchmark实现BC-RNN训练评估框架并成功调试启动Pi0.5 Phoenix在9个MimicGen任务上的评估。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-02-28/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-02-28/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-02-28/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-28">
+  <meta property="og:description" content="跨三个项目完成关键进展：MIHD修复scGPT关键checkpoint加载bug（ARI提升44.4%）并完整实现Visium HD数据集成；Desktop Video新增壁纸历史记录功能并修复多显示器支持；ErrorRecoveryBenchmark实现BC-RNN训练评估框架并成功调试启动Pi0.5 Phoenix在9个MimicGen任务上的评估。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-28T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-28T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-28">
+  <meta name="twitter:description" content="跨三个项目完成关键进展：MIHD修复scGPT关键checkpoint加载bug（ARI提升44.4%）并完整实现Visium HD数据集成；Desktop Video新增壁纸历史记录功能并修复多显示器支持；ErrorRecoveryBenchmark实现BC-RNN训练评估框架并成功调试启动Pi0.5 Phoenix在9个MimicGen任务上的评估。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Daily Summaries",
+      "item": "https://tzj2006.github.io/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-02-28",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-02-28/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-28",
+  "name": "Bug Journal 2026-02-28",
+  "description": "跨三个项目完成关键进展：MIHD修复scGPT关键checkpoint加载bug（ARI提升44.4%）并完整实现Visium HD数据集成；Desktop Video新增壁纸历史记录功能并修复多显示器支持；ErrorRecoveryBenchmark实现BC-RNN训练评估框架并成功调试启动Pi0.5 Phoenix在9个MimicGen任务上的评估。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-28 跨三个项目完成关键进展：MIHD修复scGPT关键checkpoint加载bug（ARI提升44.4%）并完整实现Visium HD数据集成；Desktop Video新增壁纸历史记录功能并修复多显示器支持；ErrorRecoveryBenchmark实现BC-RNN训练评估框架并成功调试启动Pi0.5 Phoenix在9个MimicGen任务上的评估。\n今日任务 架构与策略 ✅ scGPT-spatial checkpoint加载bug修复与全量embedding重提取 — 发现TransformerModel._init__未保存use_fast_transformer属性，导致Wqkv→in_proj key重映射永不执行，17.7%注意力权重随机初始化，strict=False静默跳过无报错。添加一行self.use_fast_transformer修复后，清除旧缓存并重新提取全部11个DLPFC section，平均ARI从0.1177提升至0.1700（+44.4%），随后使用现有benchmark可视化脚本生成验证结果。 ✅ Visium HD (crop10large) 数据支持完整实现 — 完整实现8步骤：新增load_hd_data()（含skip_log预处理）、estimate_n_clusters_leiden()、create_hd_clustering_visualization()（size=4.0），适配run_benchmark.py/pipeline/runner.py/data_preparer.py/run_pipeline.py/phase2_evaluate.py和pipeline_config.yaml。支持–dataset HD参数，无ground truth时跳过ARI/NMI只输出聚类可视化。验证通过：17,502 spots，k=17，Silhouette=0.302。 ✅ Desktop Video多显示器支持修复 — 实现allOverlaysCompletelyCovered()、anyOverlayCompletelyCovered()、reassignAllWindows()、windowScreenDidChange()四个stub函数，使powerSave/powerSavePlus模式遮挡检测正常工作。同时修复BookmarkStore.purge()缺少lastURL/lastType键、stale bookmark刷新逻辑，移除WindowManager.swift中重复的屏幕变更observer。 ✅ BC-RNN Phoenix Benchmark训练评估脚本实现与调试 — 实现train_bc_rnn_benchmark.py（generate-configs/train/eval/report/status五个模式），生成9个robomimic JSON配置（含正确horizon与rollout设置）。依次解决SLURM权限、mujoco_py缺失、MimicGen环境注册、Coffee环境get_bounding_box_half_size方法缺失等连环问题，最终在an49节点GPU并行启动全部9个任务训练（每任务约2.2GB显存）。 🔄 Pi0.5 Phoenix在9个MimicGen任务上的评估 — 实现完整评估流程：安装openpi_client、创建run_eval.sh，依次解决tyro CLI位置参数语法/代理拦截WebSocket/GPU OOM复用僵尸服务器/robosuite版本不兼容/env.seed()缺失等问题后成功启动。截至会话结束已完成7/9任务：Coffee系列0%、Stack_D0 24%、Stack_D1 12%、StackThree系列0%、Threading_D0 2%，ThreePieceAssembly进行中。 ✅ Section 151673全方法RM-IDEAL基准评估与189张可视化 — 对27种embedding方法（6种单模态+21种多模态融合）批量运行RM-IDEAL评估，计算余弦相似度与ground truth的Spearman r，覆盖7个Layer，生成三面板可视化（Niche Query / RM-IDEAL Score / Embedding Similarity）。STAIG fusion最优（平均r=0.396，Layer_3峰值0.644），单模态方法0.06-0.12，Layer_1全方法均差（r\u003c0.13）。 ✅ Desktop Video壁纸历史记录功能实现 — 实现完整历史记录功能：WallpaperHistoryEntry数据模型、WallpaperHistoryStore单例（UserDefaults持久化，上限100条）、ThumbnailGenerator、HistoryItemRow（双击应用+1秒冷却防误触）、HistoryView（带多显示器选择器），修改AppViewModel/SidebarView/AppMainWindow/SharedWallpaperWindowManager，更新本地化字符串。构建成功，所有功能正常集成。 ✅ Pi0.5 Phoenix训练状态调查与三类模型厘清 — 通过直接检查checkpoint目录确认Pi0.5 Phoenix（M16）训练已完整完成至step 99999（2月24日），纠正了基于log文件（job在step 5000崩溃）的错误判断。梳理项目中三类Pi0.5模型：预训练base（zero-shot）、9-task LoRA Phoenix（训练完成未评估）、zhaoganlong单任务微调版本。 实现与修复 🔄 visualize_from_cache.py HD扩展（含GPU加速可行性调研） — 为visualize_from_cache.py添加–dataset HD参数和process_hd_section()函数，复用utils/visualization.py的create_hd_clustering_visualization()。调研GPU加速方案：RTX 5000 Ada可用但cuML/FAISS未安装，KMeans本身已快（100-300ms/section），结论是多进程并行优于GPU加速。会话在优化讨论阶段中断，后续实现待完成。 ✅ Desktop Video自动构建号与文档规范更新 — 在Xcode项目添加Run Script Build Phase，每次构建时将CFBundleVersion自动设为YYYYMMDD格式（需关闭ENABLE_USER_SCRIPT_SANDBOXING）。将所有Version 4.1变更归入单一ChangeLog条目，在agents.md中记录版本分组规范（同天变更合并，跨天才用hot-fix后缀），CLAUDE.md引用该规范。 问题与解决方案 关键问题 1. scGPT-spatial的TransformerModel._init__未将use_fast_transformer保存为实例属性，导致load_pretrained()中getattr默认返回True，Wqkv→in_proj key重映射永不执行，12层attention的Q/K/V权重（17.7%参数）随机初始化，strict=False静默跳过无任何报错 解决方案: 添加一行self.use_fast_transformer = use_fast_transformer，修复后所有186个模型参数均正确匹配，全部11个section的ARI和NMI均显著提升，平均ARI从0.1177提升至0.1700（+44.4%）\n关键洞察: strict=False的checkpoint加载会静默丢弃不匹配的key；每个用于控制模型结构的构造参数都必须显式保存为实例属性，不能依赖getattr默认值——这是模型类设计的重要防御性编程原则\n2. 代理环境变量（http_proxy=http://127.0.0.1:10087）拦截localhost WebSocket连接，导致evaluate_mimicgen.py客户端持续报ConnectionRefusedError，多次重试无效 解决方案: 在客户端进程启动前执行unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY，通过对比加/不加代理环境变量的结果定位根因\n关键洞察: 即使是localhost的WebSocket连接也会被http_proxy拦截；调试分布式ML推理连接问题时应第一时间检查并清除代理环境变量，再用原生TCP socket验证端口可达性\n3. MimicGen与robosuite版本兼容性连环问题：①rollout时ModuleNotFoundError: mujoco_py；②环境注册失败Coffee_D1 not found in robosuite；③Coffee环境初始化AttributeError: get_bounding_box_half_size未实现（在mimicgen的coffee_machine.py中被调用7次，但robosuite三个相关类从未实现该方法） 解决方案: ①将robomimic安装目录env_robosuite.py中顶层import mujoco_py改为try/except可选导入；②在env_robosuite.py顶部添加import mimicgen触发环境注册装饰器；③在MujocoXMLObject/CompositeBodyObject/BoxObject三个类分别实现get_bounding_box_half_size()方法\n关键洞察: MimicGen环境通过Python import触发注册（非自动），且依赖robosuite中未实现的方法；评估必须使用与训练完全相同的代码分支（zhaoganlong fork），而非项目主线版本\n4. HD数据集成存在两个预处理问题：①adata_8um.h5ad的X已log变换（range [0, 6.05]），但现有preprocess_data()会重复执行normalize_total+log1p；②spot_diameter_fullres=7.3px（远小于DLPFC的~144px），sc.pl.spatial默认size=1.0导致spot几乎不可见 解决方案: ①为preprocess_data()和preprocess_for_encoding()新增skip_log参数，HD数据加载时设skip_log=True只执行HVG过滤；②将size改为4.0（bin间距29.2px / spot直径7.3px ≈ 4x）\n关键洞察: 不同分辨率数据集的spot物理参数差异巨大，可视化参数需根据bin间距/spot直径比例动态调整；预处理函数需保证幂等性，避免log变换叠加导致数据失真\n5. GPU资源管理连环问题：①遗留服务器进程（PID 2413737）占用约61GB显存导致后续启动OOM；②BC-RNN并行启动时因checkpoint目录已存在，robomimic在非TTY环境调用input()触发EOFError崩溃并留下僵尸进程 解决方案: ①复用已运行的僵尸服务器（已监听8000端口完成模型加载），直接连接；②启动训练前清理所有已存在的checkpoint目录，通过nvidia-smi查询残留进程PID后kill清理\n关键洞察: robomimic在checkpoint目录存在时调用input()等待交互，在脚本/非TTY环境中立即抛出EOFError；在GPU资源紧张环境中应先检查端口和进程状态再启动新服务\n6. 两处信息误读：①AI基于job崩溃log（step 5000）误判Pi0.5训练失败；②tyro CLI语法错误——将union subcommand位置参数误写为–选项格式 解决方案: ①直接检查checkpoint目录确认step 4000~99999完整存在（训练已于2月24日完成）；②通过–help确认tyro CLI接口格式，位置参数无需–前缀\n关键洞察: 训练job崩溃不代表训练失败，应以checkpoint文件为准而非log文件结尾；tyro的union subcommand是位置参数，构建复杂CLI命令前必须先–help验证\n一般问题 7. SLURM作业提交与管理连环问题：①User’s group not permitted to use this partition；②–mem is not allowed违反QOS策略；③srun附加到已运行的交互式作业时输出为空命令未执行 解决方案: ①添加–account=sysu_gbli2；②移除–mem=32G改用–gres=gpu:1（参考已成功运行的作业配置）；③添加–overlap标志：srun –jobid=xxx –overlap bash -c …\n关键洞察: HPC集群需显式指定账号才能提交；不同集群对内存申请限制不同，参考已成功运行的作业是最可靠的配置来源；srun附加到有步骤运行的作业需要–overlap标志\n8. run_benchmark.py存在独立的cluster_embeddings()函数副本，与utils/clustering.py不同步，HD运行时传入n_clusters=-1导致KMeans InvalidParameterError 解决方案: 在run_benchmark.py本地的cluster_embeddings()中也添加n_clusters\u003c=0的自动估计逻辑（调用estimate_n_clusters_leiden()），保持两处实现一致\n关键洞察: 项目中存在功能重复的本地定义与utils模块，修改utils时必须同步检查scripts/中是否有独立副本\n人类思路 vs AI 思路 战略层面 渐进验证与全局架构视角 角色 思路 人类 在AI规划全量HD数据（545K spots）方案时要求先用crop10large验证；在BC-RNN脚本设计时追加未来错误注入兼容性需求，体现对下游pipeline的长远规划 AI 倾向于完整实现当前需求，规划全量HD方案时未主动考虑渐进测试；BC-RNN设计只聚焦训练和评估，未考虑下游错误注入用途 差异分析: 用户更注重快速验证、风险控制和架构全局视角；AI专注于当前任务的完整实现，缺乏对下游场景的主动预见\n先理解再行动 角色 思路 人类 在Pi0.5评估前要求先澄清三类模型的训练数据差异；在BC-RNN设计中明确区分两篇论文的用途（MimicGen原论文提供超参数，Phoenix论文仅确定benchmark设定） AI 倾向于直接进入实施规划，未主动区分模型来源差异，也未区分两篇论文的参考用途，以第一提到的论文作为主要来源 差异分析: 用户对「先理解再行动」有更强的执行纪律，有效避免了评估错目标或引用错误参考源的风险\n实现层面 代码复用与视觉检验 角色 思路 人类 明确要求使用现有benchmark风格的可视化代码（而非新写对比脚本）；通过视觉检验发现HD spot大小异常，并主动要求在RM-IDEAL评估后补充可视化 AI 在scGPT可视化时准备重写对比脚本；直接复用了不适合HD分辨率的默认size参数；RM-IDEAL评估首次使用–no_visualize跳过可视化 差异分析: 用户对代码库整体架构掌握更清晰，视觉验证意识更强；AI倾向于从零实现并以数值结果为主，需要人类纠正方向\nGPU资源管理与集群成本意识 角色 思路 人类 基于对模型规模的直觉判断，指出单GPU VRAM足够运行9个BC-RNN任务；在调试时提醒AI先检查已运行作业再申请新节点 AI 按计划使用SLURM提交单独作业，未评估GPU内存实际冗余量；专注调试时忽略了资源全局检查 差异分析: 用户对集群资源有更强的成本意识，AI专注于任务完成而忽视资源效率\n工具调用节奏与交互细节 角色 思路 人类 多次主动中断AI的工具调用和plan mode，要求先回答具体问题再继续行动；明确指定UI交互细节（双击+1秒冷却）和ChangeLog版本分组规则 AI 倾向于在获取完整信息前启动多个并行探索工具，过度进入规划阶段；UI设计使用单击Button，ChangeLog自动创建hot-fix版本条目 差异分析: AI的主动探索模式与用户逐步确认的工作节奏不匹配；对macOS UI惯例和版本语义规则的判断均需人类纠正\nAI 局限性 重要局限 关键状态判断依赖错误证据：基于log文件误判Pi0.5训练失败，未主动检查checkpoint目录；HD可视化直接复用DLPFC默认参数而未考虑分辨率差异，需用户视觉反馈才发现——体现出对「直接证据优先」原则的忽视 环境与依赖状态预检不足：启用rollout前未验证mujoco_py是否安装；在大型共享存储上使用全局find命令导致超时；未预见代理环境变量影响localhost WebSocket连接，需多轮对比实验才定位根因 一般局限 代码库重复定义同步检查不足：修改utils/clustering.py时未检查scripts/中是否有功能副本（run_benchmark.py本地cluster_embeddings），导致HD运行时出现可预见的运行时错误 倾向从零实现而非复用现有代码，且缺乏下游架构联系：scGPT可视化准备重写对比脚本；BC-RNN设计未主动考虑下游错误注入pipeline的兼容性需求，需用户明确提出才纳入设计范围 Plan mode使用过度且节奏控制不佳：在用户希望直接实施时多次进入规划阶段；在信息未充分确认前启动多个并行探索工具，需要用户多次打断才能调整节奏 今日收获 核心收获 PyTorch模型checkpoint加载陷阱：strict=False会静默丢弃不匹配的key，每个用于控制模型结构的构造参数都必须显式保存为实例属性，否则getattr的默认值会导致隐蔽的随机初始化。scGPT官方GitHub上存在相同bug，发现后应考虑向上游提交修复。 MimicGen与robosuite版本兼容要点：①MimicGen环境变体通过import触发注册（非自动），需在env_robosuite.py顶部import mimicgen；②get_bounding_box_half_size方法在robosuite中从未实现但被mimicgen调用多次，需在MujocoXMLObject/CompositeBodyObject/BoxObject三个类手动实现；③评估必须使用与训练完全相同的环境代码分支（zhaoganlong fork） MIHD RM-IDEAL基准结论（section 151673）：STAIG fusion最优（平均Spearman r=0.396，Layer_3峰值0.644）；QFormer/LLaVA-MLP/AdaLN-Attention等学习型融合（0.15-0.25）均优于concat/mean等简单融合；单模态baseline（pca/mlp/uni2）均在0.06-0.12；Layer_1全方法表现差（r\u003c0.13），需特别关注 http_proxy代理环境变量会拦截localhost WebSocket连接；调试分布式ML推理连接问题时应第一时间unset所有代理变量，再用原生TCP socket验证端口可达性，而非直接重试连接 Visium HD数据处理要点：spot_diameter_fullres=7.3px（vs DLPFC ~144px），sc.pl.spatial的size参数应设为bin间距/spot直径≈4.0；adata_8um.h5ad的X已log变换，预处理需skip_log=True；Leiden在crop10large（17,502 spots）上估计出17-20 clusters；obsm[‘spatial’]坐标在裁剪后坐标空间，uns[‘spatial’] hires图像是全图需替换为cropped_fullres.tif 项目中三类Pi0.5模型区别：①预训练base（zero-shot，M14，错误恢复评估成功率0%）；②9-task LoRA Phoenix（M16，训练完成至step 99999，4500 episodes，5个task prompt映射9个环境，4×A800，从未评估）；③zhaoganlong单任务微调版本（已有部分评估结果） BC-RNN与错误注入pipeline的兼容性：现有RobomimicPolicyAdapter/BCPolicy/load_policy()原生支持robomimic checkpoint格式，BC-RNN训练产出标准checkpoint无需修改即可接入错误注入pipeline，只需保持标准输出结构 实践收获 HPC环境调试经验汇总：①训练job崩溃不代表训练失败，应以checkpoint文件为准；②tyro CLI的union subcommand是位置参数而非–选项，构建命令前必须–help验证；③robomimic在非TTY环境checkpoint目录已存在时调用input()立即触发EOFError，启动前必须清理旧目录；④SLURM集群：账号sysu_gbli2，不允许–mem，srun附加需–overlap；⑤BC-RNN每任务仅用~2.2GB显存，9个任务可在单GPU并行运行 会话摘要 MIHD ✅ scGPT checkpoint bug修复 + RM-IDEAL全方法基准评估与189张可视化 21:23:19.892 | claude_code 根据同事提示调查scGPT-spatial非flash attention环境下的checkpoint加载问题，通过代码审查和测试脚本确认TransformerModel未保存use_fast_transformer属性导致17.7%参数随机初始化，添加一行代码修复后重新提取全部11个DLPFC section embedding，平均ARI从0.1177提升至0.1700（+44.4%），使用现有benchmark可视化脚本（用户指定复用方式）生成结果。同会话对section 151673的27种方法批量运行RM-IDEAL评估，用户要求补充可视化后生成7 layer × 27方法 = 189张三面板可视化，STAIG fusion以平均r=0.396排名第一。\n🔄 Visium HD (crop10large) 数据支持完整实现 + visualize_from_cache.py HD扩展 22:27:49.656 | claude_code 用户在AI规划全量方案后要求先用crop10large（17,502 spots）验证，完整实现8个步骤并发现修复两个bug：preprocess double-log（新增skip_log参数）和spot大小（size=1.0→4.0，用户视觉反馈发现）。验证通过（k=17，Silhouette=0.302）。随后为visualize_from_cache.py添加HD支持并调研GPU加速可行性，结论是多进程并行优于GPU加速（cuML/FAISS未安装），后续优化实现待完成。\nDesktop Video ✅ 壁纸历史记录功能实现 + 多显示器支持修复 + 自动构建号与文档规范 21:55:04.890 | claude_code 通过/init生成CLAUDE.md后，实现完整壁纸历史记录功能（数据模型、UserDefaults持久化、ThumbnailGenerator、双击触发+1秒冷却UI）。随后实现4个stub函数修复powerSave/powerSavePlus模式遮挡检测，修复BookmarkStore持久化漏洞和重复observer。添加Xcode Build Phase自动构建号脚本（需关闭ENABLE_USER_SCRIPT_SANDBOXING），整理Version 4.1 ChangeLog（用户纠正：同天变更合并而非拆分为hot-fix），在agents.md中记录版本分组规范。\nErrorRecoveryBenchmark ✅ BC-RNN Phoenix Benchmark脚本实现（含错误注入兼容性）与全流程调试 21:17:09.961 | claude_code 规划并实现train_bc_rnn_benchmark.py（5个模式，9个任务配置，用户额外要求预留错误注入兼容性——确认RobomimicPolicyAdapter原生支持无需额外工作）。解决SLURM账号/内存限制、mujoco_py可选导入、MimicGen环境注册、Coffee get_bounding_box_half_size三类缺失实现等连环问题，修复MUJOCO_EGL_DEVICE_ID配置，最终在an49节点GPU并行启动全部9个任务训练。\n🔄 Pi0.5 Phoenix评估调试与启动（9个MimicGen任务） 21:25:33.631 | claude_code 实现evaluate_mimicgen.py并依次解决openpi_client安装、tyro位置参数语法、srun –overlap、代理变量阻断WebSocket（unset后解决）、GPU OOM后复用僵尸服务器、robosuite版本不兼容（PYTHONPATH优先指向zhaoganlong fork）、env.seed()缺失等技术障碍后成功启动评估。截至会话结束已完成7/9任务，Coffee系列0%、Stack_D0 24%、Stack_D1 12%、StackThree 0%、Threading_D0 2%，ThreePieceAssembly进行中。\n🔄 Pi0.5训练状态调查与三类模型厘清 + Phoenix评估规划 20:54:56.816 | claude_code 用户询问Pi0.5训练结果，AI起初基于log文件误判训练失败，后通过检查checkpoint目录确认训练已完整完成至step 99999。用户要求先澄清各Pi0.5模型差异，AI梳理出三类模型（预训练base、9-task LoRA Phoenix、zhaoganlong单任务版本）。用户选择只评估Pi0.5 Phoenix，AI制定评估计划，但用户在最终确认步骤中断，实施移至后续会话。\nToken 用量 总览 指标 数值 总 Token 71,219,144 输入 Token 36,695 输出 Token 197,975 Cache 创建 4,712,576 Cache 读取 66,271,898 Cache 命中率 93.4% 总费用 (USD) $51.9367 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 21,373 125,069 2,050,987 53,983,715 $43.0441 82.9% claude-haiku-4-5-20251001 15,226 72,763 1,126,930 11,694,711 $2.9572 5.7% claude-sonnet-4-6 96 143 1,534,659 593,472 $5.9354 11.4% 各设备用量 设备 总 Token 输入 输出 费用 DCC 52,737,471 25,154 128,907 $34.5661 MacBook 17,992,504 11,518 68,240 $17.0241 TzJsDesktop 489,169 23 828 $0.3465 tianhe 0 0 0 $0.0000 ",
+  "wordCount" : "468",
+  "inLanguage": "en",
+  "datePublished": "2026-02-28T00:00:00-05:00",
+  "dateModified": "2026-02-28T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-02-28/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/daily/">Daily Summaries</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-28
+    </h1>
+    <div class="post-meta"><span title='2026-02-28 00:00:00 -0500 EST'>February 28, 2026</span>&nbsp;·&nbsp;<span>3 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-28">日报 — 2026-02-28<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-28">#</a></h1>
+<blockquote>
+<p>跨三个项目完成关键进展：MIHD修复scGPT关键checkpoint加载bug（ARI提升44.4%）并完整实现Visium HD数据集成；Desktop Video新增壁纸历史记录功能并修复多显示器支持；ErrorRecoveryBenchmark实现BC-RNN训练评估框架并成功调试启动Pi0.5 Phoenix在9个MimicGen任务上的评估。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>scGPT-spatial checkpoint加载bug修复与全量embedding重提取</strong> — 发现TransformerModel._<em>init__未保存use_fast_transformer属性，导致Wqkv→in_proj</em> key重映射永不执行，17.7%注意力权重随机初始化，strict=False静默跳过无报错。添加一行self.use_fast_transformer修复后，清除旧缓存并重新提取全部11个DLPFC section，平均ARI从0.1177提升至0.1700（+44.4%），随后使用现有benchmark可视化脚本生成验证结果。</li>
+<li>✅ <strong>Visium HD (crop10large) 数据支持完整实现</strong> — 完整实现8步骤：新增load_hd_data()（含skip_log预处理）、estimate_n_clusters_leiden()、create_hd_clustering_visualization()（size=4.0），适配run_benchmark.py/pipeline/runner.py/data_preparer.py/run_pipeline.py/phase2_evaluate.py和pipeline_config.yaml。支持&ndash;dataset HD参数，无ground truth时跳过ARI/NMI只输出聚类可视化。验证通过：17,502 spots，k=17，Silhouette=0.302。</li>
+<li>✅ <strong>Desktop Video多显示器支持修复</strong> — 实现allOverlaysCompletelyCovered()、anyOverlayCompletelyCovered()、reassignAllWindows()、windowScreenDidChange()四个stub函数，使powerSave/powerSavePlus模式遮挡检测正常工作。同时修复BookmarkStore.purge()缺少lastURL/lastType键、stale bookmark刷新逻辑，移除WindowManager.swift中重复的屏幕变更observer。</li>
+<li>✅ <strong>BC-RNN Phoenix Benchmark训练评估脚本实现与调试</strong> — 实现train_bc_rnn_benchmark.py（generate-configs/train/eval/report/status五个模式），生成9个robomimic JSON配置（含正确horizon与rollout设置）。依次解决SLURM权限、mujoco_py缺失、MimicGen环境注册、Coffee环境get_bounding_box_half_size方法缺失等连环问题，最终在an49节点GPU并行启动全部9个任务训练（每任务约2.2GB显存）。</li>
+<li>🔄 <strong>Pi0.5 Phoenix在9个MimicGen任务上的评估</strong> — 实现完整评估流程：安装openpi_client、创建run_eval.sh，依次解决tyro CLI位置参数语法/代理拦截WebSocket/GPU OOM复用僵尸服务器/robosuite版本不兼容/env.seed()缺失等问题后成功启动。截至会话结束已完成7/9任务：Coffee系列0%、Stack_D0 24%、Stack_D1 12%、StackThree系列0%、Threading_D0 2%，ThreePieceAssembly进行中。</li>
+<li>✅ <strong>Section 151673全方法RM-IDEAL基准评估与189张可视化</strong> — 对27种embedding方法（6种单模态+21种多模态融合）批量运行RM-IDEAL评估，计算余弦相似度与ground truth的Spearman r，覆盖7个Layer，生成三面板可视化（Niche Query / RM-IDEAL Score / Embedding Similarity）。STAIG fusion最优（平均r=0.396，Layer_3峰值0.644），单模态方法0.06-0.12，Layer_1全方法均差（r&lt;0.13）。</li>
+<li>✅ <strong>Desktop Video壁纸历史记录功能实现</strong> — 实现完整历史记录功能：WallpaperHistoryEntry数据模型、WallpaperHistoryStore单例（UserDefaults持久化，上限100条）、ThumbnailGenerator、HistoryItemRow（双击应用+1秒冷却防误触）、HistoryView（带多显示器选择器），修改AppViewModel/SidebarView/AppMainWindow/SharedWallpaperWindowManager，更新本地化字符串。构建成功，所有功能正常集成。</li>
+<li>✅ <strong>Pi0.5 Phoenix训练状态调查与三类模型厘清</strong> — 通过直接检查checkpoint目录确认Pi0.5 Phoenix（M16）训练已完整完成至step 99999（2月24日），纠正了基于log文件（job在step 5000崩溃）的错误判断。梳理项目中三类Pi0.5模型：预训练base（zero-shot）、9-task LoRA Phoenix（训练完成未评估）、zhaoganlong单任务微调版本。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>🔄 <strong>visualize_from_cache.py HD扩展（含GPU加速可行性调研）</strong> — 为visualize_from_cache.py添加&ndash;dataset HD参数和process_hd_section()函数，复用utils/visualization.py的create_hd_clustering_visualization()。调研GPU加速方案：RTX 5000 Ada可用但cuML/FAISS未安装，KMeans本身已快（100-300ms/section），结论是多进程并行优于GPU加速。会话在优化讨论阶段中断，后续实现待完成。</li>
+<li>✅ <strong>Desktop Video自动构建号与文档规范更新</strong> — 在Xcode项目添加Run Script Build Phase，每次构建时将CFBundleVersion自动设为YYYYMMDD格式（需关闭ENABLE_USER_SCRIPT_SANDBOXING）。将所有Version 4.1变更归入单一ChangeLog条目，在agents.md中记录版本分组规范（同天变更合并，跨天才用hot-fix后缀），CLAUDE.md引用该规范。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-scgpt-spatial的transformermodel_init__-key重映射永不执行12层attention的qkv权重177参数随机初始化strictfalse静默跳过无任何报错">1. scGPT-spatial的TransformerModel._<em>init__未将use_fast_transformer保存为实例属性，导致load_pretrained()中getattr默认返回True，Wqkv→in_proj</em> key重映射永不执行，12层attention的Q/K/V权重（17.7%参数）随机初始化，strict=False静默跳过无任何报错<a hidden class="anchor" aria-hidden="true" href="#1-scgpt-spatial的transformermodel_init__-key重映射永不执行12层attention的qkv权重177参数随机初始化strictfalse静默跳过无任何报错">#</a></h4>
+<p><strong>解决方案:</strong> 添加一行self.use_fast_transformer = use_fast_transformer，修复后所有186个模型参数均正确匹配，全部11个section的ARI和NMI均显著提升，平均ARI从0.1177提升至0.1700（+44.4%）</p>
+<p><strong>关键洞察:</strong> strict=False的checkpoint加载会静默丢弃不匹配的key；每个用于控制模型结构的构造参数都必须显式保存为实例属性，不能依赖getattr默认值——这是模型类设计的重要防御性编程原则</p>
+<h4 id="2-代理环境变量http_proxyhttp12700110087拦截localhost-websocket连接导致evaluate_mimicgenpy客户端持续报connectionrefusederror多次重试无效">2. 代理环境变量（http_proxy=http://127.0.0.1:10087）拦截localhost WebSocket连接，导致evaluate_mimicgen.py客户端持续报ConnectionRefusedError，多次重试无效<a hidden class="anchor" aria-hidden="true" href="#2-代理环境变量http_proxyhttp12700110087拦截localhost-websocket连接导致evaluate_mimicgenpy客户端持续报connectionrefusederror多次重试无效">#</a></h4>
+<p><strong>解决方案:</strong> 在客户端进程启动前执行unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY，通过对比加/不加代理环境变量的结果定位根因</p>
+<p><strong>关键洞察:</strong> 即使是localhost的WebSocket连接也会被http_proxy拦截；调试分布式ML推理连接问题时应第一时间检查并清除代理环境变量，再用原生TCP socket验证端口可达性</p>
+<h4 id="3-mimicgen与robosuite版本兼容性连环问题rollout时modulenotfounderror-mujoco_py环境注册失败coffee_d1-not-found-in-robosuitecoffee环境初始化attributeerror-get_bounding_box_half_size未实现在mimicgen的coffee_machinepy中被调用7次但robosuite三个相关类从未实现该方法">3. MimicGen与robosuite版本兼容性连环问题：①rollout时ModuleNotFoundError: mujoco_py；②环境注册失败Coffee_D1 not found in robosuite；③Coffee环境初始化AttributeError: get_bounding_box_half_size未实现（在mimicgen的coffee_machine.py中被调用7次，但robosuite三个相关类从未实现该方法）<a hidden class="anchor" aria-hidden="true" href="#3-mimicgen与robosuite版本兼容性连环问题rollout时modulenotfounderror-mujoco_py环境注册失败coffee_d1-not-found-in-robosuitecoffee环境初始化attributeerror-get_bounding_box_half_size未实现在mimicgen的coffee_machinepy中被调用7次但robosuite三个相关类从未实现该方法">#</a></h4>
+<p><strong>解决方案:</strong> ①将robomimic安装目录env_robosuite.py中顶层import mujoco_py改为try/except可选导入；②在env_robosuite.py顶部添加import mimicgen触发环境注册装饰器；③在MujocoXMLObject/CompositeBodyObject/BoxObject三个类分别实现get_bounding_box_half_size()方法</p>
+<p><strong>关键洞察:</strong> MimicGen环境通过Python import触发注册（非自动），且依赖robosuite中未实现的方法；评估必须使用与训练完全相同的代码分支（zhaoganlong fork），而非项目主线版本</p>
+<h4 id="4-hd数据集成存在两个预处理问题adata_8umh5ad的x已log变换range-0-605但现有preprocess_data会重复执行normalize_totallog1pspot_diameter_fullres73px远小于dlpfc的144pxscplspatial默认size10导致spot几乎不可见">4. HD数据集成存在两个预处理问题：①adata_8um.h5ad的X已log变换（range [0, 6.05]），但现有preprocess_data()会重复执行normalize_total+log1p；②spot_diameter_fullres=7.3px（远小于DLPFC的~144px），sc.pl.spatial默认size=1.0导致spot几乎不可见<a hidden class="anchor" aria-hidden="true" href="#4-hd数据集成存在两个预处理问题adata_8umh5ad的x已log变换range-0-605但现有preprocess_data会重复执行normalize_totallog1pspot_diameter_fullres73px远小于dlpfc的144pxscplspatial默认size10导致spot几乎不可见">#</a></h4>
+<p><strong>解决方案:</strong> ①为preprocess_data()和preprocess_for_encoding()新增skip_log参数，HD数据加载时设skip_log=True只执行HVG过滤；②将size改为4.0（bin间距29.2px / spot直径7.3px ≈ 4x）</p>
+<p><strong>关键洞察:</strong> 不同分辨率数据集的spot物理参数差异巨大，可视化参数需根据bin间距/spot直径比例动态调整；预处理函数需保证幂等性，避免log变换叠加导致数据失真</p>
+<h4 id="5-gpu资源管理连环问题遗留服务器进程pid-2413737占用约61gb显存导致后续启动oombc-rnn并行启动时因checkpoint目录已存在robomimic在非tty环境调用input触发eoferror崩溃并留下僵尸进程">5. GPU资源管理连环问题：①遗留服务器进程（PID 2413737）占用约61GB显存导致后续启动OOM；②BC-RNN并行启动时因checkpoint目录已存在，robomimic在非TTY环境调用input()触发EOFError崩溃并留下僵尸进程<a hidden class="anchor" aria-hidden="true" href="#5-gpu资源管理连环问题遗留服务器进程pid-2413737占用约61gb显存导致后续启动oombc-rnn并行启动时因checkpoint目录已存在robomimic在非tty环境调用input触发eoferror崩溃并留下僵尸进程">#</a></h4>
+<p><strong>解决方案:</strong> ①复用已运行的僵尸服务器（已监听8000端口完成模型加载），直接连接；②启动训练前清理所有已存在的checkpoint目录，通过nvidia-smi查询残留进程PID后kill清理</p>
+<p><strong>关键洞察:</strong> robomimic在checkpoint目录存在时调用input()等待交互，在脚本/非TTY环境中立即抛出EOFError；在GPU资源紧张环境中应先检查端口和进程状态再启动新服务</p>
+<h4 id="6-两处信息误读ai基于job崩溃logstep-5000误判pi05训练失败tyro-cli语法错误将union-subcommand位置参数误写为选项格式">6. 两处信息误读：①AI基于job崩溃log（step 5000）误判Pi0.5训练失败；②tyro CLI语法错误——将union subcommand位置参数误写为&ndash;选项格式<a hidden class="anchor" aria-hidden="true" href="#6-两处信息误读ai基于job崩溃logstep-5000误判pi05训练失败tyro-cli语法错误将union-subcommand位置参数误写为选项格式">#</a></h4>
+<p><strong>解决方案:</strong> ①直接检查checkpoint目录确认step 4000~99999完整存在（训练已于2月24日完成）；②通过&ndash;help确认tyro CLI接口格式，位置参数无需&ndash;前缀</p>
+<p><strong>关键洞察:</strong> 训练job崩溃不代表训练失败，应以checkpoint文件为准而非log文件结尾；tyro的union subcommand是位置参数，构建复杂CLI命令前必须先&ndash;help验证</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="7-slurm作业提交与管理连环问题users-group-not-permitted-to-use-this-partitionmem-is-not-allowed违反qos策略srun附加到已运行的交互式作业时输出为空命令未执行">7. SLURM作业提交与管理连环问题：①User&rsquo;s group not permitted to use this partition；②&ndash;mem is not allowed违反QOS策略；③srun附加到已运行的交互式作业时输出为空命令未执行<a hidden class="anchor" aria-hidden="true" href="#7-slurm作业提交与管理连环问题users-group-not-permitted-to-use-this-partitionmem-is-not-allowed违反qos策略srun附加到已运行的交互式作业时输出为空命令未执行">#</a></h4>
+<p><strong>解决方案:</strong> ①添加&ndash;account=sysu_gbli2；②移除&ndash;mem=32G改用&ndash;gres=gpu:1（参考已成功运行的作业配置）；③添加&ndash;overlap标志：srun &ndash;jobid=xxx &ndash;overlap bash -c &hellip;</p>
+<p><strong>关键洞察:</strong> HPC集群需显式指定账号才能提交；不同集群对内存申请限制不同，参考已成功运行的作业是最可靠的配置来源；srun附加到有步骤运行的作业需要&ndash;overlap标志</p>
+<h4 id="8-run_benchmarkpy存在独立的cluster_embeddings函数副本与utilsclusteringpy不同步hd运行时传入n_clusters-1导致kmeans-invalidparametererror">8. run_benchmark.py存在独立的cluster_embeddings()函数副本，与utils/clustering.py不同步，HD运行时传入n_clusters=-1导致KMeans InvalidParameterError<a hidden class="anchor" aria-hidden="true" href="#8-run_benchmarkpy存在独立的cluster_embeddings函数副本与utilsclusteringpy不同步hd运行时传入n_clusters-1导致kmeans-invalidparametererror">#</a></h4>
+<p><strong>解决方案:</strong> 在run_benchmark.py本地的cluster_embeddings()中也添加n_clusters&lt;=0的自动估计逻辑（调用estimate_n_clusters_leiden()），保持两处实现一致</p>
+<p><strong>关键洞察:</strong> 项目中存在功能重复的本地定义与utils模块，修改utils时必须同步检查scripts/中是否有独立副本</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="渐进验证与全局架构视角">渐进验证与全局架构视角<a hidden class="anchor" aria-hidden="true" href="#渐进验证与全局架构视角">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>在AI规划全量HD数据（545K spots）方案时要求先用crop10large验证；在BC-RNN脚本设计时追加未来错误注入兼容性需求，体现对下游pipeline的长远规划</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>倾向于完整实现当前需求，规划全量HD方案时未主动考虑渐进测试；BC-RNN设计只聚焦训练和评估，未考虑下游错误注入用途</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户更注重快速验证、风险控制和架构全局视角；AI专注于当前任务的完整实现，缺乏对下游场景的主动预见</p>
+<h4 id="先理解再行动">先理解再行动<a hidden class="anchor" aria-hidden="true" href="#先理解再行动">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>在Pi0.5评估前要求先澄清三类模型的训练数据差异；在BC-RNN设计中明确区分两篇论文的用途（MimicGen原论文提供超参数，Phoenix论文仅确定benchmark设定）</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>倾向于直接进入实施规划，未主动区分模型来源差异，也未区分两篇论文的参考用途，以第一提到的论文作为主要来源</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户对「先理解再行动」有更强的执行纪律，有效避免了评估错目标或引用错误参考源的风险</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="代码复用与视觉检验">代码复用与视觉检验<a hidden class="anchor" aria-hidden="true" href="#代码复用与视觉检验">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>明确要求使用现有benchmark风格的可视化代码（而非新写对比脚本）；通过视觉检验发现HD spot大小异常，并主动要求在RM-IDEAL评估后补充可视化</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>在scGPT可视化时准备重写对比脚本；直接复用了不适合HD分辨率的默认size参数；RM-IDEAL评估首次使用&ndash;no_visualize跳过可视化</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户对代码库整体架构掌握更清晰，视觉验证意识更强；AI倾向于从零实现并以数值结果为主，需要人类纠正方向</p>
+<h4 id="gpu资源管理与集群成本意识">GPU资源管理与集群成本意识<a hidden class="anchor" aria-hidden="true" href="#gpu资源管理与集群成本意识">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>基于对模型规模的直觉判断，指出单GPU VRAM足够运行9个BC-RNN任务；在调试时提醒AI先检查已运行作业再申请新节点</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>按计划使用SLURM提交单独作业，未评估GPU内存实际冗余量；专注调试时忽略了资源全局检查</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户对集群资源有更强的成本意识，AI专注于任务完成而忽视资源效率</p>
+<h4 id="工具调用节奏与交互细节">工具调用节奏与交互细节<a hidden class="anchor" aria-hidden="true" href="#工具调用节奏与交互细节">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>多次主动中断AI的工具调用和plan mode，要求先回答具体问题再继续行动；明确指定UI交互细节（双击+1秒冷却）和ChangeLog版本分组规则</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>倾向于在获取完整信息前启动多个并行探索工具，过度进入规划阶段；UI设计使用单击Button，ChangeLog自动创建hot-fix版本条目</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI的主动探索模式与用户逐步确认的工作节奏不匹配；对macOS UI惯例和版本语义规则的判断均需人类纠正</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>关键状态判断依赖错误证据：基于log文件误判Pi0.5训练失败，未主动检查checkpoint目录；HD可视化直接复用DLPFC默认参数而未考虑分辨率差异，需用户视觉反馈才发现——体现出对「直接证据优先」原则的忽视</li>
+<li>环境与依赖状态预检不足：启用rollout前未验证mujoco_py是否安装；在大型共享存储上使用全局find命令导致超时；未预见代理环境变量影响localhost WebSocket连接，需多轮对比实验才定位根因</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>代码库重复定义同步检查不足：修改utils/clustering.py时未检查scripts/中是否有功能副本（run_benchmark.py本地cluster_embeddings），导致HD运行时出现可预见的运行时错误</li>
+<li>倾向从零实现而非复用现有代码，且缺乏下游架构联系：scGPT可视化准备重写对比脚本；BC-RNN设计未主动考虑下游错误注入pipeline的兼容性需求，需用户明确提出才纳入设计范围</li>
+<li>Plan mode使用过度且节奏控制不佳：在用户希望直接实施时多次进入规划阶段；在信息未充分确认前启动多个并行探索工具，需要用户多次打断才能调整节奏</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>PyTorch模型checkpoint加载陷阱：strict=False会静默丢弃不匹配的key，每个用于控制模型结构的构造参数都必须显式保存为实例属性，否则getattr的默认值会导致隐蔽的随机初始化。scGPT官方GitHub上存在相同bug，发现后应考虑向上游提交修复。</li>
+<li>MimicGen与robosuite版本兼容要点：①MimicGen环境变体通过import触发注册（非自动），需在env_robosuite.py顶部import mimicgen；②get_bounding_box_half_size方法在robosuite中从未实现但被mimicgen调用多次，需在MujocoXMLObject/CompositeBodyObject/BoxObject三个类手动实现；③评估必须使用与训练完全相同的环境代码分支（zhaoganlong fork）</li>
+<li>MIHD RM-IDEAL基准结论（section 151673）：STAIG fusion最优（平均Spearman r=0.396，Layer_3峰值0.644）；QFormer/LLaVA-MLP/AdaLN-Attention等学习型融合（0.15-0.25）均优于concat/mean等简单融合；单模态baseline（pca/mlp/uni2）均在0.06-0.12；Layer_1全方法表现差（r&lt;0.13），需特别关注</li>
+<li>http_proxy代理环境变量会拦截localhost WebSocket连接；调试分布式ML推理连接问题时应第一时间unset所有代理变量，再用原生TCP socket验证端口可达性，而非直接重试连接</li>
+<li>Visium HD数据处理要点：spot_diameter_fullres=7.3px（vs DLPFC ~144px），sc.pl.spatial的size参数应设为bin间距/spot直径≈4.0；adata_8um.h5ad的X已log变换，预处理需skip_log=True；Leiden在crop10large（17,502 spots）上估计出17-20 clusters；obsm[&lsquo;spatial&rsquo;]坐标在裁剪后坐标空间，uns[&lsquo;spatial&rsquo;] hires图像是全图需替换为cropped_fullres.tif</li>
+<li>项目中三类Pi0.5模型区别：①预训练base（zero-shot，M14，错误恢复评估成功率0%）；②9-task LoRA Phoenix（M16，训练完成至step 99999，4500 episodes，5个task prompt映射9个环境，4×A800，从未评估）；③zhaoganlong单任务微调版本（已有部分评估结果）</li>
+<li>BC-RNN与错误注入pipeline的兼容性：现有RobomimicPolicyAdapter/BCPolicy/load_policy()原生支持robomimic checkpoint格式，BC-RNN训练产出标准checkpoint无需修改即可接入错误注入pipeline，只需保持标准输出结构</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>HPC环境调试经验汇总：①训练job崩溃不代表训练失败，应以checkpoint文件为准；②tyro CLI的union subcommand是位置参数而非&ndash;选项，构建命令前必须&ndash;help验证；③robomimic在非TTY环境checkpoint目录已存在时调用input()立即触发EOFError，启动前必须清理旧目录；④SLURM集群：账号sysu_gbli2，不允许&ndash;mem，srun附加需&ndash;overlap；⑤BC-RNN每任务仅用~2.2GB显存，9个任务可在单GPU并行运行</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>✅ scGPT checkpoint bug修复 + RM-IDEAL全方法基准评估与189张可视化</strong>
+<em>21:23:19.892 | claude_code</em>
+根据同事提示调查scGPT-spatial非flash attention环境下的checkpoint加载问题，通过代码审查和测试脚本确认TransformerModel未保存use_fast_transformer属性导致17.7%参数随机初始化，添加一行代码修复后重新提取全部11个DLPFC section embedding，平均ARI从0.1177提升至0.1700（+44.4%），使用现有benchmark可视化脚本（用户指定复用方式）生成结果。同会话对section 151673的27种方法批量运行RM-IDEAL评估，用户要求补充可视化后生成7 layer × 27方法 = 189张三面板可视化，STAIG fusion以平均r=0.396排名第一。</p>
+<p><strong>🔄 Visium HD (crop10large) 数据支持完整实现 + visualize_from_cache.py HD扩展</strong>
+<em>22:27:49.656 | claude_code</em>
+用户在AI规划全量方案后要求先用crop10large（17,502 spots）验证，完整实现8个步骤并发现修复两个bug：preprocess double-log（新增skip_log参数）和spot大小（size=1.0→4.0，用户视觉反馈发现）。验证通过（k=17，Silhouette=0.302）。随后为visualize_from_cache.py添加HD支持并调研GPU加速可行性，结论是多进程并行优于GPU加速（cuML/FAISS未安装），后续优化实现待完成。</p>
+<h3 id="desktop-video">Desktop Video<a hidden class="anchor" aria-hidden="true" href="#desktop-video">#</a></h3>
+<p><strong>✅ 壁纸历史记录功能实现 + 多显示器支持修复 + 自动构建号与文档规范</strong>
+<em>21:55:04.890 | claude_code</em>
+通过/init生成CLAUDE.md后，实现完整壁纸历史记录功能（数据模型、UserDefaults持久化、ThumbnailGenerator、双击触发+1秒冷却UI）。随后实现4个stub函数修复powerSave/powerSavePlus模式遮挡检测，修复BookmarkStore持久化漏洞和重复observer。添加Xcode Build Phase自动构建号脚本（需关闭ENABLE_USER_SCRIPT_SANDBOXING），整理Version 4.1 ChangeLog（用户纠正：同天变更合并而非拆分为hot-fix），在agents.md中记录版本分组规范。</p>
+<h3 id="errorrecoverybenchmark">ErrorRecoveryBenchmark<a hidden class="anchor" aria-hidden="true" href="#errorrecoverybenchmark">#</a></h3>
+<p><strong>✅ BC-RNN Phoenix Benchmark脚本实现（含错误注入兼容性）与全流程调试</strong>
+<em>21:17:09.961 | claude_code</em>
+规划并实现train_bc_rnn_benchmark.py（5个模式，9个任务配置，用户额外要求预留错误注入兼容性——确认RobomimicPolicyAdapter原生支持无需额外工作）。解决SLURM账号/内存限制、mujoco_py可选导入、MimicGen环境注册、Coffee get_bounding_box_half_size三类缺失实现等连环问题，修复MUJOCO_EGL_DEVICE_ID配置，最终在an49节点GPU并行启动全部9个任务训练。</p>
+<p><strong>🔄 Pi0.5 Phoenix评估调试与启动（9个MimicGen任务）</strong>
+<em>21:25:33.631 | claude_code</em>
+实现evaluate_mimicgen.py并依次解决openpi_client安装、tyro位置参数语法、srun &ndash;overlap、代理变量阻断WebSocket（unset后解决）、GPU OOM后复用僵尸服务器、robosuite版本不兼容（PYTHONPATH优先指向zhaoganlong fork）、env.seed()缺失等技术障碍后成功启动评估。截至会话结束已完成7/9任务，Coffee系列0%、Stack_D0 24%、Stack_D1 12%、StackThree 0%、Threading_D0 2%，ThreePieceAssembly进行中。</p>
+<p><strong>🔄 Pi0.5训练状态调查与三类模型厘清 + Phoenix评估规划</strong>
+<em>20:54:56.816 | claude_code</em>
+用户询问Pi0.5训练结果，AI起初基于log文件误判训练失败，后通过检查checkpoint目录确认训练已完整完成至step 99999。用户要求先澄清各Pi0.5模型差异，AI梳理出三类模型（预训练base、9-task LoRA Phoenix、zhaoganlong单任务版本）。用户选择只评估Pi0.5 Phoenix，AI制定评估计划，但用户在最终确认步骤中断，实施移至后续会话。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>71,219,144</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>36,695</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>197,975</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>4,712,576</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>66,271,898</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>93.4%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$51.9367</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>21,373</td>
+          <td>125,069</td>
+          <td>2,050,987</td>
+          <td>53,983,715</td>
+          <td>$43.0441</td>
+          <td>82.9%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>15,226</td>
+          <td>72,763</td>
+          <td>1,126,930</td>
+          <td>11,694,711</td>
+          <td>$2.9572</td>
+          <td>5.7%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>96</td>
+          <td>143</td>
+          <td>1,534,659</td>
+          <td>593,472</td>
+          <td>$5.9354</td>
+          <td>11.4%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>52,737,471</td>
+          <td>25,154</td>
+          <td>128,907</td>
+          <td>$34.5661</td>
+      </tr>
+      <tr>
+          <td>MacBook</td>
+          <td>17,992,504</td>
+          <td>11,518</td>
+          <td>68,240</td>
+          <td>$17.0241</td>
+      </tr>
+      <tr>
+          <td>TzJsDesktop</td>
+          <td>489,169</td>
+          <td>23</td>
+          <td>828</td>
+          <td>$0.3465</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>$0.0000</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

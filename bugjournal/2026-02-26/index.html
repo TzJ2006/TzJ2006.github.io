@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-26 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="在 tianhe 服务器上系统推进 MimicGen 错误恢复基准实验全链路（Pi0.5/BC-RNN 0%根因诊断、多任务评估框架搭建、BC-RNN image 模式配置重写并启动5任务并行训练、Pi0.5评测基础设施调研），同时在 MacBook 上完成 LaTeX 学术简历制作">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-02-26/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-02-26/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-02-26/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-26">
+  <meta property="og:description" content="在 tianhe 服务器上系统推进 MimicGen 错误恢复基准实验全链路（Pi0.5/BC-RNN 0%根因诊断、多任务评估框架搭建、BC-RNN image 模式配置重写并启动5任务并行训练、Pi0.5评测基础设施调研），同时在 MacBook 上完成 LaTeX 学术简历制作">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-26T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-26T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-26">
+  <meta name="twitter:description" content="在 tianhe 服务器上系统推进 MimicGen 错误恢复基准实验全链路（Pi0.5/BC-RNN 0%根因诊断、多任务评估框架搭建、BC-RNN image 模式配置重写并启动5任务并行训练、Pi0.5评测基础设施调研），同时在 MacBook 上完成 LaTeX 学术简历制作">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-26",
+      "item": "https://tzj2006.github.io/bugjournal/2026-02-26/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-26",
+  "name": "Bug Journal 2026-02-26",
+  "description": "在 tianhe 服务器上系统推进 MimicGen 错误恢复基准实验全链路（Pi0.5/BC-RNN 0%根因诊断、多任务评估框架搭建、BC-RNN image 模式配置重写并启动5任务并行训练、Pi0.5评测基础设施调研），同时在 MacBook 上完成 LaTeX 学术简历制作",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-26 今日概览 做了什么： 两台设备并行工作：tianhe 侧重机器人学习实验全链路（Pi0.5/BC-RNN 0%根因诊断、多任务评估框架、BC-RNN image模式训练启动、Pi0.5评测基础设施调研），MacBook 负责学术简历排版 怎么做的： 通过代码审计+配置修改+SLURM任务调度推进实验管线；通过 Claude Code 并发代理子任务探索多代码库；通过 Jake’s Resume Template 迭代 LaTeX 编辑完成简历 有什么用： 完成 BC-RNN 5 任务 image-mode 训练启动（5个A800 GPU并行训练中），建立与 MimicGen 论文对齐的评估框架基础设施，摸清 Pi0.5 评测所需全部基础条件；简历产出可一键编译的 Overleaf 文件 MacBook 做了什么： 为 Tang Zijia (Thomas) 制作 LaTeX 格式学术简历，覆盖 CS 教育背景、4 篇论文（CVPR/Nature Communications/J. Advanced Research/ACM-BCB）、项目和工作经历 怎么做的： 基于 Jake’s Resume Template，通过多次迭代调整 Publications 排版（单行 → resumeSubheading 双行格式），确保 Overleaf 可直接编译 有什么用： 输出可在 Overleaf 上一键编译的 ATS 友好 LaTeX 简历，论文标题与作者角色分行显示，视觉层次清晰 tianhe 做了什么： 调查 Pi0.5/BC-RNN 评估 0% 根因、实现多任务评估框架、将 BC-RNN 训练配置重写为 image 模式并启动并行训练，同时全面调研 Pi0.5 MimicGen 评测基础设施（检查点、评测脚本、VLA 服务器架构） 怎么做的： 通过代码审计定位 task mismatch 和 obs 维度不匹配根因；通过修改 YAML configs、Python scripts、SLURM 脚本实现多任务支持；通过 srun –overlap 绕开权限问题并行启动训练；通过 3 个并发 Task 代理探索多代码库结构 有什么用： 5 个 image-mode BC-RNN 训练任务已在 A800 GPU 上运行；确立任务对齐的评估基础（task_registry + 5个task YAML）；明确 Pi0.5 评测所需全部条件，但受限于登录节点无 GPU，Pi0.5 实际评测尚未执行 在 tianhe 服务器上系统推进 MimicGen 错误恢复基准实验全链路（Pi0.5/BC-RNN 0%根因诊断、多任务评估框架搭建、BC-RNN image 模式配置重写并启动5任务并行训练、Pi0.5评测基础设施调研），同时在 MacBook 上完成 LaTeX 学术简历制作\n今日任务 架构与策略 ✅ Pi0.5 和 BC-RNN 评估失败根因分析 — Pi0.5 根因：训练在 5 个 MimicGen task，评估在 PickPlace（task mismatch → 0%）。BC-RNN 根因：create_env 剥离 _D0 后缀导致 obs 维度从 65 缩至 37。修复：在所有 4 个 scripts 中 import mimicgen 保留 _D0 注册 🔄 BC-RNN 训练配置重写为 image 模式并启动并行训练 — 将 5 个任务配置全面重写为 image 模式（移除 object obs、加入双摄像头、ResNet18Conv+SpatialSoftmax 32kp+CropRandomizer 76x76，rnn hidden_dim=1000，batch_size=16，hdf5_cache_mode=low_dim）；在 an49 节点 8x A800 80GB 上通过 srun –jobid=45628 –overlap 并行启动 5 个训练任务（GPU 0-4），每任务 600 epochs ❌ 执行 Pi0.5 MimicGen 评测 — 当前登录节点（an49 交互节点）无 GPU，需通过 Slurm 向 ai 分区提交 GPU 作业（#SBATCH –gres=gpu:4），以 openpi05 conda 环境启动 VLA 服务器后执行 evaluate_mimicgen.py ✅ 多任务评估框架扩展 — 创建 5 个 task YAML configs（coffee/stack/stack_three/threading/three_piece_assembly）、task_registry.yaml，为 1_generate_scenes.py / 3_collect_data.py / 4_analyze_results.py 添加 –task 参数，重写 run_full_eval.sh 支持多任务，创建 train_bc_rnn_all.sh ✅ 调研 Pi0.5 MimicGen 评测基础设施 — 系统探索 error_recovery_benchmark 与 Motion-based-Self-Reflection-Framework 代码库，定位 phoenix_comparison 检查点（步数 10000–50000+）、evaluate_mimicgen.py 脚本、VLA 服务器架构（start_vla_server.py）及数据转换脚本，确认评测所需全部条件 实现与修复 ✅ LaTeX 学术简历制作 — 将 Markdown 格式简历转换为基于 Jake’s Resume Template 的 LaTeX 版本，经多次迭代将 Publications 改为 resumeSubheading 双行格式，输出 Overleaf 可直接编译的 ATS 友好文件 问题与解决方案 关键问题 1. Pi0.5 评估 success rate 为 0% 解决方案: 根因是 task mismatch：Pi0.5 训练在 5 个 MimicGen task，评估在 PickPlace（不在训练集中）。解决方案：在已训练的 5 个 task 上重新评估\n关键洞察: 用户主动质疑「是否把 9 个 task 全部混训了？」直接触发深入根因分析；train/eval task alignment 是机器人学习实验的基础前提，显著失败往往源于配置不对齐而非模型本身\n2. BC-RNN 评估报 RuntimeError: input.size(-1) must be equal to input_size. Expected 65, got 37 解决方案: 根因：create_env() 剥离 _D0 后缀导致使用 base robosuite env 而非 MimicGen env，obs 维度不完整。修复：在所有 4 个 scripts 中 import mimicgen 注册 _D0 环境\n关键洞察: MimicGen _D0 环境注册了额外 observables（完整物体状态），base robosuite 环境只返回主物体状态，是两套不同的 observation schema\n3. BC-RNN 训练配置为 low_dim 模式，与 MimicGen 论文主结果不一致 解决方案: 全面重写 5 个配置文件：obs 移除 object key、加入双摄像头、加入 ResNet18Conv encoder + SpatialSoftmax + CropRandomizer、调整 batch_size/hidden_dim/actor_layer_dims\n关键洞察: image 模式和 low_dim 模式不只是 obs 不同，整个网络架构也不同；hdf5_cache_mode 必须从 all 改为 low_dim，否则 80GB VRAM 也会 OOM\n4. SLURM sbatch 分区无权限且登录节点无 GPU，无法直接提交训练或评测任务 解决方案: BC-RNN 训练通过 srun –jobid=45628 –overlap 附加到已运行的 interactive job 绕开权限问题；Pi0.5 评测需正式提交 Slurm GPU 作业（#SBATCH –gres=gpu:4）到 ai 分区\n关键洞察: SLURM 集群可能有多套工具链（系统级 vs 集群专用），需 source set-XY-I.sh 使用正确版本；集群登录节点工作需时刻意识到 GPU 不可用约束\n一般问题 5. Pi0.5 checkpoints 与评测代码分属不同用户目录，路径关系不明确 解决方案: 通过并行代理任务分别探索两个用户目录，确认 phoenix_comparison 检查点位于 zhaoganlong 目录，评测脚本位于 tangzijia 的 error_recovery_benchmark，需使用绝对路径引用\n关键洞察: 跨用户协作项目需在脚本中明确约定绝对路径，避免相对路径引起的跨用户访问问题\n人类思路 vs AI 思路 战略层面 Pi0.5 问题诊断与评测目标确定 角色 思路 人类 用户通过精准质疑「是否把 9 个 task 全部混训了？」直接定位 task mismatch 核心问题；对后续评测也直接提出科研验证目标，假设可立即执行 AI AI 在诊断 0% 时列举多个复杂假设（OOM、action clipping、task mismatch），分散注意力；规划评测时通过 3 个并行子代理高效探索基础设施，但未主动意识到 GPU 硬件约束 差异分析: 用户凭直觉直接定位根本问题；AI 需要点拨才能聚焦。但 AI 在工程探索（并行代理）上展现了结构化优势，用户未参与方法选择\nBC-RNN 模式选择（low_dim vs image） 角色 思路 人类 用户明确选择与 MimicGen 论文主结果一致的 image 模式，优先科学严谨性 AI AI 默认创建了 low_dim 配置（实现更简单），未主动提出两种模式的权衡让用户选择，被动响应 差异分析: 用户在工程简便性和论文一致性之间明确选择后者；AI 需要被引导才意识到这个权衡\n实现层面 LaTeX 简历排版 角色 思路 人类 用户提出视觉需求：「把 AI AI 自动将视觉目标映射为 \\resumeSubheading 双行 LaTeX 结构，协作顺畅 差异分析: 用户提出目标，AI 正确翻译为具体实现；此场景无明显分歧\nAI 局限性 重要局限 诊断显著失败（如 0% success rate）时倾向列举多个复杂假设，而非优先核查最基础的配置一致性（task alignment、obs schema），需要用户点拨才聚焦根本原因 规划完成后未能给出用户可直接执行的下一步操作（如草拟 Slurm 提交脚本），对话在规划阶段结束而非推进到可执行方案 工程决策上缺乏主动权衡提示：默认选择实现简单的方案（low_dim 模式），未主动询问用户在简便性与论文一致性之间的取舍 一般局限 代码分析阶段出现事实错误（将 5 tasks 描述为 9 tasks）；Write 工具需先 Read 才能覆写已有文件，导致部分创建流程略微低效 今日收获 核心收获 机器人学习实验中 train/eval task alignment 是基础前提：必须在评估前确认两侧使用同一套任务定义和 observation schema。Pi0.5/BC-RNN 0% 这类「显著失败」根因往往是配置不对齐，而非模型本身问题 MimicGen 官方不提供预训练 BC-RNN checkpoint，需自行训练。官方 image 模式关键参数：ResNet18Conv encoder、SpatialSoftmax 32 keypoints、CropRandomizer 76x76、rnn hidden_dim=1000、actor_layer_dims=[]、batch_size=16、hdf5_cache_mode=low_dim MimicGen _D0 环境通过 import mimicgen 注册到 robosuite，提供比 base 环境更完整的 observables；剥离 _D0 后缀会导致 obs 维度不完整，是 BC-RNN 维度不匹配的根因 Pi0.5 MimicGen 评测需要双进程架构：VLA 策略服务器（openpi05环境+GPU）通过 WebSocket 向评测客户端（mimicgen_env）提供动作预测，两者解耦但必须在 GPU 节点上运行 实践收获 SLURM 集群可能有多套工具链，需 source 特定初始化脚本（如 set-XY-I.sh）使用正确版本；当 sbatch 分区无权限时可通过 srun –jobid –overlap 附加到已运行的 interactive job；登录节点工作需时刻意识到 GPU 不可用约束 会话摘要 Error Recovery Benchmark 🔄 Pi0.5/BC-RNN 0%根因分析→多任务框架搭建→BC-RNN image模式训练启动→Pi0.5评测基础设施调研 01:10:41.534 | claude_code 全天核心工作，横跨四个会话。首先调查 Pi0.5（99999步）和 BC-RNN（600 epochs）均评估 0% 的根因：Pi0.5 是 task mismatch（训练5个MimicGen task，评估在PickPlace），BC-RNN 是 obs 维度不匹配（_D0后缀剥离导致维度65→37），均已修复。随后创建完整多任务评估框架（5个task YAML + task_registry + 脚本 –task 参数）。确认需从零自训练 BC-RNN，用户选择与论文一致的 image 模式，完成 5 个配置文件全面重写（ResNet18+SpatialSoftmax+CropRandomizer），通过 srun –overlap 绕开权限问题在 an49 节点 5 个 A800 GPU 上启动 5 任务并行训练（进行中）。此外通过 3 个并行代理深度调研 Pi0.5 评测基础设施（phoenix_comparison 检查点步数 10000–50000+、evaluate_mimicgen.py、VLA服务器双进程架构），但受限于登录节点无 GPU，Pi0.5 实际评测尚未执行，需通过 Slurm 提交 GPU 作业。\nResume ✅ 为 CS 学生制作 Jake’s Resume Template 风格 LaTeX 学术简历 04:33:57.481 | claude_code 用户提供含 4 篇论文（CVPR/Nature Comm./J.Adv.Res./ACM-BCB）的简历内容，AI 生成可直接粘贴到 Overleaf 的完整 .tex 文件，经多次迭代将 Publications 改为 resumeSubheading 双行格式（第一行标题占满整行，第二行显示作者角色和期刊名），产出 ATS 友好的 letterpaper 格式简历。\ntianhe 集群环境探索（hello 会话） ❌ 多个项目目录连接测试 11:18:53.200 | claude_code 用户在 X-VLA、mozihao/VLA、HOME 目录（sysu_gbli2xy_1）等多个目录下启动 Claude Code 会话，均以 hello/hi 开始后立即中断，推测为探索工作环境或测试不同项目目录的访问权限，无实质工作内容。\nToken 用量 总览 指标 数值 总 Token 27,735,699 输入 Token 36,934 输出 Token 23,324 Cache 创建 1,628,765 Cache 读取 26,046,676 Cache 命中率 94.1% 总费用 (USD) $15.6040 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 20,565 13,462 879,151 15,156,354 $13.5122 86.6% claude-haiku-4-5-20251001 16,369 9,862 749,614 10,890,322 $2.0917 13.4% 各设备用量 设备 总 Token 输入 输出 费用 MacBook 673,457 27 519 $0.4893 tianhe 27,062,242 36,907 22,805 $15.1147 ",
+  "wordCount" : "769",
+  "inLanguage": "en",
+  "datePublished": "2026-02-26T00:00:00-05:00",
+  "dateModified": "2026-02-26T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-02-26/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-26
+    </h1>
+    <div class="post-meta"><span title='2026-02-26 00:00:00 -0500 EST'>February 26, 2026</span>&nbsp;·&nbsp;<span>4 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-26">日报 — 2026-02-26<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-26">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 两台设备并行工作：tianhe 侧重机器人学习实验全链路（Pi0.5/BC-RNN 0%根因诊断、多任务评估框架、BC-RNN image模式训练启动、Pi0.5评测基础设施调研），MacBook 负责学术简历排版</li>
+<li><strong>怎么做的：</strong> 通过代码审计+配置修改+SLURM任务调度推进实验管线；通过 Claude Code 并发代理子任务探索多代码库；通过 Jake&rsquo;s Resume Template 迭代 LaTeX 编辑完成简历</li>
+<li><strong>有什么用：</strong> 完成 BC-RNN 5 任务 image-mode 训练启动（5个A800 GPU并行训练中），建立与 MimicGen 论文对齐的评估框架基础设施，摸清 Pi0.5 评测所需全部基础条件；简历产出可一键编译的 Overleaf 文件</li>
+</ul>
+<h3 id="macbook">MacBook<a hidden class="anchor" aria-hidden="true" href="#macbook">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 为 Tang Zijia (Thomas) 制作 LaTeX 格式学术简历，覆盖 CS 教育背景、4 篇论文（CVPR/Nature Communications/J. Advanced Research/ACM-BCB）、项目和工作经历</li>
+<li><strong>怎么做的：</strong> 基于 Jake&rsquo;s Resume Template，通过多次迭代调整 Publications 排版（单行 → resumeSubheading 双行格式），确保 Overleaf 可直接编译</li>
+<li><strong>有什么用：</strong> 输出可在 Overleaf 上一键编译的 ATS 友好 LaTeX 简历，论文标题与作者角色分行显示，视觉层次清晰</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 调查 Pi0.5/BC-RNN 评估 0% 根因、实现多任务评估框架、将 BC-RNN 训练配置重写为 image 模式并启动并行训练，同时全面调研 Pi0.5 MimicGen 评测基础设施（检查点、评测脚本、VLA 服务器架构）</li>
+<li><strong>怎么做的：</strong> 通过代码审计定位 task mismatch 和 obs 维度不匹配根因；通过修改 YAML configs、Python scripts、SLURM 脚本实现多任务支持；通过 srun &ndash;overlap 绕开权限问题并行启动训练；通过 3 个并发 Task 代理探索多代码库结构</li>
+<li><strong>有什么用：</strong> 5 个 image-mode BC-RNN 训练任务已在 A800 GPU 上运行；确立任务对齐的评估基础（task_registry + 5个task YAML）；明确 Pi0.5 评测所需全部条件，但受限于登录节点无 GPU，Pi0.5 实际评测尚未执行</li>
+</ul>
+<blockquote>
+<p>在 tianhe 服务器上系统推进 MimicGen 错误恢复基准实验全链路（Pi0.5/BC-RNN 0%根因诊断、多任务评估框架搭建、BC-RNN image 模式配置重写并启动5任务并行训练、Pi0.5评测基础设施调研），同时在 MacBook 上完成 LaTeX 学术简历制作</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>Pi0.5 和 BC-RNN 评估失败根因分析</strong> — Pi0.5 根因：训练在 5 个 MimicGen task，评估在 PickPlace（task mismatch → 0%）。BC-RNN 根因：create_env 剥离 _D0 后缀导致 obs 维度从 65 缩至 37。修复：在所有 4 个 scripts 中 import mimicgen 保留 _D0 注册</li>
+<li>🔄 <strong>BC-RNN 训练配置重写为 image 模式并启动并行训练</strong> — 将 5 个任务配置全面重写为 image 模式（移除 object obs、加入双摄像头、ResNet18Conv+SpatialSoftmax 32kp+CropRandomizer 76x76，rnn hidden_dim=1000，batch_size=16，hdf5_cache_mode=low_dim）；在 an49 节点 8x A800 80GB 上通过 srun &ndash;jobid=45628 &ndash;overlap 并行启动 5 个训练任务（GPU 0-4），每任务 600 epochs</li>
+<li>❌ <strong>执行 Pi0.5 MimicGen 评测</strong> — 当前登录节点（an49 交互节点）无 GPU，需通过 Slurm 向 ai 分区提交 GPU 作业（#SBATCH &ndash;gres=gpu:4），以 openpi05 conda 环境启动 VLA 服务器后执行 evaluate_mimicgen.py</li>
+<li>✅ <strong>多任务评估框架扩展</strong> — 创建 5 个 task YAML configs（coffee/stack/stack_three/threading/three_piece_assembly）、task_registry.yaml，为 1_generate_scenes.py / 3_collect_data.py / 4_analyze_results.py 添加 &ndash;task 参数，重写 run_full_eval.sh 支持多任务，创建 train_bc_rnn_all.sh</li>
+<li>✅ <strong>调研 Pi0.5 MimicGen 评测基础设施</strong> — 系统探索 error_recovery_benchmark 与 Motion-based-Self-Reflection-Framework 代码库，定位 phoenix_comparison 检查点（步数 10000–50000+）、evaluate_mimicgen.py 脚本、VLA 服务器架构（start_vla_server.py）及数据转换脚本，确认评测所需全部条件</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>LaTeX 学术简历制作</strong> — 将 Markdown 格式简历转换为基于 Jake&rsquo;s Resume Template 的 LaTeX 版本，经多次迭代将 Publications 改为 resumeSubheading 双行格式，输出 Overleaf 可直接编译的 ATS 友好文件</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-pi05-评估-success-rate-为-0">1. Pi0.5 评估 success rate 为 0%<a hidden class="anchor" aria-hidden="true" href="#1-pi05-评估-success-rate-为-0">#</a></h4>
+<p><strong>解决方案:</strong> 根因是 task mismatch：Pi0.5 训练在 5 个 MimicGen task，评估在 PickPlace（不在训练集中）。解决方案：在已训练的 5 个 task 上重新评估</p>
+<p><strong>关键洞察:</strong> 用户主动质疑「是否把 9 个 task 全部混训了？」直接触发深入根因分析；train/eval task alignment 是机器人学习实验的基础前提，显著失败往往源于配置不对齐而非模型本身</p>
+<h4 id="2-bc-rnn-评估报-runtimeerror-inputsize-1-must-be-equal-to-input_size-expected-65-got-37">2. BC-RNN 评估报 RuntimeError: input.size(-1) must be equal to input_size. Expected 65, got 37<a hidden class="anchor" aria-hidden="true" href="#2-bc-rnn-评估报-runtimeerror-inputsize-1-must-be-equal-to-input_size-expected-65-got-37">#</a></h4>
+<p><strong>解决方案:</strong> 根因：create_env() 剥离 _D0 后缀导致使用 base robosuite env 而非 MimicGen env，obs 维度不完整。修复：在所有 4 个 scripts 中 import mimicgen 注册 _D0 环境</p>
+<p><strong>关键洞察:</strong> MimicGen _D0 环境注册了额外 observables（完整物体状态），base robosuite 环境只返回主物体状态，是两套不同的 observation schema</p>
+<h4 id="3-bc-rnn-训练配置为-low_dim-模式与-mimicgen-论文主结果不一致">3. BC-RNN 训练配置为 low_dim 模式，与 MimicGen 论文主结果不一致<a hidden class="anchor" aria-hidden="true" href="#3-bc-rnn-训练配置为-low_dim-模式与-mimicgen-论文主结果不一致">#</a></h4>
+<p><strong>解决方案:</strong> 全面重写 5 个配置文件：obs 移除 object key、加入双摄像头、加入 ResNet18Conv encoder + SpatialSoftmax + CropRandomizer、调整 batch_size/hidden_dim/actor_layer_dims</p>
+<p><strong>关键洞察:</strong> image 模式和 low_dim 模式不只是 obs 不同，整个网络架构也不同；hdf5_cache_mode 必须从 all 改为 low_dim，否则 80GB VRAM 也会 OOM</p>
+<h4 id="4-slurm-sbatch-分区无权限且登录节点无-gpu无法直接提交训练或评测任务">4. SLURM sbatch 分区无权限且登录节点无 GPU，无法直接提交训练或评测任务<a hidden class="anchor" aria-hidden="true" href="#4-slurm-sbatch-分区无权限且登录节点无-gpu无法直接提交训练或评测任务">#</a></h4>
+<p><strong>解决方案:</strong> BC-RNN 训练通过 srun &ndash;jobid=45628 &ndash;overlap 附加到已运行的 interactive job 绕开权限问题；Pi0.5 评测需正式提交 Slurm GPU 作业（#SBATCH &ndash;gres=gpu:4）到 ai 分区</p>
+<p><strong>关键洞察:</strong> SLURM 集群可能有多套工具链（系统级 vs 集群专用），需 source set-XY-I.sh 使用正确版本；集群登录节点工作需时刻意识到 GPU 不可用约束</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="5-pi05-checkpoints-与评测代码分属不同用户目录路径关系不明确">5. Pi0.5 checkpoints 与评测代码分属不同用户目录，路径关系不明确<a hidden class="anchor" aria-hidden="true" href="#5-pi05-checkpoints-与评测代码分属不同用户目录路径关系不明确">#</a></h4>
+<p><strong>解决方案:</strong> 通过并行代理任务分别探索两个用户目录，确认 phoenix_comparison 检查点位于 zhaoganlong 目录，评测脚本位于 tangzijia 的 error_recovery_benchmark，需使用绝对路径引用</p>
+<p><strong>关键洞察:</strong> 跨用户协作项目需在脚本中明确约定绝对路径，避免相对路径引起的跨用户访问问题</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="pi05-问题诊断与评测目标确定">Pi0.5 问题诊断与评测目标确定<a hidden class="anchor" aria-hidden="true" href="#pi05-问题诊断与评测目标确定">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户通过精准质疑「是否把 9 个 task 全部混训了？」直接定位 task mismatch 核心问题；对后续评测也直接提出科研验证目标，假设可立即执行</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 在诊断 0% 时列举多个复杂假设（OOM、action clipping、task mismatch），分散注意力；规划评测时通过 3 个并行子代理高效探索基础设施，但未主动意识到 GPU 硬件约束</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户凭直觉直接定位根本问题；AI 需要点拨才能聚焦。但 AI 在工程探索（并行代理）上展现了结构化优势，用户未参与方法选择</p>
+<h4 id="bc-rnn-模式选择low_dim-vs-image">BC-RNN 模式选择（low_dim vs image）<a hidden class="anchor" aria-hidden="true" href="#bc-rnn-模式选择low_dim-vs-image">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户明确选择与 MimicGen 论文主结果一致的 image 模式，优先科学严谨性</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 默认创建了 low_dim 配置（实现更简单），未主动提出两种模式的权衡让用户选择，被动响应</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户在工程简便性和论文一致性之间明确选择后者；AI 需要被引导才意识到这个权衡</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="latex-简历排版">LaTeX 简历排版<a hidden class="anchor" aria-hidden="true" href="#latex-简历排版">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户提出视觉需求：「把</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 自动将视觉目标映射为 \resumeSubheading 双行 LaTeX 结构，协作顺畅</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户提出目标，AI 正确翻译为具体实现；此场景无明显分歧</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>诊断显著失败（如 0% success rate）时倾向列举多个复杂假设，而非优先核查最基础的配置一致性（task alignment、obs schema），需要用户点拨才聚焦根本原因</li>
+<li>规划完成后未能给出用户可直接执行的下一步操作（如草拟 Slurm 提交脚本），对话在规划阶段结束而非推进到可执行方案</li>
+<li>工程决策上缺乏主动权衡提示：默认选择实现简单的方案（low_dim 模式），未主动询问用户在简便性与论文一致性之间的取舍</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>代码分析阶段出现事实错误（将 5 tasks 描述为 9 tasks）；Write 工具需先 Read 才能覆写已有文件，导致部分创建流程略微低效</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>机器人学习实验中 train/eval task alignment 是基础前提：必须在评估前确认两侧使用同一套任务定义和 observation schema。Pi0.5/BC-RNN 0% 这类「显著失败」根因往往是配置不对齐，而非模型本身问题</li>
+<li>MimicGen 官方不提供预训练 BC-RNN checkpoint，需自行训练。官方 image 模式关键参数：ResNet18Conv encoder、SpatialSoftmax 32 keypoints、CropRandomizer 76x76、rnn hidden_dim=1000、actor_layer_dims=[]、batch_size=16、hdf5_cache_mode=low_dim</li>
+<li>MimicGen _D0 环境通过 import mimicgen 注册到 robosuite，提供比 base 环境更完整的 observables；剥离 _D0 后缀会导致 obs 维度不完整，是 BC-RNN 维度不匹配的根因</li>
+<li>Pi0.5 MimicGen 评测需要双进程架构：VLA 策略服务器（openpi05环境+GPU）通过 WebSocket 向评测客户端（mimicgen_env）提供动作预测，两者解耦但必须在 GPU 节点上运行</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>SLURM 集群可能有多套工具链，需 source 特定初始化脚本（如 set-XY-I.sh）使用正确版本；当 sbatch 分区无权限时可通过 srun &ndash;jobid &ndash;overlap 附加到已运行的 interactive job；登录节点工作需时刻意识到 GPU 不可用约束</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 Pi0.5/BC-RNN 0%根因分析→多任务框架搭建→BC-RNN image模式训练启动→Pi0.5评测基础设施调研</strong>
+<em>01:10:41.534 | claude_code</em>
+全天核心工作，横跨四个会话。首先调查 Pi0.5（99999步）和 BC-RNN（600 epochs）均评估 0% 的根因：Pi0.5 是 task mismatch（训练5个MimicGen task，评估在PickPlace），BC-RNN 是 obs 维度不匹配（_D0后缀剥离导致维度65→37），均已修复。随后创建完整多任务评估框架（5个task YAML + task_registry + 脚本 &ndash;task 参数）。确认需从零自训练 BC-RNN，用户选择与论文一致的 image 模式，完成 5 个配置文件全面重写（ResNet18+SpatialSoftmax+CropRandomizer），通过 srun &ndash;overlap 绕开权限问题在 an49 节点 5 个 A800 GPU 上启动 5 任务并行训练（进行中）。此外通过 3 个并行代理深度调研 Pi0.5 评测基础设施（phoenix_comparison 检查点步数 10000–50000+、evaluate_mimicgen.py、VLA服务器双进程架构），但受限于登录节点无 GPU，Pi0.5 实际评测尚未执行，需通过 Slurm 提交 GPU 作业。</p>
+<h3 id="resume">Resume<a hidden class="anchor" aria-hidden="true" href="#resume">#</a></h3>
+<p><strong>✅ 为 CS 学生制作 Jake&rsquo;s Resume Template 风格 LaTeX 学术简历</strong>
+<em>04:33:57.481 | claude_code</em>
+用户提供含 4 篇论文（CVPR/Nature Comm./J.Adv.Res./ACM-BCB）的简历内容，AI 生成可直接粘贴到 Overleaf 的完整 .tex 文件，经多次迭代将 Publications 改为 resumeSubheading 双行格式（第一行标题占满整行，第二行显示作者角色和期刊名），产出 ATS 友好的 letterpaper 格式简历。</p>
+<h3 id="tianhe-集群环境探索hello-会话">tianhe 集群环境探索（hello 会话）<a hidden class="anchor" aria-hidden="true" href="#tianhe-集群环境探索hello-会话">#</a></h3>
+<p><strong>❌ 多个项目目录连接测试</strong>
+<em>11:18:53.200 | claude_code</em>
+用户在 X-VLA、mozihao/VLA、HOME 目录（sysu_gbli2xy_1）等多个目录下启动 Claude Code 会话，均以 hello/hi 开始后立即中断，推测为探索工作环境或测试不同项目目录的访问权限，无实质工作内容。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>27,735,699</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>36,934</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>23,324</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>1,628,765</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>26,046,676</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>94.1%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$15.6040</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>20,565</td>
+          <td>13,462</td>
+          <td>879,151</td>
+          <td>15,156,354</td>
+          <td>$13.5122</td>
+          <td>86.6%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>16,369</td>
+          <td>9,862</td>
+          <td>749,614</td>
+          <td>10,890,322</td>
+          <td>$2.0917</td>
+          <td>13.4%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>MacBook</td>
+          <td>673,457</td>
+          <td>27</td>
+          <td>519</td>
+          <td>$0.4893</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>27,062,242</td>
+          <td>36,907</td>
+          <td>22,805</td>
+          <td>$15.1147</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

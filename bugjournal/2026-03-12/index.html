@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-12 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="MacBook 修复 Desktop Video 历史记录权限 bug 并成功编译，tianhe 修复 VLA 评估环境的多层依赖冲突（torchvision→curobo），并改进 GPU 监控工具">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-03-12/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-03-12/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-03-12/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-12">
+  <meta property="og:description" content="MacBook 修复 Desktop Video 历史记录权限 bug 并成功编译，tianhe 修复 VLA 评估环境的多层依赖冲突（torchvision→curobo），并改进 GPU 监控工具">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-12T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-12T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-12">
+  <meta name="twitter:description" content="MacBook 修复 Desktop Video 历史记录权限 bug 并成功编译，tianhe 修复 VLA 评估环境的多层依赖冲突（torchvision→curobo），并改进 GPU 监控工具">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-03-12",
+      "item": "https://tzj2006.github.io/bugjournal/2026-03-12/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-12",
+  "name": "Bug Journal 2026-03-12",
+  "description": "MacBook 修复 Desktop Video 历史记录权限 bug 并成功编译，tianhe 修复 VLA 评估环境的多层依赖冲突（torchvision→curobo），并改进 GPU 监控工具",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-12 今日概览 做了什么： 跨两台设备同时推进：MacBook 完整修复了 macOS 沙盒权限导致的视频历史记录失效问题，tianhe 迭代排查并修复了 RoboTwin VLA 评估脚本的多层 Python 环境依赖冲突 怎么做的： MacBook 采用「启用 App Sandbox + NSOpenPanel 重授权」双保险方案；tianhe 通过逐层分析错误栈，依次升级 torchvision、从源码重编 curobo（设置 CPATH 绕过非标准 CUDA 头文件路径） 有什么用： Desktop Video 的历史记录功能得到根本性修复（security-scoped bookmark 正式生效）；RoboTwin 评估环境基本可用，但仍存在 checkpoint 路径配置未对齐的问题待解决 MacBook 做了什么： 定位并修复 Desktop Video App 中因未启用 App Sandbox 导致 security-scoped bookmark 始终失败、历史记录无法重新打开旧视频文件的 bug 怎么做的： 在 entitlements 中添加 app-sandbox 和 user-selected.read-write 权限，修复 ensureFileAccess 的 non-scoped bookmark 回退逻辑，为 showVideo/showImage 添加权限失败时弹出 NSOpenPanel 的重试机制，同步更新本地化和 ChangeLog 有什么用： 构建验证通过，历史记录中的旧视频文件访问权限问题得到根本解决，兼容已有 non-scoped 旧书签数据 tianhe 做了什么： 修复 RoboTwin pi05 评估脚本报错：先后处理了 torchvision ABI 不匹配、curobo 预编译 .so 失效、ninja 缺失、CUDA 头文件路径非标准等多个连锁环境问题，并重写了 GPU 监控工具 gpumon.py 怎么做的： 升级 torchvision 至 0.22.1+cu126，删除旧 .so 后用 CPATH 指定 conda 环境内 targets/x86_64-linux/include/ 从源码重编 curobo，通过 python -c 逐步验证各层依赖；gpumon.py 固定 80 列宽并合并进程展示 有什么用： torchvision 和 curobo 依赖修复完成，评估脚本可以启动但仍因 checkpoint_id=5000 不存在（实际有 15000/25000/29999）而失败；gpumon.py 改进被用户中途纠正需求 MacBook 修复 Desktop Video 历史记录权限 bug 并成功编译，tianhe 修复 VLA 评估环境的多层依赖冲突（torchvision→curobo），并改进 GPU 监控工具\n今日任务 架构与策略 ✅ Desktop Video：修复历史记录无法打开旧视频 — 启用 App Sandbox，修复 ensureFileAccess 的 non-scoped bookmark 回退，为 showVideo/showImage 添加权限失败时 NSOpenPanel 重试，添加 requestFileReaccess 方法，更新 Localizable.xcstrings（5 语言）和 ChangeLog，xcodebuild 验证通过 ✅ RoboTwin pi05：重编 curobo 解决 ABI 不兼容 — 删除旧预编译 .so，安装 ninja，通过设置 CPATH 指向 conda 环境内 CUDA 头文件路径，从源码 pip install -e . 重新编译 curobo，验证 import 成功 实现与修复 ✅ RoboTwin pi05：修复 torchvision 版本不匹配 — 将 torchvision 从 0.21.0 升级至 0.22.1+cu126 以匹配 torch 2.7.1+cu126，验证 torchvision::nms 算子可用 ❌ RoboTwin pi05：解决 checkpoint 路径不存在问题 — eval.sh 传入 checkpoint_id=5000，但实际目录下只有 15000/25000/29999，需要修改 deploy_policy.yml 或 eval.sh 参数，用户在 AI 继续读取代码时中断 🔄 gpumon.py：修复显示宽度和进程去重逻辑 — 将输出固定为 80 列，合并多 GPU 进程显示，过滤 multiprocessing worker 等噪声进程。但用户纠正了需求：应该是每个进程在每个 GPU 上显示一次，而不是全局去重 问题与解决方案 关键问题 1. macOS 非沙盒应用无法创建 security-scoped bookmark，历史记录打开旧视频时被 TCC 拒绝（Operation not permitted, Code=257） 解决方案: 启用 App Sandbox（entitlements 添加 app-sandbox + files.user-selected.read-write），同时修复 ensureFileAccess 使其能解析旧的 non-scoped bookmark，并在权限失败时通过 NSOpenPanel 让用户重新授权\n关键洞察: App Sandbox 是 security-scoped bookmark 能工作的前提条件；non-scoped bookmark 本身只能解析出 URL，不能恢复 TCC 权限——权限持久化必须靠 security-scoped bookmark\n2. 升级 torchvision 后 curobo 预编译 .so 与新 torch ABI 不兼容，JIT 编译因 CUDA 头文件路径非标准而失败 解决方案: 删除旧 .so，安装 ninja，设置 CPATH=/HOME/…/envs/RefineVLA/targets/x86_64-linux/include 后从源码重编 curobo\n关键洞察: conda 内通过 pip 安装的 nvidia CUDA 包将头文件放在 targets/x86_64-linux/include/ 而非标准的 $CUDA_HOME/include/，需要显式设置 CPATH\n一般问题 3. torch 2.7.1+cu126 与 torchvision 0.21.0 C++ ABI 不兼容，导致 torchvision::nms 算子注册失败 解决方案: 升级 torchvision 至 0.22.1+cu126\n关键洞察: PyTorch 生态中 torch/torchvision 需要精确的版本对应关系（2.7.x → 0.22.x），预编译 wheel 通过算子注册接口与 torch 紧耦合\n4. gpumon.py 进程去重逻辑错误：AI 将跨 GPU 的同一进程全局合并为一行，但实际需求是每个进程在每个 GPU 上各显示一次 解决方案: 用户中途纠正了需求，AI 尚未重新实现\n关键洞察: 对于多卡分布式训练，进程在不同 GPU 上的显存占用和利用率可能不同，全局去重会丢失有价值的信息；正确做法是以 (pid, gpu_id) 为粒度去重\n5. eval.sh 默认 checkpoint_id=5000，但实际 checkpoint 目录中只有 15000/25000/29999 解决方案: 需修改 deploy_policy.yml 中的 checkpoint_id 为现有值（如 29999），未完成\n关键洞察: deploy_policy.yml 的默认值与实际训练产出的 checkpoint 编号不一致，评估脚本需要对参数范围做验证或提供更友好的报错\n人类思路 vs AI 思路 战略层面 Desktop Video 修复方案的选择 角色 思路 人类 用户选择「两者结合」——同时启用 App Sandbox 和 NSOpenPanel 重授权，考虑到了已有旧数据的兼容性需求 AI AI 将两种方案作为互斥选项呈现，倾向于推荐「启用 App Sandbox」单一方案 差异分析: 人类的综合直觉更强，能看到两种方案可以互补（沙盒处理新场景、NSOpenPanel 处理遗留数据），而 AI 倾向于给出单一推荐\nDesktop Video 权限问题根因的理解 角色 思路 人类 用户第一反应是追问「为什么会权限不足」，而不是直接接受修复方案，驱动 AI 给出了完整的 TCC + App Sandbox 机制解释 AI AI 直接给出了两个修复选项（启用沙盒 / NSOpenPanel 重试），未主动解释权限不足的底层原因 差异分析: 人类更注重理解问题根因再决策，AI 倾向于直接提供解决方案。用户的追问促使 AI 补充了关键背景知识\n实现层面 gpumon.py 进程去重需求的理解 角色 思路 人类 用户明确指出：一个进程可以跑在多个 GPU 上，应该是「每个进程在每个 GPU 上只显示一次」 AI AI 将「去重」理解为全局去重，把多卡进程合并为一行并用 GPU 列表展示 差异分析: AI 对多卡训练场景的实际监控需求理解有偏差，把两个不同粒度（per-process 和 per-process-per-gpu）的去重需求混淆了\nAI 局限性 重要局限 RoboTwin 环境修复缺乏整体预见性：每修复一层依赖（torchvision→curobo→checkpoint 路径）才发现下一个问题，没有在开始时全面检查环境依赖链 一般局限 gpumon.py 进程去重逻辑错误：AI 将「每个进程只显示一次」实现为全局去重，与实际需求「每个进程在每个 GPU 上显示一次」不符，需要用户纠正 面对复杂 CUDA 环境问题时，AI 尝试了多种 workaround（CPATH、符号链接、CUDA_HOME 设置）才找到正确方案，过程中产生了一些冗余操作（创建了部分多余符号链接） 工具调用格式错误：在第一个 Desktop Video 会话中，AI 连续两次调用 Agent 工具时忘记传 description 参数，导致 InputValidationError，需要人类等待重试 今日收获 核心收获 macOS TCC 与 App Sandbox 的交互机制：非沙盒应用无法创建 security-scoped bookmark（即使有 bookmarks.app-scope entitlement），访问受保护目录（Documents/Desktop）的权限无法在 app 重启后自动持久化，必须通过 App Sandbox + security-scoped bookmark 或每次通过 NSOpenPanel 重新授权 PyTorch 生态依赖链：torch → torchvision → curobo 通过 C++ ABI 紧耦合，升级 torch/torchvision 后，依赖 torch C++ API 的第三方库（如 curobo）必须重新编译，不能仅靠 Python 层面的版本升级解决 conda 环境中 CUDA 头文件的非标准位置：通过 pip 安装的 nvidia-cuda-runtime 等包将头文件放在 envs//targets/x86_64-linux/include/ 而非标准的 $CONDA_PREFIX/include/，编译 CUDA 扩展时需要显式设置 CPATH 或 CUDA_HOME 实践收获 macOS App Sandbox 对现有功能的兼容性：CGWindowLevelForKey(.desktopWindow) 窗口级别设置、SMAppService 开机启动、~/Library/Logs 日志写入、WKWebView 网络请求在沙盒下均可正常工作，不需要额外适配 会话摘要 Desktop Video ✅ 实施历史记录权限 bug 修复并验证编译通过 07:52:05.359 | claude_code 按照计划实施四项代码修改：entitlements 添加沙盒权限、ensureFileAccess 增加 non-scoped bookmark 回退、showVideo/showImage 添加权限失败时 NSOpenPanel 重试、新增 requestFileReaccess 方法。同步更新了 Localizable.xcstrings（Open 和重授权提示的 5 语言翻译）和 ChangeLog.md。xcodebuild clean build 验证通过，无编译错误。\n✅ 历史记录无法打开旧视频的根因分析与修复方案设计 07:19:11.220 | claude_code 用户报告历史记录中旧视频有时无法打开。AI 探索代码库后发现根因是 App 未启用沙盒导致 security-scoped bookmark 始终创建失败，ensureFileAccess 的 per-URL bookmark 解析只尝试 withSecurityScope 选项因此永远失败，最终回退到原始 URL 被 TCC 拒绝。用户追问权限不足的原因后，AI 详细解释了 TCC 机制，用户决策采用「启用 App Sandbox + NSOpenPanel 重授权」双保险方案，AI 完成了详细的修复计划文档。\nRoboTwin VLA Pi05 🔄 修复评估环境：torchvision 升级→curobo 重编→checkpoint 路径问题 02:34:02.634 | claude_code 按计划升级 torchvision 至 0.22.1+cu126 并验证成功。随后发现 curobo 预编译 .so 与新 torch ABI 不兼容，AI 安装 ninja、设置 CPATH 指向 conda 内非标准 CUDA 头文件路径，从源码重编 curobo 成功。再次运行 eval.sh 后发现新错误：checkpoint_id=5000 不存在（实际有 15000/25000/29999），用户在 AI 继续读代码时中断了会话，该问题未解决。\n🔄 eval.sh 运行报错分析：torch/torchvision 版本不匹配 02:23:18.705 | claude_code 用户请求运行 eval.sh 并分析报错。AI 通过错误栈定位到 torchvision 0.21.0 与 torch 2.7.1+cu126 C++ ABI 不兼容，导致 torchvision::nms 算子注册失败。AI 确认版本对应关系（torch 2.7.x 需要 torchvision 0.22.x）并提出升级方案，用户选择升级 torchvision，AI 创建了修复计划文件，但用户最初拒绝了退出计划模式的操作。\nrobobrain gpumon 🔄 重写 gpumon.py：固定 80 列宽度并改进进程展示 15:48:28.705 | claude_code 用户展示了 GPU 监控输出，显示宽度过大且同一进程在多 GPU 下重复显示。AI 重写了 gpumon.py，固定 80 列宽度、过滤 multiprocessing worker 等噪声进程，并将同一进程合并为一行显示所有 GPU。但用户随即纠正了需求：正确逻辑应是「每个进程在每个 GPU 上各显示一次」而非全局合并，AI 的实现与需求不符，被用户中断。\nToken 用量 总览 指标 数值 总 Token 5,158,777 输入 Token 10,125 输出 Token 13,117 Cache 创建 442,684 Cache 读取 4,692,851 Cache 命中率 91.4% 总费用 (USD) $4.5086 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 10,009 7,752 348,132 3,686,170 $4.2628 94.5% claude-haiku-4-5-20251001 116 5,365 94,552 1,006,681 $0.2458 5.5% 各设备用量 设备 总 Token 输入 输出 费用 MacBook 3,188,381 10,063 9,775 $2.2933 tianhe 1,970,396 62 3,342 $2.2153 ",
+  "wordCount" : "754",
+  "inLanguage": "en",
+  "datePublished": "2026-03-12T00:00:00-05:00",
+  "dateModified": "2026-03-12T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-03-12/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-12
+    </h1>
+    <div class="post-meta"><span title='2026-03-12 00:00:00 -0500 -0500'>March 12, 2026</span>&nbsp;·&nbsp;<span>4 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-12">日报 — 2026-03-12<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-12">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 跨两台设备同时推进：MacBook 完整修复了 macOS 沙盒权限导致的视频历史记录失效问题，tianhe 迭代排查并修复了 RoboTwin VLA 评估脚本的多层 Python 环境依赖冲突</li>
+<li><strong>怎么做的：</strong> MacBook 采用「启用 App Sandbox + NSOpenPanel 重授权」双保险方案；tianhe 通过逐层分析错误栈，依次升级 torchvision、从源码重编 curobo（设置 CPATH 绕过非标准 CUDA 头文件路径）</li>
+<li><strong>有什么用：</strong> Desktop Video 的历史记录功能得到根本性修复（security-scoped bookmark 正式生效）；RoboTwin 评估环境基本可用，但仍存在 checkpoint 路径配置未对齐的问题待解决</li>
+</ul>
+<h3 id="macbook">MacBook<a hidden class="anchor" aria-hidden="true" href="#macbook">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 定位并修复 Desktop Video App 中因未启用 App Sandbox 导致 security-scoped bookmark 始终失败、历史记录无法重新打开旧视频文件的 bug</li>
+<li><strong>怎么做的：</strong> 在 entitlements 中添加 app-sandbox 和 user-selected.read-write 权限，修复 ensureFileAccess 的 non-scoped bookmark 回退逻辑，为 showVideo/showImage 添加权限失败时弹出 NSOpenPanel 的重试机制，同步更新本地化和 ChangeLog</li>
+<li><strong>有什么用：</strong> 构建验证通过，历史记录中的旧视频文件访问权限问题得到根本解决，兼容已有 non-scoped 旧书签数据</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 修复 RoboTwin pi05 评估脚本报错：先后处理了 torchvision ABI 不匹配、curobo 预编译 .so 失效、ninja 缺失、CUDA 头文件路径非标准等多个连锁环境问题，并重写了 GPU 监控工具 gpumon.py</li>
+<li><strong>怎么做的：</strong> 升级 torchvision 至 0.22.1+cu126，删除旧 .so 后用 CPATH 指定 conda 环境内 targets/x86_64-linux/include/ 从源码重编 curobo，通过 python -c 逐步验证各层依赖；gpumon.py 固定 80 列宽并合并进程展示</li>
+<li><strong>有什么用：</strong> torchvision 和 curobo 依赖修复完成，评估脚本可以启动但仍因 checkpoint_id=5000 不存在（实际有 15000/25000/29999）而失败；gpumon.py 改进被用户中途纠正需求</li>
+</ul>
+<blockquote>
+<p>MacBook 修复 Desktop Video 历史记录权限 bug 并成功编译，tianhe 修复 VLA 评估环境的多层依赖冲突（torchvision→curobo），并改进 GPU 监控工具</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>Desktop Video：修复历史记录无法打开旧视频</strong> — 启用 App Sandbox，修复 ensureFileAccess 的 non-scoped bookmark 回退，为 showVideo/showImage 添加权限失败时 NSOpenPanel 重试，添加 requestFileReaccess 方法，更新 Localizable.xcstrings（5 语言）和 ChangeLog，xcodebuild 验证通过</li>
+<li>✅ <strong>RoboTwin pi05：重编 curobo 解决 ABI 不兼容</strong> — 删除旧预编译 .so，安装 ninja，通过设置 CPATH 指向 conda 环境内 CUDA 头文件路径，从源码 pip install -e . 重新编译 curobo，验证 import 成功</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>RoboTwin pi05：修复 torchvision 版本不匹配</strong> — 将 torchvision 从 0.21.0 升级至 0.22.1+cu126 以匹配 torch 2.7.1+cu126，验证 torchvision::nms 算子可用</li>
+<li>❌ <strong>RoboTwin pi05：解决 checkpoint 路径不存在问题</strong> — eval.sh 传入 checkpoint_id=5000，但实际目录下只有 15000/25000/29999，需要修改 deploy_policy.yml 或 eval.sh 参数，用户在 AI 继续读取代码时中断</li>
+<li>🔄 <strong>gpumon.py：修复显示宽度和进程去重逻辑</strong> — 将输出固定为 80 列，合并多 GPU 进程显示，过滤 multiprocessing worker 等噪声进程。但用户纠正了需求：应该是每个进程在每个 GPU 上显示一次，而不是全局去重</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-macos-非沙盒应用无法创建-security-scoped-bookmark历史记录打开旧视频时被-tcc-拒绝operation-not-permitted-code257">1. macOS 非沙盒应用无法创建 security-scoped bookmark，历史记录打开旧视频时被 TCC 拒绝（Operation not permitted, Code=257）<a hidden class="anchor" aria-hidden="true" href="#1-macos-非沙盒应用无法创建-security-scoped-bookmark历史记录打开旧视频时被-tcc-拒绝operation-not-permitted-code257">#</a></h4>
+<p><strong>解决方案:</strong> 启用 App Sandbox（entitlements 添加 app-sandbox + files.user-selected.read-write），同时修复 ensureFileAccess 使其能解析旧的 non-scoped bookmark，并在权限失败时通过 NSOpenPanel 让用户重新授权</p>
+<p><strong>关键洞察:</strong> App Sandbox 是 security-scoped bookmark 能工作的前提条件；non-scoped bookmark 本身只能解析出 URL，不能恢复 TCC 权限——权限持久化必须靠 security-scoped bookmark</p>
+<h4 id="2-升级-torchvision-后-curobo-预编译-so-与新-torch-abi-不兼容jit-编译因-cuda-头文件路径非标准而失败">2. 升级 torchvision 后 curobo 预编译 .so 与新 torch ABI 不兼容，JIT 编译因 CUDA 头文件路径非标准而失败<a hidden class="anchor" aria-hidden="true" href="#2-升级-torchvision-后-curobo-预编译-so-与新-torch-abi-不兼容jit-编译因-cuda-头文件路径非标准而失败">#</a></h4>
+<p><strong>解决方案:</strong> 删除旧 .so，安装 ninja，设置 CPATH=/HOME/&hellip;/envs/RefineVLA/targets/x86_64-linux/include 后从源码重编 curobo</p>
+<p><strong>关键洞察:</strong> conda 内通过 pip 安装的 nvidia CUDA 包将头文件放在 targets/x86_64-linux/include/ 而非标准的 $CUDA_HOME/include/，需要显式设置 CPATH</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="3-torch-271cu126-与-torchvision-0210-c-abi-不兼容导致-torchvisionnms-算子注册失败">3. torch 2.7.1+cu126 与 torchvision 0.21.0 C++ ABI 不兼容，导致 torchvision::nms 算子注册失败<a hidden class="anchor" aria-hidden="true" href="#3-torch-271cu126-与-torchvision-0210-c-abi-不兼容导致-torchvisionnms-算子注册失败">#</a></h4>
+<p><strong>解决方案:</strong> 升级 torchvision 至 0.22.1+cu126</p>
+<p><strong>关键洞察:</strong> PyTorch 生态中 torch/torchvision 需要精确的版本对应关系（2.7.x → 0.22.x），预编译 wheel 通过算子注册接口与 torch 紧耦合</p>
+<h4 id="4-gpumonpy-进程去重逻辑错误ai-将跨-gpu-的同一进程全局合并为一行但实际需求是每个进程在每个-gpu-上各显示一次">4. gpumon.py 进程去重逻辑错误：AI 将跨 GPU 的同一进程全局合并为一行，但实际需求是每个进程在每个 GPU 上各显示一次<a hidden class="anchor" aria-hidden="true" href="#4-gpumonpy-进程去重逻辑错误ai-将跨-gpu-的同一进程全局合并为一行但实际需求是每个进程在每个-gpu-上各显示一次">#</a></h4>
+<p><strong>解决方案:</strong> 用户中途纠正了需求，AI 尚未重新实现</p>
+<p><strong>关键洞察:</strong> 对于多卡分布式训练，进程在不同 GPU 上的显存占用和利用率可能不同，全局去重会丢失有价值的信息；正确做法是以 (pid, gpu_id) 为粒度去重</p>
+<h4 id="5-evalsh-默认-checkpoint_id5000但实际-checkpoint-目录中只有-150002500029999">5. eval.sh 默认 checkpoint_id=5000，但实际 checkpoint 目录中只有 15000/25000/29999<a hidden class="anchor" aria-hidden="true" href="#5-evalsh-默认-checkpoint_id5000但实际-checkpoint-目录中只有-150002500029999">#</a></h4>
+<p><strong>解决方案:</strong> 需修改 deploy_policy.yml 中的 checkpoint_id 为现有值（如 29999），未完成</p>
+<p><strong>关键洞察:</strong> deploy_policy.yml 的默认值与实际训练产出的 checkpoint 编号不一致，评估脚本需要对参数范围做验证或提供更友好的报错</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="desktop-video-修复方案的选择">Desktop Video 修复方案的选择<a hidden class="anchor" aria-hidden="true" href="#desktop-video-修复方案的选择">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户选择「两者结合」——同时启用 App Sandbox 和 NSOpenPanel 重授权，考虑到了已有旧数据的兼容性需求</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 将两种方案作为互斥选项呈现，倾向于推荐「启用 App Sandbox」单一方案</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类的综合直觉更强，能看到两种方案可以互补（沙盒处理新场景、NSOpenPanel 处理遗留数据），而 AI 倾向于给出单一推荐</p>
+<h4 id="desktop-video-权限问题根因的理解">Desktop Video 权限问题根因的理解<a hidden class="anchor" aria-hidden="true" href="#desktop-video-权限问题根因的理解">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户第一反应是追问「为什么会权限不足」，而不是直接接受修复方案，驱动 AI 给出了完整的 TCC + App Sandbox 机制解释</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 直接给出了两个修复选项（启用沙盒 / NSOpenPanel 重试），未主动解释权限不足的底层原因</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类更注重理解问题根因再决策，AI 倾向于直接提供解决方案。用户的追问促使 AI 补充了关键背景知识</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="gpumonpy-进程去重需求的理解">gpumon.py 进程去重需求的理解<a hidden class="anchor" aria-hidden="true" href="#gpumonpy-进程去重需求的理解">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户明确指出：一个进程可以跑在多个 GPU 上，应该是「每个进程在每个 GPU 上只显示一次」</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 将「去重」理解为全局去重，把多卡进程合并为一行并用 GPU 列表展示</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI 对多卡训练场景的实际监控需求理解有偏差，把两个不同粒度（per-process 和 per-process-per-gpu）的去重需求混淆了</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>RoboTwin 环境修复缺乏整体预见性：每修复一层依赖（torchvision→curobo→checkpoint 路径）才发现下一个问题，没有在开始时全面检查环境依赖链</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>gpumon.py 进程去重逻辑错误：AI 将「每个进程只显示一次」实现为全局去重，与实际需求「每个进程在每个 GPU 上显示一次」不符，需要用户纠正</li>
+<li>面对复杂 CUDA 环境问题时，AI 尝试了多种 workaround（CPATH、符号链接、CUDA_HOME 设置）才找到正确方案，过程中产生了一些冗余操作（创建了部分多余符号链接）</li>
+<li>工具调用格式错误：在第一个 Desktop Video 会话中，AI 连续两次调用 Agent 工具时忘记传 description 参数，导致 InputValidationError，需要人类等待重试</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>macOS TCC 与 App Sandbox 的交互机制：非沙盒应用无法创建 security-scoped bookmark（即使有 bookmarks.app-scope entitlement），访问受保护目录（Documents/Desktop）的权限无法在 app 重启后自动持久化，必须通过 App Sandbox + security-scoped bookmark 或每次通过 NSOpenPanel 重新授权</li>
+<li>PyTorch 生态依赖链：torch → torchvision → curobo 通过 C++ ABI 紧耦合，升级 torch/torchvision 后，依赖 torch C++ API 的第三方库（如 curobo）必须重新编译，不能仅靠 Python 层面的版本升级解决</li>
+<li>conda 环境中 CUDA 头文件的非标准位置：通过 pip 安装的 nvidia-cuda-runtime 等包将头文件放在 envs/<name>/targets/x86_64-linux/include/ 而非标准的 $CONDA_PREFIX/include/，编译 CUDA 扩展时需要显式设置 CPATH 或 CUDA_HOME</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>macOS App Sandbox 对现有功能的兼容性：CGWindowLevelForKey(.desktopWindow) 窗口级别设置、SMAppService 开机启动、~/Library/Logs 日志写入、WKWebView 网络请求在沙盒下均可正常工作，不需要额外适配</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="desktop-video">Desktop Video<a hidden class="anchor" aria-hidden="true" href="#desktop-video">#</a></h3>
+<p><strong>✅ 实施历史记录权限 bug 修复并验证编译通过</strong>
+<em>07:52:05.359 | claude_code</em>
+按照计划实施四项代码修改：entitlements 添加沙盒权限、ensureFileAccess 增加 non-scoped bookmark 回退、showVideo/showImage 添加权限失败时 NSOpenPanel 重试、新增 requestFileReaccess 方法。同步更新了 Localizable.xcstrings（Open 和重授权提示的 5 语言翻译）和 ChangeLog.md。xcodebuild clean build 验证通过，无编译错误。</p>
+<p><strong>✅ 历史记录无法打开旧视频的根因分析与修复方案设计</strong>
+<em>07:19:11.220 | claude_code</em>
+用户报告历史记录中旧视频有时无法打开。AI 探索代码库后发现根因是 App 未启用沙盒导致 security-scoped bookmark 始终创建失败，ensureFileAccess 的 per-URL bookmark 解析只尝试 withSecurityScope 选项因此永远失败，最终回退到原始 URL 被 TCC 拒绝。用户追问权限不足的原因后，AI 详细解释了 TCC 机制，用户决策采用「启用 App Sandbox + NSOpenPanel 重授权」双保险方案，AI 完成了详细的修复计划文档。</p>
+<h3 id="robotwin-vla-pi05">RoboTwin VLA Pi05<a hidden class="anchor" aria-hidden="true" href="#robotwin-vla-pi05">#</a></h3>
+<p><strong>🔄 修复评估环境：torchvision 升级→curobo 重编→checkpoint 路径问题</strong>
+<em>02:34:02.634 | claude_code</em>
+按计划升级 torchvision 至 0.22.1+cu126 并验证成功。随后发现 curobo 预编译 .so 与新 torch ABI 不兼容，AI 安装 ninja、设置 CPATH 指向 conda 内非标准 CUDA 头文件路径，从源码重编 curobo 成功。再次运行 eval.sh 后发现新错误：checkpoint_id=5000 不存在（实际有 15000/25000/29999），用户在 AI 继续读代码时中断了会话，该问题未解决。</p>
+<p><strong>🔄 eval.sh 运行报错分析：torch/torchvision 版本不匹配</strong>
+<em>02:23:18.705 | claude_code</em>
+用户请求运行 eval.sh 并分析报错。AI 通过错误栈定位到 torchvision 0.21.0 与 torch 2.7.1+cu126 C++ ABI 不兼容，导致 torchvision::nms 算子注册失败。AI 确认版本对应关系（torch 2.7.x 需要 torchvision 0.22.x）并提出升级方案，用户选择升级 torchvision，AI 创建了修复计划文件，但用户最初拒绝了退出计划模式的操作。</p>
+<h3 id="robobrain-gpumon">robobrain gpumon<a hidden class="anchor" aria-hidden="true" href="#robobrain-gpumon">#</a></h3>
+<p><strong>🔄 重写 gpumon.py：固定 80 列宽度并改进进程展示</strong>
+<em>15:48:28.705 | claude_code</em>
+用户展示了 GPU 监控输出，显示宽度过大且同一进程在多 GPU 下重复显示。AI 重写了 gpumon.py，固定 80 列宽度、过滤 multiprocessing worker 等噪声进程，并将同一进程合并为一行显示所有 GPU。但用户随即纠正了需求：正确逻辑应是「每个进程在每个 GPU 上各显示一次」而非全局合并，AI 的实现与需求不符，被用户中断。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>5,158,777</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>10,125</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>13,117</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>442,684</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>4,692,851</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>91.4%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$4.5086</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>10,009</td>
+          <td>7,752</td>
+          <td>348,132</td>
+          <td>3,686,170</td>
+          <td>$4.2628</td>
+          <td>94.5%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>116</td>
+          <td>5,365</td>
+          <td>94,552</td>
+          <td>1,006,681</td>
+          <td>$0.2458</td>
+          <td>5.5%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>MacBook</td>
+          <td>3,188,381</td>
+          <td>10,063</td>
+          <td>9,775</td>
+          <td>$2.2933</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>1,970,396</td>
+          <td>62</td>
+          <td>3,342</td>
+          <td>$2.2153</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

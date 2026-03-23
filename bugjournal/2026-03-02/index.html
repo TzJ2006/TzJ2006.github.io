@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-02 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="跨DCC、MacBook、天河三端并行：DCC完成MIHD scGPT&#43;UNI2五种融合实验与周一汇报（QFormer最佳ARI=0.370，发现STAIG架构关键洞察），MacBook修复Desktop Video四项安全权限关键Bug并实现液态玻璃屏保时钟，天河集群完成Pi0.5 LoRA训练管理、eval pipeline调试修复、BatchedVLAServer并行推理架构实现（GPU利用率从约10%提升至60%以上）与MimicGen九任务批量评估部署（Stack系列达95-100%成功率）。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-03-02/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-03-02/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-03-02/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-02">
+  <meta property="og:description" content="跨DCC、MacBook、天河三端并行：DCC完成MIHD scGPT&#43;UNI2五种融合实验与周一汇报（QFormer最佳ARI=0.370，发现STAIG架构关键洞察），MacBook修复Desktop Video四项安全权限关键Bug并实现液态玻璃屏保时钟，天河集群完成Pi0.5 LoRA训练管理、eval pipeline调试修复、BatchedVLAServer并行推理架构实现（GPU利用率从约10%提升至60%以上）与MimicGen九任务批量评估部署（Stack系列达95-100%成功率）。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-02T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-02T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-02">
+  <meta name="twitter:description" content="跨DCC、MacBook、天河三端并行：DCC完成MIHD scGPT&#43;UNI2五种融合实验与周一汇报（QFormer最佳ARI=0.370，发现STAIG架构关键洞察），MacBook修复Desktop Video四项安全权限关键Bug并实现液态玻璃屏保时钟，天河集群完成Pi0.5 LoRA训练管理、eval pipeline调试修复、BatchedVLAServer并行推理架构实现（GPU利用率从约10%提升至60%以上）与MimicGen九任务批量评估部署（Stack系列达95-100%成功率）。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-03-02",
+      "item": "https://tzj2006.github.io/bugjournal/2026-03-02/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-02",
+  "name": "Bug Journal 2026-03-02",
+  "description": "跨DCC、MacBook、天河三端并行：DCC完成MIHD scGPT+UNI2五种融合实验与周一汇报（QFormer最佳ARI=0.370，发现STAIG架构关键洞察），MacBook修复Desktop Video四项安全权限关键Bug并实现液态玻璃屏保时钟，天河集群完成Pi0.5 LoRA训练管理、eval pipeline调试修复、BatchedVLAServer并行推理架构实现（GPU利用率从约10%提升至60%以上）与MimicGen九任务批量评估部署（Stack系列达95-100%成功率）。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-02 今日概览 做了什么： 三端全天并行：DCC推进MIHD空间转录组融合实验与汇报，MacBook完成Desktop Video安全权限根本修复和液态玻璃UI升级，天河集群全面推进Pi0.5 LoRA训练管理、eval pipeline修复、GPU利用率优化架构实现与MimicGen批量评估部署 怎么做的： DCC通过phase2_evaluate.py跑5种融合策略+visualize_from_cache.py生成可视化；MacBook通过分析4438行运行日志定位entitlements空文件根因→修复四项Bug→重写屏保时钟；天河通过SSH/srun管理双节点进程，迭代调试eval脚本（v1→v5），实现BatchedVLAServer三线程批推理架构，修复JAX内存和MuJoCo渲染冲突后通过sbatch部署批量评估 有什么用： MIHD获得完整scGPT benchmark数据并发现STAIG不使用gene encoder输出的架构关键洞察；Desktop Video解决跨重启视频恢复权限错误Code 257的根本原因；天河GPU利用率从约10%提升至60%以上，20个trials评估时间从约15分钟压缩至约4分钟，Pi0.5 MimicGen Stack系列达95-100%成功率，建立可复用并行评估基础设施 DCC 做了什么： 完成scGPT嵌入缓存修复、scGPT-only基线重评估、五种融合策略全量实验（concat/mean/attention/llava_mlp/qformer）、三种单模态33张聚类可视化生成，编译周一汇报文档 怎么做的： 修复11个.npz缓存version字段→phase2_evaluate.py全量评估→使用现有visualize_from_cache.py批量出图→更新weekly_report_20260301.md含对比表和统计可视化（排名图/热力图/PCA vs scGPT对比图） 有什么用： QFormer最佳（avg ARI=0.370，+124% vs scGPT-only），揭示STAIG fusion使用原始HVG矩阵而非gene encoder输出的架构问题，为周一汇报提供完整数据支撑 MacBook 做了什么： 通过日志分析定位并修复Desktop Video四项关键Bug（entitlements缺失书签权限、errorLog并发写入、高频日志刷屏、启动双开），实现液态玻璃屏保时钟；标签真透明度和视频切换冻结问题待下次会话解决 怎么做的： 读取4438行运行日志发现entitlements文件为空为根因→补全权限+non-scoped回退解析+errorLog路由LogFile.shared+删除高频dlog（1550+条）+修复启动调用链；重写ScreensaverClockView使用.ultraThinMaterial+.mask裁剪为文字轮廓+渐变高光 有什么用： 解决视频/图片跨重启恢复权限错误（Code 257）的根本原因；屏保时钟升级为透明液态玻璃风格，但视频切换冻结和标签真透明问题仍待下次会话解决 tianhe 做了什么： 完成Pi0.5 LoRA训练任务管理（进度监控+an53迁移+意外中断重启）、eval pipeline三个串联Bug修复、BatchedVLAServer批量推理架构完整实现与部署、1823行VLA优化研究综述撰写，以及MimicGen九任务批量评估部署（前6任务结果已出） 怎么做的： 通过SSH/srun管理an49/an53双节点进程，迭代调试eval脚本（v1→v5），实现BatchedVLAServer三线程架构（Accept+ClientHandler+BatchInference）+3b_parallel_collect.py并行启动器，修复JAX内存（XLA_PYTHON_CLIENT_MEM_FRACTION=0.85）和osmesa渲染冲突，通过sbatch提交Slurm作业47209至an46 有什么用： 9个训练任务全部稳定运行；eval pipeline从完全失效（SR=0%）修复至正常（Stack_D0 SR=100%）；GPU利用率从约10%提升至60%以上；Stack系列95-100%、StackThree系列80-90%验证Pi0.5微调有效性 跨DCC、MacBook、天河三端并行：DCC完成MIHD scGPT+UNI2五种融合实验与周一汇报（QFormer最佳ARI=0.370，发现STAIG架构关键洞察），MacBook修复Desktop Video四项安全权限关键Bug并实现液态玻璃屏保时钟，天河集群完成Pi0.5 LoRA训练管理、eval pipeline调试修复、BatchedVLAServer并行推理架构实现（GPU利用率从约10%提升至60%以上）与MimicGen九任务批量评估部署（Stack系列达95-100%成功率）。\n今日任务 架构与策略 ✅ Desktop Video核心Bug修复（安全书签权限+并发日志+高频日志+启动双开） — 通过分析运行日志定位根本原因：entitlements文件为空导致书签从未以app-scope方式保存。四项修复：补全com.apple.security.files.bookmarks.app-scope权限+添加non-scoped回退解析兼容旧书签；errorLog路由至LogFile.shared消除并发写入；删除每秒触发的高频调试日志（1550+条）；在applyAppAppearanceSetting添加守卫防止启动时双重openMainWindow ✅ VLA评估GPU利用率优化：BatchedVLAServer架构完整实现与部署 — 从根因分析到架构实现到部署全链路完成：揭示action chunking（50步/chunk→每trial仅约8次GPU调用）是利用率仅10%的架构性根因；实现BatchedVLAServer三线程批量推理架构（最多等20ms或凑满8请求后执行单次前向传播）+3b_parallel_collect.py并行启动器（N个独立子进程）+3c_merge_results.py合并脚本；修复JAX内存（XLA_PYTHON_CLIENT_MEM_FRACTION=0.85）和MuJoCo渲染（osmesa）冲突；更新configs/Makefile/run_full_eval.sh，编写单元测试，更新项目全景总结.md至v4.19 ✅ scGPT+UNI2融合实验全流程（缓存修复→基线评估→五种融合→可视化→周报） — 修复11个.npz嵌入缓存元数据（添加cache_version和metadata_json字段），重跑scGPT-only基线（avg ARI=0.170，+49% vs buggy版本），依次完成concat/mean/attention/llava_mlp/qformer五种融合实验（QFormer最佳avg ARI=0.370），使用现有visualize_from_cache.py生成三种单模态聚类可视化共33张PNG，更新weekly_report_20260301.md含对比表、统计图和单模态可视化链接 🔄 Pi0.5 MimicGen批量评估部署与执行（Slurm 47209，9任务） — 终止an53 GPU3旧顺序评估，创建evaluate_mimicgen_batched.py和run_mimicgen_eval_batched.sh，通过sbatch提交作业47209在an46 GPU0运行。前6任务结果：Stack_D0 100%、Stack_D1 95%、StackThree_D0 80%、StackThree_D1 90%、Coffee_D0 45%、Coffee_D1 15%；Threading和ThreePieceAssembly会话结束时仍在运行 🔄 液态玻璃屏保时钟实现（标签真透明度和视频切换冻结待解决） — 重写ScreensaverClockView.swift，用.ultraThinMaterial+.mask裁剪为文字形状+渐变高光实现Liquid Glass效果，字体改为.thin weight，移除所有卡片背景。构建成功，但用户报告标签颜色固定（非真透明）和切换视频后视频卡住不更新两个新问题，会话被截断待下次会话解决 ✅ VLA推理优化研究综述（1823行，48篇论文，8大类别） — 撰写docs/vla_inference_optimization.md（中文），涵盖多环境批量推理、异步流水线、Flow Matching步数压缩、视觉Token优化、模型压缩、并行仿真、扩散加速等8大类，包含适用性矩阵和优先级推荐，由后台Agent并行完成 实现与修复 ✅ Pi0.5 Eval Pipeline调试修复（三个串联Bug） — 修复三个串联Bug：MUJOCO_EGL_DEVICE_ID断言错误、tyro CLI bool参数格式（–args.no-save-videos）、websocket keepalive ping timeout（在websocket_client_policy.py添加ping_timeout=None）。验证v3五路并行因JIT竞争崩溃，v4错开启动稳定，最终v5单GPU顺序脚本成功运行。隔离Test 1证实Stack_D0 step 4000 SR=100%（此前SR=0%为websocket超时导致episode跳过，非模型失败） ✅ Pi0.5 LoRA训练任务管理（进度监控+an53迁移+意外中断重启） — 监控an49上6个任务（11%→38%进度）和an53上4个任务（27%），将3个排队任务从an49迁移至an53；因kill launcher意外终止an49全部6个训练进程，重写restart脚本v2（独立后台srun –overlap，而非srun内部nohup）成功恢复，9个任务最终全部稳定运行；预计an49 3月4日完成，an53 3月5日完成；an49 GPU7（BC-RNN训练完成后）完全空闲可利用 ✅ 项目外部文件依赖清单（docs/external_files_inventory.md） — 通过读取task_registry.yaml、benchmark_v4.yaml、Makefile等核心配置文件验证所有外部路径引用，创建涵盖10类外部依赖的完整清单（4个conda环境、10个HDF5数据集约18.4GB、9个BC-RNN检查点、4个VLA检查点约47GB等），同步更新项目全景总结.md 问题与解决方案 关键问题 1. STAIG fusion架构中gene encoder输出被完全忽略，导致scGPT+UNI2+STAIG与PCA+UNI2+STAIG结果相同 解决方案: 代码追踪确认train_staig_fusion()使用原始HVG矩阵（staig_gene_feat）而非gene_emb，在汇报中明确标注并调整评估预期，无需额外实验\n关键洞察: STAIG是独立的图神经网络训练流程，gene encoder（PCA/scGPT）输出对STAIG结果没有影响，仅影响concat/mean/attention等直接线性融合；要在STAIG中区分gene encoder需修改其数据预处理\n2. Desktop Video重启后视频恢复报权限错误Code 257，安全作用域书签从未成功创建；errorLog静默丢失导致问题难以诊断 解决方案: 发现entitlements文件为空是根本原因，添加com.apple.security.files.bookmarks.app-scope；添加non-scoped书签回退解析兼容已保存旧书签；将errorLog路由至LogFile.shared消除并发写入\n关键洞察: ENABLE_USER_SELECTED_FILES=readonly只注入文件读取沙盒权限，书签持久化需独立entitlement手动声明，两者不互相隐含；多写者（独立FileHandle）访问同一文件会产生竞争导致日志静默丢失\n3. Pi0.5 VLA评估GPU利用率仅约10%，20个trials评估需约15分钟，效率低下 解决方案: 实现BatchedVLAServer三线程批量推理架构（聚合跨trial推理请求，最多等20ms或凑满8请求后执行单次前向传播）+N个独立子进程并行仿真，GPU利用率提升至60%以上，评估时间压缩至约4分钟\n关键洞察: 低GPU利用率是action chunking的固有架构特性（每trial仅约8次GPU调用，GPU在50步动作执行期间完全空闲），不是bug；解决方案需从批推理（数据面）和多worker并行仿真（控制面）两个维度同时引入并行\n4. scGPT单模态聚类ARI（0.170）显著低于PCA（0.261），Foundation Model表示不适合直接聚类 解决方案: 分析确认PCA直接最大化数据方差适合KMeans，scGPT优化跨组织泛化；QFormer跨注意力融合可将ARI提升至0.370（+124%），LLaVA-MLP达+86%\n关键洞察: Foundation Model表示在单模态聚类中不如PCA，但通过非线性融合可大幅超越PCA基线，说明其表示空间有价值但需非线性对齐才能在下游聚类中发挥作用\n5. Eval客户端websocket报keepalive ping timeout，所有episode失败（SR=0%），误判checkpoint无效 解决方案: 在websocket_client_policy.py的connect()添加ping_timeout=None禁用超时；通过隔离Test 1验证Stack_D0 step 4000实际SR=100%\n关键洞察: Pi0.5 JAX JIT首次编译需30-60s，超过websocket默认20s超时；SR=0%是episode被跳过而非策略失败，需仔细区分两种失败模式，出现异常低SR应立即隔离测试而非继续调整方案\n6. JAX默认贪心预分配全部GPU内存，导致cuBLAS初始化失败OOM；Worker EGL渲染与JAX GPU内存竞争 解决方案: 设置XLA_PYTHON_CLIENT_MEM_FRACTION=0.85为cuBLAS预留约12GB显存；Worker渲染后端从egl改为osmesa（CPU软件渲染），完全解耦GPU与MuJoCo仿真\n关键洞察: JAX贪心内存预分配策略与cuBLAS运行时需求冲突；osmesa+内存占比限制组合可稳定运行批量评估而无资源竞争，轻微增加CPU负担但保证稳定性\n7. JAX JIT多实例并行编译（5个server同时启动）引发CPU/内存竞争，websocket连接崩溃；Slurm srun内嵌nohup的训练进程随srun退出被杀死 解决方案: 实现staggered startup（逐一启动server+warmup JIT确认编译完成后再启动下一个）；重写restart脚本v2（每个任务改为独立后台srun –overlap，训练进程生命周期不依赖父srun）\n关键洞察: JAX JIT编译是CPU密集操作，多实例并行竞争资源；Slurm通过cgroup机制管理进程组，srun退出时终止所有子进程（包括nohup）；长期后台进程必须使用独立的srun命令\n一般问题 8. SSH直连GPU节点被PAM Slurm拒绝；srun在高负载节点超时或资源冲突 解决方案: SSH直连只在自己有active job的节点有效；无active job时用srun –jobid通过已有作业上下文访问；节点高负载时改用sbatch将任务委托给调度器自动寻找可用资源\n关键洞察: HPC访问策略优先级：SSH直连（最高效，文件路径和conda环境一致）\u003e srun –jobid（中间方案）\u003e sbatch（长时间任务首选，调度器自动分配）\n9. macOS 26+ SwiftUI .glassEffect() API与macOS 12.4+部署目标不兼容 解决方案: 设计降级方案：使用.mask()将ultraThinMaterial裁剪为文字形状，叠加渐变高光模拟玻璃反射，全部API兼容macOS 12.4+\n关键洞察: 新API只能用于最新系统，自定义mask材质方案是支持老版本的唯一兼容路径，效果上接近原生液态玻璃\n人类思路 vs AI 思路 战略层面 领域洞察与研究方向识别 角色 思路 人类 PI（Yi Zhang）主动从benchmark结果中识别跨样本zero-shot查询作为novel研究方向；用户完整分析action chunking机制（50步/chunk→每trial约8次推理→10%利用率）并拆解CPU/GPU时间分配，主动指明需要BatchedVLAServer方向 AI AI专注于当前数值和执行计划，没有主动识别研究机会；GPU利用率根因分析完全由人类完成，AI负责技术验证、文献调研和代码实现 差异分析: 研究导师和用户具备更高层次的领域视野（VLA架构知识、研究潜力判断），AI停留在执行和验证层面，缺乏主动发现研究机会的能力；典型的’人类设计方向，AI高质量执行’分工模式\n工程直觉与复杂度控制 角色 思路 人类 用户通过直觉判断关键工程约束（client显存轻量可与server共置GPU）、快速识别JIT竞争并给出’一个一个来’的串行化解法、在AI设计越来越复杂方案时主动收窄到单GPU顺序方案 AI AI倾向于充分利用所有可用GPU设计复杂并行方案，未主动预判资源竞争；用户确认后AI快速计算验证（client约400MB+server约61GB\u003c80GB）并实现错开启动 差异分析: 用户的工程实用主义避免了AI过度工程化倾向；用户直觉比AI分析更快收敛到正确稳定的解决方向；AI在此模式下提供技术验证和实现，而非架构决策\n运行时行为观察与异常数据识别 角色 思路 人类 用户直接观察到UI行为（视频切换冻结、SR=0%异常）并准确描述现象；基于’推理时间比例=GPU利用率’的直觉提出质疑，推动了根因分析 AI AI通过代码分析定位权限问题和action chunking机制，提供架构层面的解释；SR=0%时未立即质疑异常数据而继续调整方案，需要隔离测试才发现真实原因 差异分析: 用户提供运行时现象，AI提供代码路径和机理解释，两者互补；AI需要提高对’异常数据’的敏感性，Stack_D0在step 4000出现SR=0%应立即触发质疑而非接受\n实现层面 HPC节点访问策略与集群运维知识 角色 思路 人类 用户知道该集群支持SSH直连自己有active job的节点，且文件路径/conda环境与主机一致，指导AI优先SSH而非Slurm；用户明确评估需求是用于外部展示/论文验证，需尽快在已有checkpoint上跑eval AI AI过于保守地默认使用Slurm srun接口，多次超时后才找到正确方法；AI将eval视为训练完成后的常规下一步，未主动询问评估的外部目的和紧迫性 差异分析: 用户对集群运维知识和研究外部需求的掌握显著优于AI，提供了更高效的操作策略\n代码库熟悉度与工具复用 角色 思路 人类 用户明确指出visualize_from_cache.py已存在且功能足够，不需要新建脚本；用户提前准备了详细的外部依赖清单计划（包含所有路径和引用位置） AI AI在未检查现有工具的情况下直接编写新可视化脚本；通过读取配置文件验证路径引用增加文档可信度，但并未主动发现计划外的外部依赖 差异分析: 用户对代码库的熟悉度高于AI；AI在解决新问题时倾向于从头构建，不如用户有’先搜索现有工具’的意识\nAI 局限性 重要局限 两次未能在首轮识别根本原因：Desktop Video权限首轮修复只添加了生命周期管理，错过entitlements空文件根因，需要另一会话才完成正确修复；SR=0%时未立即质疑异常数据而继续调整并行方案，需要隔离Test 1才发现Stack_D0实际SR=100% 对项目内多套评估系统边界认识不清，将MimicGen任务评估与error recovery benchmark的pick_place评估以及LIBERO混淆，需用户两轮纠正；设计v3并行方案时未预见5个JAX JIT同时编译的CPU/内存竞争，用户比AI更快提出串行化解法 一般局限 未预见JAX贪心内存预分配导致cuBLAS OOM、bash内联Python f-string引号转义等工程陷阱，均在实际运行失败后才发现修复，属于可在设计阶段预防的常见问题 未检查现有工具就新建可视化脚本（visualize_weekly_report.py），被用户纠正后才改用现有visualize_from_cache.py；倾向于从头构建而非先搜索已有实现，产生不必要的代码冗余 在HPC环境中默认使用Slurm srun而非SSH，多次超时效率损失后才找到正确策略；Glob/Grep工具无法搜索HPC文件系统（XYFS01/HOME路径），严重限制代码搜索能力，只能依赖用户提供确切路径 ExitPlanMode/执行确认节点判断多次不准确，被用户连续拒绝，说明AI对计划→实施切换时机的感知与用户预期不符，浪费交互轮次；倾向于在方案未充分对齐时就启动Agent子任务并行执行 今日收获 核心收获 STAIG two-stage fusion直接使用原始HVG表达矩阵（staig_gene_feat）作为GCN节点特征，gene encoder（PCA/scGPT）输出对STAIG结果没有影响——gene encoder只影响concat/mean/attention等直接线性融合策略；要在STAIG中区分gene encoder需修改其数据预处理 scGPT Foundation Model单独使用在空间转录组聚类任务中不如PCA，但配合QFormer跨注意力融合后ARI从0.170提升至0.370（+124%），说明其表示空间有价值但需非线性对齐才能在下游聚类中发挥作用 VLA action chunking是GPU eval利用率低（约10%）的架构性根因：每次forward pass产生N步动作块，client执行期间GPU完全空闲，每trial仅约8次GPU调用。BatchedVLAServer聚合跨trial请求可将GPU利用率提升至60%以上，20个trials评估时间从约15分钟压缩至约4分钟（约4倍加速） Pi0.5 MimicGen微调检查点性能基线（step 14000-15000）：Stack系列95-100%（接近完美），StackThree系列80-90%（优秀），Coffee系列5-45%（较弱）；任务差异显著，操作复杂度（Coffee把手抓握）是主要挑战；Pi0.5 LoRA单张A800 80GB完全可行（约占76GB），多卡是为数据并行加速而非显存不足 macOS沙盒应用书签持久化权限（com.apple.security.files.bookmarks.app-scope）必须手动添加到.entitlements，ENABLE_USER_SELECTED_FILES=readonly不会自动包含此权限，两者相互独立；多写者（独立FileHandle）访问同一日志文件会产生竞争导致条目静默丢失，必须通过统一入口串行化 JAX JIT编译是CPU密集操作，多实例并行编译争抢CPU/内存带宽；openpi websocket默认ping_timeout=20s不适合JAX首次JIT编译（可超过20s），eval pipeline必须设置ping_timeout=None；多server部署必须串行化编译阶段（staggered startup+warmup） 实践收获 JAX+MuJoCo同机部署资源隔离策略：XLA_PYTHON_CLIENT_MEM_FRACTION限制JAX GPU内存占比（为cuBLAS预留空间）+Worker改用osmesa软件渲染（完全解耦GPU），两措施组合可稳定运行批量评估而无资源竞争 HPC集群节点访问策略：SSH优先（更高效稳定，文件路径和conda环境与主机一致），失败时回退到srun –jobid通过已有作业上下文；Slurm通过cgroup机制终止srun所有子进程（包括nohup），长期后台进程必须使用独立的后台srun命令；sbatch是长时间任务部署的最健壮方式（调度器自动寻找可用节点） SwiftUI .glassEffect()要求macOS 26+；对macOS 12.4+的液态玻璃文字效果，可用.mask()将ultraThinMaterial裁剪为文字形状+叠加渐变高光模拟玻璃反射，效果接近原生，全部API兼容macOS 12.4+ openpi checkpoint配置：save_interval=1000，max_to_keep=1（只保留最新），orbax格式包含assets/params/train_state三部分；Pi0.5训练与评估分离，训练完后需手动运行serve_policy.py起VLA server + evaluate_mimicgen.py跑rollout 会话摘要 MIHD ✅ scGPT+UNI2全套融合实验、汇报文档编译与STAIG架构关键发现 02:51:19.717 | claude_code PI（Yi Zhang）肯定scGPT bug fix效果，要求获取完整融合实验数据并编译周一汇报。AI通过代码追踪（models/Fusion.py:1247, pipeline/runner.py:445-446）发现STAIG fusion使用原始HVG矩阵而非gene encoder输出（关键架构洞察）。随后完整执行：修复11个.npz嵌入缓存元数据→重跑scGPT-only基线（avg ARI=0.170，+49%）→完成五种融合实验（QFormer最佳avg ARI=0.370）→使用现有visualize_from_cache.py生成三种单模态聚类可视化33张PNG（用户纠正AI新建脚本的错误）→更新weekly_report_20260301.md含对比表和统计图。PI额外提出跨样本zero-shot查询作为下一步研究方向。\nDesktop Video 🔄 安全作用域书签权限根本修复、四项Bug修复、液态玻璃屏保时钟实现 21:48:20.773 | claude_code 用户报告重启后视频恢复报权限错误Code 257。首轮修复（21:48会话）添加了书签访问生命周期管理，但未检查entitlements，错过根本原因。第二轮（22:31会话）通过完整分析4438行运行日志，确认entitlements文件为空是根因，完成四项修复：补全书签权限+non-scoped回退兼容、errorLog路由至LogFile.shared消除并发写入、删除1550+条高频调试日志、修复启动时双重openMainWindow调用链。随后（22:35会话）重写ScreensaverClockView实现液态玻璃屏保时钟，构建成功。用户报告两个新问题（标签非真透明、视频切换冻结），会话在定位前被截断，待下次会话解决。\nError Recovery Benchmark 🔄 Pi0.5训练管理、Eval Pipeline修复、VLA并行评估架构实现与MimicGen批量评估部署 03:10:32.466 | claude_code 全天在天河集群（an49/an53/an46节点）多线并进：①训练管理：监控9个Pi0.5 LoRA微调任务进度（an49约38%，an53约27%），将3个排队任务迁移至an53，因kill launcher意外终止an49全部6个进程，通过重写v2独立后台srun脚本成功恢复；创建docs/external_files_inventory.md（10类外部依赖）。②Eval Pipeline调试：修复websocket ping_timeout（=None）、JAX JIT多实例竞争（staggered startup→v5单GPU顺序）、tyro CLI参数格式三个串联Bug，隔离测试证实Stack_D0 step 4000 SR=100%（此前SR=0%为timeout误报）。③BatchedVLAServer实现：从根因分析（action chunking→10%利用率）到完整实现批量推理架构（vla_server.py+3b_parallel_collect.py+3c_merge_results.py）及配置更新，修复JAX OOM（XLA_PYTHON_CLIENT_MEM_FRACTION=0.85）和MuJoCo渲染冲突（osmesa），GPU利用率提升至60%以上。④MimicGen批量评估：终止旧顺序评估，通过sbatch提交作业47209在an46部署9任务评估，前6任务：Stack系列95-100%、StackThree系列80-90%、Coffee系列15-45%。⑤后台Agent同步撰写1823行VLA推理优化研究综述（48篇论文，8大类别）。\nToken 用量 总览 指标 数值 总 Token 80,835,492 输入 Token 143,427 输出 Token 217,530 Cache 创建 4,002,370 Cache 读取 76,472,165 Cache 命中率 95.0% 总费用 (USD) $55.0110 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 91,845 139,992 2,577,422 62,688,510 $51.4122 93.5% claude-haiku-4-5-20251001 51,582 77,538 1,424,948 13,783,655 $3.5988 6.5% 各设备用量 设备 总 Token 输入 输出 费用 DCC 637,595 9 435 $0.4049 MacBook 25,951,513 33,128 110,599 $19.1127 tianhe 54,246,384 110,290 106,496 $35.4933 ",
+  "wordCount" : "464",
+  "inLanguage": "en",
+  "datePublished": "2026-03-02T00:00:00-05:00",
+  "dateModified": "2026-03-02T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-03-02/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-02
+    </h1>
+    <div class="post-meta"><span title='2026-03-02 00:00:00 -0500 EST'>March 2, 2026</span>&nbsp;·&nbsp;<span>3 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-02">日报 — 2026-03-02<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-02">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 三端全天并行：DCC推进MIHD空间转录组融合实验与汇报，MacBook完成Desktop Video安全权限根本修复和液态玻璃UI升级，天河集群全面推进Pi0.5 LoRA训练管理、eval pipeline修复、GPU利用率优化架构实现与MimicGen批量评估部署</li>
+<li><strong>怎么做的：</strong> DCC通过phase2_evaluate.py跑5种融合策略+visualize_from_cache.py生成可视化；MacBook通过分析4438行运行日志定位entitlements空文件根因→修复四项Bug→重写屏保时钟；天河通过SSH/srun管理双节点进程，迭代调试eval脚本（v1→v5），实现BatchedVLAServer三线程批推理架构，修复JAX内存和MuJoCo渲染冲突后通过sbatch部署批量评估</li>
+<li><strong>有什么用：</strong> MIHD获得完整scGPT benchmark数据并发现STAIG不使用gene encoder输出的架构关键洞察；Desktop Video解决跨重启视频恢复权限错误Code 257的根本原因；天河GPU利用率从约10%提升至60%以上，20个trials评估时间从约15分钟压缩至约4分钟，Pi0.5 MimicGen Stack系列达95-100%成功率，建立可复用并行评估基础设施</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成scGPT嵌入缓存修复、scGPT-only基线重评估、五种融合策略全量实验（concat/mean/attention/llava_mlp/qformer）、三种单模态33张聚类可视化生成，编译周一汇报文档</li>
+<li><strong>怎么做的：</strong> 修复11个.npz缓存version字段→phase2_evaluate.py全量评估→使用现有visualize_from_cache.py批量出图→更新weekly_report_20260301.md含对比表和统计可视化（排名图/热力图/PCA vs scGPT对比图）</li>
+<li><strong>有什么用：</strong> QFormer最佳（avg ARI=0.370，+124% vs scGPT-only），揭示STAIG fusion使用原始HVG矩阵而非gene encoder输出的架构问题，为周一汇报提供完整数据支撑</li>
+</ul>
+<h3 id="macbook">MacBook<a hidden class="anchor" aria-hidden="true" href="#macbook">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 通过日志分析定位并修复Desktop Video四项关键Bug（entitlements缺失书签权限、errorLog并发写入、高频日志刷屏、启动双开），实现液态玻璃屏保时钟；标签真透明度和视频切换冻结问题待下次会话解决</li>
+<li><strong>怎么做的：</strong> 读取4438行运行日志发现entitlements文件为空<dict/>为根因→补全权限+non-scoped回退解析+errorLog路由LogFile.shared+删除高频dlog（1550+条）+修复启动调用链；重写ScreensaverClockView使用.ultraThinMaterial+.mask裁剪为文字轮廓+渐变高光</li>
+<li><strong>有什么用：</strong> 解决视频/图片跨重启恢复权限错误（Code 257）的根本原因；屏保时钟升级为透明液态玻璃风格，但视频切换冻结和标签真透明问题仍待下次会话解决</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成Pi0.5 LoRA训练任务管理（进度监控+an53迁移+意外中断重启）、eval pipeline三个串联Bug修复、BatchedVLAServer批量推理架构完整实现与部署、1823行VLA优化研究综述撰写，以及MimicGen九任务批量评估部署（前6任务结果已出）</li>
+<li><strong>怎么做的：</strong> 通过SSH/srun管理an49/an53双节点进程，迭代调试eval脚本（v1→v5），实现BatchedVLAServer三线程架构（Accept+ClientHandler+BatchInference）+3b_parallel_collect.py并行启动器，修复JAX内存（XLA_PYTHON_CLIENT_MEM_FRACTION=0.85）和osmesa渲染冲突，通过sbatch提交Slurm作业47209至an46</li>
+<li><strong>有什么用：</strong> 9个训练任务全部稳定运行；eval pipeline从完全失效（SR=0%）修复至正常（Stack_D0 SR=100%）；GPU利用率从约10%提升至60%以上；Stack系列95-100%、StackThree系列80-90%验证Pi0.5微调有效性</li>
+</ul>
+<blockquote>
+<p>跨DCC、MacBook、天河三端并行：DCC完成MIHD scGPT+UNI2五种融合实验与周一汇报（QFormer最佳ARI=0.370，发现STAIG架构关键洞察），MacBook修复Desktop Video四项安全权限关键Bug并实现液态玻璃屏保时钟，天河集群完成Pi0.5 LoRA训练管理、eval pipeline调试修复、BatchedVLAServer并行推理架构实现（GPU利用率从约10%提升至60%以上）与MimicGen九任务批量评估部署（Stack系列达95-100%成功率）。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>Desktop Video核心Bug修复（安全书签权限+并发日志+高频日志+启动双开）</strong> — 通过分析运行日志定位根本原因：entitlements文件为空<dict/>导致书签从未以app-scope方式保存。四项修复：补全com.apple.security.files.bookmarks.app-scope权限+添加non-scoped回退解析兼容旧书签；errorLog路由至LogFile.shared消除并发写入；删除每秒触发的高频调试日志（1550+条）；在applyAppAppearanceSetting添加守卫防止启动时双重openMainWindow</li>
+<li>✅ <strong>VLA评估GPU利用率优化：BatchedVLAServer架构完整实现与部署</strong> — 从根因分析到架构实现到部署全链路完成：揭示action chunking（50步/chunk→每trial仅约8次GPU调用）是利用率仅10%的架构性根因；实现BatchedVLAServer三线程批量推理架构（最多等20ms或凑满8请求后执行单次前向传播）+3b_parallel_collect.py并行启动器（N个独立子进程）+3c_merge_results.py合并脚本；修复JAX内存（XLA_PYTHON_CLIENT_MEM_FRACTION=0.85）和MuJoCo渲染（osmesa）冲突；更新configs/Makefile/run_full_eval.sh，编写单元测试，更新项目全景总结.md至v4.19</li>
+<li>✅ <strong>scGPT+UNI2融合实验全流程（缓存修复→基线评估→五种融合→可视化→周报）</strong> — 修复11个.npz嵌入缓存元数据（添加cache_version和metadata_json字段），重跑scGPT-only基线（avg ARI=0.170，+49% vs buggy版本），依次完成concat/mean/attention/llava_mlp/qformer五种融合实验（QFormer最佳avg ARI=0.370），使用现有visualize_from_cache.py生成三种单模态聚类可视化共33张PNG，更新weekly_report_20260301.md含对比表、统计图和单模态可视化链接</li>
+<li>🔄 <strong>Pi0.5 MimicGen批量评估部署与执行（Slurm 47209，9任务）</strong> — 终止an53 GPU3旧顺序评估，创建evaluate_mimicgen_batched.py和run_mimicgen_eval_batched.sh，通过sbatch提交作业47209在an46 GPU0运行。前6任务结果：Stack_D0 100%、Stack_D1 95%、StackThree_D0 80%、StackThree_D1 90%、Coffee_D0 45%、Coffee_D1 15%；Threading和ThreePieceAssembly会话结束时仍在运行</li>
+<li>🔄 <strong>液态玻璃屏保时钟实现（标签真透明度和视频切换冻结待解决）</strong> — 重写ScreensaverClockView.swift，用.ultraThinMaterial+.mask裁剪为文字形状+渐变高光实现Liquid Glass效果，字体改为.thin weight，移除所有卡片背景。构建成功，但用户报告标签颜色固定（非真透明）和切换视频后视频卡住不更新两个新问题，会话被截断待下次会话解决</li>
+<li>✅ <strong>VLA推理优化研究综述（1823行，48篇论文，8大类别）</strong> — 撰写docs/vla_inference_optimization.md（中文），涵盖多环境批量推理、异步流水线、Flow Matching步数压缩、视觉Token优化、模型压缩、并行仿真、扩散加速等8大类，包含适用性矩阵和优先级推荐，由后台Agent并行完成</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>Pi0.5 Eval Pipeline调试修复（三个串联Bug）</strong> — 修复三个串联Bug：MUJOCO_EGL_DEVICE_ID断言错误、tyro CLI bool参数格式（&ndash;args.no-save-videos）、websocket keepalive ping timeout（在websocket_client_policy.py添加ping_timeout=None）。验证v3五路并行因JIT竞争崩溃，v4错开启动稳定，最终v5单GPU顺序脚本成功运行。隔离Test 1证实Stack_D0 step 4000 SR=100%（此前SR=0%为websocket超时导致episode跳过，非模型失败）</li>
+<li>✅ <strong>Pi0.5 LoRA训练任务管理（进度监控+an53迁移+意外中断重启）</strong> — 监控an49上6个任务（11%→38%进度）和an53上4个任务（27%），将3个排队任务从an49迁移至an53；因kill launcher意外终止an49全部6个训练进程，重写restart脚本v2（独立后台srun &ndash;overlap，而非srun内部nohup）成功恢复，9个任务最终全部稳定运行；预计an49 3月4日完成，an53 3月5日完成；an49 GPU7（BC-RNN训练完成后）完全空闲可利用</li>
+<li>✅ <strong>项目外部文件依赖清单（docs/external_files_inventory.md）</strong> — 通过读取task_registry.yaml、benchmark_v4.yaml、Makefile等核心配置文件验证所有外部路径引用，创建涵盖10类外部依赖的完整清单（4个conda环境、10个HDF5数据集约18.4GB、9个BC-RNN检查点、4个VLA检查点约47GB等），同步更新项目全景总结.md</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-staig-fusion架构中gene-encoder输出被完全忽略导致scgptuni2staig与pcauni2staig结果相同">1. STAIG fusion架构中gene encoder输出被完全忽略，导致scGPT+UNI2+STAIG与PCA+UNI2+STAIG结果相同<a hidden class="anchor" aria-hidden="true" href="#1-staig-fusion架构中gene-encoder输出被完全忽略导致scgptuni2staig与pcauni2staig结果相同">#</a></h4>
+<p><strong>解决方案:</strong> 代码追踪确认train_staig_fusion()使用原始HVG矩阵（staig_gene_feat）而非gene_emb，在汇报中明确标注并调整评估预期，无需额外实验</p>
+<p><strong>关键洞察:</strong> STAIG是独立的图神经网络训练流程，gene encoder（PCA/scGPT）输出对STAIG结果没有影响，仅影响concat/mean/attention等直接线性融合；要在STAIG中区分gene encoder需修改其数据预处理</p>
+<h4 id="2-desktop-video重启后视频恢复报权限错误code-257安全作用域书签从未成功创建errorlog静默丢失导致问题难以诊断">2. Desktop Video重启后视频恢复报权限错误Code 257，安全作用域书签从未成功创建；errorLog静默丢失导致问题难以诊断<a hidden class="anchor" aria-hidden="true" href="#2-desktop-video重启后视频恢复报权限错误code-257安全作用域书签从未成功创建errorlog静默丢失导致问题难以诊断">#</a></h4>
+<p><strong>解决方案:</strong> 发现entitlements文件为空<dict/>是根本原因，添加com.apple.security.files.bookmarks.app-scope；添加non-scoped书签回退解析兼容已保存旧书签；将errorLog路由至LogFile.shared消除并发写入</p>
+<p><strong>关键洞察:</strong> ENABLE_USER_SELECTED_FILES=readonly只注入文件读取沙盒权限，书签持久化需独立entitlement手动声明，两者不互相隐含；多写者（独立FileHandle）访问同一文件会产生竞争导致日志静默丢失</p>
+<h4 id="3-pi05-vla评估gpu利用率仅约1020个trials评估需约15分钟效率低下">3. Pi0.5 VLA评估GPU利用率仅约10%，20个trials评估需约15分钟，效率低下<a hidden class="anchor" aria-hidden="true" href="#3-pi05-vla评估gpu利用率仅约1020个trials评估需约15分钟效率低下">#</a></h4>
+<p><strong>解决方案:</strong> 实现BatchedVLAServer三线程批量推理架构（聚合跨trial推理请求，最多等20ms或凑满8请求后执行单次前向传播）+N个独立子进程并行仿真，GPU利用率提升至60%以上，评估时间压缩至约4分钟</p>
+<p><strong>关键洞察:</strong> 低GPU利用率是action chunking的固有架构特性（每trial仅约8次GPU调用，GPU在50步动作执行期间完全空闲），不是bug；解决方案需从批推理（数据面）和多worker并行仿真（控制面）两个维度同时引入并行</p>
+<h4 id="4-scgpt单模态聚类ari0170显著低于pca0261foundation-model表示不适合直接聚类">4. scGPT单模态聚类ARI（0.170）显著低于PCA（0.261），Foundation Model表示不适合直接聚类<a hidden class="anchor" aria-hidden="true" href="#4-scgpt单模态聚类ari0170显著低于pca0261foundation-model表示不适合直接聚类">#</a></h4>
+<p><strong>解决方案:</strong> 分析确认PCA直接最大化数据方差适合KMeans，scGPT优化跨组织泛化；QFormer跨注意力融合可将ARI提升至0.370（+124%），LLaVA-MLP达+86%</p>
+<p><strong>关键洞察:</strong> Foundation Model表示在单模态聚类中不如PCA，但通过非线性融合可大幅超越PCA基线，说明其表示空间有价值但需非线性对齐才能在下游聚类中发挥作用</p>
+<h4 id="5-eval客户端websocket报keepalive-ping-timeout所有episode失败sr0误判checkpoint无效">5. Eval客户端websocket报keepalive ping timeout，所有episode失败（SR=0%），误判checkpoint无效<a hidden class="anchor" aria-hidden="true" href="#5-eval客户端websocket报keepalive-ping-timeout所有episode失败sr0误判checkpoint无效">#</a></h4>
+<p><strong>解决方案:</strong> 在websocket_client_policy.py的connect()添加ping_timeout=None禁用超时；通过隔离Test 1验证Stack_D0 step 4000实际SR=100%</p>
+<p><strong>关键洞察:</strong> Pi0.5 JAX JIT首次编译需30-60s，超过websocket默认20s超时；SR=0%是episode被跳过而非策略失败，需仔细区分两种失败模式，出现异常低SR应立即隔离测试而非继续调整方案</p>
+<h4 id="6-jax默认贪心预分配全部gpu内存导致cublas初始化失败oomworker-egl渲染与jax-gpu内存竞争">6. JAX默认贪心预分配全部GPU内存，导致cuBLAS初始化失败OOM；Worker EGL渲染与JAX GPU内存竞争<a hidden class="anchor" aria-hidden="true" href="#6-jax默认贪心预分配全部gpu内存导致cublas初始化失败oomworker-egl渲染与jax-gpu内存竞争">#</a></h4>
+<p><strong>解决方案:</strong> 设置XLA_PYTHON_CLIENT_MEM_FRACTION=0.85为cuBLAS预留约12GB显存；Worker渲染后端从egl改为osmesa（CPU软件渲染），完全解耦GPU与MuJoCo仿真</p>
+<p><strong>关键洞察:</strong> JAX贪心内存预分配策略与cuBLAS运行时需求冲突；osmesa+内存占比限制组合可稳定运行批量评估而无资源竞争，轻微增加CPU负担但保证稳定性</p>
+<h4 id="7-jax-jit多实例并行编译5个server同时启动引发cpu内存竞争websocket连接崩溃slurm-srun内嵌nohup的训练进程随srun退出被杀死">7. JAX JIT多实例并行编译（5个server同时启动）引发CPU/内存竞争，websocket连接崩溃；Slurm srun内嵌nohup的训练进程随srun退出被杀死<a hidden class="anchor" aria-hidden="true" href="#7-jax-jit多实例并行编译5个server同时启动引发cpu内存竞争websocket连接崩溃slurm-srun内嵌nohup的训练进程随srun退出被杀死">#</a></h4>
+<p><strong>解决方案:</strong> 实现staggered startup（逐一启动server+warmup JIT确认编译完成后再启动下一个）；重写restart脚本v2（每个任务改为独立后台srun &ndash;overlap，训练进程生命周期不依赖父srun）</p>
+<p><strong>关键洞察:</strong> JAX JIT编译是CPU密集操作，多实例并行竞争资源；Slurm通过cgroup机制管理进程组，srun退出时终止所有子进程（包括nohup）；长期后台进程必须使用独立的srun命令</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="8-ssh直连gpu节点被pam-slurm拒绝srun在高负载节点超时或资源冲突">8. SSH直连GPU节点被PAM Slurm拒绝；srun在高负载节点超时或资源冲突<a hidden class="anchor" aria-hidden="true" href="#8-ssh直连gpu节点被pam-slurm拒绝srun在高负载节点超时或资源冲突">#</a></h4>
+<p><strong>解决方案:</strong> SSH直连只在自己有active job的节点有效；无active job时用srun &ndash;jobid通过已有作业上下文访问；节点高负载时改用sbatch将任务委托给调度器自动寻找可用资源</p>
+<p><strong>关键洞察:</strong> HPC访问策略优先级：SSH直连（最高效，文件路径和conda环境一致）&gt; srun &ndash;jobid（中间方案）&gt; sbatch（长时间任务首选，调度器自动分配）</p>
+<h4 id="9-macos-26-swiftui-glasseffect-api与macos-124部署目标不兼容">9. macOS 26+ SwiftUI .glassEffect() API与macOS 12.4+部署目标不兼容<a hidden class="anchor" aria-hidden="true" href="#9-macos-26-swiftui-glasseffect-api与macos-124部署目标不兼容">#</a></h4>
+<p><strong>解决方案:</strong> 设计降级方案：使用.mask()将ultraThinMaterial裁剪为文字形状，叠加渐变高光模拟玻璃反射，全部API兼容macOS 12.4+</p>
+<p><strong>关键洞察:</strong> 新API只能用于最新系统，自定义mask材质方案是支持老版本的唯一兼容路径，效果上接近原生液态玻璃</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="领域洞察与研究方向识别">领域洞察与研究方向识别<a hidden class="anchor" aria-hidden="true" href="#领域洞察与研究方向识别">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>PI（Yi Zhang）主动从benchmark结果中识别跨样本zero-shot查询作为novel研究方向；用户完整分析action chunking机制（50步/chunk→每trial约8次推理→10%利用率）并拆解CPU/GPU时间分配，主动指明需要BatchedVLAServer方向</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI专注于当前数值和执行计划，没有主动识别研究机会；GPU利用率根因分析完全由人类完成，AI负责技术验证、文献调研和代码实现</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 研究导师和用户具备更高层次的领域视野（VLA架构知识、研究潜力判断），AI停留在执行和验证层面，缺乏主动发现研究机会的能力；典型的&rsquo;人类设计方向，AI高质量执行&rsquo;分工模式</p>
+<h4 id="工程直觉与复杂度控制">工程直觉与复杂度控制<a hidden class="anchor" aria-hidden="true" href="#工程直觉与复杂度控制">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户通过直觉判断关键工程约束（client显存轻量可与server共置GPU）、快速识别JIT竞争并给出&rsquo;一个一个来&rsquo;的串行化解法、在AI设计越来越复杂方案时主动收窄到单GPU顺序方案</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI倾向于充分利用所有可用GPU设计复杂并行方案，未主动预判资源竞争；用户确认后AI快速计算验证（client约400MB+server约61GB&lt;80GB）并实现错开启动</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户的工程实用主义避免了AI过度工程化倾向；用户直觉比AI分析更快收敛到正确稳定的解决方向；AI在此模式下提供技术验证和实现，而非架构决策</p>
+<h4 id="运行时行为观察与异常数据识别">运行时行为观察与异常数据识别<a hidden class="anchor" aria-hidden="true" href="#运行时行为观察与异常数据识别">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户直接观察到UI行为（视频切换冻结、SR=0%异常）并准确描述现象；基于&rsquo;推理时间比例=GPU利用率&rsquo;的直觉提出质疑，推动了根因分析</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI通过代码分析定位权限问题和action chunking机制，提供架构层面的解释；SR=0%时未立即质疑异常数据而继续调整方案，需要隔离测试才发现真实原因</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户提供运行时现象，AI提供代码路径和机理解释，两者互补；AI需要提高对&rsquo;异常数据&rsquo;的敏感性，Stack_D0在step 4000出现SR=0%应立即触发质疑而非接受</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="hpc节点访问策略与集群运维知识">HPC节点访问策略与集群运维知识<a hidden class="anchor" aria-hidden="true" href="#hpc节点访问策略与集群运维知识">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户知道该集群支持SSH直连自己有active job的节点，且文件路径/conda环境与主机一致，指导AI优先SSH而非Slurm；用户明确评估需求是用于外部展示/论文验证，需尽快在已有checkpoint上跑eval</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI过于保守地默认使用Slurm srun接口，多次超时后才找到正确方法；AI将eval视为训练完成后的常规下一步，未主动询问评估的外部目的和紧迫性</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户对集群运维知识和研究外部需求的掌握显著优于AI，提供了更高效的操作策略</p>
+<h4 id="代码库熟悉度与工具复用">代码库熟悉度与工具复用<a hidden class="anchor" aria-hidden="true" href="#代码库熟悉度与工具复用">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户明确指出visualize_from_cache.py已存在且功能足够，不需要新建脚本；用户提前准备了详细的外部依赖清单计划（包含所有路径和引用位置）</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI在未检查现有工具的情况下直接编写新可视化脚本；通过读取配置文件验证路径引用增加文档可信度，但并未主动发现计划外的外部依赖</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户对代码库的熟悉度高于AI；AI在解决新问题时倾向于从头构建，不如用户有&rsquo;先搜索现有工具&rsquo;的意识</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>两次未能在首轮识别根本原因：Desktop Video权限首轮修复只添加了生命周期管理，错过entitlements空文件根因，需要另一会话才完成正确修复；SR=0%时未立即质疑异常数据而继续调整并行方案，需要隔离Test 1才发现Stack_D0实际SR=100%</li>
+<li>对项目内多套评估系统边界认识不清，将MimicGen任务评估与error recovery benchmark的pick_place评估以及LIBERO混淆，需用户两轮纠正；设计v3并行方案时未预见5个JAX JIT同时编译的CPU/内存竞争，用户比AI更快提出串行化解法</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>未预见JAX贪心内存预分配导致cuBLAS OOM、bash内联Python f-string引号转义等工程陷阱，均在实际运行失败后才发现修复，属于可在设计阶段预防的常见问题</li>
+<li>未检查现有工具就新建可视化脚本（visualize_weekly_report.py），被用户纠正后才改用现有visualize_from_cache.py；倾向于从头构建而非先搜索已有实现，产生不必要的代码冗余</li>
+<li>在HPC环境中默认使用Slurm srun而非SSH，多次超时效率损失后才找到正确策略；Glob/Grep工具无法搜索HPC文件系统（XYFS01/HOME路径），严重限制代码搜索能力，只能依赖用户提供确切路径</li>
+<li>ExitPlanMode/执行确认节点判断多次不准确，被用户连续拒绝，说明AI对计划→实施切换时机的感知与用户预期不符，浪费交互轮次；倾向于在方案未充分对齐时就启动Agent子任务并行执行</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>STAIG two-stage fusion直接使用原始HVG表达矩阵（staig_gene_feat）作为GCN节点特征，gene encoder（PCA/scGPT）输出对STAIG结果没有影响——gene encoder只影响concat/mean/attention等直接线性融合策略；要在STAIG中区分gene encoder需修改其数据预处理</li>
+<li>scGPT Foundation Model单独使用在空间转录组聚类任务中不如PCA，但配合QFormer跨注意力融合后ARI从0.170提升至0.370（+124%），说明其表示空间有价值但需非线性对齐才能在下游聚类中发挥作用</li>
+<li>VLA action chunking是GPU eval利用率低（约10%）的架构性根因：每次forward pass产生N步动作块，client执行期间GPU完全空闲，每trial仅约8次GPU调用。BatchedVLAServer聚合跨trial请求可将GPU利用率提升至60%以上，20个trials评估时间从约15分钟压缩至约4分钟（约4倍加速）</li>
+<li>Pi0.5 MimicGen微调检查点性能基线（step 14000-15000）：Stack系列95-100%（接近完美），StackThree系列80-90%（优秀），Coffee系列5-45%（较弱）；任务差异显著，操作复杂度（Coffee把手抓握）是主要挑战；Pi0.5 LoRA单张A800 80GB完全可行（约占76GB），多卡是为数据并行加速而非显存不足</li>
+<li>macOS沙盒应用书签持久化权限（com.apple.security.files.bookmarks.app-scope）必须手动添加到.entitlements，ENABLE_USER_SELECTED_FILES=readonly不会自动包含此权限，两者相互独立；多写者（独立FileHandle）访问同一日志文件会产生竞争导致条目静默丢失，必须通过统一入口串行化</li>
+<li>JAX JIT编译是CPU密集操作，多实例并行编译争抢CPU/内存带宽；openpi websocket默认ping_timeout=20s不适合JAX首次JIT编译（可超过20s），eval pipeline必须设置ping_timeout=None；多server部署必须串行化编译阶段（staggered startup+warmup）</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>JAX+MuJoCo同机部署资源隔离策略：XLA_PYTHON_CLIENT_MEM_FRACTION限制JAX GPU内存占比（为cuBLAS预留空间）+Worker改用osmesa软件渲染（完全解耦GPU），两措施组合可稳定运行批量评估而无资源竞争</li>
+<li>HPC集群节点访问策略：SSH优先（更高效稳定，文件路径和conda环境与主机一致），失败时回退到srun &ndash;jobid通过已有作业上下文；Slurm通过cgroup机制终止srun所有子进程（包括nohup），长期后台进程必须使用独立的后台srun命令；sbatch是长时间任务部署的最健壮方式（调度器自动寻找可用节点）</li>
+<li>SwiftUI .glassEffect()要求macOS 26+；对macOS 12.4+的液态玻璃文字效果，可用.mask()将ultraThinMaterial裁剪为文字形状+叠加渐变高光模拟玻璃反射，效果接近原生，全部API兼容macOS 12.4+</li>
+<li>openpi checkpoint配置：save_interval=1000，max_to_keep=1（只保留最新），orbax格式包含assets/params/train_state三部分；Pi0.5训练与评估分离，训练完后需手动运行serve_policy.py起VLA server + evaluate_mimicgen.py跑rollout</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>✅ scGPT+UNI2全套融合实验、汇报文档编译与STAIG架构关键发现</strong>
+<em>02:51:19.717 | claude_code</em>
+PI（Yi Zhang）肯定scGPT bug fix效果，要求获取完整融合实验数据并编译周一汇报。AI通过代码追踪（models/Fusion.py:1247, pipeline/runner.py:445-446）发现STAIG fusion使用原始HVG矩阵而非gene encoder输出（关键架构洞察）。随后完整执行：修复11个.npz嵌入缓存元数据→重跑scGPT-only基线（avg ARI=0.170，+49%）→完成五种融合实验（QFormer最佳avg ARI=0.370）→使用现有visualize_from_cache.py生成三种单模态聚类可视化33张PNG（用户纠正AI新建脚本的错误）→更新weekly_report_20260301.md含对比表和统计图。PI额外提出跨样本zero-shot查询作为下一步研究方向。</p>
+<h3 id="desktop-video">Desktop Video<a hidden class="anchor" aria-hidden="true" href="#desktop-video">#</a></h3>
+<p><strong>🔄 安全作用域书签权限根本修复、四项Bug修复、液态玻璃屏保时钟实现</strong>
+<em>21:48:20.773 | claude_code</em>
+用户报告重启后视频恢复报权限错误Code 257。首轮修复（21:48会话）添加了书签访问生命周期管理，但未检查entitlements，错过根本原因。第二轮（22:31会话）通过完整分析4438行运行日志，确认entitlements文件为空<dict/>是根因，完成四项修复：补全书签权限+non-scoped回退兼容、errorLog路由至LogFile.shared消除并发写入、删除1550+条高频调试日志、修复启动时双重openMainWindow调用链。随后（22:35会话）重写ScreensaverClockView实现液态玻璃屏保时钟，构建成功。用户报告两个新问题（标签非真透明、视频切换冻结），会话在定位前被截断，待下次会话解决。</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 Pi0.5训练管理、Eval Pipeline修复、VLA并行评估架构实现与MimicGen批量评估部署</strong>
+<em>03:10:32.466 | claude_code</em>
+全天在天河集群（an49/an53/an46节点）多线并进：①训练管理：监控9个Pi0.5 LoRA微调任务进度（an49约38%，an53约27%），将3个排队任务迁移至an53，因kill launcher意外终止an49全部6个进程，通过重写v2独立后台srun脚本成功恢复；创建docs/external_files_inventory.md（10类外部依赖）。②Eval Pipeline调试：修复websocket ping_timeout（=None）、JAX JIT多实例竞争（staggered startup→v5单GPU顺序）、tyro CLI参数格式三个串联Bug，隔离测试证实Stack_D0 step 4000 SR=100%（此前SR=0%为timeout误报）。③BatchedVLAServer实现：从根因分析（action chunking→10%利用率）到完整实现批量推理架构（vla_server.py+3b_parallel_collect.py+3c_merge_results.py）及配置更新，修复JAX OOM（XLA_PYTHON_CLIENT_MEM_FRACTION=0.85）和MuJoCo渲染冲突（osmesa），GPU利用率提升至60%以上。④MimicGen批量评估：终止旧顺序评估，通过sbatch提交作业47209在an46部署9任务评估，前6任务：Stack系列95-100%、StackThree系列80-90%、Coffee系列15-45%。⑤后台Agent同步撰写1823行VLA推理优化研究综述（48篇论文，8大类别）。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>80,835,492</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>143,427</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>217,530</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>4,002,370</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>76,472,165</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>95.0%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$55.0110</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>91,845</td>
+          <td>139,992</td>
+          <td>2,577,422</td>
+          <td>62,688,510</td>
+          <td>$51.4122</td>
+          <td>93.5%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>51,582</td>
+          <td>77,538</td>
+          <td>1,424,948</td>
+          <td>13,783,655</td>
+          <td>$3.5988</td>
+          <td>6.5%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>637,595</td>
+          <td>9</td>
+          <td>435</td>
+          <td>$0.4049</td>
+      </tr>
+      <tr>
+          <td>MacBook</td>
+          <td>25,951,513</td>
+          <td>33,128</td>
+          <td>110,599</td>
+          <td>$19.1127</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>54,246,384</td>
+          <td>110,290</td>
+          <td>106,496</td>
+          <td>$35.4933</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

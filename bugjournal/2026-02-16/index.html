@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-16 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="三台设备并行推进：DCC 上为 STAIG GCN 实现 hidden_dim 消融框架并启动实验；tianhe 上完成 VLA Pi0 端到端验证、修复 obs 图像 bug 并采集 150 个自然错误场景；TzJsDesktop 上为日报工具添加会话摘要、重要性评分和双层 overview 结构。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-02-16/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-02-16/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-02-16/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-16">
+  <meta property="og:description" content="三台设备并行推进：DCC 上为 STAIG GCN 实现 hidden_dim 消融框架并启动实验；tianhe 上完成 VLA Pi0 端到端验证、修复 obs 图像 bug 并采集 150 个自然错误场景；TzJsDesktop 上为日报工具添加会话摘要、重要性评分和双层 overview 结构。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-16T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-16T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-16">
+  <meta name="twitter:description" content="三台设备并行推进：DCC 上为 STAIG GCN 实现 hidden_dim 消融框架并启动实验；tianhe 上完成 VLA Pi0 端到端验证、修复 obs 图像 bug 并采集 150 个自然错误场景；TzJsDesktop 上为日报工具添加会话摘要、重要性评分和双层 overview 结构。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-16",
+      "item": "https://tzj2006.github.io/bugjournal/2026-02-16/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-16",
+  "name": "Bug Journal 2026-02-16",
+  "description": "三台设备并行推进：DCC 上为 STAIG GCN 实现 hidden_dim 消融框架并启动实验；tianhe 上完成 VLA Pi0 端到端验证、修复 obs 图像 bug 并采集 150 个自然错误场景；TzJsDesktop 上为日报工具添加会话摘要、重要性评分和双层 overview 结构。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-16 今日概览 做了什么： 跨三台设备同步推进科研与工具链开发——MIHD 消融框架建设、VLA 采集 pipeline 验证、日报分析系统升级 怎么做的： 通过代码修改与测试验证相结合，在模型训练框架、机器人 rollout 系统和日报生成工具中分别新增功能或修复关键 bug 有什么用： GCN 消融实验框架就绪、数据库扩充至 271 个场景同时达成 M5/M10 里程碑、日报工具获得带优先级评分的可检索知识库能力 DCC 做了什么： 为 STAIG 融合策略添加 hidden_dim 可配置支持，修改 5 个文件构建消融实验体系，并在 151508 slice 上启动 pca+UNI2 消融 怎么做的： 通过 CLI flag → extra_config → fusion_config 三级注入链将 hidden_dim 传递到 GCN 训练代码，在 pipeline_config.yaml 中定义 4 组消融实验 有什么用： 使 hidden_dim=64/128/256/512 系统性消融成为可能，为排查 151672 模型坍塌（std=0.12，仅 2 个有效 cluster）的根因提供实验基础 TzJsDesktop 做了什么： 为 daily_summary.py 新增 conversation_summaries 章节，以及 level/importance 重要性评分系统和全局+设备两层 daily_overview 结构 怎么做的： 修改 SUMMARY_PROMPT 模板、ANTHROPIC_TOOL schema 和 generate_markdown()，并通过 _build_summary_prompt() 函数动态生成单设备或多设备版本 有什么用： 日报从简单工作记录升级为带优先级评分的可检索知识库，每段对话均有结构化摘要和重要性标注 tianhe 做了什么： 完成 VLA Pi0 端到端 injection-mode 验证，修复 rollout_generator.py 中初始 obs 不包含相机图像的关键 bug，并采集 50 rollouts 共 150 个自然错误场景 怎么做的： 通过 TCP Policy Server 连接 Pi0 模型，EGL 渲染 + mimicgen_env 运行 rollout，PolicyErrorMonitor 实时检测自然失败模式 有什么用： VLA 采集 pipeline 完整验证通过，数据库从 121 扩充至 271 个场景，M5（≥200 场景）和 M10（自然错误采集）里程碑同时达标 三台设备并行推进：DCC 上为 STAIG GCN 实现 hidden_dim 消融框架并启动实验；tianhe 上完成 VLA Pi0 端到端验证、修复 obs 图像 bug 并采集 150 个自然错误场景；TzJsDesktop 上为日报工具添加会话摘要、重要性评分和双层 overview 结构。\n今日任务 架构与策略 ✅ GCN hidden_dim 消融实验框架实现 — 修改 run_benchmark.py（添加 –hidden_dim CLI 参数、注入 fusion_config、更新 exp_name 后缀 _h{dim}）、evaluation_planner.py（EvaluationJob 新增 hidden_dim 字段及 key/exp_name 更新）、runner.py（传递 hidden_dim 到 fusion_config 三个位置）、pipeline_config.yaml（4 个消融实验 + hidden_dim_ablation 组）和 staig_alignment_config.yaml（添加注释），通过 3 项单元测试验证。 ✅ VLA Pi0 端到端 injection-mode 验证 — 成功启动 Pi0 VLA 服务器（端口 5556，加载耗时约 2.5 分钟），运行 10 次 injection-mode rollouts，生成 3 个 tip_over 错误场景（proximity + instability 检测器触发，impulse 注入器）。 ✅ rollout_generator.py 初始 obs 图像缺失 bug 修复 — 修复 _get_current_obs() 方法添加 include_images 参数，在 _generate_from_single_rollout 和 capture_natural_errors 中检测 PolicyServerAdapter 并传入 include_images=True，确保 VLA policy 在第一步能获取相机图像。 ✅ 50 rollouts 自然错误场景采集 — 运行 50 次 natural_capture rollouts（约 12.5 分钟），采集 150 个自然错误场景（3 个/rollout 上限）。错误类型分布：joint_limit_approach 47%、grasp_wrong_pose 30%、misalignment_pre_grasp 17%、overshoot 5%、premature_release 1%。数据库总量从 121 扩充至 271 个场景，所有 50 次 rollout success=False（Pi0 在 LIBERO 上训练，无法泛化至 PickPlace）。 ✅ 日报格式升级：level/importance + 两层 daily_overview — 为所有报告字段（tasks、problems_and_solutions、human_vs_ai、ai_limitations、learnings、conversation_summaries）添加 level 和 importance 评分；将 daily_overview 改为 global + devices 两层结构；实现 _build_summary_prompt() 函数动态生成多设备版本；添加跳过仅含打断标记的无效会话要求。 ✅ daily_summary.py conversation_summaries 功能实现 — 在 SUMMARY_PROMPT 中添加 conversation_summaries JSON 模板、更新 ANTHROPIC_TOOL schema、在 generate_markdown() 中渲染会话摘要章节（含结果图标 ✅/🔄/🔍/❌ 和时间戳），max_tokens 从 4096 升至 8192。 实现与修复 🔄 151508 pca+UNI2 hidden_dim 消融实验运行 — 在 151508 slice 上启动 pca+UNI2 的 hidden_dim=64/128/256/512 消融实验，包含 staig_fusion、staig_fusion_e2e、basic_contrastive 三种融合策略共 10 个评估任务，实验在会话结束时仍在后台运行。 ✅ 项目全景总结.md 同步更新 — 多次更新 项目全景总结.md，包括版本号（v4.5.0→v4.5.1）、场景数量（118→121→271）、M5/M9/M10 里程碑状态、新增 v4.5.1 版本历史章节，以及自然采集的错误分布数据和 Pi0 失败分析。 问题与解决方案 关键问题 1. VLA rollout 第一步报错 ‘observation/image’ KeyError，VLA policy 无法获取图像导致 pipeline 中断 解决方案: 修改 _get_current_obs() 添加 include_images 参数，在 _generate_from_single_rollout 和 capture_natural_errors 中检测到 PolicyServerAdapter 时传入 include_images=True\n关键洞察: 两种 obs 来源（state_extractor.extract 和 env.step 原始 obs）格式不同；初始 obs 来自 state_extractor，默认不包含相机图像；VLA 模式必须显式请求图像，此 bug 只在 VLA 模式首次运行时才会暴露\n2. Pi0（LIBERO checkpoint）在 PickPlace 任务上 100% 失败，50 个 rollout 全部 success=False 解决方案: 确认为预期行为——Pi0 在 LIBERO 数据集上训练，不能泛化到 robosuite PickPlace；natural_capture 模式利用这种失败来采集错误场景\n关键洞察: 用于 natural_capture 的策略不需要成功执行任务，高失败率反而提供更丰富的错误样本；平均每 rollout 48 个错误事件说明 Pi0 在 PickPlace 上的失败模式具有多样性\n一般问题 3. conda run –no-banner 参数在 HPC 节点的 conda 版本中不被支持，VLA 服务器启动失败（exit code 2） 解决方案: 去掉 –no-banner 标志直接使用 conda run，接受 banner 输出混入 stderr\n关键洞察: HPC 环境的 conda 版本可能落后于开发环境，需测试兼容性；conda run 的 stdout 被 shell 缓冲，无法实时看到输出，应改用端口监听轮询判断服务就绪\n4. VLA 服务器目标端口 5555 被其他进程占用，服务器无法启动 解决方案: ss -tlnp 检查端口占用后改用 5556 端口，rollout 脚本的 –vla_port 参数同步修改\n关键洞察: 在共享 HPC 节点上启动服务前应先检查端口可用性；轮询 ss -tlnp 比等待固定时间更可靠\n5. Edit 工具在多步骤编辑 daily_summary.py 时积累了重复行（重复的 if 语句、注释、dict key） 解决方案: 通过 Read 工具检查当前文件状态，定位并逐一删除所有重复行，最终用 ast.parse 做语法验证\n关键洞察: Edit 工具需要精确的 old_string 匹配，当文件中存在已有重复内容时易引入新重复；每次编辑后应立即用 Read 验证\n人类思路 vs AI 思路 战略层面 日报格式设计：用户主导的多轮需求升级 角色 思路 人类 用户在第一次实现后连续提出三项具体升级：summary 应为散文而非 bullet list、需要 level/importance 评分系统（high=战略决策，1-10 分）、daily_overview 需要分全局和设备两层 AI AI 在第一次实现 conversation_summaries 时只做了最基础的字段结构，未预见优先级评分和多层 overview 这些使用场景 差异分析: 人类对日报作为\"可检索知识库\"的长期使用需求有深层理解；AI 倾向于最小可行实现，需要用户明确描述使用场景才能做出合适的设计决策\nhidden_dim 消融实验：用户设计架构，AI 负责实现 角色 思路 人类 用户预先设计了完整的 5 文件修改计划，包括 CLI 参数层级、三级注入链、exp_name 命名规范（仅 hidden_dim!=64 时加后缀）和 pipeline_config 消融组定义 AI AI 按照计划执行实现，在单元测试验证时主动覆盖了 exp_name 后缀、EvaluationPlanner hidden_dim 提取等边界情况 差异分析: 人类负责架构设计和关键决策（如默认值 64 不加后缀），AI 负责转化为可运行代码并主动验证；这是高效人机协作的典型模式\n实现层面 VLA 执行节奏：人类拒绝了 AI 准备直接运行的 rollout 角色 思路 人类 在 AI 准备运行第一次（修复前的）rollout 时，用户直接拒绝了工具调用，随后中断并重新给出计划 AI AI 在服务器端口监听就绪后立即准备运行 rollout，未等待用户确认 差异分析: 人类对执行时机有更谨慎的判断；AI 在技术条件满足后倾向于立即执行，缺乏对\"是否应该先确认\"的主动询问\nAI 局限性 重要局限 在实现 conversation_summaries 时未预见 level/importance 评分、prose summary 格式要求和两层 daily_overview 等高价值需求，需要用户明确提出后才能逐一添加 一般局限 Edit 工具在多步骤编辑中积累了重复行，未能在每次编辑后主动调用 Read 验证文件完整性 在 VLA 服务器就绪后准备直接运行 rollout，未主动询问用户是否确认，被拒绝后才意识到需要等待 今日收获 核心收获 VLA rollout 初始 obs 必须显式请求相机图像：state_extractor.extract() 默认不包含图像，VLA 模式下必须传 include_images=True，否则 VLA server 在第一步因 ‘observation/image’ KeyError 而失败；这个 bug 只在 VLA 模式首次运行时才会暴露 natural_capture 模式下策略的高失败率是数据优势：Pi0 在 PickPlace 上 100% 失败，但每 rollout 平均产生 48 个错误事件、3 个场景；不能完成任务的策略反而能高效采集错误场景，这是 natural_capture 设计的核心逻辑 日报工具加入 level/importance 评分是从\"日志\"到\"知识库\"的关键升级：评分使未来可以按重要性筛选和检索，将日常工作记录转化为可用的学习资产 GCN hidden_dim 通过三级注入链（CLI flag → extra_config → fusion_config）传递的设计模式，使消融实验可以在不修改模型代码的情况下进行；这种\"外部化超参数\"的配置注入模式值得在类似实验框架中推广 会话摘要 MIHD GCN 消融实验 🔄 实现 GCN hidden_dim 消融框架并启动 151508 ablation 实验 22:49:28.071 | claude_code 用户提供了完整的 5 文件修改计划，AI 按计划实现了 hidden_dim 消融实验支持：run_benchmark.py 新增 –hidden_dim CLI 参数和三级注入链，evaluation_planner.py 扩展 EvaluationJob，runner.py 传递参数，pipeline_config.yaml 定义 4 组消融实验，并通过 3 项单元测试验证。随后用户要求立即在 151508 slice 上启动 pca+UNI2 的消融实验，实验包含 10 个评估任务，在会话结束时仍在后台运行中。\nError Recovery Benchmark ✅ VLA Pi0 端到端验证 + obs 图像 bug 修复 + 150 个自然错误场景采集 16:23:03.741 | claude_code 按计划启动 Pi0 VLA 服务器时遇到 conda –no-banner 兼容性问题和端口 5555 占用，改用端口 5556 后成功启动；首次 injection rollout 因 _get_current_obs() 未传 include_images=True 报 KeyError，AI 定位并修复了该 bug。修复后 10 次 injection rollout 生成 3 个场景验证通过，随后 50 次 natural_capture rollout 生成 150 个自然错误场景（以 joint_limit_approach 47% 和 grasp_wrong_pose 30% 为主）。最后多次更新 项目全景总结.md，将数据库场景数更新至 271，M5 和 M10 里程碑同时标记为完成。\nGadget 日报工具 ✅ 日报格式升级：level/importance 评分 + prose summaries + 两层 daily_overview 23:24:16.457 | claude_code 用户对第一版 conversation_summaries 提出三项改进：summary 字段应为 2-4 句连贯散文、所有报告字段应有 level/importance 优先级评分、daily_overview 应分全局（global）和设备（devices）两层。AI 更新了 SUMMARY_PROMPT（新增 10 条要求）、ANTHROPIC_TOOL schema（daily_overview 对象结构），并实现了 _build_summary_prompt() 函数动态生成多设备版本的 overview 块；同时在 generate_markdown() 中渲染了新的今日概览章节。\n✅ 为日报添加 conversation_summaries 章节（从计划到实现） 22:51:46.457 | claude_code 用户提出日报需要一个 part 来总结每段与 AI 的对话。AI 在计划模式下设计了在 SUMMARY_PROMPT、ANTHROPIC_TOOL schema 和 generate_markdown() 中添加 conversation_summaries 字段的方案，并成功实现，同时将 max_tokens 从 4096 升至 8192。过程中 Edit 工具引入了多处重复行，需要多次修复。\nToken 用量 总览 指标 数值 总 Token 26,576,538 输入 Token 65,270 输出 Token 4,763 Cache 创建 3,210,416 Cache 读取 23,296,089 Cache 命中率 87.9% 总费用 (USD) $15.3719 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 4,932 3,096 831,748 6,700,904 $8.6509 56.3% claude-haiku-4-5-20251001 37,707 1,202 1,837,053 13,517,884 $3.6918 24.0% claude-sonnet-4-5-20250929 22,631 465 541,615 3,077,301 $3.0291 19.7% 各设备用量 设备 总 Token 输入 输出 费用 DCC 4,966,180 4,181 811 $3.2654 MacBook 872,417 19 224 $0.7495 tianhe 17,831,330 57,454 2,021 $8.2146 TzJsDesktop 2,906,611 3,616 1,707 $3.1424 ",
+  "wordCount" : "868",
+  "inLanguage": "en",
+  "datePublished": "2026-02-16T00:00:00-05:00",
+  "dateModified": "2026-02-16T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-02-16/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-16
+    </h1>
+    <div class="post-meta"><span title='2026-02-16 00:00:00 -0500 EST'>February 16, 2026</span>&nbsp;·&nbsp;<span>5 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-16">日报 — 2026-02-16<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-16">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 跨三台设备同步推进科研与工具链开发——MIHD 消融框架建设、VLA 采集 pipeline 验证、日报分析系统升级</li>
+<li><strong>怎么做的：</strong> 通过代码修改与测试验证相结合，在模型训练框架、机器人 rollout 系统和日报生成工具中分别新增功能或修复关键 bug</li>
+<li><strong>有什么用：</strong> GCN 消融实验框架就绪、数据库扩充至 271 个场景同时达成 M5/M10 里程碑、日报工具获得带优先级评分的可检索知识库能力</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 为 STAIG 融合策略添加 hidden_dim 可配置支持，修改 5 个文件构建消融实验体系，并在 151508 slice 上启动 pca+UNI2 消融</li>
+<li><strong>怎么做的：</strong> 通过 CLI flag → extra_config → fusion_config 三级注入链将 hidden_dim 传递到 GCN 训练代码，在 pipeline_config.yaml 中定义 4 组消融实验</li>
+<li><strong>有什么用：</strong> 使 hidden_dim=64/128/256/512 系统性消融成为可能，为排查 151672 模型坍塌（std=0.12，仅 2 个有效 cluster）的根因提供实验基础</li>
+</ul>
+<h3 id="tzjsdesktop">TzJsDesktop<a hidden class="anchor" aria-hidden="true" href="#tzjsdesktop">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 为 daily_summary.py 新增 conversation_summaries 章节，以及 level/importance 重要性评分系统和全局+设备两层 daily_overview 结构</li>
+<li><strong>怎么做的：</strong> 修改 SUMMARY_PROMPT 模板、ANTHROPIC_TOOL schema 和 generate_markdown()，并通过 _build_summary_prompt() 函数动态生成单设备或多设备版本</li>
+<li><strong>有什么用：</strong> 日报从简单工作记录升级为带优先级评分的可检索知识库，每段对话均有结构化摘要和重要性标注</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成 VLA Pi0 端到端 injection-mode 验证，修复 rollout_generator.py 中初始 obs 不包含相机图像的关键 bug，并采集 50 rollouts 共 150 个自然错误场景</li>
+<li><strong>怎么做的：</strong> 通过 TCP Policy Server 连接 Pi0 模型，EGL 渲染 + mimicgen_env 运行 rollout，PolicyErrorMonitor 实时检测自然失败模式</li>
+<li><strong>有什么用：</strong> VLA 采集 pipeline 完整验证通过，数据库从 121 扩充至 271 个场景，M5（≥200 场景）和 M10（自然错误采集）里程碑同时达标</li>
+</ul>
+<blockquote>
+<p>三台设备并行推进：DCC 上为 STAIG GCN 实现 hidden_dim 消融框架并启动实验；tianhe 上完成 VLA Pi0 端到端验证、修复 obs 图像 bug 并采集 150 个自然错误场景；TzJsDesktop 上为日报工具添加会话摘要、重要性评分和双层 overview 结构。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>GCN hidden_dim 消融实验框架实现</strong> — 修改 run_benchmark.py（添加 &ndash;hidden_dim CLI 参数、注入 fusion_config、更新 exp_name 后缀 _h{dim}）、evaluation_planner.py（EvaluationJob 新增 hidden_dim 字段及 key/exp_name 更新）、runner.py（传递 hidden_dim 到 fusion_config 三个位置）、pipeline_config.yaml（4 个消融实验 + hidden_dim_ablation 组）和 staig_alignment_config.yaml（添加注释），通过 3 项单元测试验证。</li>
+<li>✅ <strong>VLA Pi0 端到端 injection-mode 验证</strong> — 成功启动 Pi0 VLA 服务器（端口 5556，加载耗时约 2.5 分钟），运行 10 次 injection-mode rollouts，生成 3 个 tip_over 错误场景（proximity + instability 检测器触发，impulse 注入器）。</li>
+<li>✅ <strong>rollout_generator.py 初始 obs 图像缺失 bug 修复</strong> — 修复 _get_current_obs() 方法添加 include_images 参数，在 _generate_from_single_rollout 和 capture_natural_errors 中检测 PolicyServerAdapter 并传入 include_images=True，确保 VLA policy 在第一步能获取相机图像。</li>
+<li>✅ <strong>50 rollouts 自然错误场景采集</strong> — 运行 50 次 natural_capture rollouts（约 12.5 分钟），采集 150 个自然错误场景（3 个/rollout 上限）。错误类型分布：joint_limit_approach 47%、grasp_wrong_pose 30%、misalignment_pre_grasp 17%、overshoot 5%、premature_release 1%。数据库总量从 121 扩充至 271 个场景，所有 50 次 rollout success=False（Pi0 在 LIBERO 上训练，无法泛化至 PickPlace）。</li>
+<li>✅ <strong>日报格式升级：level/importance + 两层 daily_overview</strong> — 为所有报告字段（tasks、problems_and_solutions、human_vs_ai、ai_limitations、learnings、conversation_summaries）添加 level 和 importance 评分；将 daily_overview 改为 global + devices 两层结构；实现 _build_summary_prompt() 函数动态生成多设备版本；添加跳过仅含打断标记的无效会话要求。</li>
+<li>✅ <strong>daily_summary.py conversation_summaries 功能实现</strong> — 在 SUMMARY_PROMPT 中添加 conversation_summaries JSON 模板、更新 ANTHROPIC_TOOL schema、在 generate_markdown() 中渲染会话摘要章节（含结果图标 ✅/🔄/🔍/❌ 和时间戳），max_tokens 从 4096 升至 8192。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>🔄 <strong>151508 pca+UNI2 hidden_dim 消融实验运行</strong> — 在 151508 slice 上启动 pca+UNI2 的 hidden_dim=64/128/256/512 消融实验，包含 staig_fusion、staig_fusion_e2e、basic_contrastive 三种融合策略共 10 个评估任务，实验在会话结束时仍在后台运行。</li>
+<li>✅ <strong>项目全景总结.md 同步更新</strong> — 多次更新 项目全景总结.md，包括版本号（v4.5.0→v4.5.1）、场景数量（118→121→271）、M5/M9/M10 里程碑状态、新增 v4.5.1 版本历史章节，以及自然采集的错误分布数据和 Pi0 失败分析。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-vla-rollout-第一步报错-observationimage-keyerrorvla-policy-无法获取图像导致-pipeline-中断">1. VLA rollout 第一步报错 &lsquo;observation/image&rsquo; KeyError，VLA policy 无法获取图像导致 pipeline 中断<a hidden class="anchor" aria-hidden="true" href="#1-vla-rollout-第一步报错-observationimage-keyerrorvla-policy-无法获取图像导致-pipeline-中断">#</a></h4>
+<p><strong>解决方案:</strong> 修改 _get_current_obs() 添加 include_images 参数，在 _generate_from_single_rollout 和 capture_natural_errors 中检测到 PolicyServerAdapter 时传入 include_images=True</p>
+<p><strong>关键洞察:</strong> 两种 obs 来源（state_extractor.extract 和 env.step 原始 obs）格式不同；初始 obs 来自 state_extractor，默认不包含相机图像；VLA 模式必须显式请求图像，此 bug 只在 VLA 模式首次运行时才会暴露</p>
+<h4 id="2-pi0libero-checkpoint在-pickplace-任务上-100-失败50-个-rollout-全部-successfalse">2. Pi0（LIBERO checkpoint）在 PickPlace 任务上 100% 失败，50 个 rollout 全部 success=False<a hidden class="anchor" aria-hidden="true" href="#2-pi0libero-checkpoint在-pickplace-任务上-100-失败50-个-rollout-全部-successfalse">#</a></h4>
+<p><strong>解决方案:</strong> 确认为预期行为——Pi0 在 LIBERO 数据集上训练，不能泛化到 robosuite PickPlace；natural_capture 模式利用这种失败来采集错误场景</p>
+<p><strong>关键洞察:</strong> 用于 natural_capture 的策略不需要成功执行任务，高失败率反而提供更丰富的错误样本；平均每 rollout 48 个错误事件说明 Pi0 在 PickPlace 上的失败模式具有多样性</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="3-conda-run-no-banner-参数在-hpc-节点的-conda-版本中不被支持vla-服务器启动失败exit-code-2">3. conda run &ndash;no-banner 参数在 HPC 节点的 conda 版本中不被支持，VLA 服务器启动失败（exit code 2）<a hidden class="anchor" aria-hidden="true" href="#3-conda-run-no-banner-参数在-hpc-节点的-conda-版本中不被支持vla-服务器启动失败exit-code-2">#</a></h4>
+<p><strong>解决方案:</strong> 去掉 &ndash;no-banner 标志直接使用 conda run，接受 banner 输出混入 stderr</p>
+<p><strong>关键洞察:</strong> HPC 环境的 conda 版本可能落后于开发环境，需测试兼容性；conda run 的 stdout 被 shell 缓冲，无法实时看到输出，应改用端口监听轮询判断服务就绪</p>
+<h4 id="4-vla-服务器目标端口-5555-被其他进程占用服务器无法启动">4. VLA 服务器目标端口 5555 被其他进程占用，服务器无法启动<a hidden class="anchor" aria-hidden="true" href="#4-vla-服务器目标端口-5555-被其他进程占用服务器无法启动">#</a></h4>
+<p><strong>解决方案:</strong> ss -tlnp 检查端口占用后改用 5556 端口，rollout 脚本的 &ndash;vla_port 参数同步修改</p>
+<p><strong>关键洞察:</strong> 在共享 HPC 节点上启动服务前应先检查端口可用性；轮询 ss -tlnp 比等待固定时间更可靠</p>
+<h4 id="5-edit-工具在多步骤编辑-daily_summarypy-时积累了重复行重复的-if-语句注释dict-key">5. Edit 工具在多步骤编辑 daily_summary.py 时积累了重复行（重复的 if 语句、注释、dict key）<a hidden class="anchor" aria-hidden="true" href="#5-edit-工具在多步骤编辑-daily_summarypy-时积累了重复行重复的-if-语句注释dict-key">#</a></h4>
+<p><strong>解决方案:</strong> 通过 Read 工具检查当前文件状态，定位并逐一删除所有重复行，最终用 ast.parse 做语法验证</p>
+<p><strong>关键洞察:</strong> Edit 工具需要精确的 old_string 匹配，当文件中存在已有重复内容时易引入新重复；每次编辑后应立即用 Read 验证</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="日报格式设计用户主导的多轮需求升级">日报格式设计：用户主导的多轮需求升级<a hidden class="anchor" aria-hidden="true" href="#日报格式设计用户主导的多轮需求升级">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户在第一次实现后连续提出三项具体升级：summary 应为散文而非 bullet list、需要 level/importance 评分系统（high=战略决策，1-10 分）、daily_overview 需要分全局和设备两层</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 在第一次实现 conversation_summaries 时只做了最基础的字段结构，未预见优先级评分和多层 overview 这些使用场景</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类对日报作为&quot;可检索知识库&quot;的长期使用需求有深层理解；AI 倾向于最小可行实现，需要用户明确描述使用场景才能做出合适的设计决策</p>
+<h4 id="hidden_dim-消融实验用户设计架构ai-负责实现">hidden_dim 消融实验：用户设计架构，AI 负责实现<a hidden class="anchor" aria-hidden="true" href="#hidden_dim-消融实验用户设计架构ai-负责实现">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户预先设计了完整的 5 文件修改计划，包括 CLI 参数层级、三级注入链、exp_name 命名规范（仅 hidden_dim!=64 时加后缀）和 pipeline_config 消融组定义</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 按照计划执行实现，在单元测试验证时主动覆盖了 exp_name 后缀、EvaluationPlanner hidden_dim 提取等边界情况</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类负责架构设计和关键决策（如默认值 64 不加后缀），AI 负责转化为可运行代码并主动验证；这是高效人机协作的典型模式</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="vla-执行节奏人类拒绝了-ai-准备直接运行的-rollout">VLA 执行节奏：人类拒绝了 AI 准备直接运行的 rollout<a hidden class="anchor" aria-hidden="true" href="#vla-执行节奏人类拒绝了-ai-准备直接运行的-rollout">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>在 AI 准备运行第一次（修复前的）rollout 时，用户直接拒绝了工具调用，随后中断并重新给出计划</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 在服务器端口监听就绪后立即准备运行 rollout，未等待用户确认</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类对执行时机有更谨慎的判断；AI 在技术条件满足后倾向于立即执行，缺乏对&quot;是否应该先确认&quot;的主动询问</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>在实现 conversation_summaries 时未预见 level/importance 评分、prose summary 格式要求和两层 daily_overview 等高价值需求，需要用户明确提出后才能逐一添加</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>Edit 工具在多步骤编辑中积累了重复行，未能在每次编辑后主动调用 Read 验证文件完整性</li>
+<li>在 VLA 服务器就绪后准备直接运行 rollout，未主动询问用户是否确认，被拒绝后才意识到需要等待</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>VLA rollout 初始 obs 必须显式请求相机图像：state_extractor.extract() 默认不包含图像，VLA 模式下必须传 include_images=True，否则 VLA server 在第一步因 &lsquo;observation/image&rsquo; KeyError 而失败；这个 bug 只在 VLA 模式首次运行时才会暴露</li>
+<li>natural_capture 模式下策略的高失败率是数据优势：Pi0 在 PickPlace 上 100% 失败，但每 rollout 平均产生 48 个错误事件、3 个场景；不能完成任务的策略反而能高效采集错误场景，这是 natural_capture 设计的核心逻辑</li>
+<li>日报工具加入 level/importance 评分是从&quot;日志&quot;到&quot;知识库&quot;的关键升级：评分使未来可以按重要性筛选和检索，将日常工作记录转化为可用的学习资产</li>
+<li>GCN hidden_dim 通过三级注入链（CLI flag → extra_config → fusion_config）传递的设计模式，使消融实验可以在不修改模型代码的情况下进行；这种&quot;外部化超参数&quot;的配置注入模式值得在类似实验框架中推广</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd-gcn-消融实验">MIHD GCN 消融实验<a hidden class="anchor" aria-hidden="true" href="#mihd-gcn-消融实验">#</a></h3>
+<p><strong>🔄 实现 GCN hidden_dim 消融框架并启动 151508 ablation 实验</strong>
+<em>22:49:28.071 | claude_code</em>
+用户提供了完整的 5 文件修改计划，AI 按计划实现了 hidden_dim 消融实验支持：run_benchmark.py 新增 &ndash;hidden_dim CLI 参数和三级注入链，evaluation_planner.py 扩展 EvaluationJob，runner.py 传递参数，pipeline_config.yaml 定义 4 组消融实验，并通过 3 项单元测试验证。随后用户要求立即在 151508 slice 上启动 pca+UNI2 的消融实验，实验包含 10 个评估任务，在会话结束时仍在后台运行中。</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>✅ VLA Pi0 端到端验证 + obs 图像 bug 修复 + 150 个自然错误场景采集</strong>
+<em>16:23:03.741 | claude_code</em>
+按计划启动 Pi0 VLA 服务器时遇到 conda &ndash;no-banner 兼容性问题和端口 5555 占用，改用端口 5556 后成功启动；首次 injection rollout 因 _get_current_obs() 未传 include_images=True 报 KeyError，AI 定位并修复了该 bug。修复后 10 次 injection rollout 生成 3 个场景验证通过，随后 50 次 natural_capture rollout 生成 150 个自然错误场景（以 joint_limit_approach 47% 和 grasp_wrong_pose 30% 为主）。最后多次更新 项目全景总结.md，将数据库场景数更新至 271，M5 和 M10 里程碑同时标记为完成。</p>
+<h3 id="gadget-日报工具">Gadget 日报工具<a hidden class="anchor" aria-hidden="true" href="#gadget-日报工具">#</a></h3>
+<p><strong>✅ 日报格式升级：level/importance 评分 + prose summaries + 两层 daily_overview</strong>
+<em>23:24:16.457 | claude_code</em>
+用户对第一版 conversation_summaries 提出三项改进：summary 字段应为 2-4 句连贯散文、所有报告字段应有 level/importance 优先级评分、daily_overview 应分全局（global）和设备（devices）两层。AI 更新了 SUMMARY_PROMPT（新增 10 条要求）、ANTHROPIC_TOOL schema（daily_overview 对象结构），并实现了 _build_summary_prompt() 函数动态生成多设备版本的 overview 块；同时在 generate_markdown() 中渲染了新的今日概览章节。</p>
+<p><strong>✅ 为日报添加 conversation_summaries 章节（从计划到实现）</strong>
+<em>22:51:46.457 | claude_code</em>
+用户提出日报需要一个 part 来总结每段与 AI 的对话。AI 在计划模式下设计了在 SUMMARY_PROMPT、ANTHROPIC_TOOL schema 和 generate_markdown() 中添加 conversation_summaries 字段的方案，并成功实现，同时将 max_tokens 从 4096 升至 8192。过程中 Edit 工具引入了多处重复行，需要多次修复。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>26,576,538</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>65,270</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>4,763</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>3,210,416</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>23,296,089</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>87.9%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$15.3719</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>4,932</td>
+          <td>3,096</td>
+          <td>831,748</td>
+          <td>6,700,904</td>
+          <td>$8.6509</td>
+          <td>56.3%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>37,707</td>
+          <td>1,202</td>
+          <td>1,837,053</td>
+          <td>13,517,884</td>
+          <td>$3.6918</td>
+          <td>24.0%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-5-20250929</td>
+          <td>22,631</td>
+          <td>465</td>
+          <td>541,615</td>
+          <td>3,077,301</td>
+          <td>$3.0291</td>
+          <td>19.7%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>4,966,180</td>
+          <td>4,181</td>
+          <td>811</td>
+          <td>$3.2654</td>
+      </tr>
+      <tr>
+          <td>MacBook</td>
+          <td>872,417</td>
+          <td>19</td>
+          <td>224</td>
+          <td>$0.7495</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>17,831,330</td>
+          <td>57,454</td>
+          <td>2,021</td>
+          <td>$8.2146</td>
+      </tr>
+      <tr>
+          <td>TzJsDesktop</td>
+          <td>2,906,611</td>
+          <td>3,616</td>
+          <td>1,707</td>
+          <td>$3.1424</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

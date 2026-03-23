@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-20 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="MIHD项目完成STAIG fusion评估与embedding缓存架构集成，error_recovery_benchmark修复BC-RNN obs维度bug并启动M12-M14大规模并行评估">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-02-20/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-02-20/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-02-20/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-20">
+  <meta property="og:description" content="MIHD项目完成STAIG fusion评估与embedding缓存架构集成，error_recovery_benchmark修复BC-RNN obs维度bug并启动M12-M14大规模并行评估">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-20T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-20T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-20">
+  <meta name="twitter:description" content="MIHD项目完成STAIG fusion评估与embedding缓存架构集成，error_recovery_benchmark修复BC-RNN obs维度bug并启动M12-M14大规模并行评估">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-20",
+      "item": "https://tzj2006.github.io/bugjournal/2026-02-20/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-20",
+  "name": "Bug Journal 2026-02-20",
+  "description": "MIHD项目完成STAIG fusion评估与embedding缓存架构集成，error_recovery_benchmark修复BC-RNN obs维度bug并启动M12-M14大规模并行评估",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-20 今日概览 做了什么： 在DCC（MIHD空间转录组分析）和tianhe（机器人错误恢复基准）两台设备上分别完成了关键架构改进与实验启动 怎么做的： 通过代码追踪发现并修复预处理管线错误，将独立评估脚本整合进已有pipeline，修复跨版本兼容性问题后启动多GPU并行实验 有什么用： MIHD建立了完整embedding缓存机制避免重复推理，error_recovery_benchmark修复了阻塞实验运行的BC-RNN obs维度不匹配问题，两个项目均为后续论文实验扫清了主要障碍 DCC 做了什么： 调查STAIG fusion双重归一化bug、获取fusion方法对比基准结果，并将CacheManager集成到run_benchmark.py 怎么做的： 逐层追踪preprocess_for_encoding与STAIGTrainer内部StandardScaler的归一化路径，创建临时测试脚本验证结果，最终通过CacheManager API改造主评估脚本 有什么用： run_benchmark.py可直接复用pipeline缓存的embeddings避免重复UNI2推理，支持自定义缓存名实现SCAN embedding替换实验，解决了独立评估脚本引入bug的根本问题 tianhe 做了什么： 实现M12-M14里程碑基础设施，修复BC-RNN obs维度不匹配和MimicGen版本兼容性，启动6个并行后台评估任务 怎么做的： 读取BC-RNN checkpoint配置诊断65 vs 37维差异，修改policy_adapter和rollout_generator两条路径的原始obs传递，用inspect.signature动态适配robomimic 0.3.0 API 有什么用： BC-RNN策略现可正常在基准环境运行rollout，Pi0/Pi0.5服务器成功加载，BC-RNN injection已运行至118/200 rollout，M14四策略全量评估正式启动 MIHD项目完成STAIG fusion评估与embedding缓存架构集成，error_recovery_benchmark修复BC-RNN obs维度bug并启动M12-M14大规模并行评估\n今日任务 架构与策略 ✅ BC-RNN obs维度不匹配修复（两条路径） — BC-RNN期望65维输入（8物体×7维object-state），StateExtractor只提供37维（4物体）。修复policy_adapter._to_robosuite_obs()使用原始robosuite obs，修复rollout_generator中injection路径（_generate_from_single_rollout）和natural_capture路径（_capture_single_rollout）的初始obs获取 ✅ 调查STAIG fusion双重归一化bug及历史结果缺失 — 发现eval_scan_fusion.py未传staig_alignment_config，导致STAIGTrainer内部StandardScaler与上游preprocess_for_encoding重复归一化。同时确认staig_fusion从未在151673上官方benchmark运行过（experiments_log无记录） ✅ run_benchmark.py embedding缓存集成 — 添加CacheManager导入和初始化，gene/vision encoding前检查embeddings_cache/命中则跳过encoder实例化，新提取后保存缓存。增加vision variant支持（standard/freq/staig_strict），放宽vision_encoder argparse choices，两个call site传入override参数。语法检查和CacheManager功能验证通过 🔄 M14大规模并行评估启动 — 启动5个并行后台任务：BC-RNN injection(GPU0, 运行至rollout118/200)、BC-RNN natural capture(GPU1, 修复后重启)、demo生成(GPU2)、Pi0服务器(GPU4, 已就绪)、Pi0.5服务器(GPU5, 已就绪)。VLA端口冲突修复后服务器成功加载 实现与修复 ✅ MimicGen robomimic 0.3.0兼容性修复 — robomimic 0.3.0的create_env_for_data_processing()不支持env_class等新参数，导致MimicGen数据增强失败。修改mimicgen/utils/robomimic_utils.py用inspect.signature动态过滤不支持的参数 ✅ STAIG fusion单独对比实验（151673） — 中断长达2+小时的全fusion评估任务，创建_test_staig_scan.py单独对比UNI2_raw vs SCAN(UNI2)在staig_fusion上的表现。结果：UNI2_raw ARI=0.3929/NMI=0.5660，SCAN ARI=0.3880/NMI=0.5639，基本持平。临时脚本已清理 ✅ error_recovery_benchmark M12-M14基础设施检查与save_images新增 — 检查发现mimicgen_augment_200.json和taxonomy_justification.md已存在（无需重建），新增collector.py的save_images选项（M14 S3.2.3），支持VLA训练数据采集时同步保存相机帧 问题与解决方案 关键问题 1. eval_scan_fusion.py在staig_fusion中存在双重归一化：上游preprocess_for_encoding已做max_value=10的scale，STAIGTrainer内部StandardScaler又做了一次，导致基因特征被处理两次 解决方案: 放弃修复独立脚本，改为通过run_benchmark.py传递完整的staig_alignment_config，STAIGTrainer收到align_staig=True后跳过内部归一化，并集成embedding缓存直接加载已缓存的embeddings\n关键洞察: eval_scan_fusion.py绕过了run_benchmark.py的正确预处理管线；用户「为什么不直接用benchmark script」这一问题指出了根本解决方案，避免了在错误路径上继续修补\n2. BC-RNN期望65维输入（训练时用8物体robosuite原始obs），但rollout_generator通过StateExtractor提取的obs只有37维（自定义4物体抽象），运行时报input_size mismatch 解决方案: 修改policy_adapter._to_robosuite_obs()识别并直接传递robosuite env.step()返回的原始obs（含56维object-state），而非StateExtractor重映射的版本。injection和natural_capture两条路径均需修复\n关键洞察: BC-RNN训练时使用的是robosuite原始obs（8物体PickPlace任务），而项目框架为了通用性引入StateExtractor只跟踪4个核心物体，两套obs体系语义不同，必须为BC-RNN bypass抽象层\n3. run_benchmark.py每次运行都重新实例化UNI2 encoder从头提取embeddings，即使pipeline已缓存了相同的embeddings，造成大量不必要的GPU推理时间 解决方案: 集成CacheManager，encoding前检查embeddings_cache/{type}/{encoder}/{section}.npz，命中则直接加载（秒级），未命中才执行encoder提取并保存到缓存\n关键洞察: pipeline缓存的是归一化前的raw embeddings，因此post-encoder normalization必须在缓存加载后执行，缓存设计的语义边界是提取后、归一化前\n一般问题 4. MimicGen调用create_env_for_data_processing()时传入env_class等参数，但当前安装的robomimic 0.3.0不支持这些参数（TypeError: unexpected keyword argument） 解决方案: 用inspect.signature动态获取函数签名，只传入目标robomimic版本支持的参数，实现版本自适应兼容\n关键洞察: MimicGen代码假设了更新版本的robomimic API接口，动态签名检查比版本号条件判断更健壮\n5. VLA服务器重启时报Address already in use（端口5556/5557被上个会话的进程占用） 解决方案: 用lsof -ti找到占用进程并kill，确认端口释放后重新启动\n关键洞察: HPC长期运行节点上Claude会话结束后服务器进程可能未正常退出，重启前应先清理残留进程\n人类思路 vs AI 思路 战略层面 SCAN fusion评估应使用独立脚本还是现有benchmark script 角色 思路 人类 用户直接指出「为什么不直接用原本的benchmark script」，认为已有正确实现的管线应直接复用 AI AI创建了独立的eval_scan_fusion.py进行对比实验，发现bug后计划修复独立脚本，并设计了ExitPlanMode准备实施修复方案 差异分析: 用户一句话指向了正确架构决策（复用已有管线），AI陷入了局部修复思维。用户的工程直觉（不重复造轮子）比AI的实现导向更有效。AI浪费了大量调查和规划时间\nrun_benchmark.py是否应有embedding缓存机制 角色 思路 人类 用户表达了明确期望：「我期望的run_benchmark.py就应该是这种pipeline格式」，认为缓存是基本工程预期 AI AI分析代码后确认缺少缓存机制，说明了两者差异，并提议实现该功能 差异分析: 用户提出合理架构期望，AI负责诊断现状和实现改进；双方角色清晰，此处AI执行到位\n实现层面 长时间等待任务的处理策略 角色 思路 人类 用户在eval_scan_fusion.py运行约2小时后主动中断，要求「先帮我处理STAIG fusion first」，采用分解策略获取关键子结果 AI AI持续用sleep+TaskOutput轮询等待全部结果，未主动建议分解或调整实验优先级 差异分析: 用户展示了实验管理的主动性——关键子实验优先于完整实验。AI的等待策略缺乏任务优先级动态调整能力\nAI 局限性 重要局限 创建eval_scan_fusion.py时未意识到独立脚本绕过run_benchmark.py预处理管线的风险，引入了双重归一化bug，且在调查阶段也未主动质疑是否应该使用独立脚本，需要用户直接点出才转变方向 修复BC-RNN obs维度问题时只修复了injection路径（_generate_from_single_rollout），遗漏了natural_capture路径（_capture_single_rollout），导致natural capture任务失败后需要在后续会话中发现并再次修复 一般局限 在长时间运行任务上过度依赖sleep+polling循环（多次600s超时），未能主动分析任务进度或建议更高效的监控/调度策略，需要用户主动中断才改变策略 使用Glob搜索mimicgen_augment_200.json时采用了相对路径，导致误报文件不存在，随后开始重新创建该文件，浪费了工作量 今日收获 核心收获 训练好的robomimic模型的obs空间与自定义StateExtractor抽象层不兼容：BC-RNN训练时用robosuite原始obs（8物体65维），而框架StateExtractor只提取4物体37维；调用训练模型时必须bypass抽象层直接传递原始obs 当项目已有正确的完整pipeline时，新的评估脚本必须复用现有管线而非另起炉灶，否则极易遗漏关键预处理步骤（如STAIG归一化控制），且独立脚本难以维护与原管线的一致性 embedding缓存的语义边界应在「encoder提取后、post-encoder normalization之前」：缓存raw embeddings而非归一化后的版本，这样不同归一化策略可以共享同一份缓存 STAIG fusion的align_staig参数是关键归一化控制开关：未传staig_alignment_config时STAIGTrainer默认执行内部StandardScaler，与已做scale的上游pipeline不兼容，会造成double normalization 会话摘要 MIHD 🔄 STAIG fusion结果获取、双重归一化bug调查与run_benchmark.py重构方向确定 18:06:33.022 | claude_code 会话从继续运行全fusion对比脚本开始，任务运行2+小时后用户中断要求先单独跑STAIG fusion。AI创建临时脚本获得结果（UNI2_raw ARI=0.393 vs SCAN ARI=0.388基本持平）。用户询问实现细节后，AI调查发现eval_scan_fusion.py存在双重归一化bug且staig_fusion从未在151673上官方运行。用户直接指出应使用run_benchmark.py，AI更新计划方向改为集成embedding缓存\n✅ run_benchmark.py集成CacheManager实现embedding缓存读写 21:22:59.022 | claude_code 按计划实现5处代码改动：添加CacheManager导入、函数签名增加override参数和缓存初始化、gene encoding缓存读写、vision encoding缓存读写（含variant支持）、放宽argparse choices。通过语法检查（ast.parse）和功能验证（缓存中发现pca/mlp/scgpt和uni2/hipt等已有缓存），所有改动确认正确\nError Recovery Benchmark 🔄 M12-M14里程碑实现：BC-RNN obs修复、MimicGen兼容性修复与大规模评估启动 19:00:40.022 | claude_code 检查M12-M14任务发现mimicgen配置和taxonomy文档均已存在，只新增save_images功能。诊断BC-RNN 37 vs 65维obs不匹配（训练用8物体原始obs），修复policy_adapter和rollout_generator injection路径。修复MimicGen robomimic 0.3.0兼容性。并行启动BC-RNN injection/natural capture/demo生成/Pi0服务器/Pi0.5服务器共5个后台任务\n🔄 后台任务检查、BC-RNN natural capture路径修复与VLA服务器重启 02:39:21.022 | claude_code 检查后台任务发现BC-RNN natural capture同样失败（AI此前只修复injection路径，遗漏了_capture_single_rollout），修复该路径后重启。VLA服务器因端口冲突失败，清理旧进程后重启，Pi0和Pi0.5服务器成功加载（pi0_libero/pi05_libero模型）。BC-RNN injection已运行至rollout118/200正常\n🔍 项目进度确认（M14基础设施就绪，实验待运行） 20:11:59.022 | claude_code 用户询问项目当前进度，AI梳理了M1-M11已完成、454场景已生成、M14评估代码就绪但实验未开始的状态。用户决定运行M14基线。此会话主要是状态对齐，为启动大规模实验提供决策依据\n❌ 请求Pi0.5和MimicGen基线模型评估脚本 21:01:10.022 | claude_code 用户请求生成运行Pi0.5和MimicGen基线的脚本，会话在AI开始响应前被用户中断，未能完成任务\nToken 用量 总览 指标 数值 总 Token 48,685,110 输入 Token 44,193 输出 Token 82,271 Cache 创建 3,450,689 Cache 读取 45,107,957 Cache 命中率 92.9% 总费用 (USD) $35.7807 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 17,087 81,154 2,223,726 34,097,959 $33.0616 92.4% claude-haiku-4-5-20251001 27,101 1,112 1,208,807 10,978,447 $2.6415 7.4% claude-sonnet-4-6 5 5 18,156 31,551 $0.0776 0.2% 各设备用量 设备 总 Token 输入 输出 费用 DCC 11,878,326 11,447 8,263 $7.8720 tianhe 36,806,784 32,746 74,008 $27.9087 ",
+  "wordCount" : "341",
+  "inLanguage": "en",
+  "datePublished": "2026-02-20T00:00:00-05:00",
+  "dateModified": "2026-02-20T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-02-20/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-20
+    </h1>
+    <div class="post-meta"><span title='2026-02-20 00:00:00 -0500 EST'>February 20, 2026</span>&nbsp;·&nbsp;<span>2 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-20">日报 — 2026-02-20<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-20">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 在DCC（MIHD空间转录组分析）和tianhe（机器人错误恢复基准）两台设备上分别完成了关键架构改进与实验启动</li>
+<li><strong>怎么做的：</strong> 通过代码追踪发现并修复预处理管线错误，将独立评估脚本整合进已有pipeline，修复跨版本兼容性问题后启动多GPU并行实验</li>
+<li><strong>有什么用：</strong> MIHD建立了完整embedding缓存机制避免重复推理，error_recovery_benchmark修复了阻塞实验运行的BC-RNN obs维度不匹配问题，两个项目均为后续论文实验扫清了主要障碍</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 调查STAIG fusion双重归一化bug、获取fusion方法对比基准结果，并将CacheManager集成到run_benchmark.py</li>
+<li><strong>怎么做的：</strong> 逐层追踪preprocess_for_encoding与STAIGTrainer内部StandardScaler的归一化路径，创建临时测试脚本验证结果，最终通过CacheManager API改造主评估脚本</li>
+<li><strong>有什么用：</strong> run_benchmark.py可直接复用pipeline缓存的embeddings避免重复UNI2推理，支持自定义缓存名实现SCAN embedding替换实验，解决了独立评估脚本引入bug的根本问题</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 实现M12-M14里程碑基础设施，修复BC-RNN obs维度不匹配和MimicGen版本兼容性，启动6个并行后台评估任务</li>
+<li><strong>怎么做的：</strong> 读取BC-RNN checkpoint配置诊断65 vs 37维差异，修改policy_adapter和rollout_generator两条路径的原始obs传递，用inspect.signature动态适配robomimic 0.3.0 API</li>
+<li><strong>有什么用：</strong> BC-RNN策略现可正常在基准环境运行rollout，Pi0/Pi0.5服务器成功加载，BC-RNN injection已运行至118/200 rollout，M14四策略全量评估正式启动</li>
+</ul>
+<blockquote>
+<p>MIHD项目完成STAIG fusion评估与embedding缓存架构集成，error_recovery_benchmark修复BC-RNN obs维度bug并启动M12-M14大规模并行评估</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>BC-RNN obs维度不匹配修复（两条路径）</strong> — BC-RNN期望65维输入（8物体×7维object-state），StateExtractor只提供37维（4物体）。修复policy_adapter._to_robosuite_obs()使用原始robosuite obs，修复rollout_generator中injection路径（_generate_from_single_rollout）和natural_capture路径（_capture_single_rollout）的初始obs获取</li>
+<li>✅ <strong>调查STAIG fusion双重归一化bug及历史结果缺失</strong> — 发现eval_scan_fusion.py未传staig_alignment_config，导致STAIGTrainer内部StandardScaler与上游preprocess_for_encoding重复归一化。同时确认staig_fusion从未在151673上官方benchmark运行过（experiments_log无记录）</li>
+<li>✅ <strong>run_benchmark.py embedding缓存集成</strong> — 添加CacheManager导入和初始化，gene/vision encoding前检查embeddings_cache/命中则跳过encoder实例化，新提取后保存缓存。增加vision variant支持（standard/freq/staig_strict），放宽vision_encoder argparse choices，两个call site传入override参数。语法检查和CacheManager功能验证通过</li>
+<li>🔄 <strong>M14大规模并行评估启动</strong> — 启动5个并行后台任务：BC-RNN injection(GPU0, 运行至rollout118/200)、BC-RNN natural capture(GPU1, 修复后重启)、demo生成(GPU2)、Pi0服务器(GPU4, 已就绪)、Pi0.5服务器(GPU5, 已就绪)。VLA端口冲突修复后服务器成功加载</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>MimicGen robomimic 0.3.0兼容性修复</strong> — robomimic 0.3.0的create_env_for_data_processing()不支持env_class等新参数，导致MimicGen数据增强失败。修改mimicgen/utils/robomimic_utils.py用inspect.signature动态过滤不支持的参数</li>
+<li>✅ <strong>STAIG fusion单独对比实验（151673）</strong> — 中断长达2+小时的全fusion评估任务，创建_test_staig_scan.py单独对比UNI2_raw vs SCAN(UNI2)在staig_fusion上的表现。结果：UNI2_raw ARI=0.3929/NMI=0.5660，SCAN ARI=0.3880/NMI=0.5639，基本持平。临时脚本已清理</li>
+<li>✅ <strong>error_recovery_benchmark M12-M14基础设施检查与save_images新增</strong> — 检查发现mimicgen_augment_200.json和taxonomy_justification.md已存在（无需重建），新增collector.py的save_images选项（M14 S3.2.3），支持VLA训练数据采集时同步保存相机帧</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-eval_scan_fusionpy在staig_fusion中存在双重归一化上游preprocess_for_encoding已做max_value10的scalestaigtrainer内部standardscaler又做了一次导致基因特征被处理两次">1. eval_scan_fusion.py在staig_fusion中存在双重归一化：上游preprocess_for_encoding已做max_value=10的scale，STAIGTrainer内部StandardScaler又做了一次，导致基因特征被处理两次<a hidden class="anchor" aria-hidden="true" href="#1-eval_scan_fusionpy在staig_fusion中存在双重归一化上游preprocess_for_encoding已做max_value10的scalestaigtrainer内部standardscaler又做了一次导致基因特征被处理两次">#</a></h4>
+<p><strong>解决方案:</strong> 放弃修复独立脚本，改为通过run_benchmark.py传递完整的staig_alignment_config，STAIGTrainer收到align_staig=True后跳过内部归一化，并集成embedding缓存直接加载已缓存的embeddings</p>
+<p><strong>关键洞察:</strong> eval_scan_fusion.py绕过了run_benchmark.py的正确预处理管线；用户「为什么不直接用benchmark script」这一问题指出了根本解决方案，避免了在错误路径上继续修补</p>
+<h4 id="2-bc-rnn期望65维输入训练时用8物体robosuite原始obs但rollout_generator通过stateextractor提取的obs只有37维自定义4物体抽象运行时报input_size-mismatch">2. BC-RNN期望65维输入（训练时用8物体robosuite原始obs），但rollout_generator通过StateExtractor提取的obs只有37维（自定义4物体抽象），运行时报input_size mismatch<a hidden class="anchor" aria-hidden="true" href="#2-bc-rnn期望65维输入训练时用8物体robosuite原始obs但rollout_generator通过stateextractor提取的obs只有37维自定义4物体抽象运行时报input_size-mismatch">#</a></h4>
+<p><strong>解决方案:</strong> 修改policy_adapter._to_robosuite_obs()识别并直接传递robosuite env.step()返回的原始obs（含56维object-state），而非StateExtractor重映射的版本。injection和natural_capture两条路径均需修复</p>
+<p><strong>关键洞察:</strong> BC-RNN训练时使用的是robosuite原始obs（8物体PickPlace任务），而项目框架为了通用性引入StateExtractor只跟踪4个核心物体，两套obs体系语义不同，必须为BC-RNN bypass抽象层</p>
+<h4 id="3-run_benchmarkpy每次运行都重新实例化uni2-encoder从头提取embeddings即使pipeline已缓存了相同的embeddings造成大量不必要的gpu推理时间">3. run_benchmark.py每次运行都重新实例化UNI2 encoder从头提取embeddings，即使pipeline已缓存了相同的embeddings，造成大量不必要的GPU推理时间<a hidden class="anchor" aria-hidden="true" href="#3-run_benchmarkpy每次运行都重新实例化uni2-encoder从头提取embeddings即使pipeline已缓存了相同的embeddings造成大量不必要的gpu推理时间">#</a></h4>
+<p><strong>解决方案:</strong> 集成CacheManager，encoding前检查embeddings_cache/{type}/{encoder}/{section}.npz，命中则直接加载（秒级），未命中才执行encoder提取并保存到缓存</p>
+<p><strong>关键洞察:</strong> pipeline缓存的是归一化前的raw embeddings，因此post-encoder normalization必须在缓存加载后执行，缓存设计的语义边界是提取后、归一化前</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="4-mimicgen调用create_env_for_data_processing时传入env_class等参数但当前安装的robomimic-030不支持这些参数typeerror-unexpected-keyword-argument">4. MimicGen调用create_env_for_data_processing()时传入env_class等参数，但当前安装的robomimic 0.3.0不支持这些参数（TypeError: unexpected keyword argument）<a hidden class="anchor" aria-hidden="true" href="#4-mimicgen调用create_env_for_data_processing时传入env_class等参数但当前安装的robomimic-030不支持这些参数typeerror-unexpected-keyword-argument">#</a></h4>
+<p><strong>解决方案:</strong> 用inspect.signature动态获取函数签名，只传入目标robomimic版本支持的参数，实现版本自适应兼容</p>
+<p><strong>关键洞察:</strong> MimicGen代码假设了更新版本的robomimic API接口，动态签名检查比版本号条件判断更健壮</p>
+<h4 id="5-vla服务器重启时报address-already-in-use端口55565557被上个会话的进程占用">5. VLA服务器重启时报Address already in use（端口5556/5557被上个会话的进程占用）<a hidden class="anchor" aria-hidden="true" href="#5-vla服务器重启时报address-already-in-use端口55565557被上个会话的进程占用">#</a></h4>
+<p><strong>解决方案:</strong> 用lsof -ti找到占用进程并kill，确认端口释放后重新启动</p>
+<p><strong>关键洞察:</strong> HPC长期运行节点上Claude会话结束后服务器进程可能未正常退出，重启前应先清理残留进程</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="scan-fusion评估应使用独立脚本还是现有benchmark-script">SCAN fusion评估应使用独立脚本还是现有benchmark script<a hidden class="anchor" aria-hidden="true" href="#scan-fusion评估应使用独立脚本还是现有benchmark-script">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户直接指出「为什么不直接用原本的benchmark script」，认为已有正确实现的管线应直接复用</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI创建了独立的eval_scan_fusion.py进行对比实验，发现bug后计划修复独立脚本，并设计了ExitPlanMode准备实施修复方案</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户一句话指向了正确架构决策（复用已有管线），AI陷入了局部修复思维。用户的工程直觉（不重复造轮子）比AI的实现导向更有效。AI浪费了大量调查和规划时间</p>
+<h4 id="run_benchmarkpy是否应有embedding缓存机制">run_benchmark.py是否应有embedding缓存机制<a hidden class="anchor" aria-hidden="true" href="#run_benchmarkpy是否应有embedding缓存机制">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户表达了明确期望：「我期望的run_benchmark.py就应该是这种pipeline格式」，认为缓存是基本工程预期</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI分析代码后确认缺少缓存机制，说明了两者差异，并提议实现该功能</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户提出合理架构期望，AI负责诊断现状和实现改进；双方角色清晰，此处AI执行到位</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="长时间等待任务的处理策略">长时间等待任务的处理策略<a hidden class="anchor" aria-hidden="true" href="#长时间等待任务的处理策略">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户在eval_scan_fusion.py运行约2小时后主动中断，要求「先帮我处理STAIG fusion first」，采用分解策略获取关键子结果</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI持续用sleep+TaskOutput轮询等待全部结果，未主动建议分解或调整实验优先级</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户展示了实验管理的主动性——关键子实验优先于完整实验。AI的等待策略缺乏任务优先级动态调整能力</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>创建eval_scan_fusion.py时未意识到独立脚本绕过run_benchmark.py预处理管线的风险，引入了双重归一化bug，且在调查阶段也未主动质疑是否应该使用独立脚本，需要用户直接点出才转变方向</li>
+<li>修复BC-RNN obs维度问题时只修复了injection路径（_generate_from_single_rollout），遗漏了natural_capture路径（_capture_single_rollout），导致natural capture任务失败后需要在后续会话中发现并再次修复</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>在长时间运行任务上过度依赖sleep+polling循环（多次600s超时），未能主动分析任务进度或建议更高效的监控/调度策略，需要用户主动中断才改变策略</li>
+<li>使用Glob搜索mimicgen_augment_200.json时采用了相对路径，导致误报文件不存在，随后开始重新创建该文件，浪费了工作量</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>训练好的robomimic模型的obs空间与自定义StateExtractor抽象层不兼容：BC-RNN训练时用robosuite原始obs（8物体65维），而框架StateExtractor只提取4物体37维；调用训练模型时必须bypass抽象层直接传递原始obs</li>
+<li>当项目已有正确的完整pipeline时，新的评估脚本必须复用现有管线而非另起炉灶，否则极易遗漏关键预处理步骤（如STAIG归一化控制），且独立脚本难以维护与原管线的一致性</li>
+<li>embedding缓存的语义边界应在「encoder提取后、post-encoder normalization之前」：缓存raw embeddings而非归一化后的版本，这样不同归一化策略可以共享同一份缓存</li>
+<li>STAIG fusion的align_staig参数是关键归一化控制开关：未传staig_alignment_config时STAIGTrainer默认执行内部StandardScaler，与已做scale的上游pipeline不兼容，会造成double normalization</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>🔄 STAIG fusion结果获取、双重归一化bug调查与run_benchmark.py重构方向确定</strong>
+<em>18:06:33.022 | claude_code</em>
+会话从继续运行全fusion对比脚本开始，任务运行2+小时后用户中断要求先单独跑STAIG fusion。AI创建临时脚本获得结果（UNI2_raw ARI=0.393 vs SCAN ARI=0.388基本持平）。用户询问实现细节后，AI调查发现eval_scan_fusion.py存在双重归一化bug且staig_fusion从未在151673上官方运行。用户直接指出应使用run_benchmark.py，AI更新计划方向改为集成embedding缓存</p>
+<p><strong>✅ run_benchmark.py集成CacheManager实现embedding缓存读写</strong>
+<em>21:22:59.022 | claude_code</em>
+按计划实现5处代码改动：添加CacheManager导入、函数签名增加override参数和缓存初始化、gene encoding缓存读写、vision encoding缓存读写（含variant支持）、放宽argparse choices。通过语法检查（ast.parse）和功能验证（缓存中发现pca/mlp/scgpt和uni2/hipt等已有缓存），所有改动确认正确</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 M12-M14里程碑实现：BC-RNN obs修复、MimicGen兼容性修复与大规模评估启动</strong>
+<em>19:00:40.022 | claude_code</em>
+检查M12-M14任务发现mimicgen配置和taxonomy文档均已存在，只新增save_images功能。诊断BC-RNN 37 vs 65维obs不匹配（训练用8物体原始obs），修复policy_adapter和rollout_generator injection路径。修复MimicGen robomimic 0.3.0兼容性。并行启动BC-RNN injection/natural capture/demo生成/Pi0服务器/Pi0.5服务器共5个后台任务</p>
+<p><strong>🔄 后台任务检查、BC-RNN natural capture路径修复与VLA服务器重启</strong>
+<em>02:39:21.022 | claude_code</em>
+检查后台任务发现BC-RNN natural capture同样失败（AI此前只修复injection路径，遗漏了_capture_single_rollout），修复该路径后重启。VLA服务器因端口冲突失败，清理旧进程后重启，Pi0和Pi0.5服务器成功加载（pi0_libero/pi05_libero模型）。BC-RNN injection已运行至rollout118/200正常</p>
+<p><strong>🔍 项目进度确认（M14基础设施就绪，实验待运行）</strong>
+<em>20:11:59.022 | claude_code</em>
+用户询问项目当前进度，AI梳理了M1-M11已完成、454场景已生成、M14评估代码就绪但实验未开始的状态。用户决定运行M14基线。此会话主要是状态对齐，为启动大规模实验提供决策依据</p>
+<p><strong>❌ 请求Pi0.5和MimicGen基线模型评估脚本</strong>
+<em>21:01:10.022 | claude_code</em>
+用户请求生成运行Pi0.5和MimicGen基线的脚本，会话在AI开始响应前被用户中断，未能完成任务</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>48,685,110</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>44,193</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>82,271</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>3,450,689</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>45,107,957</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>92.9%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$35.7807</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>17,087</td>
+          <td>81,154</td>
+          <td>2,223,726</td>
+          <td>34,097,959</td>
+          <td>$33.0616</td>
+          <td>92.4%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>27,101</td>
+          <td>1,112</td>
+          <td>1,208,807</td>
+          <td>10,978,447</td>
+          <td>$2.6415</td>
+          <td>7.4%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>5</td>
+          <td>5</td>
+          <td>18,156</td>
+          <td>31,551</td>
+          <td>$0.0776</td>
+          <td>0.2%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>11,878,326</td>
+          <td>11,447</td>
+          <td>8,263</td>
+          <td>$7.8720</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>36,806,784</td>
+          <td>32,746</td>
+          <td>74,008</td>
+          <td>$27.9087</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

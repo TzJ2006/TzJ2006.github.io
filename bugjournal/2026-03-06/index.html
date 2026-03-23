@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-06 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="跨DCC、tianhe、TzJsDesktop三台设备并行推进：DCC完成ContraVAE/STHD空间转录组数据归一化链路溯源；tianhe完成Phoenix/FLARE全任务训练脚本工程化与文件系统重组、修复RoboTwin评估管线三个顺序Bug；TzJsDesktop完成Life Copilot 1674行中文教程撰写并定位Discord Bot对话上下文失忆三层根因">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-03-06/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-03-06/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-03-06/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-06">
+  <meta property="og:description" content="跨DCC、tianhe、TzJsDesktop三台设备并行推进：DCC完成ContraVAE/STHD空间转录组数据归一化链路溯源；tianhe完成Phoenix/FLARE全任务训练脚本工程化与文件系统重组、修复RoboTwin评估管线三个顺序Bug；TzJsDesktop完成Life Copilot 1674行中文教程撰写并定位Discord Bot对话上下文失忆三层根因">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-06T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-06T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-06">
+  <meta name="twitter:description" content="跨DCC、tianhe、TzJsDesktop三台设备并行推进：DCC完成ContraVAE/STHD空间转录组数据归一化链路溯源；tianhe完成Phoenix/FLARE全任务训练脚本工程化与文件系统重组、修复RoboTwin评估管线三个顺序Bug；TzJsDesktop完成Life Copilot 1674行中文教程撰写并定位Discord Bot对话上下文失忆三层根因">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-03-06",
+      "item": "https://tzj2006.github.io/bugjournal/2026-03-06/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-06",
+  "name": "Bug Journal 2026-03-06",
+  "description": "跨DCC、tianhe、TzJsDesktop三台设备并行推进：DCC完成ContraVAE/STHD空间转录组数据归一化链路溯源；tianhe完成Phoenix/FLARE全任务训练脚本工程化与文件系统重组、修复RoboTwin评估管线三个顺序Bug；TzJsDesktop完成Life Copilot 1674行中文教程撰写并定位Discord Bot对话上下文失忆三层根因",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-06 今日概览 做了什么： 跨三台服务器并行推进六条工作线：DCC解析单细胞空间转录组数据预处理链路，tianhe完成机器人操作基准训练框架工程化搭建并修复RoboTwin仿真评估管线三个顺序Bug，TzJsDesktop完成Life Copilot中文文档撰写并深入分析Bot对话系统架构缺陷 怎么做的： 综合运用源码溯源（逐层阅读Jupyter/Python脚本）、系统级调试（Vulkan渲染栈、数据路径修复、bare except改造）、文档工程（CLAUDE.md编写、大型教程撰写）、并行Agent探索及代码修改等多种手段 有什么用： ContraVAE/STHD两个空间转录组项目的数据假设得到明确区分；Phoenix/FLARE训练框架从零到完整可执行脚本集（磁盘占用从78GB降至37MB）；RoboTwin评估管线从全量报错到渲染检查通过并进入模型推理阶段；Life Copilot获得覆盖用户与开发者视角的一站式中文文档，Bot上下文失忆问题有明确三层修复方案 DCC 做了什么： 调查ContraVAE和STHD两个空间转录组项目的expression matrix归一化方案，明确adata.X来源、layers[“counts”]含义、HVG选择方法和spatial坐标单位 怎么做的： 通过backed=‘r’内存高效读取大型h5ad文件，追溯processdata.ipynb和sthdio.py等源码，完整还原两个项目各自的数据处理链路 有什么用： 准确区分两个项目的不同预处理策略（ContraVAE做了normalize_total+log1p，STHD pipeline内保留raw counts），为下游模型开发提供正确的数据假设 TzJsDesktop 做了什么： 为Life Copilot撰写1674行完整中文使用教程（docs/TUTORIAL.md），并通过三层源码分析定位Discord Bot将追问误判为通用问候的架构缺陷 怎么做的： 并行启动4个探索Agent收集10+源文件信息后规划文档结构批量写入；通过读取general_keywords、LLM Prompt指令和intent_routes.py三层逐一定位上下文失忆问题 有什么用： 项目获得覆盖用户指南与开发者指南的一站式中文文档；Bot对话上下文修复方案已设计完毕，消除了将追问误判为通用问候的系统性缺陷 tianhe 做了什么： 完成Error Recovery Benchmark的CLAUDE.md改进、Phoenix/FLARE全任务训练脚本创建（6个脚本）与文件系统重组；在无头Docker容器中修复RoboTwin eval.sh三个顺序Bug（Vulkan渲染、FrozenInstanceError、norm_stats路径）；为CALVIN代码库创建CLAUDE.md 怎么做的： 多轮subagent并行探索代码库；修改bare except暴露Vulkan真实traceback，手工从官方驱动包提取匹配库文件配置三个环境变量；编写bash训练脚本，修改OpenPI config.py补充缺失配置；用符号链接代替大型数据目录大幅节省磁盘 有什么用： RoboTwin评估管线从完全报错到成功通过渲染检查；Phoenix/FLARE训练工程化（磁盘占用从78GB降至37MB），为9个MimicGen任务提供完整可执行脚本集；CALVIN代码库获得结构化文档导引 跨DCC、tianhe、TzJsDesktop三台设备并行推进：DCC完成ContraVAE/STHD空间转录组数据归一化链路溯源；tianhe完成Phoenix/FLARE全任务训练脚本工程化与文件系统重组、修复RoboTwin评估管线三个顺序Bug；TzJsDesktop完成Life Copilot 1674行中文教程撰写并定位Discord Bot对话上下文失忆三层根因\n今日任务 架构与策略 ✅ RoboTwin评估管线调试（三个顺序Bug修复） — 无头Docker容器中连续修复三个顺序Bug：①Render Error——暴露bare except真实traceback后，从NVIDIA官方535.104.12驱动包提取匹配Vulkan库文件并配置三个环境变量，eval.sh成功输出’Render Well’；②FrozenInstanceError——将policy_config.py对frozen dataclass的直接赋值改为dataclasses.replace()；③norm_stats FileNotFoundError——修复load_norm_stats()将文件名当子目录名的路径拼接错误 ✅ Phoenix/FLARE全任务训练脚本创建与文件系统重组 — 为全部9个MimicGen任务创建6个bash训练脚本（Phoenix训练、FLARE数据生成/LeRoBot转换/训练/评估、master编排），向OpenPI config.py补充3个缺失warmup配置（coffee_D1、stack_three_D1、three_piece_assembly_D1）；将Phoenix/FLARE从zhaoganlong目录分离为独立目录，train_datasets（77GB）和ckpt（1GB）改为符号链接，代码实际占用从78GB降至37MB ✅ Life Copilot中文使用教程撰写 — 创建docs/TUTORIAL.md，1674行，19章节双层结构（用户指南+开发者指南），覆盖安装配置、日程/能量/健康/Agent/技能/后台服务、24种意图类型参考、完整EventBus事件表、CLI/Discord/API命令速查及扩展开发指南 🔄 Discord Bot对话上下文丢失根因分析 — 定位Bot将追问（‘你安排在几点了呀’、‘ok’）误判为通用问候的三层根因：①general_keywords集合误匹配’几点了’；②LLM Prompt FIRST CHECK指令强制某些输入走GENERAL；③语义路由GENERAL_ROUTE utterances过宽。修复方案已设计，尚未实施 🔄 现有Phoenix/FLARE checkpoint调查 — 用户提出先检查现有checkpoint是否可复用（符号链接），AI在zhaoganlong找到Phoenix diffusion policy checkpoint（1.5GB），但FLARE warmup per-task checkpoint的完整调查在会话中断前未完成 实现与修复 ✅ ContraVAE/STHD空间转录组数据归一化溯源 — 确认ContraVAE的adata_8um.h5ad中X矩阵来源（log1p+normalize_total的binned sum）、layers[“counts”]（raw UMI counts）、HVG选择方式及spatial坐标单位；同步通过阅读sthdio.py等核心源码确认STHD pipeline内X始终是raw UMI counts（Poisson模型假设），HVG用自定义cell type informative gene选择，用户观察到的归一化.X是在STHD之外的scanpy预处理产生的 ✅ RoboTwin数据采集与仿真架构解读 — 解读collect_data.sh两阶段流程（随机探索找成功seed + 确定性重放采集HDF5数据），以及place_dual_shoes完整仿真链路（场景初始化→物体加载→稳定检查→双臂动作序列→运动规划→物理步进→数据存储） ✅ Error Recovery Benchmark CLAUDE.md改进 — 将225行CLAUDE.md精简至167行：删减冗余命令节（引用make help代替）、添加PYTHONPATH实际路径、补充单测函数示例、压缩Related Project节 • CALVIN基准CLAUDE.md创建 — 探索CALVIN代码库后创建CLAUDE.md，覆盖安装命令、训练评估CLI、Hydra配置体系、MCIL模型架构和NPZ数据格式；MulticoreTSNE安装失败（cmake版本不兼容：需≤3.18，系统3.26.4），AI建议注释掉该可选依赖，用户拒绝，问题未解决 问题与解决方案 关键问题 1. Docker容器的bare except隐藏Render Error真实原因；NVIDIA apt包版本（535.288.01）与内核驱动版本（535.104.12）不匹配，常规安装后Vulkan仍无法识别GPU 解决方案: 将bare except改为except Exception as e:并打印完整traceback暴露根因；从NVIDIA官网下载535.104.12驱动.run文件，–extract-only提取全套匹配库文件，通过VK_ICD_FILENAMES+LD_LIBRARY_PATH+__EGL_VENDOR_LIBRARY_FILENAMES三变量注入；批量复制所有libnvidia-*.so避免逐一追踪依赖链\n关键洞察: 受限容器中版本不匹配时可直接从驱动包提取用户态库文件通过环境变量绕过系统路径，无需root权限；bare except是调试黑洞，排查阶段应第一步暴露完整traceback\n2. Discord Bot将追问（‘你安排在几点了呀’）误判为通用问候，返回’我不太确定您在问什么’ 解决方案: 修复三层：①缩小general_keywords范围或改为精确全词匹配；②LLM Prompt FIRST CHECK加入对话历史感知条件；③优化语义路由GENERAL_ROUTE utterances精确度\n关键洞察: 多层意图分类防御机制中任一层过于激进都会导致上下文对话失败；有对话历史时应整体降低general类触发敏感度\n3. FLARE warmup训练在OpenPI config.py中缺少coffee_D1、stack_three_D1、three_piece_assembly_D1三个任务的配置 解决方案: 在config.py的_CONFIGS列表中分别添加add_finetune_config和add_inference_config调用，共补充6个配置项\n关键洞察: 训练配置扩展时需系统性检查全任务×全难度的完整性，遗漏的均为D1难度版本，说明扩展时应从矩阵视角而非逐条添加\n4. Phoenix目录复制后占用78GB（train_datasets 77GB + ckpt 1GB），远超预期代码体积 解决方案: 删除已复制的大目录，改为符号链接指向zhaoganlong原始数据，代码体积从78GB降至37MB\n关键洞察: HPC上大型数据集和checkpoint应通过符号链接跨项目共享，不应随代码库复制；应在项目初始化阶段就建立shared_deps/共享依赖层\n一般问题 5. 大型h5ad文件直接读取+toarray()导致OOM（exit code 137），且初始分析目标文件定位错误（不同处理阶段的h5ad特征完全不匹配） 解决方案: 改用backed=‘r’模式（内存映射）加载文件只切片读取；用户提供processdata.ipynb路径确认正确目标文件为all_region/adata_8um.h5ad\n关键洞察: anndata支持backed模式实现lazy loading，大型稀疏矩阵应默认使用此模式；同一项目下不同处理阶段的h5ad差异极大，应先确认文件路径再分析\n6. norm_stats路径重复：load_norm_stats()将asset_id（文件名）当作子目录名拼接，产生assets/norm_stats.json/norm_stats.json 解决方案: 当robotwin_repo_id有值时直接从checkpoint_dir/assets目录加载，跳过asset_id子目录层级\n关键洞察: 复用通用路径拼接函数时需验证其对目录结构的假设是否与实际一致\n7. MulticoreTSNE构建失败：cmake版本不兼容（需要≤3.18，系统3.26.4） 解决方案: （未解决）建议注释掉该可选依赖（仅用于TSNE可视化），用户拒绝。备选：pip install cmake==3.18.4或用scikit-learn TSNE替代\n关键洞察: 旧版C++扩展包的cmake版本绑定是常见HPC安装痛点，可选依赖应在requirements中明确标注\n人类思路 vs AI 思路 战略层面 定位正确分析目标与复用已有资源 角色 思路 人类 用户自行提供了processdata.ipynb处理脚本的完整路径（ContraVAE），直接解除了AI的搜索僵局；提出应先检查现有checkpoint是否可符号链接复用（Phoenix/FLARE），避免重复训练 AI AI在ContraVAE项目中多轮glob/grep搜索仍未找到jupyter处理脚本；在设计Phoenix/FLARE训练方案时直接假设从零训练，未主动考虑复用已有checkpoint 差异分析: 人类对自己项目有直接记忆和HPC资源效率意识，能快速定位关键脚本并规避重复计算；AI擅长系统性探索但缺乏对项目历史和计算资源稀缺性的实际感知\nDocker容器渲染问题排查 角色 思路 人类 人类提供了两个关键环境信息：容器是远程无显示器的Docker环境，以及系统使用/app/ubuntu/bin/apt-get的非标准安装路径——这些信息AI无法自行获知 AI AI系统化逐层排查（暴露traceback→检查GPU→检查Vulkan ICD→检查驱动版本→提取驱动文件），最终找到可行的非root方案 差异分析: 人类贡献关键环境上下文和系统特殊性知识，AI贡献Linux Vulkan栈深度知识与调试方法论；两者互补缺一不可\nCalendarPro对话上下文失忆分析 角色 思路 人类 人类提出假设’会不会是因为每次调用独立的claude code进程’，指向无状态进程问题 AI AI通过阅读源代码发现真实根因是三层预检机制过于激进（keyword set + LLM Prompt + semantic router），与进程无关 差异分析: 人类假设方向不完全准确，但触发了AI深入分析架构；AI定位了更准确的根因。两者共同完成从现象到根因的推断链\n实现层面 文档工作的规划与实施流程 角色 思路 人类 在CalendarPro教程和CLAUDE.md改进两个场景中，用户均拒绝了AI的ExitPlanMode确认流程，倾向于在下一轮对话中直接提供完整计划文本要求实施 AI AI主动进入plan mode并使用ExitPlanMode请求用户确认，符合计划驱动工作流程 差异分析: 用户更倾向于一次性完成计划+实施，不习惯中断式确认流程；AI的计划内容本身被接受，但流程形式被拒绝\nAI 局限性 重要局限 HPC资源规划上缺乏主动性：设计Phoenix/FLARE训练方案时直接假设从零训练，未主动检查现有checkpoint可否复用；在ContraVAE中多轮文件搜索仍未找到jupyter处理脚本，需用户提供路径才能继续 一般局限 无法预判完整依赖链：Vulkan库修复需多次迭代（逐步追踪缺失.so），处理大型h5ad文件时也需两次OOM失败后才改用backed模式——初始方案应主动选择更完整的内存高效策略 分析完成后未主动推进到代码实施：RoboTwin连续Bug修复中未预判后续问题，CalendarPro上下文分析停留在方案设计阶段，均需用户再次推动才进入实施 ExitPlanMode/plan mode的工作流程与用户偏好不符——用户希望直接进入实施，不喜欢规划阶段的中断式确认；多次出现同类情况 今日收获 核心收获 受限Docker容器中解决NVIDIA Vulkan库缺失的完整方案：从官方.run驱动包–extract-only提取匹配版本全套库文件，通过VK_ICD_FILENAMES+LD_LIBRARY_PATH+__EGL_VENDOR_LIBRARY_FILENAMES三变量注入，无需root权限修改系统目录；NVIDIA用户态渲染栈.so文件互相依赖，批量复制比逐一修补更高效 Phoenix（diffusion policy+运动指令纠正）和FLARE（Pi0.5 LoRA+warmup perturbation重置技能）是两个互补的机器人误差恢复框架，均在9个MimicGen任务上评估；FLARE的5阶段pipeline中warmup数据生成→LeRoBot转换→训练是核心前置步骤；RoboTwin两阶段数据采集设计（seed随机探索+确定性重放写HDF5）兼顾断点续采与多模态数据完整性 对话机器人的多层意图防御机制（关键词过滤+LLM Prompt+语义路由）中，上下文感知能力需贯穿每一层；有对话历史时应整体降低general类触发敏感度，否则追问会被误判为通用问候 VisiumHD空间转录组典型处理链路：2μm raw counts → 4×4 binning（sum聚合）→ normalize_total → log1p → 8μm normalized expression；STHD和ContraVAE数据策略截然不同——STHD pipeline内X始终是raw counts（Poisson模型所需），ContraVAE在pipeline外做标准scanpy预处理；layers[“counts”]在normalize前保存，spatial坐标为全分辨率像素（1px≈0.274μm） HPC大型ML项目文件系统设计原则：数据集和checkpoint应通过符号链接跨项目共享而非复制，可将实际代码占用从数十GB降至数十MB；初始化时就应建立shared_deps/作为共享依赖层 实践收获 frozen dataclass字段修改须用dataclasses.replace()返回新实例；复用通用路径拼接函数前需验证其对目录结构的假设是否与实际一致 会话摘要 ContraVAE \u0026 STHD ✅ 两个空间转录组项目的expression matrix归一化链路溯源 16:38:00.000 | claude_code 用户分别询问ContraVAE和STHD两个项目的数据归一化方式。ContraVAE：AI尝试直接读取h5ad时OOM，改用backed模式后分析了错误文件；用户提供processdata.ipynb后确认X=log1p(normalize_total(binned_counts))，layers[“counts”]=raw UMI sum聚合，HVG=seurat默认参数，spatial=全分辨率像素坐标。STHD：通过阅读sthdio.py等核心源码发现STHD本身不做normalization（Poisson模型直接用raw counts），HVG用自定义gene选择，用户看到的归一化.X是在pipeline外产生的。\nError Recovery Benchmark 🔄 CLAUDE.md改进 + Phoenix/FLARE全任务训练脚本创建与文件系统重组 + checkpoint调查 17:37:00.000 | claude_code AI将error-recovery-benchmark CLAUDE.md从225行精简至167行。随后为Phoenix/FLARE创建6个bash训练脚本，补充OpenPI config.py中3个缺失warmup配置；将Phoenix/FLARE从zhaoganlong目录分离为独立目录，将train_datasets（77GB）和ckpt（1GB）改为符号链接（磁盘从78GB降至37MB）。GPU规划：an49 GPU0做Phoenix，GPU1-7做FLARE 7任务，an53做剩余2任务。用户提出先检查现有checkpoint可否复用，AI在zhaoganlong找到Phoenix checkpoint（1.5GB），FLARE调查在会话中断前未完成。另解释了source setproxy.sh的HTTP代理机制。\nCALVIN 🔄 代码库分析：创建CLAUDE.md并排查MulticoreTSNE安装失败 02:09:00.000 | claude_code AI探索CALVIN代码库创建CLAUDE.md（覆盖安装、训练评估CLI、Hydra配置、MCIL模型架构和NPZ数据格式）。MulticoreTSNE构建失败（cmake版本不兼容），AI建议注释掉该可选依赖，用户拒绝，问题未解决。\nRoboTwin ✅ 修复eval.sh三个顺序Bug并解读数据采集仿真架构 06:39:00.000 | claude_code 用户报告eval.sh运行时报Render Error。AI修改bare except暴露真实traceback，确认是SAPIEN找不到渲染设备；系统驱动（535.104.12）与apt包（535.288.01）版本不匹配，从NVIDIA官方.run文件提取匹配库并配置三个环境变量，eval.sh成功输出’Render Well’。随后修复FrozenInstanceError（frozen dataclass直接赋值→dataclasses.replace()）和norm_stats FileNotFoundError（文件名被当子目录拼接→直接从assets/加载）。最后解读了两阶段数据采集设计和place_dual_shoes完整仿真链路。\nLife Copilot (CalendarPro) 🔄 中文使用教程撰写 + Discord Bot对话上下文失忆根因分析 00:32:00.000 | claude_code AI并行探索项目多个模块后撰写docs/TUTORIAL.md（1674行，19章节，涵盖用户指南+开发者指南、24种意图类型参考、完整EventBus事件表、命令速查表和扩展开发指南）。随后用户展示Bot将追问误判为通用问候的案例并提出进程独立性假设，AI通过读取源代码定位三层真实根因：general_keywords过宽、LLM Prompt FIRST CHECK过于强制、语义路由GENERAL_ROUTE utterances过宽泛。修复方案设计完成但未在当次会话中实施。\nToken 用量 总览 指标 数值 总 Token 29,608,728 输入 Token 82,875 输出 Token 82,462 Cache 创建 1,818,007 Cache 读取 27,625,384 Cache 命中率 93.8% 总费用 (USD) $17.4820 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 6,533 33,941 935,222 16,426,841 $14.9397 85.5% claude-haiku-4-5-20251001 76,342 48,521 882,785 11,198,543 $2.5423 14.5% 各设备用量 设备 总 Token 输入 输出 费用 DCC 639,003 2,953 1,904 $0.9898 tianhe 19,735,847 73,329 52,047 $11.2305 TzJsDesktop 9,233,878 6,593 28,511 $5.2618 ",
+  "wordCount" : "424",
+  "inLanguage": "en",
+  "datePublished": "2026-03-06T00:00:00-05:00",
+  "dateModified": "2026-03-06T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-03-06/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-06
+    </h1>
+    <div class="post-meta"><span title='2026-03-06 00:00:00 -0500 EST'>March 6, 2026</span>&nbsp;·&nbsp;<span>2 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-06">日报 — 2026-03-06<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-06">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 跨三台服务器并行推进六条工作线：DCC解析单细胞空间转录组数据预处理链路，tianhe完成机器人操作基准训练框架工程化搭建并修复RoboTwin仿真评估管线三个顺序Bug，TzJsDesktop完成Life Copilot中文文档撰写并深入分析Bot对话系统架构缺陷</li>
+<li><strong>怎么做的：</strong> 综合运用源码溯源（逐层阅读Jupyter/Python脚本）、系统级调试（Vulkan渲染栈、数据路径修复、bare except改造）、文档工程（CLAUDE.md编写、大型教程撰写）、并行Agent探索及代码修改等多种手段</li>
+<li><strong>有什么用：</strong> ContraVAE/STHD两个空间转录组项目的数据假设得到明确区分；Phoenix/FLARE训练框架从零到完整可执行脚本集（磁盘占用从78GB降至37MB）；RoboTwin评估管线从全量报错到渲染检查通过并进入模型推理阶段；Life Copilot获得覆盖用户与开发者视角的一站式中文文档，Bot上下文失忆问题有明确三层修复方案</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 调查ContraVAE和STHD两个空间转录组项目的expression matrix归一化方案，明确adata.X来源、layers[&ldquo;counts&rdquo;]含义、HVG选择方法和spatial坐标单位</li>
+<li><strong>怎么做的：</strong> 通过backed=&lsquo;r&rsquo;内存高效读取大型h5ad文件，追溯processdata.ipynb和sthdio.py等源码，完整还原两个项目各自的数据处理链路</li>
+<li><strong>有什么用：</strong> 准确区分两个项目的不同预处理策略（ContraVAE做了normalize_total+log1p，STHD pipeline内保留raw counts），为下游模型开发提供正确的数据假设</li>
+</ul>
+<h3 id="tzjsdesktop">TzJsDesktop<a hidden class="anchor" aria-hidden="true" href="#tzjsdesktop">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 为Life Copilot撰写1674行完整中文使用教程（docs/TUTORIAL.md），并通过三层源码分析定位Discord Bot将追问误判为通用问候的架构缺陷</li>
+<li><strong>怎么做的：</strong> 并行启动4个探索Agent收集10+源文件信息后规划文档结构批量写入；通过读取general_keywords、LLM Prompt指令和intent_routes.py三层逐一定位上下文失忆问题</li>
+<li><strong>有什么用：</strong> 项目获得覆盖用户指南与开发者指南的一站式中文文档；Bot对话上下文修复方案已设计完毕，消除了将追问误判为通用问候的系统性缺陷</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成Error Recovery Benchmark的CLAUDE.md改进、Phoenix/FLARE全任务训练脚本创建（6个脚本）与文件系统重组；在无头Docker容器中修复RoboTwin eval.sh三个顺序Bug（Vulkan渲染、FrozenInstanceError、norm_stats路径）；为CALVIN代码库创建CLAUDE.md</li>
+<li><strong>怎么做的：</strong> 多轮subagent并行探索代码库；修改bare except暴露Vulkan真实traceback，手工从官方驱动包提取匹配库文件配置三个环境变量；编写bash训练脚本，修改OpenPI config.py补充缺失配置；用符号链接代替大型数据目录大幅节省磁盘</li>
+<li><strong>有什么用：</strong> RoboTwin评估管线从完全报错到成功通过渲染检查；Phoenix/FLARE训练工程化（磁盘占用从78GB降至37MB），为9个MimicGen任务提供完整可执行脚本集；CALVIN代码库获得结构化文档导引</li>
+</ul>
+<blockquote>
+<p>跨DCC、tianhe、TzJsDesktop三台设备并行推进：DCC完成ContraVAE/STHD空间转录组数据归一化链路溯源；tianhe完成Phoenix/FLARE全任务训练脚本工程化与文件系统重组、修复RoboTwin评估管线三个顺序Bug；TzJsDesktop完成Life Copilot 1674行中文教程撰写并定位Discord Bot对话上下文失忆三层根因</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>RoboTwin评估管线调试（三个顺序Bug修复）</strong> — 无头Docker容器中连续修复三个顺序Bug：①Render Error——暴露bare except真实traceback后，从NVIDIA官方535.104.12驱动包提取匹配Vulkan库文件并配置三个环境变量，eval.sh成功输出&rsquo;Render Well&rsquo;；②FrozenInstanceError——将policy_config.py对frozen dataclass的直接赋值改为dataclasses.replace()；③norm_stats FileNotFoundError——修复load_norm_stats()将文件名当子目录名的路径拼接错误</li>
+<li>✅ <strong>Phoenix/FLARE全任务训练脚本创建与文件系统重组</strong> — 为全部9个MimicGen任务创建6个bash训练脚本（Phoenix训练、FLARE数据生成/LeRoBot转换/训练/评估、master编排），向OpenPI config.py补充3个缺失warmup配置（coffee_D1、stack_three_D1、three_piece_assembly_D1）；将Phoenix/FLARE从zhaoganlong目录分离为独立目录，train_datasets（77GB）和ckpt（1GB）改为符号链接，代码实际占用从78GB降至37MB</li>
+<li>✅ <strong>Life Copilot中文使用教程撰写</strong> — 创建docs/TUTORIAL.md，1674行，19章节双层结构（用户指南+开发者指南），覆盖安装配置、日程/能量/健康/Agent/技能/后台服务、24种意图类型参考、完整EventBus事件表、CLI/Discord/API命令速查及扩展开发指南</li>
+<li>🔄 <strong>Discord Bot对话上下文丢失根因分析</strong> — 定位Bot将追问（&lsquo;你安排在几点了呀&rsquo;、&lsquo;ok&rsquo;）误判为通用问候的三层根因：①general_keywords集合误匹配&rsquo;几点了&rsquo;；②LLM Prompt FIRST CHECK指令强制某些输入走GENERAL；③语义路由GENERAL_ROUTE utterances过宽。修复方案已设计，尚未实施</li>
+<li>🔄 <strong>现有Phoenix/FLARE checkpoint调查</strong> — 用户提出先检查现有checkpoint是否可复用（符号链接），AI在zhaoganlong找到Phoenix diffusion policy checkpoint（1.5GB），但FLARE warmup per-task checkpoint的完整调查在会话中断前未完成</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>ContraVAE/STHD空间转录组数据归一化溯源</strong> — 确认ContraVAE的adata_8um.h5ad中X矩阵来源（log1p+normalize_total的binned sum）、layers[&ldquo;counts&rdquo;]（raw UMI counts）、HVG选择方式及spatial坐标单位；同步通过阅读sthdio.py等核心源码确认STHD pipeline内X始终是raw UMI counts（Poisson模型假设），HVG用自定义cell type informative gene选择，用户观察到的归一化.X是在STHD之外的scanpy预处理产生的</li>
+<li>✅ <strong>RoboTwin数据采集与仿真架构解读</strong> — 解读collect_data.sh两阶段流程（随机探索找成功seed + 确定性重放采集HDF5数据），以及place_dual_shoes完整仿真链路（场景初始化→物体加载→稳定检查→双臂动作序列→运动规划→物理步进→数据存储）</li>
+<li>✅ <strong>Error Recovery Benchmark CLAUDE.md改进</strong> — 将225行CLAUDE.md精简至167行：删减冗余命令节（引用make help代替）、添加PYTHONPATH实际路径、补充单测函数示例、压缩Related Project节</li>
+<li>• <strong>CALVIN基准CLAUDE.md创建</strong> — 探索CALVIN代码库后创建CLAUDE.md，覆盖安装命令、训练评估CLI、Hydra配置体系、MCIL模型架构和NPZ数据格式；MulticoreTSNE安装失败（cmake版本不兼容：需≤3.18，系统3.26.4），AI建议注释掉该可选依赖，用户拒绝，问题未解决</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-docker容器的bare-except隐藏render-error真实原因nvidia-apt包版本53528801与内核驱动版本53510412不匹配常规安装后vulkan仍无法识别gpu">1. Docker容器的bare except隐藏Render Error真实原因；NVIDIA apt包版本（535.288.01）与内核驱动版本（535.104.12）不匹配，常规安装后Vulkan仍无法识别GPU<a hidden class="anchor" aria-hidden="true" href="#1-docker容器的bare-except隐藏render-error真实原因nvidia-apt包版本53528801与内核驱动版本53510412不匹配常规安装后vulkan仍无法识别gpu">#</a></h4>
+<p><strong>解决方案:</strong> 将bare except改为except Exception as e:并打印完整traceback暴露根因；从NVIDIA官网下载535.104.12驱动.run文件，&ndash;extract-only提取全套匹配库文件，通过VK_ICD_FILENAMES+LD_LIBRARY_PATH+__EGL_VENDOR_LIBRARY_FILENAMES三变量注入；批量复制所有libnvidia-*.so避免逐一追踪依赖链</p>
+<p><strong>关键洞察:</strong> 受限容器中版本不匹配时可直接从驱动包提取用户态库文件通过环境变量绕过系统路径，无需root权限；bare except是调试黑洞，排查阶段应第一步暴露完整traceback</p>
+<h4 id="2-discord-bot将追问你安排在几点了呀误判为通用问候返回我不太确定您在问什么">2. Discord Bot将追问（&lsquo;你安排在几点了呀&rsquo;）误判为通用问候，返回&rsquo;我不太确定您在问什么&rsquo;<a hidden class="anchor" aria-hidden="true" href="#2-discord-bot将追问你安排在几点了呀误判为通用问候返回我不太确定您在问什么">#</a></h4>
+<p><strong>解决方案:</strong> 修复三层：①缩小general_keywords范围或改为精确全词匹配；②LLM Prompt FIRST CHECK加入对话历史感知条件；③优化语义路由GENERAL_ROUTE utterances精确度</p>
+<p><strong>关键洞察:</strong> 多层意图分类防御机制中任一层过于激进都会导致上下文对话失败；有对话历史时应整体降低general类触发敏感度</p>
+<h4 id="3-flare-warmup训练在openpi-configpy中缺少coffee_d1stack_three_d1three_piece_assembly_d1三个任务的配置">3. FLARE warmup训练在OpenPI config.py中缺少coffee_D1、stack_three_D1、three_piece_assembly_D1三个任务的配置<a hidden class="anchor" aria-hidden="true" href="#3-flare-warmup训练在openpi-configpy中缺少coffee_d1stack_three_d1three_piece_assembly_d1三个任务的配置">#</a></h4>
+<p><strong>解决方案:</strong> 在config.py的_CONFIGS列表中分别添加add_finetune_config和add_inference_config调用，共补充6个配置项</p>
+<p><strong>关键洞察:</strong> 训练配置扩展时需系统性检查全任务×全难度的完整性，遗漏的均为D1难度版本，说明扩展时应从矩阵视角而非逐条添加</p>
+<h4 id="4-phoenix目录复制后占用78gbtrain_datasets-77gb--ckpt-1gb远超预期代码体积">4. Phoenix目录复制后占用78GB（train_datasets 77GB + ckpt 1GB），远超预期代码体积<a hidden class="anchor" aria-hidden="true" href="#4-phoenix目录复制后占用78gbtrain_datasets-77gb--ckpt-1gb远超预期代码体积">#</a></h4>
+<p><strong>解决方案:</strong> 删除已复制的大目录，改为符号链接指向zhaoganlong原始数据，代码体积从78GB降至37MB</p>
+<p><strong>关键洞察:</strong> HPC上大型数据集和checkpoint应通过符号链接跨项目共享，不应随代码库复制；应在项目初始化阶段就建立shared_deps/共享依赖层</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="5-大型h5ad文件直接读取toarray导致oomexit-code-137且初始分析目标文件定位错误不同处理阶段的h5ad特征完全不匹配">5. 大型h5ad文件直接读取+toarray()导致OOM（exit code 137），且初始分析目标文件定位错误（不同处理阶段的h5ad特征完全不匹配）<a hidden class="anchor" aria-hidden="true" href="#5-大型h5ad文件直接读取toarray导致oomexit-code-137且初始分析目标文件定位错误不同处理阶段的h5ad特征完全不匹配">#</a></h4>
+<p><strong>解决方案:</strong> 改用backed=&lsquo;r&rsquo;模式（内存映射）加载文件只切片读取；用户提供processdata.ipynb路径确认正确目标文件为all_region/adata_8um.h5ad</p>
+<p><strong>关键洞察:</strong> anndata支持backed模式实现lazy loading，大型稀疏矩阵应默认使用此模式；同一项目下不同处理阶段的h5ad差异极大，应先确认文件路径再分析</p>
+<h4 id="6-norm_stats路径重复load_norm_stats将asset_id文件名当作子目录名拼接产生assetsnorm_statsjsonnorm_statsjson">6. norm_stats路径重复：load_norm_stats()将asset_id（文件名）当作子目录名拼接，产生assets/norm_stats.json/norm_stats.json<a hidden class="anchor" aria-hidden="true" href="#6-norm_stats路径重复load_norm_stats将asset_id文件名当作子目录名拼接产生assetsnorm_statsjsonnorm_statsjson">#</a></h4>
+<p><strong>解决方案:</strong> 当robotwin_repo_id有值时直接从checkpoint_dir/assets目录加载，跳过asset_id子目录层级</p>
+<p><strong>关键洞察:</strong> 复用通用路径拼接函数时需验证其对目录结构的假设是否与实际一致</p>
+<h4 id="7-multicoretsne构建失败cmake版本不兼容需要318系统3264">7. MulticoreTSNE构建失败：cmake版本不兼容（需要≤3.18，系统3.26.4）<a hidden class="anchor" aria-hidden="true" href="#7-multicoretsne构建失败cmake版本不兼容需要318系统3264">#</a></h4>
+<p><strong>解决方案:</strong> （未解决）建议注释掉该可选依赖（仅用于TSNE可视化），用户拒绝。备选：pip install cmake==3.18.4或用scikit-learn TSNE替代</p>
+<p><strong>关键洞察:</strong> 旧版C++扩展包的cmake版本绑定是常见HPC安装痛点，可选依赖应在requirements中明确标注</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="定位正确分析目标与复用已有资源">定位正确分析目标与复用已有资源<a hidden class="anchor" aria-hidden="true" href="#定位正确分析目标与复用已有资源">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户自行提供了processdata.ipynb处理脚本的完整路径（ContraVAE），直接解除了AI的搜索僵局；提出应先检查现有checkpoint是否可符号链接复用（Phoenix/FLARE），避免重复训练</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI在ContraVAE项目中多轮glob/grep搜索仍未找到jupyter处理脚本；在设计Phoenix/FLARE训练方案时直接假设从零训练，未主动考虑复用已有checkpoint</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类对自己项目有直接记忆和HPC资源效率意识，能快速定位关键脚本并规避重复计算；AI擅长系统性探索但缺乏对项目历史和计算资源稀缺性的实际感知</p>
+<h4 id="docker容器渲染问题排查">Docker容器渲染问题排查<a hidden class="anchor" aria-hidden="true" href="#docker容器渲染问题排查">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类提供了两个关键环境信息：容器是远程无显示器的Docker环境，以及系统使用/app/ubuntu/bin/apt-get的非标准安装路径——这些信息AI无法自行获知</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI系统化逐层排查（暴露traceback→检查GPU→检查Vulkan ICD→检查驱动版本→提取驱动文件），最终找到可行的非root方案</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类贡献关键环境上下文和系统特殊性知识，AI贡献Linux Vulkan栈深度知识与调试方法论；两者互补缺一不可</p>
+<h4 id="calendarpro对话上下文失忆分析">CalendarPro对话上下文失忆分析<a hidden class="anchor" aria-hidden="true" href="#calendarpro对话上下文失忆分析">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类提出假设&rsquo;会不会是因为每次调用独立的claude code进程&rsquo;，指向无状态进程问题</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI通过阅读源代码发现真实根因是三层预检机制过于激进（keyword set + LLM Prompt + semantic router），与进程无关</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类假设方向不完全准确，但触发了AI深入分析架构；AI定位了更准确的根因。两者共同完成从现象到根因的推断链</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="文档工作的规划与实施流程">文档工作的规划与实施流程<a hidden class="anchor" aria-hidden="true" href="#文档工作的规划与实施流程">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>在CalendarPro教程和CLAUDE.md改进两个场景中，用户均拒绝了AI的ExitPlanMode确认流程，倾向于在下一轮对话中直接提供完整计划文本要求实施</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI主动进入plan mode并使用ExitPlanMode请求用户确认，符合计划驱动工作流程</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户更倾向于一次性完成计划+实施，不习惯中断式确认流程；AI的计划内容本身被接受，但流程形式被拒绝</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>HPC资源规划上缺乏主动性：设计Phoenix/FLARE训练方案时直接假设从零训练，未主动检查现有checkpoint可否复用；在ContraVAE中多轮文件搜索仍未找到jupyter处理脚本，需用户提供路径才能继续</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>无法预判完整依赖链：Vulkan库修复需多次迭代（逐步追踪缺失.so），处理大型h5ad文件时也需两次OOM失败后才改用backed模式——初始方案应主动选择更完整的内存高效策略</li>
+<li>分析完成后未主动推进到代码实施：RoboTwin连续Bug修复中未预判后续问题，CalendarPro上下文分析停留在方案设计阶段，均需用户再次推动才进入实施</li>
+<li>ExitPlanMode/plan mode的工作流程与用户偏好不符——用户希望直接进入实施，不喜欢规划阶段的中断式确认；多次出现同类情况</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>受限Docker容器中解决NVIDIA Vulkan库缺失的完整方案：从官方.run驱动包&ndash;extract-only提取匹配版本全套库文件，通过VK_ICD_FILENAMES+LD_LIBRARY_PATH+__EGL_VENDOR_LIBRARY_FILENAMES三变量注入，无需root权限修改系统目录；NVIDIA用户态渲染栈.so文件互相依赖，批量复制比逐一修补更高效</li>
+<li>Phoenix（diffusion policy+运动指令纠正）和FLARE（Pi0.5 LoRA+warmup perturbation重置技能）是两个互补的机器人误差恢复框架，均在9个MimicGen任务上评估；FLARE的5阶段pipeline中warmup数据生成→LeRoBot转换→训练是核心前置步骤；RoboTwin两阶段数据采集设计（seed随机探索+确定性重放写HDF5）兼顾断点续采与多模态数据完整性</li>
+<li>对话机器人的多层意图防御机制（关键词过滤+LLM Prompt+语义路由）中，上下文感知能力需贯穿每一层；有对话历史时应整体降低general类触发敏感度，否则追问会被误判为通用问候</li>
+<li>VisiumHD空间转录组典型处理链路：2μm raw counts → 4×4 binning（sum聚合）→ normalize_total → log1p → 8μm normalized expression；STHD和ContraVAE数据策略截然不同——STHD pipeline内X始终是raw counts（Poisson模型所需），ContraVAE在pipeline外做标准scanpy预处理；layers[&ldquo;counts&rdquo;]在normalize前保存，spatial坐标为全分辨率像素（1px≈0.274μm）</li>
+<li>HPC大型ML项目文件系统设计原则：数据集和checkpoint应通过符号链接跨项目共享而非复制，可将实际代码占用从数十GB降至数十MB；初始化时就应建立shared_deps/作为共享依赖层</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>frozen dataclass字段修改须用dataclasses.replace()返回新实例；复用通用路径拼接函数前需验证其对目录结构的假设是否与实际一致</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="contravae--sthd">ContraVAE &amp; STHD<a hidden class="anchor" aria-hidden="true" href="#contravae--sthd">#</a></h3>
+<p><strong>✅ 两个空间转录组项目的expression matrix归一化链路溯源</strong>
+<em>16:38:00.000 | claude_code</em>
+用户分别询问ContraVAE和STHD两个项目的数据归一化方式。ContraVAE：AI尝试直接读取h5ad时OOM，改用backed模式后分析了错误文件；用户提供processdata.ipynb后确认X=log1p(normalize_total(binned_counts))，layers[&ldquo;counts&rdquo;]=raw UMI sum聚合，HVG=seurat默认参数，spatial=全分辨率像素坐标。STHD：通过阅读sthdio.py等核心源码发现STHD本身不做normalization（Poisson模型直接用raw counts），HVG用自定义gene选择，用户看到的归一化.X是在pipeline外产生的。</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 CLAUDE.md改进 + Phoenix/FLARE全任务训练脚本创建与文件系统重组 + checkpoint调查</strong>
+<em>17:37:00.000 | claude_code</em>
+AI将error-recovery-benchmark CLAUDE.md从225行精简至167行。随后为Phoenix/FLARE创建6个bash训练脚本，补充OpenPI config.py中3个缺失warmup配置；将Phoenix/FLARE从zhaoganlong目录分离为独立目录，将train_datasets（77GB）和ckpt（1GB）改为符号链接（磁盘从78GB降至37MB）。GPU规划：an49 GPU0做Phoenix，GPU1-7做FLARE 7任务，an53做剩余2任务。用户提出先检查现有checkpoint可否复用，AI在zhaoganlong找到Phoenix checkpoint（1.5GB），FLARE调查在会话中断前未完成。另解释了source setproxy.sh的HTTP代理机制。</p>
+<h3 id="calvin">CALVIN<a hidden class="anchor" aria-hidden="true" href="#calvin">#</a></h3>
+<p><strong>🔄 代码库分析：创建CLAUDE.md并排查MulticoreTSNE安装失败</strong>
+<em>02:09:00.000 | claude_code</em>
+AI探索CALVIN代码库创建CLAUDE.md（覆盖安装、训练评估CLI、Hydra配置、MCIL模型架构和NPZ数据格式）。MulticoreTSNE构建失败（cmake版本不兼容），AI建议注释掉该可选依赖，用户拒绝，问题未解决。</p>
+<h3 id="robotwin">RoboTwin<a hidden class="anchor" aria-hidden="true" href="#robotwin">#</a></h3>
+<p><strong>✅ 修复eval.sh三个顺序Bug并解读数据采集仿真架构</strong>
+<em>06:39:00.000 | claude_code</em>
+用户报告eval.sh运行时报Render Error。AI修改bare except暴露真实traceback，确认是SAPIEN找不到渲染设备；系统驱动（535.104.12）与apt包（535.288.01）版本不匹配，从NVIDIA官方.run文件提取匹配库并配置三个环境变量，eval.sh成功输出&rsquo;Render Well&rsquo;。随后修复FrozenInstanceError（frozen dataclass直接赋值→dataclasses.replace()）和norm_stats FileNotFoundError（文件名被当子目录拼接→直接从assets/加载）。最后解读了两阶段数据采集设计和place_dual_shoes完整仿真链路。</p>
+<h3 id="life-copilot-calendarpro">Life Copilot (CalendarPro)<a hidden class="anchor" aria-hidden="true" href="#life-copilot-calendarpro">#</a></h3>
+<p><strong>🔄 中文使用教程撰写 + Discord Bot对话上下文失忆根因分析</strong>
+<em>00:32:00.000 | claude_code</em>
+AI并行探索项目多个模块后撰写docs/TUTORIAL.md（1674行，19章节，涵盖用户指南+开发者指南、24种意图类型参考、完整EventBus事件表、命令速查表和扩展开发指南）。随后用户展示Bot将追问误判为通用问候的案例并提出进程独立性假设，AI通过读取源代码定位三层真实根因：general_keywords过宽、LLM Prompt FIRST CHECK过于强制、语义路由GENERAL_ROUTE utterances过宽泛。修复方案设计完成但未在当次会话中实施。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>29,608,728</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>82,875</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>82,462</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>1,818,007</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>27,625,384</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>93.8%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$17.4820</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>6,533</td>
+          <td>33,941</td>
+          <td>935,222</td>
+          <td>16,426,841</td>
+          <td>$14.9397</td>
+          <td>85.5%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>76,342</td>
+          <td>48,521</td>
+          <td>882,785</td>
+          <td>11,198,543</td>
+          <td>$2.5423</td>
+          <td>14.5%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>639,003</td>
+          <td>2,953</td>
+          <td>1,904</td>
+          <td>$0.9898</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>19,735,847</td>
+          <td>73,329</td>
+          <td>52,047</td>
+          <td>$11.2305</td>
+      </tr>
+      <tr>
+          <td>TzJsDesktop</td>
+          <td>9,233,878</td>
+          <td>6,593</td>
+          <td>28,511</td>
+          <td>$5.2618</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

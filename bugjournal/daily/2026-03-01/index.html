@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-01 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="三台设备并行推进：DCC完成VisiumHD crop10large三源annotation对比可视化（Pathologist/STHD/STAIG Fusion，Silhouette=0.343）与MIHD仓库六阶段大规模重构（删除41个死文件，修复drop_feature语义bug，440个实验dry_run验证通过）；天河完成BC-RNN Stack_D0错误注入流水线（11个tip_over场景&#43;MP4）、Pi0.5 Phoenix九任务基准评测（整体SR 4.2%）、诊断Coffee零成功率根因（缺失57维object观测键）并修复，最终成功启动Pi0.5 LoRA六GPU并行训练（77.7GB/100%利用率）；MacBook修复daily_summary工具逻辑（finalize机制&#43;&ndash;sync逐天处理）、批量生成13&#43;天历史日报，并完成Desktop Video播放模式三个Bug修复与Liquid Glass UI重设计。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-01/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-01/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-01/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-01">
+  <meta property="og:description" content="三台设备并行推进：DCC完成VisiumHD crop10large三源annotation对比可视化（Pathologist/STHD/STAIG Fusion，Silhouette=0.343）与MIHD仓库六阶段大规模重构（删除41个死文件，修复drop_feature语义bug，440个实验dry_run验证通过）；天河完成BC-RNN Stack_D0错误注入流水线（11个tip_over场景&#43;MP4）、Pi0.5 Phoenix九任务基准评测（整体SR 4.2%）、诊断Coffee零成功率根因（缺失57维object观测键）并修复，最终成功启动Pi0.5 LoRA六GPU并行训练（77.7GB/100%利用率）；MacBook修复daily_summary工具逻辑（finalize机制&#43;–sync逐天处理）、批量生成13&#43;天历史日报，并完成Desktop Video播放模式三个Bug修复与Liquid Glass UI重设计。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-01T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-01T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-01">
+  <meta name="twitter:description" content="三台设备并行推进：DCC完成VisiumHD crop10large三源annotation对比可视化（Pathologist/STHD/STAIG Fusion，Silhouette=0.343）与MIHD仓库六阶段大规模重构（删除41个死文件，修复drop_feature语义bug，440个实验dry_run验证通过）；天河完成BC-RNN Stack_D0错误注入流水线（11个tip_over场景&#43;MP4）、Pi0.5 Phoenix九任务基准评测（整体SR 4.2%）、诊断Coffee零成功率根因（缺失57维object观测键）并修复，最终成功启动Pi0.5 LoRA六GPU并行训练（77.7GB/100%利用率）；MacBook修复daily_summary工具逻辑（finalize机制&#43;–sync逐天处理）、批量生成13&#43;天历史日报，并完成Desktop Video播放模式三个Bug修复与Liquid Glass UI重设计。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Daily Summaries",
+      "item": "https://tzj2006.github.io/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-03-01",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-03-01/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-01",
+  "name": "Bug Journal 2026-03-01",
+  "description": "三台设备并行推进：DCC完成VisiumHD crop10large三源annotation对比可视化（Pathologist/STHD/STAIG Fusion，Silhouette=0.343）与MIHD仓库六阶段大规模重构（删除41个死文件，修复drop_feature语义bug，440个实验dry_run验证通过）；天河完成BC-RNN Stack_D0错误注入流水线（11个tip_over场景+MP4）、Pi0.5 Phoenix九任务基准评测（整体SR 4.2%）、诊断Coffee零成功率根因（缺失57维object观测键）并修复，最终成功启动Pi0.5 LoRA六GPU并行训练（77.7GB/100%利用率）；MacBook修复daily_summary工具逻辑（finalize机制+\u0026ndash;sync逐天处理）、批量生成13+天历史日报，并完成Desktop Video播放模式三个Bug修复与Liquid Glass UI重设计。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-01 三台设备并行推进：DCC完成VisiumHD crop10large三源annotation对比可视化（Pathologist/STHD/STAIG Fusion，Silhouette=0.343）与MIHD仓库六阶段大规模重构（删除41个死文件，修复drop_feature语义bug，440个实验dry_run验证通过）；天河完成BC-RNN Stack_D0错误注入流水线（11个tip_over场景+MP4）、Pi0.5 Phoenix九任务基准评测（整体SR 4.2%）、诊断Coffee零成功率根因（缺失57维object观测键）并修复，最终成功启动Pi0.5 LoRA六GPU并行训练（77.7GB/100%利用率）；MacBook修复daily_summary工具逻辑（finalize机制+–sync逐天处理）、批量生成13+天历史日报，并完成Desktop Video播放模式三个Bug修复与Liquid Glass UI重设计。\n今日任务 架构与策略 ✅ MIHD仓库六阶段大规模清理重构（DCC） — 执行预先规划的六阶段重构：Phase 1删除30+死文件（~250K代码+5.3MB图片）；Phase 2从3488行run_benchmark.py monolith提取共享函数至utils/data_loader、models/staig_utils（新建）、models/vision_extractors（新建）、models/Fusion、utils/clustering；Phase 3删除run_benchmark.py及5个依赖模型；Phase 4提取STAIG公共函数并修复BasicContrastive.py的drop_feature逻辑bug（\u003e= 改为 \u003c）；Phase 5-6更新所有文档，pipeline dry_run验证通过（440个实验计划）。人类在计划阶段通过grep逐一验证41个文件导入关系并制定精确迁移表，是整个重构成功的关键前提。 ✅ Coffee BC-RNN 0% SR根因诊断与修复（tianhe） — 定位Coffee D0/D1在600 epoch训练中成功率始终为0的根因：BC-RNN配置模板缺少Coffee任务必需的object键（57维物体状态，包含pod和pod_holder相对位姿）。通过h5py数据集查验确认所有9个任务均含该键，在TASK_DEFS中添加extra_low_dim=[“object”]，修改cmd_generate_configs支持per-task观测覆盖，重新生成9个配置文件。另外发现Coffee环境初始化存在物体穿模/卡住的独立环境bug，需单独修复。 ✅ VisiumHD crop10large 三源annotation对比可视化（DCC） — 实现三层次annotation可视化体系：(1) Pathologist annotation——发现r_big//4坐标映射规则，将Zenodo CSV以100%匹配率映射到17502个8um bins，生成H\u0026E+annotation双面板，识别Neoplasm/Connective Tissue/Non-neoplastic Epithelium/Smooth Muscle四类；(2) STHD细胞类型预测——将276968个2um bin的85种细胞类型通过majority vote聚合至8um粒度，96.3%匹配率；(3) STAIG多模态融合聚类——经5轮bug修复（路径、坐标加载、mclust fallback、stdout buffering）成功完成PCA gene+UNI2 vision+STAIG GCN fusion，300 epochs，Silhouette=0.343。scGPT可视化从mclust（预计6小时）切换为KMeans，2分钟完成11个section（ARI=0.1695）。同步改进STHD和MIHD的CLAUDE.md。 ✅ BC-RNN Stack_D0 错误注入与可视化流水线（tianhe） — 修复BC-RNN视觉策略推理三个关键配置bug（相机使能、84×84分辨率、HWC→CHW转置），创建benchmark_v4_stack.yaml配置，修改2_visualize_scene.py支持policy场景（NPZ加载、跳过demo replay），创建batch_visualize_policy_scenes.py，成功从50次rollout生成11个tip_over错误场景并批量渲染为MP4。使用srun –overlap复用已有interactive job资源。 ✅ Pi0.5 Phoenix全任务基准评测（tianhe/DCC） — 完成Pi0.5 Phoenix（step 99999）在9个MimicGen任务各50 episodes的评估：Stack_D0 24%、Stack_D1 12%，Coffee/StackThree/ThreePieceAssembly均接近0%，整体SR 4.2%（19/450）。确认此为预训练基线权重的零样本迁移性能，两次Pi0.5 fine-tune任务（Job 46551/46553）均未完成100k步，需重新训练。 ✅ Pi0.5 LoRA微调管线搭建与6GPU并行训练启动（tianhe） — 创建scripts/train_pi05_benchmark.py（convert-data/compute-norms/train/eval/report五种子命令）；在lipeida/openpi的config.py注册18个训练/推理config（9任务×finetune+inference）；完成9个MimicGen→LeRobot v2.1格式转换，batch转换段错误后改为逐个运行；验证coffee_d0 norm_stats（223K帧，8D state，7D action）；修复训练启动4个连续bug（JAX_PLATFORMS=cpu缺失、norm_stats路径错误、–no-overwrite标志形式、WANDB_MODE=disabled）；最终6个任务在GPU 1-6以XLA_PYTHON_CLIENT_MEM_FRACTION=0.95并行运行（77.7GB显存/100%利用率）。 ✅ Desktop Video播放模式Bug修复与UI优化（MacBook） — 修复三个联动Bug：(1) PowerSave/PowerSave+新窗口创建时仅处理当前屏幕，改为委托全局评估；(2) Automatic模式缺少低电量感知，注册NSProcessInfoPowerStateDidChange，低电量时切换省电+行为（anyOverlayCompletelyCovered阈值）；(3) 将updatePlaybackStateForAllScreens()移入AppState.playbackMode.didSet实现单一真相源。UI优化：移除GeneralSettingsView中与PlaybackSettingsView重复的控件；重设计CombinedGlassClock为macOS Tahoe原生风格（.regular glass、独立胶囊容器、去阴影）；统一4处时钟定位常量（clockVerticalPositionFactor=0.85）；改用dateFormat(fromTemplate:)区域感知日期格式。xcodebuild全部通过。 ✅ daily_summary工具改进（MacBook） — 实现merge finalize机制（双重条件：date",
+  "wordCount" : "511",
+  "inLanguage": "en",
+  "datePublished": "2026-03-01T00:00:00-05:00",
+  "dateModified": "2026-03-01T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-03-01/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/daily/">Daily Summaries</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-01
+    </h1>
+    <div class="post-meta"><span title='2026-03-01 00:00:00 -0500 EST'>March 1, 2026</span>&nbsp;·&nbsp;<span>3 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-01">日报 — 2026-03-01<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-01">#</a></h1>
+<blockquote>
+<p>三台设备并行推进：DCC完成VisiumHD crop10large三源annotation对比可视化（Pathologist/STHD/STAIG Fusion，Silhouette=0.343）与MIHD仓库六阶段大规模重构（删除41个死文件，修复drop_feature语义bug，440个实验dry_run验证通过）；天河完成BC-RNN Stack_D0错误注入流水线（11个tip_over场景+MP4）、Pi0.5 Phoenix九任务基准评测（整体SR 4.2%）、诊断Coffee零成功率根因（缺失57维object观测键）并修复，最终成功启动Pi0.5 LoRA六GPU并行训练（77.7GB/100%利用率）；MacBook修复daily_summary工具逻辑（finalize机制+&ndash;sync逐天处理）、批量生成13+天历史日报，并完成Desktop Video播放模式三个Bug修复与Liquid Glass UI重设计。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>MIHD仓库六阶段大规模清理重构（DCC）</strong> — 执行预先规划的六阶段重构：Phase 1删除30+死文件（~250K代码+5.3MB图片）；Phase 2从3488行run_benchmark.py monolith提取共享函数至utils/data_loader、models/staig_utils（新建）、models/vision_extractors（新建）、models/Fusion、utils/clustering；Phase 3删除run_benchmark.py及5个依赖模型；Phase 4提取STAIG公共函数并修复BasicContrastive.py的drop_feature逻辑bug（&gt;= 改为 &lt;）；Phase 5-6更新所有文档，pipeline dry_run验证通过（440个实验计划）。人类在计划阶段通过grep逐一验证41个文件导入关系并制定精确迁移表，是整个重构成功的关键前提。</li>
+<li>✅ <strong>Coffee BC-RNN 0% SR根因诊断与修复（tianhe）</strong> — 定位Coffee D0/D1在600 epoch训练中成功率始终为0的根因：BC-RNN配置模板缺少Coffee任务必需的object键（57维物体状态，包含pod和pod_holder相对位姿）。通过h5py数据集查验确认所有9个任务均含该键，在TASK_DEFS中添加extra_low_dim=[&ldquo;object&rdquo;]，修改cmd_generate_configs支持per-task观测覆盖，重新生成9个配置文件。另外发现Coffee环境初始化存在物体穿模/卡住的独立环境bug，需单独修复。</li>
+<li>✅ <strong>VisiumHD crop10large 三源annotation对比可视化（DCC）</strong> — 实现三层次annotation可视化体系：(1) Pathologist annotation——发现r_big//4坐标映射规则，将Zenodo CSV以100%匹配率映射到17502个8um bins，生成H&amp;E+annotation双面板，识别Neoplasm/Connective Tissue/Non-neoplastic Epithelium/Smooth Muscle四类；(2) STHD细胞类型预测——将276968个2um bin的85种细胞类型通过majority vote聚合至8um粒度，96.3%匹配率；(3) STAIG多模态融合聚类——经5轮bug修复（路径、坐标加载、mclust fallback、stdout buffering）成功完成PCA gene+UNI2 vision+STAIG GCN fusion，300 epochs，Silhouette=0.343。scGPT可视化从mclust（预计6小时）切换为KMeans，2分钟完成11个section（ARI=0.1695）。同步改进STHD和MIHD的CLAUDE.md。</li>
+<li>✅ <strong>BC-RNN Stack_D0 错误注入与可视化流水线（tianhe）</strong> — 修复BC-RNN视觉策略推理三个关键配置bug（相机使能、84×84分辨率、HWC→CHW转置），创建benchmark_v4_stack.yaml配置，修改2_visualize_scene.py支持policy场景（NPZ加载、跳过demo replay），创建batch_visualize_policy_scenes.py，成功从50次rollout生成11个tip_over错误场景并批量渲染为MP4。使用srun &ndash;overlap复用已有interactive job资源。</li>
+<li>✅ <strong>Pi0.5 Phoenix全任务基准评测（tianhe/DCC）</strong> — 完成Pi0.5 Phoenix（step 99999）在9个MimicGen任务各50 episodes的评估：Stack_D0 24%、Stack_D1 12%，Coffee/StackThree/ThreePieceAssembly均接近0%，整体SR 4.2%（19/450）。确认此为预训练基线权重的零样本迁移性能，两次Pi0.5 fine-tune任务（Job 46551/46553）均未完成100k步，需重新训练。</li>
+<li>✅ <strong>Pi0.5 LoRA微调管线搭建与6GPU并行训练启动（tianhe）</strong> — 创建scripts/train_pi05_benchmark.py（convert-data/compute-norms/train/eval/report五种子命令）；在lipeida/openpi的config.py注册18个训练/推理config（9任务×finetune+inference）；完成9个MimicGen→LeRobot v2.1格式转换，batch转换段错误后改为逐个运行；验证coffee_d0 norm_stats（223K帧，8D state，7D action）；修复训练启动4个连续bug（JAX_PLATFORMS=cpu缺失、norm_stats路径错误、&ndash;no-overwrite标志形式、WANDB_MODE=disabled）；最终6个任务在GPU 1-6以XLA_PYTHON_CLIENT_MEM_FRACTION=0.95并行运行（77.7GB显存/100%利用率）。</li>
+<li>✅ <strong>Desktop Video播放模式Bug修复与UI优化（MacBook）</strong> — 修复三个联动Bug：(1) PowerSave/PowerSave+新窗口创建时仅处理当前屏幕，改为委托全局评估；(2) Automatic模式缺少低电量感知，注册NSProcessInfoPowerStateDidChange，低电量时切换省电+行为（anyOverlayCompletelyCovered阈值）；(3) 将updatePlaybackStateForAllScreens()移入AppState.playbackMode.didSet实现单一真相源。UI优化：移除GeneralSettingsView中与PlaybackSettingsView重复的控件；重设计CombinedGlassClock为macOS Tahoe原生风格（.regular glass、独立胶囊容器、去阴影）；统一4处时钟定位常量（clockVerticalPositionFactor=0.85）；改用dateFormat(fromTemplate:)区域感知日期格式。xcodebuild全部通过。</li>
+<li>✅ <strong>daily_summary工具改进（MacBook）</strong> — 实现merge finalize机制（双重条件：date&lt;today AND 所有源log均_finalized → 报告标记_finalized=True，下次自动跳过），新增&ndash;force参数覆盖检查并传递给子进程；修复merge &ndash;sync无&ndash;date参数时将所有日期合并为单批次的问题，改为委托给_cmd_merge_sync_all()逐天处理。两项改进均保持与export finalize机制的语义一致性。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>🔄 <strong>BC-RNN九任务训练监控（tianhe）</strong> — 监控9个MimicGen任务BC-RNN训练进度：epoch 20时Stack_D0 64%、Stack_D1 44%（良好收敛），Coffee 0%（后发现环境初始化穿模bug，config缺失object键已修复，待重新训练）。清理an49节点约407GB闲置GPU显存（3个过时VLA server进程）。</li>
+<li>✅ <strong>项目文件整理v4.17/v4.18与文档更新（tianhe）</strong> — v4.17：创建archive/目录结构，归档过时文档、mimicgen_workspace v1-v3遗留代码，合并VLM教程（完整版721行取代旧版331行），创建README.md/.gitignore/docs/EXTERNAL_DEPENDENCIES.md。v4.18：将3个脚本中重复的create_env()/load_task_registry()（约210行）提取到scripts/script_utils.py，归档batch_visualize.py等过时脚本，更新项目全景总结至v4.18（LOC统计、新脚本目录、版本历史）。</li>
+<li>✅ <strong>批量生成历史结构化日报（MacBook）</strong> — 在MacBook上批量运行gadget/summarize工具，为2026-02-01至02-28共13+天历史日期生成结构化JSON日报，涵盖MIHD、ErrorRecoveryBenchmark、CalendarPro、gadget、DesktopVideo等多项目。部分复杂日期（02-14、02-16、02-28等）因内容过多触发API 32K token超限，合并不完整，需设置CLAUDE_CODE_MAX_OUTPUT_TOKENS环境变量。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-mihd-pipeline大量from-scriptsrun_benchmark-import3488行monolith文件无法直接删除">1. MIHD pipeline大量from scripts.run_benchmark import&hellip;，3488行monolith文件无法直接删除<a hidden class="anchor" aria-hidden="true" href="#1-mihd-pipeline大量from-scriptsrun_benchmark-import3488行monolith文件无法直接删除">#</a></h4>
+<p><strong>解决方案:</strong> 人类通过grep逐一验证41个文件导入关系制定精确迁移表；AI按表将共享函数迁移至正确模块，grep验证零残留引用后删除原文件，pipeline dry_run通过</p>
+<p><strong>关键洞察:</strong> 大型代码库清理的关键是人类主导的依赖分析；「先迁移后删除，grep全验证」是避免ImportError的必要步骤；代码合并本身是一种安全审计，自然发现同名函数间的语义差异bug</p>
+<h4 id="2-coffee-bc-rnn训练600-epoch成功率始终为0训练loss正常收敛而stack同配置达98-sr">2. Coffee BC-RNN训练600 epoch成功率始终为0%，训练Loss正常收敛，而Stack同配置达98% SR<a hidden class="anchor" aria-hidden="true" href="#2-coffee-bc-rnn训练600-epoch成功率始终为0训练loss正常收敛而stack同配置达98-sr">#</a></h4>
+<p><strong>解决方案:</strong> h5py查验发现所有9个BC-RNN配置模板均缺少object键（57维物体状态）；在TASK_DEFS中添加extra_low_dim=[&ldquo;object&rdquo;]，修改cmd_generate_configs支持per-task覆盖，重新生成9个配置；另发现Coffee环境初始化穿模的独立bug需单独修复</p>
+<p><strong>关键洞察:</strong> Stack靠图像即可，Coffee（多阶段精细操作）必须有低维物体状态；统一模板不适用于不同观测需求的任务；评估0% SR时应首先检查观测键而非归因于训练超参</p>
+<h4 id="3-visiumhd-hd数据集在staig-fusion-pipeline上连续遇到5类兼容性问题路径格式不兼容8um-bin坐标加载失败barcode格式与dlpfc不同mclust在大数据量下崩溃kmeans-fallback含nan崩溃stdout-buffering导致进度不可见">3. VisiumHD HD数据集在STAIG fusion pipeline上连续遇到5类兼容性问题：路径格式不兼容、8um bin坐标加载失败（barcode格式与DLPFC不同）、mclust在大数据量下崩溃、KMeans fallback含NaN崩溃、stdout buffering导致进度不可见<a hidden class="anchor" aria-hidden="true" href="#3-visiumhd-hd数据集在staig-fusion-pipeline上连续遇到5类兼容性问题路径格式不兼容8um-bin坐标加载失败barcode格式与dlpfc不同mclust在大数据量下崩溃kmeans-fallback含nan崩溃stdout-buffering导致进度不可见">#</a></h4>
+<p><strong>解决方案:</strong> 逐轮修复：修正HD路径格式（find_spatial_image新增cropped_fullres.tif模式）；适配HD坐标加载逻辑（crop_dir.parent作为data_root）；KMeans fallback添加nan_to_num；改用文件系统轮询监控进度</p>
+<p><strong>关键洞察:</strong> VisiumHD（8um bins）与DLPFC（55um spots）在barcode格式和坐标系统上均不兼容，需在调用链的多个层次分别适配；多bug级联时逐一修复比整体重构更高效</p>
+<h4 id="4-bc-rnn视觉策略推理连续三个格式错误keyerror-agentview_image未启用相机croprandomizer断言失败分辨率256256-vs-8484图像维度错误hwc-vs-chw">4. BC-RNN视觉策略推理连续三个格式错误：KeyError &lsquo;agentview_image&rsquo;（未启用相机）、CropRandomizer断言失败（分辨率256×256 vs 84×84）、图像维度错误（HWC vs CHW）<a hidden class="anchor" aria-hidden="true" href="#4-bc-rnn视觉策略推理连续三个格式错误keyerror-agentview_image未启用相机croprandomizer断言失败分辨率256256-vs-8484图像维度错误hwc-vs-chw">#</a></h4>
+<p><strong>解决方案:</strong> 从checkpoint的shape_metadata自动检测image obs keys并设置enable_camera=True；读取训练分辨率传入create_env()；在policy_adapter.py中添加HWC→CHW转置和uint8→float32归一化</p>
+<p><strong>关键洞察:</strong> BC-RNN视觉策略推理三重必要条件缺任一均在不同层崩溃且报错各异；checkpoint的config字段是JSON字符串而非dict，需先json.loads()解析</p>
+<h4 id="5-compute_norm_statspy将pi05模型铺满8块gpu各61gb-vram但gpu利用率0cuda_visible_devices设置后jax仍尝试初始化cuda后端而崩溃">5. compute_norm_stats.py将Pi0.5模型铺满8块GPU（各~61GB VRAM）但GPU利用率0%；CUDA_VISIBLE_DEVICES=&ldquo;&ldquo;设置后JAX仍尝试初始化CUDA后端而崩溃<a hidden class="anchor" aria-hidden="true" href="#5-compute_norm_statspy将pi05模型铺满8块gpu各61gb-vram但gpu利用率0cuda_visible_devices设置后jax仍尝试初始化cuda后端而崩溃">#</a></h4>
+<p><strong>解决方案:</strong> 同时设置CUDA_VISIBLE_DEVICES=&ldquo;&ldquo;和JAX_PLATFORMS=cpu强制CPU-only模式；添加&ndash;max-frames子采样+9任务并行，大幅缩短计算时间</p>
+<p><strong>关键洞察:</strong> openpi框架get_config()阶段eagerly实例化PaligemmaTokenizer并分发到所有可见GPU；JAX_PLATFORMS=cpu是阻止这一行为的额外必要变量，CUDA_VISIBLE_DEVICES单独设置不够</p>
+<h4 id="6-zenodo病理学家annotation-csv的barcode格式s_008um_rrrrr_ccccc-1与adataobs中r_bigc_big2um网格坐标无法直接匹配">6. Zenodo病理学家annotation CSV的barcode格式（s_008um_RRRRR_CCCCC-1）与adata.obs中r_big/c_big（2um网格坐标）无法直接匹配<a hidden class="anchor" aria-hidden="true" href="#6-zenodo病理学家annotation-csv的barcode格式s_008um_rrrrr_ccccc-1与adataobs中r_bigc_big2um网格坐标无法直接匹配">#</a></h4>
+<p><strong>解决方案:</strong> 通过分析barcodes_included字段发现r_big//4的坐标映射规则，构造匹配barcode实现100%匹配（17502/17502）</p>
+<p><strong>关键洞察:</strong> VisiumHD的8um bin是4×4个2um bin的聚合，整除而非除法；barcodes_included字段是发现这个映射关系的关键线索</p>
+<h4 id="7-basiccontrastivepy的drop_feature存在隐性语义bugmask条件为-drop_prob而非-drop_prob导致丢弃概率反向低drop_prob时反而丢弃更多特征">7. BasicContrastive.py的drop_feature()存在隐性语义bug：mask条件为&gt;= drop_prob而非&lt; drop_prob，导致丢弃概率反向，低drop_prob时反而丢弃更多特征<a hidden class="anchor" aria-hidden="true" href="#7-basiccontrastivepy的drop_feature存在隐性语义bugmask条件为-drop_prob而非-drop_prob导致丢弃概率反向低drop_prob时反而丢弃更多特征">#</a></h4>
+<p><strong>解决方案:</strong> 重构提取三份同名函数为单一来源（staig_utils.py），过程中对比各版本实现差异，以STAIGTrainerE2E的正确版本（&lt; drop_prob）为准，BasicContrastive.py改为从staig_utils导入</p>
+<p><strong>关键洞察:</strong> 三份同名函数分散在不同文件是bug温床；代码合并本身起到了安全审计效果</p>
+<h4 id="8-pi05-lora训练启动连续4个bugjax-cpu初始化失败norm_stats路径错误检测路径与实际输出路径不符布尔标志解析错误overwritefalsewb-proxyerror无限重试">8. Pi0.5 LoRA训练启动连续4个bug：JAX CPU初始化失败、norm_stats路径错误（检测路径与实际输出路径不符）、布尔标志解析错误（&ndash;overwrite=False）、W&amp;B ProxyError无限重试<a hidden class="anchor" aria-hidden="true" href="#8-pi05-lora训练启动连续4个bugjax-cpu初始化失败norm_stats路径错误检测路径与实际输出路径不符布尔标志解析错误overwritefalsewb-proxyerror无限重试">#</a></h4>
+<p><strong>解决方案:</strong> 逐一修复：JAX_PLATFORMS=cpu+CUDA_VISIBLE_DEVICES；实地find确认实际路径为assets/<config>/benchmark/mimicgen_<task>/norm_stats.json；改用&ndash;no-overwrite标志；设置WANDB_MODE=disabled；修改脚本后先kill launcher进程再用新配置重启</p>
+<p><strong>关键洞察:</strong> HPC计算节点无外网访问，批量训练应默认禁用W&amp;B；修改启动脚本后需同时终止正在运行的launcher，否则其按旧配置自动恢复子进程</p>
+<h4 id="9-srun在已有interactive-session时阻塞不响应ssh直连被pam_slurm_adopt拒绝">9. srun在已有interactive session时阻塞不响应，SSH直连被pam_slurm_adopt拒绝<a hidden class="anchor" aria-hidden="true" href="#9-srun在已有interactive-session时阻塞不响应ssh直连被pam_slurm_adopt拒绝">#</a></h4>
+<p><strong>解决方案:</strong> 使用srun &ndash;overlap &ndash;jobid=<ID> bash -c &ldquo;&hellip;&quot;，在同一job allocation内共享已有资源</p>
+<p><strong>关键洞察:</strong> &ndash;overlap是GPU集群快速迭代调试时复用已有interactive job的关键技巧，避免重新排队等待资源</p>
+<h4 id="10-desktop-video播放模式三个联动bugpowersave全局委托缺失automatic无低电量感知模式切换未触发全局重评估状态重评估分散在generalsettingsviewonchange和desktop_videoappconfirmchanges多处">10. Desktop Video播放模式三个联动Bug：PowerSave+全局委托缺失、Automatic无低电量感知、模式切换未触发全局重评估；状态重评估分散在GeneralSettingsView.onChange和Desktop_VideoApp.confirmChanges()多处<a hidden class="anchor" aria-hidden="true" href="#10-desktop-video播放模式三个联动bugpowersave全局委托缺失automatic无低电量感知模式切换未触发全局重评估状态重评估分散在generalsettingsviewonchange和desktop_videoappconfirmchanges多处">#</a></h4>
+<p><strong>解决方案:</strong> 将updatePlaybackStateForAllScreens()移入AppState.playbackMode.didSet（单一真相源，防抖guard）；AppDelegate注册NSProcessInfoPowerStateDidChange，低电量时automatic分支使用anyOverlayCompletelyCovered()阈值</p>
+<p><strong>关键洞察:</strong> 将全局副作用集中到@Published属性的didSet是单一真相源原则的体现；NSProcessInfoPowerStateDidChange是macOS标准低电量通知，无需轮询</p>
+<h4 id="11-merge-finalize机制缺失导致sync-all每次重新处理所有历史日期merge-sync无日期参数时将所有日期合并为单批次">11. merge finalize机制缺失导致&ndash;sync-all每次重新处理所有历史日期；merge &ndash;sync无日期参数时将所有日期合并为单批次<a hidden class="anchor" aria-hidden="true" href="#11-merge-finalize机制缺失导致sync-all每次重新处理所有历史日期merge-sync无日期参数时将所有日期合并为单批次">#</a></h4>
+<p><strong>解决方案:</strong> 实现与export一致的_finalized双重条件（date&lt;today AND 所有源log均_finalized）自动标记报告；无&ndash;date的&ndash;sync委托给_cmd_merge_sync_all()逐天处理，一行修改解决行为不一致问题</p>
+<p><strong>关键洞察:</strong> finalize双重条件缺一不可：时间维度保证非当天数据，完整性维度保证多设备数据已全量上传；两个相似功能行为应保持一致</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="coffee任务失败的根本原因识别">Coffee任务失败的根本原因识别<a hidden class="anchor" aria-hidden="true" href="#coffee任务失败的根本原因识别">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>提供关键对比观察（Stack同配置98% SR，Coffee 0%，Loss正常收敛）；通过观看MP4视频几秒内识别出Coffee环境初始化穿模bug；决策「诊断后暂不修复config，先处理环境bug」</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>通过代码分析和h5py数据集交叉验证系统锁定object键缺失根因（57维），量化维度和内容，完整修复9个任务配置；从数值指标（Loss下降）无法判断出环境穿模问题</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类用视觉直觉发现了AI分析大量日志也未能发现的环境bug；AI的价值在于系统性的技术深度调查和实施</p>
+<h4 id="大规模代码库重构的依赖关系分析">大规模代码库重构的依赖关系分析<a hidden class="anchor" aria-hidden="true" href="#大规模代码库重构的依赖关系分析">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类在执行前独立通过grep逐一验证41个文件的导入关系（含跨文件间接依赖），制定精确的函数迁移表；承担了架构分析和风险识别的核心工作</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI在收到完整计划后按图索骥执行：迁移函数、更新导入、验证零残留、运行dry_run；独立发现test_batch_correction.py等计划外的级联死文件</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类承担最关键的架构分析（若让AI自主分析，大概率遗漏间接依赖）；AI承担繁琐的多文件编辑执行工作，两者分工明确</p>
+<h4 id="gpu资源效率监控与资源浪费识别">GPU资源效率监控与资源浪费识别<a hidden class="anchor" aria-hidden="true" href="#gpu资源效率监控与资源浪费识别">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户主动发现GPU占用0%（compute_norm_stats铺满8块GPU但无计算）、识别an49节点闲置VLA server占用407GB显存，要求停止进程先排查；主动提出将XLA_PYTHON_CLIENT_MEM_FRACTION提升至0.95并扩展至6 GPU并行</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI启动训练后专注查看日志进度，未主动检查GPU利用率；训练稳定后认为任务完成，未主动提出显存或GPU数量优化</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户对HPC计算资源效率有直觉感知和主动优化意识，最终使显存从61GB提升至77.7GB；AI解决功能问题但缺乏性能层面的主动思考</p>
+<h4 id="desktop-video省电模式语义与自动模式设计">Desktop Video省电+模式语义与自动模式设计<a hidden class="anchor" aria-hidden="true" href="#desktop-video省电模式语义与自动模式设计">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>明确省电+模式「任意屏幕被遮挡即暂停全部」；设计自动模式=正常电量→省电行为，低电量→省电+行为，充分复用现有阈值函数（anyOverlayCompletelyCovered vs allOverlaysCompletelyCovered）</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>最初实现省电+时使用allOverlaysCompletelyCovered（与预期语义相反）；被纠正后能正确实现，但若无指引会设计为独立逻辑而非复用现有模式</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类从用户体验角度思考「最保守省电策略」并充分复用现有代码结构；AI的默认阈值假设与实际需求完全相反</p>
+<h4 id="算法与工具的效率权衡mclust-vs-kmeans">算法与工具的效率权衡（mclust vs KMeans）<a hidden class="anchor" aria-hidden="true" href="#算法与工具的效率权衡mclust-vs-kmeans">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>在得知mclust需要6小时后立即提议切换KMeans，判断可视化探索阶段不需要mclust精度，2分钟完成全部11个section</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>默认使用mclust（与DLPFC benchmark保持一致），未主动评估时间成本或提出替代方案</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户的工程实用主义快速识别不合理的时间成本；AI优先保持实验一致性，对算法的规模复杂度缺乏主动的计算量预估</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>从数值指标（Loss下降、训练完成）无法判断任务是否真正可学习；Coffee环境初始化穿模bug隐藏在训练日志之外，需要人类通过视频直觉在几秒内发现AI分析大量日志也未能识别的根本问题</li>
+<li>无法独立完成大规模重构的依赖关系分析，需要人类通过grep逐一验证导入关系并制定迁移计划；自主分析时大概率遗漏间接依赖链，例如死脚本被其他死脚本引用的级联依赖</li>
+<li>新数据集接入现有pipeline时缺乏系统性的兼容性预检能力：VisiumHD HD适配需要5轮迭代，BC-RNN视觉配置需要3轮，每次只修复表面报错而无法一次性识别所有差异点</li>
+<li>对HPC计算资源效率缺乏主动监控意识：未预见compute_norm_stats的GPU eager加载问题、未主动检查GPU利用率是否合理、未预见JAX_PLATFORMS=cpu的必要性，均需用户提醒后才响应；训练稳定运行后不会主动寻求显存或并行度优化</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>PlaybackMode阈值语义的默认假设与用户需求相反（猜测对称逻辑而非用户意图的「任意遮挡即暂停」）；HPC/GPU场景下将「内存」默认理解为CPU RAM而非GPU VRAM，需要人类明确纠正</li>
+<li>多次ExitPlanMode被拒绝，说明计划存在未解决技术问题或细化程度不足，或用户倾向直接给出计划并执行而非走正式审批流程；AI未能识别「用户已给出完整计划」这一信号</li>
+<li>批量历史日报合并时多次触发32K token输出上限，未主动预估复杂合并报告的输出体积；Bash工具失效时缺乏有效诊断手段，只能被动等待或用文件工具降级替代</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>BC-RNN观测键对复杂任务至关重要：统一config模板只含eef_pos/quat/gripper_qpos，Stack等简单任务（堆叠方块）靠图像即可达98%，但Coffee/Threading等多阶段精细操作必须包含低维物体状态（57维object键）；评估0% SR时应首先检查观测键覆盖，而非归因于训练超参或模型容量</li>
+<li>大型代码库清理的可靠流程：人类先grep全面建立依赖图（含间接依赖链）→制定精确迁移表→按反向依赖顺序执行（先迁移共享函数，再删除原文件）→grep验证零残留→dry_run验证。代码合并本身是安全审计：统一三份同名函数时自然发现BasicContrastive.py的drop_feature语义bug（&gt;= vs &lt;）</li>
+<li>BC-RNN视觉策略推理三重必要条件：①enable_camera=True，②分辨率与训练时一致（从checkpoint shape_metadata读取），③HWC→CHW转置+float32归一化。缺任一均在不同层崩溃且报错各异；checkpoint的config字段是JSON字符串，需json.loads()解析</li>
+<li>视频可视化是机器人学习debug最快的工具：Coffee训练Loss正常下降但rollout视频直接暴露环境初始化穿模，比分析所有训练曲线更快定位根本问题；训练指标正常不等于任务真正可学习</li>
+<li>JAX CPU强制模式需同时设置两个环境变量：CUDA_VISIBLE_DEVICES=&quot;&quot;（对CUDA驱动生效）和JAX_PLATFORMS=cpu（对JAX后端发现机制生效），缺一不可；openpi的get_config()阶段eagerly实例化PaligemmaTokenizer并分发到所有可见GPU，凡是CPU-only预处理步骤均应设置这两个变量；XLA_PYTHON_CLIENT_MEM_FRACTION=0.95可将A800显存利用从61GB提升至77.7GB</li>
+<li>VisiumHD多分辨率坐标体系：8um bin = 4×4个2um bin聚合，坐标映射规则r_big//4（整除而非除法）；三层次annotation框架（Pathologist真值/STHD细胞类型/STAIG无监督聚类）为空间组学pipeline提供了多粒度基准参考，STAIG fusion（Silhouette=0.343）远优于scGPT image-only（ARI≈0.17）</li>
+<li>Pi0.5 Phoenix在MimicGen任务上整体SR 4.2%代表零样本迁移能力上限；BC-RNN Stack 98%代表有监督训练上限；两者训练条件不同不可直接比较，为LoRA微调提供了具体的基线参考</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>daily_summary finalize双重条件：时间条件（date&lt;today）保证非当天进行中数据，完整性条件（所有设备源log均_finalized）保证多设备数据已全量上传，两者缺一不可；两个行为相似的命令（&ndash;sync无日期、&ndash;sync-all）应复用现有逻辑保持语义一致</li>
+<li>Slurm &ndash;overlap允许在已有interactive job资源上叠加运行新命令，避免重新排队；HPC计算节点无外网应默认WANDB_MODE=disabled；修改训练启动脚本后需先kill launcher进程再重启，否则launcher按旧配置自动恢复子进程</li>
+<li>macOS播放模式设计：将全局副作用集中到@Published属性的didSet实现单一真相源；NSProcessInfoPowerStateDidChange+isLowPowerModeEnabled实现无轮询低电量感知；Liquid Glass媒体场景使用.regular glass（而非.clear）提供背景隔离，不依赖shadow；DateFormatter.dateFormat(fromTemplate:locale:)生成区域感知日期格式</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="sthdmihddcc">STHD/MIHD（DCC）<a hidden class="anchor" aria-hidden="true" href="#sthdmihddcc">#</a></h3>
+<p><strong>🔄 VisiumHD crop10large三源annotation对比可视化与STAIG Fusion HD适配</strong>
+<em>00:06:57.489 | claude_code</em>
+在DCC集群完成STHD/MIHD双项目CLAUDE.md深度改进，随后实现VisiumHD crop10large三层次annotation体系：Pathologist annotation通过r_big//4坐标映射100%匹配；STHD细胞类型预测通过majority vote聚合（96.3%匹配）；STAIG GCN Fusion经5轮bug修复成功运行（300 epochs，Silhouette=0.343）。scGPT可视化从mclust（预计6小时）切换为KMeans，2分钟完成11个section（ARI=0.1695）。MIHD代码精简优化规划因用户中断ExitPlanMode未进入实施。</p>
+<h3 id="mihddcc">MIHD（DCC）<a hidden class="anchor" aria-hidden="true" href="#mihddcc">#</a></h3>
+<p><strong>✅ 执行六阶段MIHD仓库大规模清理重构</strong>
+<em>02:46:18.544 | claude_code</em>
+用户提供完整六阶段重构计划（含grep验证的41个死文件清单和精确函数迁移表），AI执行：删除所有死文件，新建models/staig_utils.py和models/vision_extractors.py，将共享函数迁移至正确模块，更新所有pipeline导入，删除run_benchmark.py（3488行）及5个依赖模型，提取STAIG公共函数并修复BasicContrastive.py的drop_feature逻辑bug（&gt;= → &lt;），更新所有文档，pipeline dry_run验证通过（440个实验计划）。</p>
+<h3 id="errorrecoverybenchmarktianhe">ErrorRecoveryBenchmark（tianhe）<a hidden class="anchor" aria-hidden="true" href="#errorrecoverybenchmarktianhe">#</a></h3>
+<p><strong>🔄 BC-RNN错误注入流水线、Pi0.5 Phoenix评测、Coffee根因诊断修复、Pi0.5 LoRA六GPU训练启动</strong>
+<em>01:10:59.841 | claude_code</em>
+在an49 GPU节点完成四项工作：(1) 修复BC-RNN视觉策略推理三个关键配置bug，生成11个tip_over错误场景并批量渲染MP4；(2) Pi0.5 Phoenix在9个MimicGen任务基准评测完成（整体SR 4.2%，Stack_D0最高24%），确认两次fine-tune任务（Job 46551/46553）均未完成，需重训；(3) 诊断Coffee BC-RNN 0% SR根因（config模板缺失57维object观测键），修复9个任务配置，另发现Coffee环境初始化穿模的独立bug；(4) 搭建Pi0.5 LoRA微调管线（18个configs，9个数据集转换），修复4个连续启动bug，最终6任务在GPU 1-6以XLA_PYTHON_CLIENT_MEM_FRACTION=0.95并行运行。清理an49节点约407GB闲置GPU显存。</p>
+<h3 id="gadgetsummarizemacbook">gadget/summarize（MacBook）<a hidden class="anchor" aria-hidden="true" href="#gadgetsummarizemacbook">#</a></h3>
+<p><strong>🔄 merge finalize机制实现、&ndash;sync逻辑修复、历史日报批量生成</strong>
+<em>03:31:19.876 | claude_code</em>
+实现merge finalize机制（双重条件自动标记_finalized，新增&ndash;force参数）；修复merge &ndash;sync无日期参数时将所有日期合并为单批次的问题，改为委托_cmd_merge_sync_all()逐天处理。随后批量运行daily_summary.py为2026-02-01至02-28共13+天历史日期生成结构化JSON日报，覆盖MIHD、ErrorRecovery、CalendarPro、gadget、DesktopVideo等项目；部分复杂日期（02-14、02-16、02-28等）因内容过多触发API 32K token超限导致合并不完整，需设置CLAUDE_CODE_MAX_OUTPUT_TOKENS。</p>
+<h3 id="desktopvideomacbook">DesktopVideo（MacBook）<a hidden class="anchor" aria-hidden="true" href="#desktopvideomacbook">#</a></h3>
+<p><strong>✅ 播放模式三个Bug修复与Liquid Glass屏保时钟UI重设计</strong>
+<em>21:26:28.000 | claude_code</em>
+实现三个播放模式bug修复：AppState.didSet集中重评估（单一真相源），SharedWallpaperWindowManager委托全局评估方法，AppDelegate注册NSProcessInfoPowerStateDidChange低电量感知（低电量时automatic切换省电+阈值anyOverlayCompletelyCovered）。同步更新Localizable.xcstrings（5种语言）和ChangeLog.md，xcodebuild通过。UI优化：移除GeneralSettingsView中与PlaybackSettingsView重复的控件；重设计CombinedGlassClock为macOS Tahoe原生风格（.regular glass、独立胶囊容器、去阴影、clockVerticalPositionFactor=0.85常量统一4处）；改用dateFormat(fromTemplate:)区域感知日期格式；xcodebuild通过。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>100,437,375</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>149,655</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>271,922</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>6,576,589</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>93,439,209</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>93.4%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$70.2337</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>27,644</td>
+          <td>122,228</td>
+          <td>2,244,633</td>
+          <td>74,584,485</td>
+          <td>$54.5151</td>
+          <td>77.6%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>121,843</td>
+          <td>85,544</td>
+          <td>1,657,417</td>
+          <td>17,757,394</td>
+          <td>$4.3971</td>
+          <td>6.3%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>168</td>
+          <td>64,150</td>
+          <td>2,674,539</td>
+          <td>1,097,330</td>
+          <td>$11.3215</td>
+          <td>16.1%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>8,323,086</td>
+          <td>4,161</td>
+          <td>22,420</td>
+          <td>$6.0188</td>
+      </tr>
+      <tr>
+          <td>MacBook</td>
+          <td>10,481,730</td>
+          <td>4,324</td>
+          <td>84,625</td>
+          <td>$15.2352</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>81,632,559</td>
+          <td>141,170</td>
+          <td>164,877</td>
+          <td>$48.9797</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

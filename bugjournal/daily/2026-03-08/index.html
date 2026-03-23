@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-08 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="tianhe 设备全天推进 ErrorRecoveryBenchmark 大规模重构（65 个符号链接彻底清理、多任务错误场景可视化、预错误回放架构设计）与 RoboTwin VLA 关键区域标注系统建设及渲染修复，同时 TzJsDesktop 完成 Research Scout 作者搜索等多项新功能开发">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-08/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-08/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-08/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-08">
+  <meta property="og:description" content="tianhe 设备全天推进 ErrorRecoveryBenchmark 大规模重构（65 个符号链接彻底清理、多任务错误场景可视化、预错误回放架构设计）与 RoboTwin VLA 关键区域标注系统建设及渲染修复，同时 TzJsDesktop 完成 Research Scout 作者搜索等多项新功能开发">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-08T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-08T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-08">
+  <meta name="twitter:description" content="tianhe 设备全天推进 ErrorRecoveryBenchmark 大规模重构（65 个符号链接彻底清理、多任务错误场景可视化、预错误回放架构设计）与 RoboTwin VLA 关键区域标注系统建设及渲染修复，同时 TzJsDesktop 完成 Research Scout 作者搜索等多项新功能开发">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Daily Summaries",
+      "item": "https://tzj2006.github.io/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-03-08",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-03-08/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-08",
+  "name": "Bug Journal 2026-03-08",
+  "description": "tianhe 设备全天推进 ErrorRecoveryBenchmark 大规模重构（65 个符号链接彻底清理、多任务错误场景可视化、预错误回放架构设计）与 RoboTwin VLA 关键区域标注系统建设及渲染修复，同时 TzJsDesktop 完成 Research Scout 作者搜索等多项新功能开发",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-08 今日概览 做了什么： 跨两台设备分头推进三个项目：ErrorRecoveryBenchmark 完成 65 个符号链接的彻底清理与代码迁移、多任务错误场景可视化及预错误上下文回放架构设计；RoboTwin 建立 VLA 关键区域标注基础设施并修复服务器渲染问题；Research Scout 新增作者维度搜索、from-overview 初始化等多项差异化搜索能力 怎么做的： tianhe 侧通过 4 个并行 Agent 执行 9 阶段代码重构，SSH 远程调度 an53 空闲 GPU 并发渲染可视化视频，用 Vulkan/EGL 环境变量解决 headless 渲染问题，并用启发式几何距离法实现关键区域逐帧标注；TzJsDesktop 侧通过复用现有 –conference 模式架构快速实现 arXiv au: 查询的作者搜索功能 有什么用： ErrorRecoveryBenchmark 代码库消除全部间接路径依赖（127 个单元测试通过），可视化覆盖 coffee/stack/three_piece_assembly 共 6 种失败类型；RoboTwin 建立了 VLA 关键区域分类器的数据采集基础；Research Scout 从关键词/会议搜索扩展到支持研究者维度追踪，工具个性化能力显著提升 TzJsDesktop 做了什么： 为 gadget/research 工具依次实现 init –from-overview、搜索去重提前停止、arXiv 作者搜索（–author）等新特性，并同步更新 CLAUDE.md 怎么做的： 镜像现有 –conference 模式架构实现 search_arxiv_author()（au: 查询 + 可选关键词）；去重机制通过 _load_known_arxiv_ids() 扫描缓存，连续 5 篇已知即停；缓存函数统一增加 author 参数分支 有什么用： 研究工具从关键词/会议搜索扩展到支持研究者维度追踪，覆盖’追踪某位老师文章’的高频使用场景，工具个性化能力显著提升 tianhe 做了什么： 在 tianhe 登录节点统筹三条工作线：①ErrorRecoveryBenchmark 9 阶段符号链接清理与 coffee/stack/BC-RNN 可视化生成及预错误回放架构设计；②RoboTwin 关键区域标注系统实现与 headless 渲染修复；③利用 an53 空闲 GPU 并发执行 MuJoCo EGL 渲染任务 怎么做的： 通过 Claude Code 多 Agent 并行架构执行代码迁移；SSH 远程调度 an53（使用绝对路径规避 cwd 问题）；在 _base_task.py 和 10 个 task 文件中注入关键区域标注与 EE 距离记录字段；collect_data.sh 补充 Vulkan 环境变量 有什么用： 单日内完成影响全代码库的大型重构（127 个测试通过），完成多任务错误场景可视化采样，建立 VLA 关键区域分类器数据采集基础，为预错误上下文回放功能奠定数据结构基础 tianhe 设备全天推进 ErrorRecoveryBenchmark 大规模重构（65 个符号链接彻底清理、多任务错误场景可视化、预错误回放架构设计）与 RoboTwin VLA 关键区域标注系统建设及渲染修复，同时 TzJsDesktop 完成 Research Scout 作者搜索等多项新功能开发\n今日任务 架构与策略 ✅ ErrorRecoveryBenchmark：删除 65 个符号链接并迁移全量代码引用（9 阶段） — 设计并执行完整 9 阶段重构：更新 23 个文件的 error_framework→error_benchmark.framework 导入、重构 script_utils 消费路径、更新 YAML/checkpoint 配置引用、重写 Makefile、更新 Phoenix/FLARE 脚本、删除全部 65 个符号链接、更新 3 个文档文件、修复 4 处 sys.path parent 链深度错误。127 个单元测试全部通过，补充修复约 5 处计划未覆盖的衍生问题（sys.path 深度、FLARE deps 路径等）。 ✅ RoboTwin：VLA 关键区域标注系统实现与阈值校准数据采集 — 在 _base_task.py 及 10 个 task 文件中实现 critical_region 二分类标注（τ=0.10m + 夹爪状态过滤），区分 click/press（静态目标）、grab（夹爪关闭过滤）、pick-and-place（双子条件 OR）三类任务逻辑。采集后发现 critical_region 全为 0（阈值过小），随即新增 get_ee_target_distances() 逐帧记录各目标点 EE 实时距离，供分析真实分布后重新校准阈值 τ。 🔄 ErrorRecoveryBenchmark：预错误上下文轨迹回放功能 — 用户指出可视化应回放到错误前 5 秒或 rollout 起点。已在 rollout_generator.py 增加 action_history 收集与持久化（NPZ 新增 pre_context_actions、initial_state、trigger_step 字段），并更新 2_visualize_scene.py 状态加载函数以读取新字段。可视化器中从 initial_state 重建环境逐帧渲染到错误点的实际预回放逻辑尚未完成。 🔄 ErrorRecoveryBenchmark：6 任务 GPU 并行错误注入基准测试 — GPU0 跑 coffee（rollout ~99/200），GPU6 跑 stack（rollout ~33/200，rejection 率偏高，部分 rollout 生成 0 scenes）。累计场景数：pick_place 743、stack_three 264、stack 169、three_piece_assembly 158、coffee 150、threading 150。 ✅ Research Scout：作者搜索功能（–author）及三项新特性 — 新增 search_arxiv_author()（arXiv au: 查询 + 可选项目关键词），更新三个缓存函数，在 cmd_search()/cmd_report() 中添加 –conference 互斥检查和 author 分支；同时实现 init –from-overview（LLM 从已有 overview.md 提取信息自动创建 project.json）、全部’周报’→‘日报’重命名、search_arxiv() 连续 5 篇已知论文后提前停止。同步更新 CLAUDE.md 和模块 docstring，Python 语法验证通过。 ✅ ErrorRecoveryBenchmark：多任务错误场景可视化生成 — 分两批完成可视化：①利用 an53 GPU6 低占用窗口为 coffee（grasp_miss、grasp_wrong_pose 等 5 种）和 stack（含 tip_over injection 等 4 种）各生成 130 帧 MP4 视频；②BC-RNN 在 three_piece_assembly 上 injection 模式生成 0 场景（装配基座过于稳定），转向 158 个自然错误场景，并行渲染 grasp_wrong_pose、premature_release、grasp_miss、overshoot 共 4 个视频。 实现与修复 ✅ RoboTwin：headless 服务器渲染修复 — collect_data.sh 在服务器运行时 SAPIEN 报 RuntimeError: failed to find a rendering device，参照 eval.sh 补充 VK_ICD_FILENAMES、__EGL_VENDOR_LIBRARY_FILENAMES、LD_LIBRARY_PATH 三个 Vulkan/EGL 环境变量后修复。 ✅ CLAUDE.md 文档精简与同步 — ErrorRecoveryBenchmark CLAUDE.md 删除冗余章节（Project Documentation、Directory Notes、Related Project），整合 test fixtures 说明，同步修复 README.md 中引用旧符号链接路径的陈旧内容。Research CLAUDE.md 补充四处滞后内容（行数、–language 参数、去重机制、子节编号）。 问题与解决方案 关键问题 1. RoboTwin 关键区域标注采集后 critical_region 字段全为 0，τ=0.10m 阈值无效 解决方案: 新增 get_ee_target_distances() 为 10 个 task 逐帧记录 EE 与各目标点实时距离，待分析真实分布后重新校准阈值\n关键洞察: 几何距离阈值不能凭配置参数经验估计——机器人末端执行器在实际工作空间的接近距离可能远大于 pre_grasp_dis；正确工作流是’先记录分布再定阈值’，而非直接实施标注再事后修正\n2. Injection 模式在 three_piece_assembly 上生成 0 个场景；stack 任务 rejection 率极高，部分 rollout 生成 0 scenes 解决方案: three_piece_assembly 转而可视化已有 158 个自然错误场景；stack 任务异常继续观察中\n关键洞察: 脉冲力注入有效性强依赖操作对象的物理稳定性；稳定底座类任务需要专属注入策略（位姿扰动或夹爪偏置）而非通用脉冲力；stack 任务错误触发条件比 pick_place 更严格，策略 rollout 失败分布可能不均匀\n3. Research Scout 缺乏按研究者维度搜索论文的能力，用户需要追踪特定老师的最新工作 解决方案: 利用 arXiv API 的 au: 查询语法新增 –author 参数，镜像 –conference 模式完整集成到 search/report 两个子命令，与 –conference 互斥\n关键洞察: arXiv au: 查询对姓名格式敏感（全名 vs 缩写），现有 –conference 代码是高质量参考模板；作者搜索与会议搜索的关键差异是无需 comment 字段后过滤\n一般问题 4. 服务器 headless GPU 渲染环境配置不全：MuJoCo EGL 设备 ID 未与 CUDA_VISIBLE_DEVICES 对齐，以及 collect_data.sh 缺少 Vulkan ICD 文件路径导致 SAPIEN 渲染失败 解决方案: 将 MUJOCO_EGL_DEVICE_ID 显式对齐 CUDA_VISIBLE_DEVICES；在 collect_data.sh 中补充 eval.sh 已有的三个 Vulkan/EGL 环境变量\n关键洞察: headless 服务器需要显式指定 Vulkan ICD 文件路径和 EGL 设备 ID，两者相互独立、不自动同步；应在项目中统一维护渲染环境配置模板，避免新建脚本时遗漏\n5. 目录重组后 sys.path parent 链深度计算错误，以及 Phase 6 Agent 引入了已被删除的符号链接路径引用 解决方案: 逐文件重新计算 file 到项目根的实际 parent 调用次数；主 Agent 事后验证并修正 FLARE 脚本中的 deps 路径引用\n关键洞察: 多层目录迁移时所有基于 Path(file).parent 链的路径推导必须逐文件验证深度，此类错误不在静态检查中暴露；并行 Agent 各阶段的耦合点需主 Agent 事后统一验证交叉影响\n6. SSH 远程执行脚本时反复报 ‘can’t open file’ 错误（同一命令失败 5 次以上） 解决方案: 改用完全绝对路径指定 Python 脚本，并在命令头部显式 cd 到项目根目录\n关键洞察: SSH 默认落地在 home 目录，不继承本地 cwd；所有远程脚本调用必须使用绝对路径或 cd \u0026\u0026 前缀，永远不要依赖远程 cwd 与本地一致\n人类思路 vs AI 思路 战略层面 VLA 关键区域概念的提出与数据驱动的阈值校准 角色 思路 人类 从对 VLA 模型失败案例的直接观察（按钮没按准、抓取偏差）提炼出’关键区域’核心概念，明确了 CLS token 分类器的研究路径；发现 critical_region 全为 0 后凭对机器人工作空间的直觉推断’可能是阈值设小了’ AI 在用户给定概念框架后设计启发式标注规则，但初始阈值 τ=0.10m 仅凭 pre_grasp_dis 参数经验估计；接受人类诊断方向后，提出通过记录全程距离建立实证基础再确定阈值（比直接猜测调大更稳健） 差异分析: 问题定义、研究动机和异常诊断来自人类直觉；AI 在修复策略上体现了系统性实验设计思维，但初始参数选取缺乏领域直觉，缺乏对核心假设的主动验证意识\n可视化策略：从研究价值角度主动设计 vs 满足技术完成度 角色 思路 人类 用户两次主动推动可视化策略升级：①直接质问’你现在跑到不能生成 visualization 吗’，指出 AI 陷入分析-等待模式而非利用空闲 GPU 行动；②指出可视化不应只从错误瞬间开始，而应回放到错误前 5 秒或 rollout 起点，以便观察 BC-RNN 的完整行为模式 AI AI 初始倾向于罗列选项（查看旧结果 vs 等待）或仅在错误点前后截取固定帧数，聚焦于技术实现完成度，未从数据分析角度主动质疑可视化设计的研究价值 差异分析: 用户从研究需求出发（理解策略在错误前的行为比单看错误本身更重要），AI 停留在技术完成面；两次推动分别引导 AI 从’分析’切换为’行动’，从’展示错误片段’升级为’完整行为轨迹回放’\n大规模重构的宏观计划制定 vs 执行层衍生问题修复 角色 思路 人类 提供精确的 9 阶段实施计划，包括每个文件的具体修改内容、全局替换模式和并行执行策略 AI 负责执行，并在执行中发现约 4-5 处计划未覆盖的衍生问题（sys.path 深度错误、FLARE deps 路径问题、输出路径拼接 bug）并进行补充修复 差异分析: 宏观计划和架构决策由人类完成；AI 在执行层能发现并修复计划未明确覆盖的细节问题，但需要人类提供系统性框架才能高效工作\nAI 局限性 重要局限 缺乏主动验证核心假设的意识：设计关键区域标注时未提议先收集少量样本验证 τ=0.10m 阈值合理性再全量实施，导致全量采集后发现标注全为 0；面对可视化需求时默认进入’查找已有结果’模式，未主动评估能否立即利用空闲 GPU 生成新结果，两者均需用户明确纠正才切换策略 可视化设计仅聚焦技术完成度，未从研究价值角度主动质疑设计——仅截取错误发生瞬间，没有考虑展示策略完整行为轨迹对分析失效根因的必要性，需要用户提醒才触发改进 一般局限 远程执行环境问题反复犯错：SSH 路径问题失败 5 次以上才彻底修正，MuJoCo EGL 设备 ID 未预判需与 CUDA_VISIBLE_DEVICES 显式对齐，浪费用户等待时间 并行 Agent 执行中未预防跨阶段耦合问题：Phase 6 Agent 在 FLARE 脚本引入了 Phase 7 将删除的 deps 符号链接路径，需主 Agent 事后修正，说明不能完全信任独立 Agent 的局部正确性 今日收获 核心收获 错误场景可视化的研究价值在于展示策略完整行为轨迹（含预错误上下文），而非仅截取错误瞬间；VLA 失败模式集中于特定任务阶段，可通过关键区域标注 + CLS token 分类器进行针对性精细化训练，比全程均匀训练更高效 机器人操作数据标注中几何距离阈值必须从实际轨迹分布中确定；正确工作流是’先记录全程距离分布→再定阈值→再实施标注’，而非直接实现标注逻辑再事后修正——这一原则适用于所有依赖阈值的启发式标注方案 脉冲力注入有效性强依赖操作对象的物理稳定性；稳定底座类任务（如 three_piece_assembly）需专属注入策略（位姿扰动或夹爪偏置），通用脉冲力命中率为零 大规模并行 Agent 重构中各阶段耦合点需主 Agent 事后统一验证交叉影响；多层目录迁移时 Path(file).parent 链深度必须逐文件验证，此类错误不在静态检查中暴露，只在运行时以路径找不到的形式出现 实践收获 arXiv API 支持 au: 查询语法用于作者维度搜索，与关键词/会议搜索互补；headless 服务器 GPU 渲染（Vulkan/EGL 配置）应在项目中统一维护环境配置模板，避免新建脚本时遗漏 会话摘要 ErrorRecoveryBenchmark 🔄 65 个符号链接彻底清理与代码迁移、多任务错误场景可视化生成、预错误上下文回放架构设计 01:40:19.831 | claude_code 全天围绕 ErrorRecoveryBenchmark 推进三项工作：①用户提供 9 阶段计划，AI 通过 4 个并行 Agent 执行 error_framework→error_benchmark.framework 全量导入迁移、YAML/Makefile/Phoenix/FLARE 更新、65 个符号链接删除，127 个单元测试全部通过，并补充修复约 5 处计划未覆盖的衍生问题；②利用 an53 空闲 GPU 批量生成 coffee（5 种）、stack（4 种）、BC-RNN three_piece_assembly（4 种自然错误）共 13 个 MP4 可视化视频，injection 模式在 three_piece_assembly 生成 0 场景；③用户指出可视化应支持预错误上下文回放，已在 rollout_generator.py 增加 action_history/initial_state NPZ 持久化，可视化器预回放渲染逻辑未完成。\nRoboTwin 🔄 VLA 关键区域标注系统实现、EE 距离记录与阈值校准、headless 渲染修复 09:41:14.279 | claude_code 用户基于 VLA 失败模式分析提出关键区域标注需求（目标：训练 pi0.5 CLS token 分类器）。AI 在 _base_task.py 及 10 个 task 文件中实现了 τ=0.10m 距离阈值二分类标注，区分三类任务逻辑；采集后发现 critical_region 全为 0（阈值过小），随即新增 get_ee_target_distances() 逐帧记录 EE 与各目标点距离以供阈值重新校准。同步修复了 collect_data.sh 缺少 Vulkan ICD 路径导致的 SAPIEN headless 渲染失败。\nGadgetResearch ✅ Research Scout 作者搜索（–author）及三项新特性实现 03:25:22.352 | claude_code 全天为 Research Scout 新增四项能力：①–author 参数（arXiv au: 查询 + 可选项目关键词，与 –conference 互斥，更新三个缓存函数）；②init –from-overview 用 LLM 从已有 overview.md 提取信息自动创建 project.json；③全部’周报’→‘日报’重命名；④search_arxiv() 连续 5 篇已知论文后提前停止。同步通过 /init 审查并精准更新 CLAUDE.md 四处滞后内容，Python 语法验证通过。\nToken 用量 总览 指标 数值 总 Token 64,063,345 输入 Token 71,541 输出 Token 201,075 Cache 创建 3,241,928 Cache 读取 60,548,801 Cache 命中率 94.9% 总费用 (USD) $46.1756 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 32,543 133,280 2,289,190 51,874,237 $43.7393 94.7% claude-haiku-4-5-20251001 38,998 67,795 952,738 8,674,564 $2.4364 5.3% ",
+  "wordCount" : "833",
+  "inLanguage": "en",
+  "datePublished": "2026-03-08T00:00:00-05:00",
+  "dateModified": "2026-03-08T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-03-08/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/daily/">Daily Summaries</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-08
+    </h1>
+    <div class="post-meta"><span title='2026-03-08 00:00:00 -0500 EST'>March 8, 2026</span>&nbsp;·&nbsp;<span>4 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-08">日报 — 2026-03-08<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-08">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 跨两台设备分头推进三个项目：ErrorRecoveryBenchmark 完成 65 个符号链接的彻底清理与代码迁移、多任务错误场景可视化及预错误上下文回放架构设计；RoboTwin 建立 VLA 关键区域标注基础设施并修复服务器渲染问题；Research Scout 新增作者维度搜索、from-overview 初始化等多项差异化搜索能力</li>
+<li><strong>怎么做的：</strong> tianhe 侧通过 4 个并行 Agent 执行 9 阶段代码重构，SSH 远程调度 an53 空闲 GPU 并发渲染可视化视频，用 Vulkan/EGL 环境变量解决 headless 渲染问题，并用启发式几何距离法实现关键区域逐帧标注；TzJsDesktop 侧通过复用现有 &ndash;conference 模式架构快速实现 arXiv au: 查询的作者搜索功能</li>
+<li><strong>有什么用：</strong> ErrorRecoveryBenchmark 代码库消除全部间接路径依赖（127 个单元测试通过），可视化覆盖 coffee/stack/three_piece_assembly 共 6 种失败类型；RoboTwin 建立了 VLA 关键区域分类器的数据采集基础；Research Scout 从关键词/会议搜索扩展到支持研究者维度追踪，工具个性化能力显著提升</li>
+</ul>
+<h3 id="tzjsdesktop">TzJsDesktop<a hidden class="anchor" aria-hidden="true" href="#tzjsdesktop">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 为 gadget/research 工具依次实现 init &ndash;from-overview、搜索去重提前停止、arXiv 作者搜索（&ndash;author）等新特性，并同步更新 CLAUDE.md</li>
+<li><strong>怎么做的：</strong> 镜像现有 &ndash;conference 模式架构实现 search_arxiv_author()（au: 查询 + 可选关键词）；去重机制通过 _load_known_arxiv_ids() 扫描缓存，连续 5 篇已知即停；缓存函数统一增加 author 参数分支</li>
+<li><strong>有什么用：</strong> 研究工具从关键词/会议搜索扩展到支持研究者维度追踪，覆盖&rsquo;追踪某位老师文章&rsquo;的高频使用场景，工具个性化能力显著提升</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 在 tianhe 登录节点统筹三条工作线：①ErrorRecoveryBenchmark 9 阶段符号链接清理与 coffee/stack/BC-RNN 可视化生成及预错误回放架构设计；②RoboTwin 关键区域标注系统实现与 headless 渲染修复；③利用 an53 空闲 GPU 并发执行 MuJoCo EGL 渲染任务</li>
+<li><strong>怎么做的：</strong> 通过 Claude Code 多 Agent 并行架构执行代码迁移；SSH 远程调度 an53（使用绝对路径规避 cwd 问题）；在 _base_task.py 和 10 个 task 文件中注入关键区域标注与 EE 距离记录字段；collect_data.sh 补充 Vulkan 环境变量</li>
+<li><strong>有什么用：</strong> 单日内完成影响全代码库的大型重构（127 个测试通过），完成多任务错误场景可视化采样，建立 VLA 关键区域分类器数据采集基础，为预错误上下文回放功能奠定数据结构基础</li>
+</ul>
+<blockquote>
+<p>tianhe 设备全天推进 ErrorRecoveryBenchmark 大规模重构（65 个符号链接彻底清理、多任务错误场景可视化、预错误回放架构设计）与 RoboTwin VLA 关键区域标注系统建设及渲染修复，同时 TzJsDesktop 完成 Research Scout 作者搜索等多项新功能开发</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>ErrorRecoveryBenchmark：删除 65 个符号链接并迁移全量代码引用（9 阶段）</strong> — 设计并执行完整 9 阶段重构：更新 23 个文件的 error_framework→error_benchmark.framework 导入、重构 script_utils 消费路径、更新 YAML/checkpoint 配置引用、重写 Makefile、更新 Phoenix/FLARE 脚本、删除全部 65 个符号链接、更新 3 个文档文件、修复 4 处 sys.path parent 链深度错误。127 个单元测试全部通过，补充修复约 5 处计划未覆盖的衍生问题（sys.path 深度、FLARE deps 路径等）。</li>
+<li>✅ <strong>RoboTwin：VLA 关键区域标注系统实现与阈值校准数据采集</strong> — 在 _base_task.py 及 10 个 task 文件中实现 critical_region 二分类标注（τ=0.10m + 夹爪状态过滤），区分 click/press（静态目标）、grab（夹爪关闭过滤）、pick-and-place（双子条件 OR）三类任务逻辑。采集后发现 critical_region 全为 0（阈值过小），随即新增 get_ee_target_distances() 逐帧记录各目标点 EE 实时距离，供分析真实分布后重新校准阈值 τ。</li>
+<li>🔄 <strong>ErrorRecoveryBenchmark：预错误上下文轨迹回放功能</strong> — 用户指出可视化应回放到错误前 5 秒或 rollout 起点。已在 rollout_generator.py 增加 action_history 收集与持久化（NPZ 新增 pre_context_actions、initial_state、trigger_step 字段），并更新 2_visualize_scene.py 状态加载函数以读取新字段。可视化器中从 initial_state 重建环境逐帧渲染到错误点的实际预回放逻辑尚未完成。</li>
+<li>🔄 <strong>ErrorRecoveryBenchmark：6 任务 GPU 并行错误注入基准测试</strong> — GPU0 跑 coffee（rollout ~99/200），GPU6 跑 stack（rollout ~33/200，rejection 率偏高，部分 rollout 生成 0 scenes）。累计场景数：pick_place 743、stack_three 264、stack 169、three_piece_assembly 158、coffee 150、threading 150。</li>
+<li>✅ <strong>Research Scout：作者搜索功能（&ndash;author）及三项新特性</strong> — 新增 search_arxiv_author()（arXiv au: 查询 + 可选项目关键词），更新三个缓存函数，在 cmd_search()/cmd_report() 中添加 &ndash;conference 互斥检查和 author 分支；同时实现 init &ndash;from-overview（LLM 从已有 overview.md 提取信息自动创建 project.json）、全部&rsquo;周报&rsquo;→&lsquo;日报&rsquo;重命名、search_arxiv() 连续 5 篇已知论文后提前停止。同步更新 CLAUDE.md 和模块 docstring，Python 语法验证通过。</li>
+<li>✅ <strong>ErrorRecoveryBenchmark：多任务错误场景可视化生成</strong> — 分两批完成可视化：①利用 an53 GPU6 低占用窗口为 coffee（grasp_miss、grasp_wrong_pose 等 5 种）和 stack（含 tip_over injection 等 4 种）各生成 130 帧 MP4 视频；②BC-RNN 在 three_piece_assembly 上 injection 模式生成 0 场景（装配基座过于稳定），转向 158 个自然错误场景，并行渲染 grasp_wrong_pose、premature_release、grasp_miss、overshoot 共 4 个视频。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>RoboTwin：headless 服务器渲染修复</strong> — collect_data.sh 在服务器运行时 SAPIEN 报 RuntimeError: failed to find a rendering device，参照 eval.sh 补充 VK_ICD_FILENAMES、__EGL_VENDOR_LIBRARY_FILENAMES、LD_LIBRARY_PATH 三个 Vulkan/EGL 环境变量后修复。</li>
+<li>✅ <strong>CLAUDE.md 文档精简与同步</strong> — ErrorRecoveryBenchmark CLAUDE.md 删除冗余章节（Project Documentation、Directory Notes、Related Project），整合 test fixtures 说明，同步修复 README.md 中引用旧符号链接路径的陈旧内容。Research CLAUDE.md 补充四处滞后内容（行数、&ndash;language 参数、去重机制、子节编号）。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-robotwin-关键区域标注采集后-critical_region-字段全为-0τ010m-阈值无效">1. RoboTwin 关键区域标注采集后 critical_region 字段全为 0，τ=0.10m 阈值无效<a hidden class="anchor" aria-hidden="true" href="#1-robotwin-关键区域标注采集后-critical_region-字段全为-0τ010m-阈值无效">#</a></h4>
+<p><strong>解决方案:</strong> 新增 get_ee_target_distances() 为 10 个 task 逐帧记录 EE 与各目标点实时距离，待分析真实分布后重新校准阈值</p>
+<p><strong>关键洞察:</strong> 几何距离阈值不能凭配置参数经验估计——机器人末端执行器在实际工作空间的接近距离可能远大于 pre_grasp_dis；正确工作流是&rsquo;先记录分布再定阈值&rsquo;，而非直接实施标注再事后修正</p>
+<h4 id="2-injection-模式在-three_piece_assembly-上生成-0-个场景stack-任务-rejection-率极高部分-rollout-生成-0-scenes">2. Injection 模式在 three_piece_assembly 上生成 0 个场景；stack 任务 rejection 率极高，部分 rollout 生成 0 scenes<a hidden class="anchor" aria-hidden="true" href="#2-injection-模式在-three_piece_assembly-上生成-0-个场景stack-任务-rejection-率极高部分-rollout-生成-0-scenes">#</a></h4>
+<p><strong>解决方案:</strong> three_piece_assembly 转而可视化已有 158 个自然错误场景；stack 任务异常继续观察中</p>
+<p><strong>关键洞察:</strong> 脉冲力注入有效性强依赖操作对象的物理稳定性；稳定底座类任务需要专属注入策略（位姿扰动或夹爪偏置）而非通用脉冲力；stack 任务错误触发条件比 pick_place 更严格，策略 rollout 失败分布可能不均匀</p>
+<h4 id="3-research-scout-缺乏按研究者维度搜索论文的能力用户需要追踪特定老师的最新工作">3. Research Scout 缺乏按研究者维度搜索论文的能力，用户需要追踪特定老师的最新工作<a hidden class="anchor" aria-hidden="true" href="#3-research-scout-缺乏按研究者维度搜索论文的能力用户需要追踪特定老师的最新工作">#</a></h4>
+<p><strong>解决方案:</strong> 利用 arXiv API 的 au: 查询语法新增 &ndash;author 参数，镜像 &ndash;conference 模式完整集成到 search/report 两个子命令，与 &ndash;conference 互斥</p>
+<p><strong>关键洞察:</strong> arXiv au: 查询对姓名格式敏感（全名 vs 缩写），现有 &ndash;conference 代码是高质量参考模板；作者搜索与会议搜索的关键差异是无需 comment 字段后过滤</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="4-服务器-headless-gpu-渲染环境配置不全mujoco-egl-设备-id-未与-cuda_visible_devices-对齐以及-collect_datash-缺少-vulkan-icd-文件路径导致-sapien-渲染失败">4. 服务器 headless GPU 渲染环境配置不全：MuJoCo EGL 设备 ID 未与 CUDA_VISIBLE_DEVICES 对齐，以及 collect_data.sh 缺少 Vulkan ICD 文件路径导致 SAPIEN 渲染失败<a hidden class="anchor" aria-hidden="true" href="#4-服务器-headless-gpu-渲染环境配置不全mujoco-egl-设备-id-未与-cuda_visible_devices-对齐以及-collect_datash-缺少-vulkan-icd-文件路径导致-sapien-渲染失败">#</a></h4>
+<p><strong>解决方案:</strong> 将 MUJOCO_EGL_DEVICE_ID 显式对齐 CUDA_VISIBLE_DEVICES；在 collect_data.sh 中补充 eval.sh 已有的三个 Vulkan/EGL 环境变量</p>
+<p><strong>关键洞察:</strong> headless 服务器需要显式指定 Vulkan ICD 文件路径和 EGL 设备 ID，两者相互独立、不自动同步；应在项目中统一维护渲染环境配置模板，避免新建脚本时遗漏</p>
+<h4 id="5-目录重组后-syspath-parent-链深度计算错误以及-phase-6-agent-引入了已被删除的符号链接路径引用">5. 目录重组后 sys.path parent 链深度计算错误，以及 Phase 6 Agent 引入了已被删除的符号链接路径引用<a hidden class="anchor" aria-hidden="true" href="#5-目录重组后-syspath-parent-链深度计算错误以及-phase-6-agent-引入了已被删除的符号链接路径引用">#</a></h4>
+<p><strong>解决方案:</strong> 逐文件重新计算 <strong>file</strong> 到项目根的实际 parent 调用次数；主 Agent 事后验证并修正 FLARE 脚本中的 deps 路径引用</p>
+<p><strong>关键洞察:</strong> 多层目录迁移时所有基于 Path(<strong>file</strong>).parent 链的路径推导必须逐文件验证深度，此类错误不在静态检查中暴露；并行 Agent 各阶段的耦合点需主 Agent 事后统一验证交叉影响</p>
+<h4 id="6-ssh-远程执行脚本时反复报-cant-open-file-错误同一命令失败-5-次以上">6. SSH 远程执行脚本时反复报 &lsquo;can&rsquo;t open file&rsquo; 错误（同一命令失败 5 次以上）<a hidden class="anchor" aria-hidden="true" href="#6-ssh-远程执行脚本时反复报-cant-open-file-错误同一命令失败-5-次以上">#</a></h4>
+<p><strong>解决方案:</strong> 改用完全绝对路径指定 Python 脚本，并在命令头部显式 cd 到项目根目录</p>
+<p><strong>关键洞察:</strong> SSH 默认落地在 home 目录，不继承本地 cwd；所有远程脚本调用必须使用绝对路径或 <code>cd &lt;dir&gt; &amp;&amp;</code> 前缀，永远不要依赖远程 cwd 与本地一致</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="vla-关键区域概念的提出与数据驱动的阈值校准">VLA 关键区域概念的提出与数据驱动的阈值校准<a hidden class="anchor" aria-hidden="true" href="#vla-关键区域概念的提出与数据驱动的阈值校准">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>从对 VLA 模型失败案例的直接观察（按钮没按准、抓取偏差）提炼出&rsquo;关键区域&rsquo;核心概念，明确了 CLS token 分类器的研究路径；发现 critical_region 全为 0 后凭对机器人工作空间的直觉推断&rsquo;可能是阈值设小了&rsquo;</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>在用户给定概念框架后设计启发式标注规则，但初始阈值 τ=0.10m 仅凭 pre_grasp_dis 参数经验估计；接受人类诊断方向后，提出通过记录全程距离建立实证基础再确定阈值（比直接猜测调大更稳健）</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 问题定义、研究动机和异常诊断来自人类直觉；AI 在修复策略上体现了系统性实验设计思维，但初始参数选取缺乏领域直觉，缺乏对核心假设的主动验证意识</p>
+<h4 id="可视化策略从研究价值角度主动设计-vs-满足技术完成度">可视化策略：从研究价值角度主动设计 vs 满足技术完成度<a hidden class="anchor" aria-hidden="true" href="#可视化策略从研究价值角度主动设计-vs-满足技术完成度">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户两次主动推动可视化策略升级：①直接质问&rsquo;你现在跑到不能生成 visualization 吗&rsquo;，指出 AI 陷入分析-等待模式而非利用空闲 GPU 行动；②指出可视化不应只从错误瞬间开始，而应回放到错误前 5 秒或 rollout 起点，以便观察 BC-RNN 的完整行为模式</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 初始倾向于罗列选项（查看旧结果 vs 等待）或仅在错误点前后截取固定帧数，聚焦于技术实现完成度，未从数据分析角度主动质疑可视化设计的研究价值</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户从研究需求出发（理解策略在错误前的行为比单看错误本身更重要），AI 停留在技术完成面；两次推动分别引导 AI 从&rsquo;分析&rsquo;切换为&rsquo;行动&rsquo;，从&rsquo;展示错误片段&rsquo;升级为&rsquo;完整行为轨迹回放&rsquo;</p>
+<h4 id="大规模重构的宏观计划制定-vs-执行层衍生问题修复">大规模重构的宏观计划制定 vs 执行层衍生问题修复<a hidden class="anchor" aria-hidden="true" href="#大规模重构的宏观计划制定-vs-执行层衍生问题修复">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>提供精确的 9 阶段实施计划，包括每个文件的具体修改内容、全局替换模式和并行执行策略</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>负责执行，并在执行中发现约 4-5 处计划未覆盖的衍生问题（sys.path 深度错误、FLARE deps 路径问题、输出路径拼接 bug）并进行补充修复</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 宏观计划和架构决策由人类完成；AI 在执行层能发现并修复计划未明确覆盖的细节问题，但需要人类提供系统性框架才能高效工作</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>缺乏主动验证核心假设的意识：设计关键区域标注时未提议先收集少量样本验证 τ=0.10m 阈值合理性再全量实施，导致全量采集后发现标注全为 0；面对可视化需求时默认进入&rsquo;查找已有结果&rsquo;模式，未主动评估能否立即利用空闲 GPU 生成新结果，两者均需用户明确纠正才切换策略</li>
+<li>可视化设计仅聚焦技术完成度，未从研究价值角度主动质疑设计——仅截取错误发生瞬间，没有考虑展示策略完整行为轨迹对分析失效根因的必要性，需要用户提醒才触发改进</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>远程执行环境问题反复犯错：SSH 路径问题失败 5 次以上才彻底修正，MuJoCo EGL 设备 ID 未预判需与 CUDA_VISIBLE_DEVICES 显式对齐，浪费用户等待时间</li>
+<li>并行 Agent 执行中未预防跨阶段耦合问题：Phase 6 Agent 在 FLARE 脚本引入了 Phase 7 将删除的 deps 符号链接路径，需主 Agent 事后修正，说明不能完全信任独立 Agent 的局部正确性</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>错误场景可视化的研究价值在于展示策略完整行为轨迹（含预错误上下文），而非仅截取错误瞬间；VLA 失败模式集中于特定任务阶段，可通过关键区域标注 + CLS token 分类器进行针对性精细化训练，比全程均匀训练更高效</li>
+<li>机器人操作数据标注中几何距离阈值必须从实际轨迹分布中确定；正确工作流是&rsquo;先记录全程距离分布→再定阈值→再实施标注&rsquo;，而非直接实现标注逻辑再事后修正——这一原则适用于所有依赖阈值的启发式标注方案</li>
+<li>脉冲力注入有效性强依赖操作对象的物理稳定性；稳定底座类任务（如 three_piece_assembly）需专属注入策略（位姿扰动或夹爪偏置），通用脉冲力命中率为零</li>
+<li>大规模并行 Agent 重构中各阶段耦合点需主 Agent 事后统一验证交叉影响；多层目录迁移时 Path(<strong>file</strong>).parent 链深度必须逐文件验证，此类错误不在静态检查中暴露，只在运行时以路径找不到的形式出现</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>arXiv API 支持 au: 查询语法用于作者维度搜索，与关键词/会议搜索互补；headless 服务器 GPU 渲染（Vulkan/EGL 配置）应在项目中统一维护环境配置模板，避免新建脚本时遗漏</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="errorrecoverybenchmark">ErrorRecoveryBenchmark<a hidden class="anchor" aria-hidden="true" href="#errorrecoverybenchmark">#</a></h3>
+<p><strong>🔄 65 个符号链接彻底清理与代码迁移、多任务错误场景可视化生成、预错误上下文回放架构设计</strong>
+<em>01:40:19.831 | claude_code</em>
+全天围绕 ErrorRecoveryBenchmark 推进三项工作：①用户提供 9 阶段计划，AI 通过 4 个并行 Agent 执行 error_framework→error_benchmark.framework 全量导入迁移、YAML/Makefile/Phoenix/FLARE 更新、65 个符号链接删除，127 个单元测试全部通过，并补充修复约 5 处计划未覆盖的衍生问题；②利用 an53 空闲 GPU 批量生成 coffee（5 种）、stack（4 种）、BC-RNN three_piece_assembly（4 种自然错误）共 13 个 MP4 可视化视频，injection 模式在 three_piece_assembly 生成 0 场景；③用户指出可视化应支持预错误上下文回放，已在 rollout_generator.py 增加 action_history/initial_state NPZ 持久化，可视化器预回放渲染逻辑未完成。</p>
+<h3 id="robotwin">RoboTwin<a hidden class="anchor" aria-hidden="true" href="#robotwin">#</a></h3>
+<p><strong>🔄 VLA 关键区域标注系统实现、EE 距离记录与阈值校准、headless 渲染修复</strong>
+<em>09:41:14.279 | claude_code</em>
+用户基于 VLA 失败模式分析提出关键区域标注需求（目标：训练 pi0.5 CLS token 分类器）。AI 在 _base_task.py 及 10 个 task 文件中实现了 τ=0.10m 距离阈值二分类标注，区分三类任务逻辑；采集后发现 critical_region 全为 0（阈值过小），随即新增 get_ee_target_distances() 逐帧记录 EE 与各目标点距离以供阈值重新校准。同步修复了 collect_data.sh 缺少 Vulkan ICD 路径导致的 SAPIEN headless 渲染失败。</p>
+<h3 id="gadgetresearch">GadgetResearch<a hidden class="anchor" aria-hidden="true" href="#gadgetresearch">#</a></h3>
+<p><strong>✅ Research Scout 作者搜索（&ndash;author）及三项新特性实现</strong>
+<em>03:25:22.352 | claude_code</em>
+全天为 Research Scout 新增四项能力：①&ndash;author 参数（arXiv au: 查询 + 可选项目关键词，与 &ndash;conference 互斥，更新三个缓存函数）；②init &ndash;from-overview 用 LLM 从已有 overview.md 提取信息自动创建 project.json；③全部&rsquo;周报&rsquo;→&lsquo;日报&rsquo;重命名；④search_arxiv() 连续 5 篇已知论文后提前停止。同步通过 /init 审查并精准更新 CLAUDE.md 四处滞后内容，Python 语法验证通过。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>64,063,345</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>71,541</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>201,075</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>3,241,928</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>60,548,801</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>94.9%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$46.1756</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>32,543</td>
+          <td>133,280</td>
+          <td>2,289,190</td>
+          <td>51,874,237</td>
+          <td>$43.7393</td>
+          <td>94.7%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>38,998</td>
+          <td>67,795</td>
+          <td>952,738</td>
+          <td>8,674,564</td>
+          <td>$2.4364</td>
+          <td>5.3%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

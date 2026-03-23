@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-18 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="在两台HPC设备上并行推进：DCC设备监控MIHD坐标bug修复后的多模态融合实验重跑（concat ARI &#43;&gt;100%），tianhe设备完成error-recovery-benchmark的checkpoint管理基础设施搭建，并发现VLA Pi0 LIBERO checkpoint在PickPlace任务上泛化失败（0%成功率），提出MimicGen数据扩增&#43;微调的解决方案。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-02-18/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-02-18/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-02-18/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-18">
+  <meta property="og:description" content="在两台HPC设备上并行推进：DCC设备监控MIHD坐标bug修复后的多模态融合实验重跑（concat ARI &#43;&gt;100%），tianhe设备完成error-recovery-benchmark的checkpoint管理基础设施搭建，并发现VLA Pi0 LIBERO checkpoint在PickPlace任务上泛化失败（0%成功率），提出MimicGen数据扩增&#43;微调的解决方案。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-18T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-18T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-18">
+  <meta name="twitter:description" content="在两台HPC设备上并行推进：DCC设备监控MIHD坐标bug修复后的多模态融合实验重跑（concat ARI &#43;&gt;100%），tianhe设备完成error-recovery-benchmark的checkpoint管理基础设施搭建，并发现VLA Pi0 LIBERO checkpoint在PickPlace任务上泛化失败（0%成功率），提出MimicGen数据扩增&#43;微调的解决方案。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Daily Summaries",
+      "item": "https://tzj2006.github.io/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-02-18",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-02-18/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-18",
+  "name": "Bug Journal 2026-02-18",
+  "description": "在两台HPC设备上并行推进：DCC设备监控MIHD坐标bug修复后的多模态融合实验重跑（concat ARI +\u0026gt;100%），tianhe设备完成error-recovery-benchmark的checkpoint管理基础设施搭建，并发现VLA Pi0 LIBERO checkpoint在PickPlace任务上泛化失败（0%成功率），提出MimicGen数据扩增+微调的解决方案。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-18 在两台HPC设备上并行推进：DCC设备监控MIHD坐标bug修复后的多模态融合实验重跑（concat ARI +\u003e100%），tianhe设备完成error-recovery-benchmark的checkpoint管理基础设施搭建，并发现VLA Pi0 LIBERO checkpoint在PickPlace任务上泛化失败（0%成功率），提出MimicGen数据扩增+微调的解决方案。\n今日任务 架构与策略 🔄 MIHD坐标修复后benchmark实验重跑监控 — 监控core_multimodal_fast实验pipeline（pca×uni2×8种fusion×11 sections），已完成vision_only(33个)和concat/mean/element_wise_sum/attention(各11个)，basic_contrastive进行到6/11 sections，adaln_attention/staig_fusion/llava_mlp尚未开始，预计还需3-4小时 🔄 PickPlace VLA微调训练调研 — 确认现有PickPlace数据仅有10个source demos（~6288 steps），zhaoganlong的MimicGen数据中无PickPlace（只有Coffee/Stack/Threading/ThreePieceAssembly各500 demos），提出MimicGen扩增+LeRobot格式转换+Pi0.5 LoRA微调的完整pipeline方案 ✅ UNI/UNI2文献调研 — 搜索并获取UNI2模型的标准用法：224×224像素输入、patch_size=14、ImageNet归一化、20x放大倍数；HEST-1k基准使用112×112微米区域（0.5 um/px = 224像素）；坐标对齐方式各文献描述不够详细 实现与修复 ✅ error-recovery-benchmark checkpoint目录统一管理 — 创建checkpoints/目录下的符号链接（bc_rnn/pick_place、vla/pi0_libero等4个、robomimic/lift），更新benchmark_v4.yaml中3个checkpoint路径，Makefile新增viz-random/viz-bc-rnn/viz-vla-pi0等3个可视化目标 ✅ 策略rollout可视化脚本开发 — 编写visualize_policy_rollout.py（~200行），支持random/bc_rnn/vla_pi0/vla_pi05四种策略，EGL离屏渲染，HUD叠加显示，按success/fail命名保存MP4；已在A800 GPU上验证通过 问题与解决方案 关键问题 1. MIHD patch提取坐标X/Y互换bug（tissue_positions_list.csv第4/5列分别是pxl_row和pxl_col，但代码错误命名为pixel_x/pixel_y） 解决方案: 修复run_benchmark.py和utils/data_loader.py中的列名和坐标顺序，清除所有缓存（spatial_coords.npz和vision embeddings），重新运行全部实验\n关键洞察: 修复后uni2 only ARI从0.065提升至0.121（+86%），concat策略ARI达到0.275，证明正确的空间坐标对病理图像特征提取有决定性影响\n2. Pi0（LIBERO checkpoint）在robosuite PickPlace任务上成功率0%，VLA可视化结果全部fail 解决方案: 用户指出应该使用针对PickPlace fine-tuned的checkpoint，AI调研后发现zhaoganlong无此checkpoint，需从10个source demos开始重新生成数据并微调\n关键洞察: LIBERO是不同机器人平台（桌面操作）的数据集，与robosuite PickPlace的动作空间和场景差异过大，跨任务泛化不可行\n一般问题 3. basic_contrastive训练速度极慢，每个section约1小时，conda run缓冲导致无直接stdout输出监控 解决方案: 通过find命令监控输出文件时间戳（-mmin参数）间接追踪进度，每30分钟轮询一次\n关键洞察: 对长时间HPC任务，文件系统时间戳是比进程stdout更可靠的进度指标\n4. Can/Square/Transport的robomimic checkpoints目录存在但为空，无可用模型文件 解决方案: 仅记录已有的Lift checkpoint（100% SR），缺失的任务checkpoint需要后续单独训练或下载\n关键洞察: 目录结构存在不代表文件存在，需要实际验证\n人类思路 vs AI 思路 战略层面 VLA checkpoint选择的合理性质疑 角色 思路 人类 用户主动质疑：为什么加载的是Pi0 LIBERO的checkpoint？zhaoganlong文件夹里应该有正确的checkpoint AI AI此前未质疑checkpoint的任务适配性，直接使用pi0_libero作为PickPlace的VLA checkpoint，并在可视化脚本中将其设为默认 差异分析: 人类基于领域知识意识到任务迁移问题（LIBERO≠PickPlace），AI在执行层面未做合理性检验，需要人类显式提醒才能发现根本性错误\nMimicGen数据扩增方向的决策 角色 思路 人类 用户简洁地提出：“能不能在这个场景上训练一下，有mimicgen数据吗？\"，明确希望通过数据驱动解决泛化问题 AI AI系统性地检查了现有数据（10个source demos）、zhaoganlong的已有数据（无PickPlace）、LeRobot格式数据，给出了完整的两步技术路线 差异分析: 人类提出了方向性决策，AI负责技术可行性评估；人类的方案选择（训练而非搜索现有checkpoint）是更根本的解法\n文献中UNI的patch提取方式 角色 思路 人类 用户主动要求联网搜索，想了解其他文献如何使用UNI/UNI2，隐含对当前实现是否符合标准用法的疑虑 AI AI通过多轮WebSearch和WebFetch提取了标准用法（224×224、ImageNet norm、20x），并找到HEST-1k的112微米patch规范 差异分析: 人类提出了验证问题（当前代码是否符合行业标准），AI执行了信息收集，但无法从文献获取spot级别坐标对齐的详细代码实现\nAI 局限性 重要局限 在设置VLA可视化环境时，未主动验证checkpoint与目标任务的匹配性，直接使用pi0_libero（LIBERO任务微调）用于robosuite PickPlace，导致验证结果全部失败，需要人类指出才意识到问题 一般局限 文献搜索中对\"spot级别坐标对齐\"的具体实现细节获取不足，多篇论文仅描述\"co-registered\"而无代码级说明，AI无法从文献获得明确答案 长时间进程监控只能通过sleep+文件系统轮询实现，无法直接订阅stdout事件，导致监控间隔长（15-30分钟），对实时进度感知差 调查zhaoganlong目录时AI主动启动了Explore subagent，但用户拒绝了该tool use，说明AI在未充分判断必要性时倾向于过度使用subagent进行搜索 今日收获 核心收获 MIHD坐标bug修复的效果超预期：uni2 only ARI从0.065→0.121（+86%），concat达到0.275，证明在空间转录组分析中，正确的图像坐标是视觉encoder有效性的前提条件，而非实现细节 VLA的跨任务泛化边界：Pi0 LIBERO checkpoint对PickPlace完全失效（0% SR），说明现有VLA模型的泛化能力有严格的任务相似度要求，不能假设\"大模型=通用” MimicGen的数据扩增路线可行：zhaoganlong已验证10个source demos → 500个生成demos → Pi0.5 LoRA微调的完整pipeline（Coffee 96%, Stack 100%），PickPlace可复用此路线 UNI2标准用法：224×224像素@20x放大，patch_size=14（ViT内部），ImageNet归一化（mean=(0.485,0.456,0.406)，std=(0.229,0.224,0.225)），通过timm加载（embed_dim=1536） 实践收获 大型HPC实验的可观测性设计：应在pipeline启动时就规划好日志格式和文件输出路径，避免只能通过find文件时间戳间接推断进度 会话摘要 MIHD多模态融合基准 🔄 坐标修复后benchmark实验监控与中间结果分析 00:01:02.520 | claude_code AI持续监控core_multimodal_fast pipeline的后台运行状态，通过文件系统时间戳间接追踪进度。在等待过程中提取了已完成实验的ARI/NMI指标，确认坐标修复效果显著（concat ARI=0.275，uni2 only ARI从0.065提升至0.121）。basic_contrastive训练较慢，每section约1小时，整体实验预计还需3-4小时，e2e_comparison实验等待GPU释放后再启动。\n🔄 UNI/UNI2病理基础模型文献调研 00:01:02.520 | claude_code 用户主动要求调研其他文献如何使用UNI和UNI2，AI通过多轮Web搜索获取了标准用法规范（224×224、ImageNet归一化、20x放大）和HEST-1k的patch尺寸标准（112微米@0.5um/px=224px）。部分论文对spot坐标到图像坐标的对齐实现描述不足，未能获得代码级别的详细方案。这一调研隐含了对当前MIHD实现正确性的验证需求。\nError Recovery Benchmark 🔍 PickPlace VLA训练路线调研与MimicGen数据扩增方案 00:26:49.979 | claude_code 用户质疑为何使用Pi0 LIBERO checkpoint（AI此前未识别任务不匹配），触发对正确checkpoint的搜索。确认zhaoganlong无PickPlace fine-tuned权重，现有数据仅10个source demos。调研发现zhaoganlong已有完整的MimicGen→LeRobot→Pi0.5微调pipeline（Coffee 96%、Stack 100%），PickPlace可直接复用此路线。决策点停留在是否立即启动MimicGen数据生成阶段。\n✅ checkpoint符号链接、可视化脚本、配置文件整合 00:26:49.979 | claude_code 完成了基础设施整合：创建checkpoints/统一目录（含5个符号链接），编写visualize_policy_rollout.py（支持4种策略、EGL渲染、HUD叠加、MP4输出），更新benchmark_v4.yaml路径和Makefile新增3个可视化目标，更新项目全景总结文档。在A800 GPU上以random策略验证脚本可用，生成2个MP4文件。\n✅ 可用checkpoint全面盘点 05:32:29.978 | claude_code 用户请求列举所有可用checkpoint，AI系统性搜索了三个目录后给出完整清单：BC-RNN PickPlace（epoch50-600共12个，14MB/个）、Robomimic Lift（100% SR，7.6MB）、VLA pi0_libero/pi0_base/pi0_fast_base/pi05_base（各~11-12GB JAX格式）。发现robomimic的can/square/transport目录为空，缺失对应checkpoint。\n✅ VLA模型和checkpoint清单盘点 04:52:08.850 | claude_code 独立会话中用户再次询问VLA相关情况，AI通过Explore subagent深度搜索后给出详细报告：代码注册4种模型（pi0/pi05/phoenix/flare），实际可用checkpoint 4个（pi0_libero/pi0_base/pi0_fast_base/pi05_base），phoenix/flare无对应checkpoint，所有VLA checkpoint均基于LIBERO或base权重，无PickPlace fine-tuned版本。\nToken 用量 总览 指标 数值 总 Token 18,417,579 输入 Token 30,413 输出 Token 9,835 Cache 创建 1,454,311 Cache 读取 16,923,020 Cache 命中率 92.1% 总费用 (USD) $11.9626 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 819 9,461 757,794 10,229,494 $10.0916 84.4% claude-haiku-4-5-20251001 29,585 366 584,726 6,593,387 $1.4217 11.9% claude-sonnet-4-5-20250929 9 8 111,791 100,139 $0.4494 3.8% 各设备用量 设备 总 Token 输入 输出 费用 TzJsDesktop 249,655 15 73 $0.1638 tianhe 18,167,924 30,398 9,762 $11.7989 ",
+  "wordCount" : "290",
+  "inLanguage": "en",
+  "datePublished": "2026-02-18T00:00:00-05:00",
+  "dateModified": "2026-02-18T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-02-18/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/daily/">Daily Summaries</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-18
+    </h1>
+    <div class="post-meta"><span title='2026-02-18 00:00:00 -0500 EST'>February 18, 2026</span>&nbsp;·&nbsp;<span>2 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-18">日报 — 2026-02-18<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-18">#</a></h1>
+<blockquote>
+<p>在两台HPC设备上并行推进：DCC设备监控MIHD坐标bug修复后的多模态融合实验重跑（concat ARI +&gt;100%），tianhe设备完成error-recovery-benchmark的checkpoint管理基础设施搭建，并发现VLA Pi0 LIBERO checkpoint在PickPlace任务上泛化失败（0%成功率），提出MimicGen数据扩增+微调的解决方案。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>🔄 <strong>MIHD坐标修复后benchmark实验重跑监控</strong> — 监控core_multimodal_fast实验pipeline（pca×uni2×8种fusion×11 sections），已完成vision_only(33个)和concat/mean/element_wise_sum/attention(各11个)，basic_contrastive进行到6/11 sections，adaln_attention/staig_fusion/llava_mlp尚未开始，预计还需3-4小时</li>
+<li>🔄 <strong>PickPlace VLA微调训练调研</strong> — 确认现有PickPlace数据仅有10个source demos（~6288 steps），zhaoganlong的MimicGen数据中无PickPlace（只有Coffee/Stack/Threading/ThreePieceAssembly各500 demos），提出MimicGen扩增+LeRobot格式转换+Pi0.5 LoRA微调的完整pipeline方案</li>
+<li>✅ <strong>UNI/UNI2文献调研</strong> — 搜索并获取UNI2模型的标准用法：224×224像素输入、patch_size=14、ImageNet归一化、20x放大倍数；HEST-1k基准使用112×112微米区域（0.5 um/px = 224像素）；坐标对齐方式各文献描述不够详细</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>error-recovery-benchmark checkpoint目录统一管理</strong> — 创建checkpoints/目录下的符号链接（bc_rnn/pick_place、vla/pi0_libero等4个、robomimic/lift），更新benchmark_v4.yaml中3个checkpoint路径，Makefile新增viz-random/viz-bc-rnn/viz-vla-pi0等3个可视化目标</li>
+<li>✅ <strong>策略rollout可视化脚本开发</strong> — 编写visualize_policy_rollout.py（~200行），支持random/bc_rnn/vla_pi0/vla_pi05四种策略，EGL离屏渲染，HUD叠加显示，按success/fail命名保存MP4；已在A800 GPU上验证通过</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-mihd-patch提取坐标xy互换bugtissue_positions_listcsv第45列分别是pxl_row和pxl_col但代码错误命名为pixel_xpixel_y">1. MIHD patch提取坐标X/Y互换bug（tissue_positions_list.csv第4/5列分别是pxl_row和pxl_col，但代码错误命名为pixel_x/pixel_y）<a hidden class="anchor" aria-hidden="true" href="#1-mihd-patch提取坐标xy互换bugtissue_positions_listcsv第45列分别是pxl_row和pxl_col但代码错误命名为pixel_xpixel_y">#</a></h4>
+<p><strong>解决方案:</strong> 修复run_benchmark.py和utils/data_loader.py中的列名和坐标顺序，清除所有缓存（spatial_coords.npz和vision embeddings），重新运行全部实验</p>
+<p><strong>关键洞察:</strong> 修复后uni2 only ARI从0.065提升至0.121（+86%），concat策略ARI达到0.275，证明正确的空间坐标对病理图像特征提取有决定性影响</p>
+<h4 id="2-pi0libero-checkpoint在robosuite-pickplace任务上成功率0vla可视化结果全部fail">2. Pi0（LIBERO checkpoint）在robosuite PickPlace任务上成功率0%，VLA可视化结果全部fail<a hidden class="anchor" aria-hidden="true" href="#2-pi0libero-checkpoint在robosuite-pickplace任务上成功率0vla可视化结果全部fail">#</a></h4>
+<p><strong>解决方案:</strong> 用户指出应该使用针对PickPlace fine-tuned的checkpoint，AI调研后发现zhaoganlong无此checkpoint，需从10个source demos开始重新生成数据并微调</p>
+<p><strong>关键洞察:</strong> LIBERO是不同机器人平台（桌面操作）的数据集，与robosuite PickPlace的动作空间和场景差异过大，跨任务泛化不可行</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="3-basic_contrastive训练速度极慢每个section约1小时conda-run缓冲导致无直接stdout输出监控">3. basic_contrastive训练速度极慢，每个section约1小时，conda run缓冲导致无直接stdout输出监控<a hidden class="anchor" aria-hidden="true" href="#3-basic_contrastive训练速度极慢每个section约1小时conda-run缓冲导致无直接stdout输出监控">#</a></h4>
+<p><strong>解决方案:</strong> 通过find命令监控输出文件时间戳（-mmin参数）间接追踪进度，每30分钟轮询一次</p>
+<p><strong>关键洞察:</strong> 对长时间HPC任务，文件系统时间戳是比进程stdout更可靠的进度指标</p>
+<h4 id="4-cansquaretransport的robomimic-checkpoints目录存在但为空无可用模型文件">4. Can/Square/Transport的robomimic checkpoints目录存在但为空，无可用模型文件<a hidden class="anchor" aria-hidden="true" href="#4-cansquaretransport的robomimic-checkpoints目录存在但为空无可用模型文件">#</a></h4>
+<p><strong>解决方案:</strong> 仅记录已有的Lift checkpoint（100% SR），缺失的任务checkpoint需要后续单独训练或下载</p>
+<p><strong>关键洞察:</strong> 目录结构存在不代表文件存在，需要实际验证</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="vla-checkpoint选择的合理性质疑">VLA checkpoint选择的合理性质疑<a hidden class="anchor" aria-hidden="true" href="#vla-checkpoint选择的合理性质疑">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户主动质疑：为什么加载的是Pi0 LIBERO的checkpoint？zhaoganlong文件夹里应该有正确的checkpoint</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI此前未质疑checkpoint的任务适配性，直接使用pi0_libero作为PickPlace的VLA checkpoint，并在可视化脚本中将其设为默认</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类基于领域知识意识到任务迁移问题（LIBERO≠PickPlace），AI在执行层面未做合理性检验，需要人类显式提醒才能发现根本性错误</p>
+<h4 id="mimicgen数据扩增方向的决策">MimicGen数据扩增方向的决策<a hidden class="anchor" aria-hidden="true" href="#mimicgen数据扩增方向的决策">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户简洁地提出：&ldquo;能不能在这个场景上训练一下，有mimicgen数据吗？&quot;，明确希望通过数据驱动解决泛化问题</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI系统性地检查了现有数据（10个source demos）、zhaoganlong的已有数据（无PickPlace）、LeRobot格式数据，给出了完整的两步技术路线</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类提出了方向性决策，AI负责技术可行性评估；人类的方案选择（训练而非搜索现有checkpoint）是更根本的解法</p>
+<h4 id="文献中uni的patch提取方式">文献中UNI的patch提取方式<a hidden class="anchor" aria-hidden="true" href="#文献中uni的patch提取方式">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户主动要求联网搜索，想了解其他文献如何使用UNI/UNI2，隐含对当前实现是否符合标准用法的疑虑</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI通过多轮WebSearch和WebFetch提取了标准用法（224×224、ImageNet norm、20x），并找到HEST-1k的112微米patch规范</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类提出了验证问题（当前代码是否符合行业标准），AI执行了信息收集，但无法从文献获取spot级别坐标对齐的详细代码实现</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>在设置VLA可视化环境时，未主动验证checkpoint与目标任务的匹配性，直接使用pi0_libero（LIBERO任务微调）用于robosuite PickPlace，导致验证结果全部失败，需要人类指出才意识到问题</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>文献搜索中对&quot;spot级别坐标对齐&quot;的具体实现细节获取不足，多篇论文仅描述&quot;co-registered&quot;而无代码级说明，AI无法从文献获得明确答案</li>
+<li>长时间进程监控只能通过sleep+文件系统轮询实现，无法直接订阅stdout事件，导致监控间隔长（15-30分钟），对实时进度感知差</li>
+<li>调查zhaoganlong目录时AI主动启动了Explore subagent，但用户拒绝了该tool use，说明AI在未充分判断必要性时倾向于过度使用subagent进行搜索</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>MIHD坐标bug修复的效果超预期：uni2 only ARI从0.065→0.121（+86%），concat达到0.275，证明在空间转录组分析中，正确的图像坐标是视觉encoder有效性的前提条件，而非实现细节</li>
+<li>VLA的跨任务泛化边界：Pi0 LIBERO checkpoint对PickPlace完全失效（0% SR），说明现有VLA模型的泛化能力有严格的任务相似度要求，不能假设&quot;大模型=通用&rdquo;</li>
+<li>MimicGen的数据扩增路线可行：zhaoganlong已验证10个source demos → 500个生成demos → Pi0.5 LoRA微调的完整pipeline（Coffee 96%, Stack 100%），PickPlace可复用此路线</li>
+<li>UNI2标准用法：224×224像素@20x放大，patch_size=14（ViT内部），ImageNet归一化（mean=(0.485,0.456,0.406)，std=(0.229,0.224,0.225)），通过timm加载（embed_dim=1536）</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>大型HPC实验的可观测性设计：应在pipeline启动时就规划好日志格式和文件输出路径，避免只能通过find文件时间戳间接推断进度</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd多模态融合基准">MIHD多模态融合基准<a hidden class="anchor" aria-hidden="true" href="#mihd多模态融合基准">#</a></h3>
+<p><strong>🔄 坐标修复后benchmark实验监控与中间结果分析</strong>
+<em>00:01:02.520 | claude_code</em>
+AI持续监控core_multimodal_fast pipeline的后台运行状态，通过文件系统时间戳间接追踪进度。在等待过程中提取了已完成实验的ARI/NMI指标，确认坐标修复效果显著（concat ARI=0.275，uni2 only ARI从0.065提升至0.121）。basic_contrastive训练较慢，每section约1小时，整体实验预计还需3-4小时，e2e_comparison实验等待GPU释放后再启动。</p>
+<p><strong>🔄 UNI/UNI2病理基础模型文献调研</strong>
+<em>00:01:02.520 | claude_code</em>
+用户主动要求调研其他文献如何使用UNI和UNI2，AI通过多轮Web搜索获取了标准用法规范（224×224、ImageNet归一化、20x放大）和HEST-1k的patch尺寸标准（112微米@0.5um/px=224px）。部分论文对spot坐标到图像坐标的对齐实现描述不足，未能获得代码级别的详细方案。这一调研隐含了对当前MIHD实现正确性的验证需求。</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔍 PickPlace VLA训练路线调研与MimicGen数据扩增方案</strong>
+<em>00:26:49.979 | claude_code</em>
+用户质疑为何使用Pi0 LIBERO checkpoint（AI此前未识别任务不匹配），触发对正确checkpoint的搜索。确认zhaoganlong无PickPlace fine-tuned权重，现有数据仅10个source demos。调研发现zhaoganlong已有完整的MimicGen→LeRobot→Pi0.5微调pipeline（Coffee 96%、Stack 100%），PickPlace可直接复用此路线。决策点停留在是否立即启动MimicGen数据生成阶段。</p>
+<p><strong>✅ checkpoint符号链接、可视化脚本、配置文件整合</strong>
+<em>00:26:49.979 | claude_code</em>
+完成了基础设施整合：创建checkpoints/统一目录（含5个符号链接），编写visualize_policy_rollout.py（支持4种策略、EGL渲染、HUD叠加、MP4输出），更新benchmark_v4.yaml路径和Makefile新增3个可视化目标，更新项目全景总结文档。在A800 GPU上以random策略验证脚本可用，生成2个MP4文件。</p>
+<p><strong>✅ 可用checkpoint全面盘点</strong>
+<em>05:32:29.978 | claude_code</em>
+用户请求列举所有可用checkpoint，AI系统性搜索了三个目录后给出完整清单：BC-RNN PickPlace（epoch50-600共12个，14MB/个）、Robomimic Lift（100% SR，7.6MB）、VLA pi0_libero/pi0_base/pi0_fast_base/pi05_base（各~11-12GB JAX格式）。发现robomimic的can/square/transport目录为空，缺失对应checkpoint。</p>
+<p><strong>✅ VLA模型和checkpoint清单盘点</strong>
+<em>04:52:08.850 | claude_code</em>
+独立会话中用户再次询问VLA相关情况，AI通过Explore subagent深度搜索后给出详细报告：代码注册4种模型（pi0/pi05/phoenix/flare），实际可用checkpoint 4个（pi0_libero/pi0_base/pi0_fast_base/pi05_base），phoenix/flare无对应checkpoint，所有VLA checkpoint均基于LIBERO或base权重，无PickPlace fine-tuned版本。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>18,417,579</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>30,413</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>9,835</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>1,454,311</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>16,923,020</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>92.1%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$11.9626</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>819</td>
+          <td>9,461</td>
+          <td>757,794</td>
+          <td>10,229,494</td>
+          <td>$10.0916</td>
+          <td>84.4%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>29,585</td>
+          <td>366</td>
+          <td>584,726</td>
+          <td>6,593,387</td>
+          <td>$1.4217</td>
+          <td>11.9%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-5-20250929</td>
+          <td>9</td>
+          <td>8</td>
+          <td>111,791</td>
+          <td>100,139</td>
+          <td>$0.4494</td>
+          <td>3.8%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>TzJsDesktop</td>
+          <td>249,655</td>
+          <td>15</td>
+          <td>73</td>
+          <td>$0.1638</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>18,167,924</td>
+          <td>30,398</td>
+          <td>9,762</td>
+          <td>$11.7989</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

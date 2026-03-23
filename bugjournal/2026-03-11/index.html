@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-11 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="在DCC和tianhe双机上完成MIHD项目目录重构与RM-IDEAL跨section基准测试、开发K8s GPU进程监控工具gpumon.py、修复VLA训练环境torch版本冲突，并通过对齐JAX版本（0.5.0→0.5.3）及6个关键依赖彻底消除pi05 vs openpi训练时长33%差异">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/2026-03-11/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.83509f6129a23f0a0af583948e4c58ffbf72f3c1bd4b42643f074c393c602397.css" integrity="sha256-g1CfYSmiPwoK9YOUjkxY/79y88G9S0JkPwdMOTxgI5c=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/2026-03-11/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/2026-03-11/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-11">
+  <meta property="og:description" content="在DCC和tianhe双机上完成MIHD项目目录重构与RM-IDEAL跨section基准测试、开发K8s GPU进程监控工具gpumon.py、修复VLA训练环境torch版本冲突，并通过对齐JAX版本（0.5.0→0.5.3）及6个关键依赖彻底消除pi05 vs openpi训练时长33%差异">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-11T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-11T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-11">
+  <meta name="twitter:description" content="在DCC和tianhe双机上完成MIHD项目目录重构与RM-IDEAL跨section基准测试、开发K8s GPU进程监控工具gpumon.py、修复VLA训练环境torch版本冲突，并通过对齐JAX版本（0.5.0→0.5.3）及6个关键依赖彻底消除pi05 vs openpi训练时长33%差异">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-03-11",
+      "item": "https://tzj2006.github.io/bugjournal/2026-03-11/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-11",
+  "name": "Bug Journal 2026-03-11",
+  "description": "在DCC和tianhe双机上完成MIHD项目目录重构与RM-IDEAL跨section基准测试、开发K8s GPU进程监控工具gpumon.py、修复VLA训练环境torch版本冲突，并通过对齐JAX版本（0.5.0→0.5.3）及6个关键依赖彻底消除pi05 vs openpi训练时长33%差异",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-11 今日概览 做了什么： 横跨DCC和tianhe两台服务器，完成空间转录组基准测试框架目录重构与评估、GPU监控工具开发，以及VLA训练环境调试、依赖对齐与训练性能优化 怎么做的： 在DCC上通过系统性代码搜索替换完成14+文件路径迁移并运行RM-IDEAL基准；在tianhe上通过/proc/fd扫描解决K8s进程映射、用版本约束修复torch兼容性、系统对比wandb运行日志定位JAX版本差异，并通过uv override-dependencies解决传递依赖冲突完成全量依赖对齐 有什么用： MIHD项目输出目录语义化重构完成；GPU监控工具适配K8s容器环境；VLA训练环境从版本冲突恢复可运行状态，pi05训练预期时长从20h缩短至约15h DCC 做了什么： 完成MIHD项目outputs/目录重构（14个代码文件+4个文档路径全量更新），并对151673↔151508运行RM-IDEAL跨section基准测试 怎么做的： 系统搜索所有.py/.yaml/.md文件中的旧路径引用并逐一替换，修复ExperimentLogger硬编码路径改用self.log_dir，利用已有RM-IDEAL缓存快速完成基准计算 有什么用： 输出目录按数据集语义命名，代码文档全部对齐；获得151673↔151508的RM-IDEAL基准数据（Spearman r=0.18，Layer_4表现最佳，Layer_3/6出现负相关） tianhe 做了什么： 开发nvitop风格GPU进程监控工具gpumon.py，修复VLA训练torchvision版本冲突，系统分析并消除openpi vs pi05训练时长33%差异（核心：JAX 0.5.0→0.5.3升级+6个依赖对齐） 怎么做的： 通过读取/proc/fd中/dev/nvidia*设备文件+CUDA_VISIBLE_DEVICES双重检测实现K8s容器内GPU归属；在pyproject.toml显式锁定torchvision==0.22.1；通过对比wandb config.yaml确认JAX版本为主因，用uv override-dependencies绕过lerobot的torch\u003c2.7传递约束完成uv lock/sync 有什么用： 算力服务器首次有可用GPU进程监控工具；VLA训练成功启动；pi05训练预期从20h缩短至15h，依赖环境跨目录一致性得到保障 在DCC和tianhe双机上完成MIHD项目目录重构与RM-IDEAL跨section基准测试、开发K8s GPU进程监控工具gpumon.py、修复VLA训练环境torch版本冲突，并通过对齐JAX版本（0.5.0→0.5.3）及6个关键依赖彻底消除pi05 vs openpi训练时长33%差异\n今日任务 架构与策略 ✅ 分析并消除pi05 vs openpi训练时长33%差异（20h→15h） — 通过对比wandb config.yaml、pyproject.toml和model.py定位核心原因：JAX版本差异（0.5.0 vs 0.5.3）为主因，辅以num_workers过高（16 vs 8）、IMAGE_KEYS数量不同（2 vs 3相机导致XLA计算图不同）和lerobot不同git commit。完成pi05依赖全量对齐：修改6个库版本（jax/numpy/orbax-checkpoint/torch/beartype/transformers），通过uv override-dependencies绕过lerobot的torch\u003c2.7传递约束，uv lock（305包）和uv sync均成功 ✅ gpumon.py — K8s容器内GPU进程监控工具（nvitop风格） — 针对Kubernetes PID命名空间隔离导致nvidia-smi进程列表为空的问题，开发替代工具gpumon.py。通过扫描/proc//fd/中的/dev/nvidia*设备文件和CUDA_VISIBLE_DEVICES双重检测实现GPU归属，以nvitop风格双线边框表格展示GPU状态并在GPU卡下直接列出归属进程，支持监控工具自身过滤和温度/功率颜色编码 ✅ MIHD RM-IDEAL跨section基准测试（151673↔151508） — 利用已有RM-IDEAL缓存对两个DLPFC section运行benchmark_rm_ideal.py，获得Spearman秩相关、Precision@K、same-label@K等评估指标；Layer_4跨section一致性最强（r=0.657/0.275），Layer_3（最大niche，989/1385 spots）和Layer_6出现显著负相关（约-0.2至-0.36） 实现与修复 ✅ 修复VLA训练环境torch/torchvision版本冲突 — pi05环境中torch 2.7.1与torchvision 0.21.0不兼容导致RuntimeError: operator torchvision::nms does not exist。在pyproject.toml中显式锁定torchvision==0.22.1，通过uv sync成功升级至0.22.1+cu126 ✅ MIHD outputs目录重构——代码与文档路径全量更新 — 将MIHD项目中14个Python/YAML文件及4个活跃文档中所有旧路径引用批量替换为新语义路径（benchmark_results/hd_results/rm_ideal_benchmark→DLPFC/HD/rm_ideal/cross_section/single_section），并修复ExperimentLogger中硬编码路径属性名错误（self.output_dir→self.log_dir） 🔄 错误场景720p视频渲染（v5 error scenes） — 用户请求将v5 error scenes从480p重新渲染为720p，确认已有480p视频但无独立重渲染脚本。因plan mode交互问题（AI多次提交ExitPlanMode均被拒绝）未能推进到执行阶段 问题与解决方案 关键问题 1. pi05训练时间比openpi慢33%（20h vs 15h），相同训练命令与脚本 解决方案: 通过对比wandb config.yaml定位核心原因为JAX版本差异（0.5.0→0.5.3）和num_workers过高（16→8）；另有IMAGE_KEYS数量差异导致XLA计算图不同。将pi05依赖全量对齐至openpi标准\n关键洞察: JAX三个版本迭代（0.5.0→0.5.3）的XLA编译器优化可带来20-30%性能提升；wandb config.yaml是获取实际运行时配置（含CLI覆盖值）的最可靠数据源，优先于直接读代码默认值\n2. Kubernetes PID命名空间隔离导致nvidia-smi进程列表为空，无法知道哪个进程占用哪张GPU 解决方案: 读取/proc//fd/中的/dev/nvidiaX软链接+CUDA_VISIBLE_DEVICES环境变量双重确认GPU归属；对监控工具自身（nvitop/claude/gpumon等）进行过滤\n关键洞察: K8s隔离的是PID命名空间而非/proc文件系统，容器内仍可通过/proc访问真实GPU设备文件信息\n3. 升级torch至==2.7.1后，uv lock因pi05锁定的旧版lerobot（约束torch\u003c2.7）解析失败 解决方案: 在[tool.uv]的override-dependencies中添加torch==2.7.1，强制覆盖lerobot的传递依赖约束\n关键洞察: openpi使用了较新lerobot git rev（已支持torch\u003e=2.7）；升级核心框架时需通过override-dependencies绕过旧版下游传递约束\n4. RM-IDEAL Layer_3和Layer_6出现负相关（r≈-0.2至-0.36），大面积弥散niche的embedding与空间拓扑负相关 解决方案: 暂无修复，记录为基准数据。Layer_3是最大niche（989/1385 spots），空间弥散导致embedding无法捕捉精细拓扑结构\n关键洞察: 大面积弥散niche与小面积密集niche在多模态融合嵌入的空间捕获能力上存在显著差异，需要针对性优化\n一般问题 5. torch 2.7.1与torchvision 0.21.0不兼容，导致VLA训练无法启动 解决方案: 在pyproject.toml中显式锁定torchvision==0.22.1（与torch 2.7.x对应版本），通过uv sync重新解析依赖\n关键洞察: uv/pip自动依赖解析可能选择非最优版本组合；torch系列包需在pyproject.toml中手动显式约束（torch 2.7.x对应torchvision 0.22.x）\n6. ExperimentLogger.log_experiment()中可视化路径硬编码，目录重构后将指向不存在路径 解决方案: 改用self.log_dir动态属性拼接路径，避免后续迁移产生遗漏\n关键洞察: 应优先使用对象自身属性而非重复硬编码路径字符串\n人类思路 vs AI 思路 战略层面 GPU监控工具过滤策略设计与VLA训练时长差异分析 角色 思路 人类 用户提出nvitop风格需求并观察到nvitop打开全部GPU设备文件这一关键现象；主动发现两目录训练时长不一致，并要求全量依赖对齐而非单点修复 AI AI设计基于CUDA_VISIBLE_DEVICES+fd扫描双重检测策略及监控工具过滤启发式规则；通过并行探索wandb日志和配置文件系统定位JAX版本为主因，识别出IMAGE_KEYS差异导致XLA计算图不同这一非显而易见因素 差异分析: 人类提供清晰UX需求、关键现象观察和全量对齐策略决策；AI负责技术实现、系统化根因分析和证据收集。人类采用更彻底的「全量对齐」策略确保复现性，AI倾向最小化变更\n实现层面 MIHD outputs目录重构方案设计与执行 角色 思路 人类 人类提前设计好完整的8步迁移计划，包括目录命名语义（DLPFC/HD/rm_ideal等）、归档策略、代码更新顺序 AI AI执行计划时发现遗漏的文件引用（pipeline/runner.py、evaluation_planner.py等），进行补充搜索和修复，发现ExperimentLogger属性名错误，并主动更新MEMORY.md 差异分析: 人类做宏观架构设计，AI负责细节执行并发现人类计划中未提及的遗漏点\nAI 局限性 重要局限 plan mode交互逻辑混乱：在多个会话中AI多次提交ExitPlanMode均被用户拒绝，无法判断原因，陷入反复询问循环，导致错误场景渲染等任务未能推进执行 一般局限 依赖冲突预判不足：制定依赖对齐计划时未预判lerobot的torch\u003c2.7传递约束冲突，导致uv lock失败后才发现需要override-dependencies；初始分析时将GPU拓扑差异列为可能因素，属推测性分析缺乏验证，可能误导优先级判断 工具输出处理局限：batch grep超过25000 token需分批读取增加调试复杂度；GPU进程过滤启发式规则初版未能过滤claude自身等监控类进程，需额外迭代 今日收获 核心收获 JAX小版本升级（0.5.0→0.5.3）可带来显著训练性能提升（约20-33%），部署多套相同代码时需严格保证JAX版本一致性；IMAGE_KEYS等输入形状差异会产生不同XLA计算图无法复用JIT缓存，训练初期ETA不准确，需跑1000步以上才能得到稳定step/s估计 RM-IDEAL跨section评估揭示：STAIG fusion嵌入在大面积弥散niche（Layer_3/6）与拓扑结构负相关，在小面积密集niche（Layer_1/4）有较好空间一致性，揭示当前多模态融合方法的局限性 K8s容器内GPU进程监控可行方案：优先读CUDA_VISIBLE_DEVICES环境变量，备选扫描/proc//fd中的/dev/nvidia*软链接，两者结合可实现与nvitop等效的进程归属检测 wandb config.yaml记录实际运行时参数（含CLI覆盖值），是诊断配置差异的最可靠数据源，优先于直接读取代码默认值 实践收获 uv的override-dependencies可强制绕过传递依赖约束（如旧版lerobot的torch\u003c2.7限制），是升级核心框架时的有效工具；torch/torchvision版本需手动显式约束（torch 2.7.x对应torchvision 0.22.x） 会话摘要 MIHD ✅ outputs目录重构（路径全量更新）+ RM-IDEAL跨section基准测试（151673↔151508） 00:08:50.291 | claude_code 完成MIHD项目14个代码文件与4个文档的路径引用全量更新（旧路径→DLPFC/HD/rm_ideal/cross_section/single_section），修复ExperimentLogger属性名错误（self.output_dir→self.log_dir）。随后运行RM-IDEAL基准测试：平均Spearman r=0.18，Layer_4一致性最强（r=0.657/0.275），Layer_3（最大niche，989/1385 spots）和Layer_6出现显著负相关（约-0.2至-0.36），揭示大面积弥散niche上多模态融合嵌入的局限。\nRoboBrain GPU监控工具 ✅ gpumon.py改造为nvitop风格界面，实现K8s容器内GPU-进程映射 03:05:47.923 | claude_code 针对K8s PID命名空间隔离导致nvidia-smi无法显示进程的问题，开发gpumon.py替代工具。通过读取/proc/fd中/dev/nvidia*设备文件+CUDA_VISIBLE_DEVICES双重检测解决进程归属问题。经多轮迭代完成nvitop风格布局（双线边框）、监控工具自身过滤（claude/nvitop/gpumon等）和温度/功率颜色编码，最终输出清晰可用的实时GPU监控界面。\nVLA RoboTwin pi05 ✅ 修复torch/torchvision版本冲突 + 初步分析训练时长差异根因 06:47:41.428 | claude_code 修复RuntimeError: operator torchvision::nms does not exist（torch 2.7.1与torchvision 0.21.0不兼容），在pyproject.toml添加torchvision==0.22.1约束，uv sync后成功升级至0.22.1+cu126。随后分析pi05 vs openpi训练时长差异（20h vs 15h），发现model.py中IMAGE_KEYS数量不同（2 vs 3相机）、lerobot依赖不同git commit等因素，指出IMAGE_KEYS差异导致XLA计算图不同无法复用JIT缓存，训练初期ETA估计偏高。\nVLA OpenPI 训练框架 ✅ 通过wandb日志定位JAX版本为主因，完成pi05依赖全量对齐至openpi 06:16:59.992 | claude_code 并行探索两目录的wandb config.yaml确认模型架构一致，定位核心差异为JAX版本（0.5.0 vs 0.5.3）和num_workers（16 vs 8）。用户要求全量对齐而非单点修复，修改pi05/pyproject.toml中6个依赖版本（jax/numpy/orbax-checkpoint/torch/beartype/transformers）并添加override-dependencies；uv lock首次失败（旧版lerobot约束torch\u003c2.7），将torch==2.7.1加入override-dependencies后成功，最终uv lock（305包）和uv sync均完成。\nError Recovery Benchmark ❌ v5 error scenes 720p视频渲染——因plan mode交互问题未完成 00:07:14.853 | claude_code 用户请求将v5 error scenes从480p重新渲染为720p，经探索确认已有480p视频但无独立重渲染脚本。AI在plan mode下多次提交ExitPlanMode均被拒绝，无法推进执行，会话在交互混乱中结束。\nToken 用量 总览 指标 数值 总 Token 30,509,736 输入 Token 45,085 输出 Token 55,003 Cache 创建 1,485,322 Cache 读取 28,924,326 Cache 命中率 95.1% 总费用 (USD) $20.7485 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 9,605 33,868 972,139 25,257,094 $19.5991 94.5% claude-haiku-4-5-20251001 35,480 21,135 513,183 3,667,232 $1.1494 5.5% ",
+  "wordCount" : "328",
+  "inLanguage": "en",
+  "datePublished": "2026-03-11T00:00:00-05:00",
+  "dateModified": "2026-03-11T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/2026-03-11/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span>bugJournal</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-11
+    </h1>
+    <div class="post-meta"><span title='2026-03-11 00:00:00 -0500 -0500'>March 11, 2026</span>&nbsp;·&nbsp;<span>2 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-11">日报 — 2026-03-11<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-11">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 横跨DCC和tianhe两台服务器，完成空间转录组基准测试框架目录重构与评估、GPU监控工具开发，以及VLA训练环境调试、依赖对齐与训练性能优化</li>
+<li><strong>怎么做的：</strong> 在DCC上通过系统性代码搜索替换完成14+文件路径迁移并运行RM-IDEAL基准；在tianhe上通过/proc/fd扫描解决K8s进程映射、用版本约束修复torch兼容性、系统对比wandb运行日志定位JAX版本差异，并通过uv override-dependencies解决传递依赖冲突完成全量依赖对齐</li>
+<li><strong>有什么用：</strong> MIHD项目输出目录语义化重构完成；GPU监控工具适配K8s容器环境；VLA训练环境从版本冲突恢复可运行状态，pi05训练预期时长从20h缩短至约15h</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成MIHD项目outputs/目录重构（14个代码文件+4个文档路径全量更新），并对151673↔151508运行RM-IDEAL跨section基准测试</li>
+<li><strong>怎么做的：</strong> 系统搜索所有.py/.yaml/.md文件中的旧路径引用并逐一替换，修复ExperimentLogger硬编码路径改用self.log_dir，利用已有RM-IDEAL缓存快速完成基准计算</li>
+<li><strong>有什么用：</strong> 输出目录按数据集语义命名，代码文档全部对齐；获得151673↔151508的RM-IDEAL基准数据（Spearman r=0.18，Layer_4表现最佳，Layer_3/6出现负相关）</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 开发nvitop风格GPU进程监控工具gpumon.py，修复VLA训练torchvision版本冲突，系统分析并消除openpi vs pi05训练时长33%差异（核心：JAX 0.5.0→0.5.3升级+6个依赖对齐）</li>
+<li><strong>怎么做的：</strong> 通过读取/proc/fd中/dev/nvidia*设备文件+CUDA_VISIBLE_DEVICES双重检测实现K8s容器内GPU归属；在pyproject.toml显式锁定torchvision==0.22.1；通过对比wandb config.yaml确认JAX版本为主因，用uv override-dependencies绕过lerobot的torch&lt;2.7传递约束完成uv lock/sync</li>
+<li><strong>有什么用：</strong> 算力服务器首次有可用GPU进程监控工具；VLA训练成功启动；pi05训练预期从20h缩短至15h，依赖环境跨目录一致性得到保障</li>
+</ul>
+<blockquote>
+<p>在DCC和tianhe双机上完成MIHD项目目录重构与RM-IDEAL跨section基准测试、开发K8s GPU进程监控工具gpumon.py、修复VLA训练环境torch版本冲突，并通过对齐JAX版本（0.5.0→0.5.3）及6个关键依赖彻底消除pi05 vs openpi训练时长33%差异</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>分析并消除pi05 vs openpi训练时长33%差异（20h→15h）</strong> — 通过对比wandb config.yaml、pyproject.toml和model.py定位核心原因：JAX版本差异（0.5.0 vs 0.5.3）为主因，辅以num_workers过高（16 vs 8）、IMAGE_KEYS数量不同（2 vs 3相机导致XLA计算图不同）和lerobot不同git commit。完成pi05依赖全量对齐：修改6个库版本（jax/numpy/orbax-checkpoint/torch/beartype/transformers），通过uv override-dependencies绕过lerobot的torch&lt;2.7传递约束，uv lock（305包）和uv sync均成功</li>
+<li>✅ <strong>gpumon.py — K8s容器内GPU进程监控工具（nvitop风格）</strong> — 针对Kubernetes PID命名空间隔离导致nvidia-smi进程列表为空的问题，开发替代工具gpumon.py。通过扫描/proc/<pid>/fd/中的/dev/nvidia*设备文件和CUDA_VISIBLE_DEVICES双重检测实现GPU归属，以nvitop风格双线边框表格展示GPU状态并在GPU卡下直接列出归属进程，支持监控工具自身过滤和温度/功率颜色编码</li>
+<li>✅ <strong>MIHD RM-IDEAL跨section基准测试（151673↔151508）</strong> — 利用已有RM-IDEAL缓存对两个DLPFC section运行benchmark_rm_ideal.py，获得Spearman秩相关、Precision@K、same-label@K等评估指标；Layer_4跨section一致性最强（r=0.657/0.275），Layer_3（最大niche，989/1385 spots）和Layer_6出现显著负相关（约-0.2至-0.36）</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>修复VLA训练环境torch/torchvision版本冲突</strong> — pi05环境中torch 2.7.1与torchvision 0.21.0不兼容导致RuntimeError: operator torchvision::nms does not exist。在pyproject.toml中显式锁定torchvision==0.22.1，通过uv sync成功升级至0.22.1+cu126</li>
+<li>✅ <strong>MIHD outputs目录重构——代码与文档路径全量更新</strong> — 将MIHD项目中14个Python/YAML文件及4个活跃文档中所有旧路径引用批量替换为新语义路径（benchmark_results/hd_results/rm_ideal_benchmark→DLPFC/HD/rm_ideal/cross_section/single_section），并修复ExperimentLogger中硬编码路径属性名错误（self.output_dir→self.log_dir）</li>
+<li>🔄 <strong>错误场景720p视频渲染（v5 error scenes）</strong> — 用户请求将v5 error scenes从480p重新渲染为720p，确认已有480p视频但无独立重渲染脚本。因plan mode交互问题（AI多次提交ExitPlanMode均被拒绝）未能推进到执行阶段</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-pi05训练时间比openpi慢3320h-vs-15h相同训练命令与脚本">1. pi05训练时间比openpi慢33%（20h vs 15h），相同训练命令与脚本<a hidden class="anchor" aria-hidden="true" href="#1-pi05训练时间比openpi慢3320h-vs-15h相同训练命令与脚本">#</a></h4>
+<p><strong>解决方案:</strong> 通过对比wandb config.yaml定位核心原因为JAX版本差异（0.5.0→0.5.3）和num_workers过高（16→8）；另有IMAGE_KEYS数量差异导致XLA计算图不同。将pi05依赖全量对齐至openpi标准</p>
+<p><strong>关键洞察:</strong> JAX三个版本迭代（0.5.0→0.5.3）的XLA编译器优化可带来20-30%性能提升；wandb config.yaml是获取实际运行时配置（含CLI覆盖值）的最可靠数据源，优先于直接读代码默认值</p>
+<h4 id="2-kubernetes-pid命名空间隔离导致nvidia-smi进程列表为空无法知道哪个进程占用哪张gpu">2. Kubernetes PID命名空间隔离导致nvidia-smi进程列表为空，无法知道哪个进程占用哪张GPU<a hidden class="anchor" aria-hidden="true" href="#2-kubernetes-pid命名空间隔离导致nvidia-smi进程列表为空无法知道哪个进程占用哪张gpu">#</a></h4>
+<p><strong>解决方案:</strong> 读取/proc/<pid>/fd/中的/dev/nvidiaX软链接+CUDA_VISIBLE_DEVICES环境变量双重确认GPU归属；对监控工具自身（nvitop/claude/gpumon等）进行过滤</p>
+<p><strong>关键洞察:</strong> K8s隔离的是PID命名空间而非/proc文件系统，容器内仍可通过/proc访问真实GPU设备文件信息</p>
+<h4 id="3-升级torch至271后uv-lock因pi05锁定的旧版lerobot约束torch27解析失败">3. 升级torch至==2.7.1后，uv lock因pi05锁定的旧版lerobot（约束torch&lt;2.7）解析失败<a hidden class="anchor" aria-hidden="true" href="#3-升级torch至271后uv-lock因pi05锁定的旧版lerobot约束torch27解析失败">#</a></h4>
+<p><strong>解决方案:</strong> 在[tool.uv]的override-dependencies中添加torch==2.7.1，强制覆盖lerobot的传递依赖约束</p>
+<p><strong>关键洞察:</strong> openpi使用了较新lerobot git rev（已支持torch&gt;=2.7）；升级核心框架时需通过override-dependencies绕过旧版下游传递约束</p>
+<h4 id="4-rm-ideal-layer_3和layer_6出现负相关r-02至-036大面积弥散niche的embedding与空间拓扑负相关">4. RM-IDEAL Layer_3和Layer_6出现负相关（r≈-0.2至-0.36），大面积弥散niche的embedding与空间拓扑负相关<a hidden class="anchor" aria-hidden="true" href="#4-rm-ideal-layer_3和layer_6出现负相关r-02至-036大面积弥散niche的embedding与空间拓扑负相关">#</a></h4>
+<p><strong>解决方案:</strong> 暂无修复，记录为基准数据。Layer_3是最大niche（989/1385 spots），空间弥散导致embedding无法捕捉精细拓扑结构</p>
+<p><strong>关键洞察:</strong> 大面积弥散niche与小面积密集niche在多模态融合嵌入的空间捕获能力上存在显著差异，需要针对性优化</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="5-torch-271与torchvision-0210不兼容导致vla训练无法启动">5. torch 2.7.1与torchvision 0.21.0不兼容，导致VLA训练无法启动<a hidden class="anchor" aria-hidden="true" href="#5-torch-271与torchvision-0210不兼容导致vla训练无法启动">#</a></h4>
+<p><strong>解决方案:</strong> 在pyproject.toml中显式锁定torchvision==0.22.1（与torch 2.7.x对应版本），通过uv sync重新解析依赖</p>
+<p><strong>关键洞察:</strong> uv/pip自动依赖解析可能选择非最优版本组合；torch系列包需在pyproject.toml中手动显式约束（torch 2.7.x对应torchvision 0.22.x）</p>
+<h4 id="6-experimentloggerlog_experiment中可视化路径硬编码目录重构后将指向不存在路径">6. ExperimentLogger.log_experiment()中可视化路径硬编码，目录重构后将指向不存在路径<a hidden class="anchor" aria-hidden="true" href="#6-experimentloggerlog_experiment中可视化路径硬编码目录重构后将指向不存在路径">#</a></h4>
+<p><strong>解决方案:</strong> 改用self.log_dir动态属性拼接路径，避免后续迁移产生遗漏</p>
+<p><strong>关键洞察:</strong> 应优先使用对象自身属性而非重复硬编码路径字符串</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="gpu监控工具过滤策略设计与vla训练时长差异分析">GPU监控工具过滤策略设计与VLA训练时长差异分析<a hidden class="anchor" aria-hidden="true" href="#gpu监控工具过滤策略设计与vla训练时长差异分析">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户提出nvitop风格需求并观察到nvitop打开全部GPU设备文件这一关键现象；主动发现两目录训练时长不一致，并要求全量依赖对齐而非单点修复</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI设计基于CUDA_VISIBLE_DEVICES+fd扫描双重检测策略及监控工具过滤启发式规则；通过并行探索wandb日志和配置文件系统定位JAX版本为主因，识别出IMAGE_KEYS差异导致XLA计算图不同这一非显而易见因素</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类提供清晰UX需求、关键现象观察和全量对齐策略决策；AI负责技术实现、系统化根因分析和证据收集。人类采用更彻底的「全量对齐」策略确保复现性，AI倾向最小化变更</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="mihd-outputs目录重构方案设计与执行">MIHD outputs目录重构方案设计与执行<a hidden class="anchor" aria-hidden="true" href="#mihd-outputs目录重构方案设计与执行">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类提前设计好完整的8步迁移计划，包括目录命名语义（DLPFC/HD/rm_ideal等）、归档策略、代码更新顺序</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI执行计划时发现遗漏的文件引用（pipeline/runner.py、evaluation_planner.py等），进行补充搜索和修复，发现ExperimentLogger属性名错误，并主动更新MEMORY.md</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类做宏观架构设计，AI负责细节执行并发现人类计划中未提及的遗漏点</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>plan mode交互逻辑混乱：在多个会话中AI多次提交ExitPlanMode均被用户拒绝，无法判断原因，陷入反复询问循环，导致错误场景渲染等任务未能推进执行</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>依赖冲突预判不足：制定依赖对齐计划时未预判lerobot的torch&lt;2.7传递约束冲突，导致uv lock失败后才发现需要override-dependencies；初始分析时将GPU拓扑差异列为可能因素，属推测性分析缺乏验证，可能误导优先级判断</li>
+<li>工具输出处理局限：batch grep超过25000 token需分批读取增加调试复杂度；GPU进程过滤启发式规则初版未能过滤claude自身等监控类进程，需额外迭代</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>JAX小版本升级（0.5.0→0.5.3）可带来显著训练性能提升（约20-33%），部署多套相同代码时需严格保证JAX版本一致性；IMAGE_KEYS等输入形状差异会产生不同XLA计算图无法复用JIT缓存，训练初期ETA不准确，需跑1000步以上才能得到稳定step/s估计</li>
+<li>RM-IDEAL跨section评估揭示：STAIG fusion嵌入在大面积弥散niche（Layer_3/6）与拓扑结构负相关，在小面积密集niche（Layer_1/4）有较好空间一致性，揭示当前多模态融合方法的局限性</li>
+<li>K8s容器内GPU进程监控可行方案：优先读CUDA_VISIBLE_DEVICES环境变量，备选扫描/proc/<pid>/fd中的/dev/nvidia*软链接，两者结合可实现与nvitop等效的进程归属检测</li>
+<li>wandb config.yaml记录实际运行时参数（含CLI覆盖值），是诊断配置差异的最可靠数据源，优先于直接读取代码默认值</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>uv的override-dependencies可强制绕过传递依赖约束（如旧版lerobot的torch&lt;2.7限制），是升级核心框架时的有效工具；torch/torchvision版本需手动显式约束（torch 2.7.x对应torchvision 0.22.x）</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>✅ outputs目录重构（路径全量更新）+ RM-IDEAL跨section基准测试（151673↔151508）</strong>
+<em>00:08:50.291 | claude_code</em>
+完成MIHD项目14个代码文件与4个文档的路径引用全量更新（旧路径→DLPFC/HD/rm_ideal/cross_section/single_section），修复ExperimentLogger属性名错误（self.output_dir→self.log_dir）。随后运行RM-IDEAL基准测试：平均Spearman r=0.18，Layer_4一致性最强（r=0.657/0.275），Layer_3（最大niche，989/1385 spots）和Layer_6出现显著负相关（约-0.2至-0.36），揭示大面积弥散niche上多模态融合嵌入的局限。</p>
+<h3 id="robobrain-gpu监控工具">RoboBrain GPU监控工具<a hidden class="anchor" aria-hidden="true" href="#robobrain-gpu监控工具">#</a></h3>
+<p><strong>✅ gpumon.py改造为nvitop风格界面，实现K8s容器内GPU-进程映射</strong>
+<em>03:05:47.923 | claude_code</em>
+针对K8s PID命名空间隔离导致nvidia-smi无法显示进程的问题，开发gpumon.py替代工具。通过读取/proc/fd中/dev/nvidia*设备文件+CUDA_VISIBLE_DEVICES双重检测解决进程归属问题。经多轮迭代完成nvitop风格布局（双线边框）、监控工具自身过滤（claude/nvitop/gpumon等）和温度/功率颜色编码，最终输出清晰可用的实时GPU监控界面。</p>
+<h3 id="vla-robotwin-pi05">VLA RoboTwin pi05<a hidden class="anchor" aria-hidden="true" href="#vla-robotwin-pi05">#</a></h3>
+<p><strong>✅ 修复torch/torchvision版本冲突 + 初步分析训练时长差异根因</strong>
+<em>06:47:41.428 | claude_code</em>
+修复RuntimeError: operator torchvision::nms does not exist（torch 2.7.1与torchvision 0.21.0不兼容），在pyproject.toml添加torchvision==0.22.1约束，uv sync后成功升级至0.22.1+cu126。随后分析pi05 vs openpi训练时长差异（20h vs 15h），发现model.py中IMAGE_KEYS数量不同（2 vs 3相机）、lerobot依赖不同git commit等因素，指出IMAGE_KEYS差异导致XLA计算图不同无法复用JIT缓存，训练初期ETA估计偏高。</p>
+<h3 id="vla-openpi-训练框架">VLA OpenPI 训练框架<a hidden class="anchor" aria-hidden="true" href="#vla-openpi-训练框架">#</a></h3>
+<p><strong>✅ 通过wandb日志定位JAX版本为主因，完成pi05依赖全量对齐至openpi</strong>
+<em>06:16:59.992 | claude_code</em>
+并行探索两目录的wandb config.yaml确认模型架构一致，定位核心差异为JAX版本（0.5.0 vs 0.5.3）和num_workers（16 vs 8）。用户要求全量对齐而非单点修复，修改pi05/pyproject.toml中6个依赖版本（jax/numpy/orbax-checkpoint/torch/beartype/transformers）并添加override-dependencies；uv lock首次失败（旧版lerobot约束torch&lt;2.7），将torch==2.7.1加入override-dependencies后成功，最终uv lock（305包）和uv sync均完成。</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>❌ v5 error scenes 720p视频渲染——因plan mode交互问题未完成</strong>
+<em>00:07:14.853 | claude_code</em>
+用户请求将v5 error scenes从480p重新渲染为720p，经探索确认已有480p视频但无独立重渲染脚本。AI在plan mode下多次提交ExitPlanMode均被拒绝，无法推进执行，会话在交互混乱中结束。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>30,509,736</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>45,085</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>55,003</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>1,485,322</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>28,924,326</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>95.1%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$20.7485</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>9,605</td>
+          <td>33,868</td>
+          <td>972,139</td>
+          <td>25,257,094</td>
+          <td>$19.5991</td>
+          <td>94.5%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>35,480</td>
+          <td>21,135</td>
+          <td>513,183</td>
+          <td>3,667,232</td>
+          <td>$1.1494</td>
+          <td>5.5%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
