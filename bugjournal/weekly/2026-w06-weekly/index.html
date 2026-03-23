@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Weekly Summary 2026-W06 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal, Weekly Summary">
+<meta name="description" content="本周核心工作围绕 MIHD 空间转录组基准框架的深度修复与完善展开，历时 5 天系统性地对齐了 STAIG 原始论文实现（ARI 从 0.09 跃升至 0.54），补全了实验文档，并引入了基于 WWL 图核的 RM-Ideal 评估体系。同期完成了 QueST 项目的 RM-Ideal 集成与文档建设，形成了可量化 embedding 空间 niche 捕获能力的端到端评估工具链。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/weekly/2026-w06-weekly/">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.8cd4c41956f8a8d117111ec2cd7756f6feaa41c4831c7c8072b8812b377992be.css" integrity="sha256-jNTEGVb4qNEXER7CzXdW9v6qQcSDHHyAcriBKzd5kr4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/weekly/2026-w06-weekly/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+
+<script type="text/javascript" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+
+<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+        ]
+    });
+});
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/weekly/2026-w06-weekly/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Weekly Summary 2026-W06">
+  <meta property="og:description" content="本周核心工作围绕 MIHD 空间转录组基准框架的深度修复与完善展开，历时 5 天系统性地对齐了 STAIG 原始论文实现（ARI 从 0.09 跃升至 0.54），补全了实验文档，并引入了基于 WWL 图核的 RM-Ideal 评估体系。同期完成了 QueST 项目的 RM-Ideal 集成与文档建设，形成了可量化 embedding 空间 niche 捕获能力的端到端评估工具链。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-08T23:59:00-05:00">
+    <meta property="article:modified_time" content="2026-02-08T23:59:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Weekly Summary 2026-W06">
+  <meta name="twitter:description" content="本周核心工作围绕 MIHD 空间转录组基准框架的深度修复与完善展开，历时 5 天系统性地对齐了 STAIG 原始论文实现（ARI 从 0.09 跃升至 0.54），补全了实验文档，并引入了基于 WWL 图核的 RM-Ideal 评估体系。同期完成了 QueST 项目的 RM-Ideal 集成与文档建设，形成了可量化 embedding 空间 niche 捕获能力的端到端评估工具链。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Weekly Summaries",
+      "item": "https://tzj2006.github.io/bugjournal/weekly/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Weekly Summary 2026-W06",
+      "item": "https://tzj2006.github.io/bugjournal/weekly/2026-w06-weekly/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Weekly Summary 2026-W06",
+  "name": "Weekly Summary 2026-W06",
+  "description": "本周核心工作围绕 MIHD 空间转录组基准框架的深度修复与完善展开，历时 5 天系统性地对齐了 STAIG 原始论文实现（ARI 从 0.09 跃升至 0.54），补全了实验文档，并引入了基于 WWL 图核的 RM-Ideal 评估体系。同期完成了 QueST 项目的 RM-Ideal 集成与文档建设，形成了可量化 embedding 空间 niche 捕获能力的端到端评估工具链。",
+  "keywords": [
+    "Bug Journal", "Weekly Summary"
+  ],
+  "articleBody": "周报 — 2026-W06 (2026-02-02 ~ 2026-02-08) 本周核心工作围绕 MIHD 空间转录组基准框架的深度修复与完善展开，历时 5 天系统性地对齐了 STAIG 原始论文实现（ARI 从 0.09 跃升至 0.54），补全了实验文档，并引入了基于 WWL 图核的 RM-Ideal 评估体系。同期完成了 QueST 项目的 RM-Ideal 集成与文档建设，形成了可量化 embedding 空间 niche 捕获能力的端到端评估工具链。\n本周概览 指标 数值 日期范围 2026-02-02 ~ 2026-02-08 活跃天数 5 / 7 总对话数 14 涉及项目 3 完成任务 20 进行中任务 3 总 Token 10,633,735 总费用 $4.63 日均费用 $1.16 项目进展 MIHD（多模态空间转录组基准框架） (5 天活跃) — 🔄 active 完成项:\n重建 experiments_log.md（36 条记录），补全最佳结果 ARI 0.528 的文档 修复 STAIG Strict 模式与原始论文的 4 项关键对齐差异（ImageNet归一化、patch尺寸、StandardScaler、CPU随机mask），ARI 从 0.09 跃升至 0.54 修复 STAIGTrainer.py 的 4 项算法对齐：自适应边Dropout、基因Clip、边权重方向、Tau衰减 修复 apply_fusion() 缺少 **kwargs 导致的致命 Bug 修复 mclust 在多 section 循环中的随机崩溃（numpy2ri activate/deactivate 不配对） Patch 提取性能优化，速度提升 10-50 倍 通过对比 train_img_config.yaml 定位超参数不对齐根因（lr/num_layers/num_epochs/weight_decay） 创建 utils/rm_ideal.py 模块和 scripts/evaluate_rm_ideal.py CLI，完成 RM-Ideal 评估首次端到端运行（Spearman r=0.424，SameLabel@50=1.0） 新增 spatial_utils.py 中 build_grid_connectivity() 和 bfs_k_hop() 函数 阻塞项:\n⚠️ 端到端 GCN+STAIG 真正多模态拼接架构（feat=concat(gene,img) 作为 GCN 输入层）尚未实现 ⚠️ 超参数对齐工作已定位但尚未逐项验证 QueST（空间转录组评估） (2 天活跃) — 🔄 active 完成项:\n创建 CLAUDE.md 项目文档（架构说明、数据流、关键约定） 在 src/utils.py 中实现 RM-Ideal 四个核心函数（wwl_node_features、_wasserstein_distance、rm_score、compute_rm_ideal_scores），8/8 单元测试通过 在 trainer.py 中新增 compute_rm_scores() 批量评估方法 关键任务 ✅ STAIG Strict 模式 4 项对齐修复（MIHD） (2026-02-07) — 对比原始 STAIG 发现并修复 4 个关键差异：跳过 ImageNet 归一化、patch 尺寸改为 256×256、去除 StandardScaler、随机 mask 强制在 CPU 生成。ARI 从 ~0.09 跃升至 0.5435。 ✅ 分析 GCN+STAIG 性能差距并定位 STAIGTrainer 4 项实现差异 (2026-02-05) — 从 experiments_log.md 提取实验数据，发现 GCN+STAIG ARI 在 0.09-0.37 之间极不稳定，逐行对比原始 STAIG 源码定位自适应边Dropout、基因Clip缺失、边权重方向、Tau衰减 4 个关键差异。 ✅ 修复 STAIGTrainer.py 的 4 项算法对齐问题 (2026-02-05) — 实现 adaptive_dropout_adj()，添加基因 Clip，修正边权重方向，添加 Tau 衰减参数，6 项集成测试通过。 🔄 端到端 GCN+STAIG 融合框架实现（STAIGTrainerE2E） (2026-02-05) — 创建 STAIGTrainerE2E.py，修复 apply_fusion() 致命 Bug，添加 gene_preprocessing 四种模式。当前 ARI=0.050，真正的多模态拼接端到端训练架构尚未实现。 ✅ 发现并定位 MIHD 与原始 STAIG 超参数不对齐问题 (2026-02-05) — 对比 train_img_config.yaml，定位 lr(0.001 vs 0.0005)、num_layers(2 vs 1)、num_epochs(550 vs 300)、weight_decay(1e-4 vs 1e-5) 四处差距，确认为当前性能差距的主要根因。 ✅ QueST src/utils.py 新增 RM-Ideal 四个核心函数 (2026-02-08) — 实现 WWL 消息传递 + Wasserstein 最优传输算法，8/8 单元测试通过。 ✅ 在 DLPFC 151508 数据上完成 RM-Ideal 首次端到端评估 (2026-02-08) — Spearman r=0.424，SameLabel@50=1.0，RM-Ideal 缓存已持久化，形成多 embedding 方法横向比较的评估基线。 ✅ mclust ‘svd dimension is zero’ 崩溃修复 (2026-02-07) — 修复 cluster_with_mclust() 在 12 个 section 循环中随机崩溃的 bug：用 try/finally 配对 numpy2ri.activate()/deactivate()，过滤零方差列，替换 NaN/Inf。 ✅ MIHD utils/rm_ideal.py 核心模块与 evaluate_rm_ideal.py CLI 创建 (2026-02-08) — 移植 WWL 算法，创建 RMIdealEvaluator 类（支持 .npy 缓存），实现 NicheQueryEvaluator（支持标签/空间/索引三种 niche 定义），计算 Spearman、Precision@K、SameLabel@K。 ✅ 补全 MIHD experiments_log.md (2026-02-03) — 从 experiment_comparison.csv（36 条记录）重建完整实验日志，填补之前仅有 14 条的缺口，确保最佳结果 ARI 0.528 可追溯。 问题与解决方案 1. STAIG Strict 模式 ARI 仅 ~0.09，与原始 STAIG（~0.45+）差距巨大 [MIHD] (2026-02-07) 解决方案: 定位并修复 4 个关键差异：UNI encoder 跳过 ImageNet 归一化（原始 STAIG 只用 ToTensor）、patch 尺寸改为 256×256、去除 projection head 后的 StandardScaler、drop_feature 随机 mask 强制在 CPU 生成。修复后 ARI=0.5435。\n2. apply_fusion() 函数签名缺少 **kwargs，staig_fusion_e2e 策略运行时抛出 NameError [MIHD] (2026-02-05) 解决方案: 在函数签名末尾添加 **kwargs，在 staig_fusion_e2e 分支通过 kwargs.get(‘gene_expr_raw’) 读取传入的原始基因表达。\n3. mclust 在 12 个 section 循环调用中随机报错 ‘Error in svd(data, nu=0): a dimension is zero’ [MIHD] (2026-02-07) 解决方案: 用 try/finally 配对 numpy2ri.activate()/deactivate()，防止转换器栈积累损坏；同时过滤零方差列、替换 NaN/Inf，强制转为 float64 连续数组。\n4. experiments_log.md 仅记录 ~14 条实验，36 条 CSV 数据大量缺失，最佳结果 ARI 0.528 完全未被记录 [MIHD] (2026-02-03) 解决方案: 从 experiment_comparison.csv 完整重建 experiments_log.md，覆盖所有 36 条记录，并新建 BENCHMARK_RESULTS_SUMMARY.md 汇总关键发现。\n5. SameLabel@K 指标全部为 0，评估结果明显异常 [MIHD / QueST] (2026-02-08) 解决方案: 修正计算逻辑：同标签检索率应在全体有效 spot（含 niche 成员）上计算，而非将 niche 成员排除后计算（排除仅适用于 Precision@K 的自匹配去偏）。\n6. WWL 算法中 query 和 reference 子图节点 ID 冲突，共享哈希表时 key 碰撞 [MIHD] (2026-02-08) 解决方案: 为 reference 子图节点添加偏移量 offset = adata_q.n_obs，保证两组节点 ID 全局唯一。\n7. UNI2 加载时出现 shape invalid 错误，GPU 非确定性导致实验结果跨 run 不可复现 [MIHD] (2026-02-05) 解决方案: UNI2 需显式传递完整 timm 架构参数（img_size、patch_size、embed_dim 等）；在所有关键模块入口统一添加 CUBLAS_WORKSPACE_CONFIG=’:4096:8’。\n8. POT（最优传输库）在当前 conda 环境中未安装，阻塞 RM-Ideal 实现 [MIHD] (2026-02-08) 解决方案: 实现 POT → scipy.optimize.linprog 的回退策略，无需新增依赖。\n学习收获 领域知识 (domain) 原始 STAIG 三个核心机制：①自适应边 Dropout（rand() \u003e= edge_prob）使高相似度边更容易被丢弃，强迫模型学习跨域通用表示；②Tau 从高温度（26）衰减模拟退火；③GCN 以 feat=concat(gene_expr, img_emb) 为节点特征端到端训练，而非分阶段独立编码后融合——这三点共同构成 STAIG 性能的核心保障。 原始 STAIG 使用 UNI 提取图像 patch 时不做 ImageNet 归一化（只有 Resize+ToTensor），这与大多数视觉编码器的标准做法相反；复现论文时必须严格对照原始预处理代码，不能依赖常识。 RM-Ideal（WWL 图核 + Wasserstein 距离）是衡量空间 niche 结构相似度的 ground truth 指标，与 embedding 余弦相似度相关但不等价（Spearman r~0.42），说明 embedding 仅中等程度地捕获了 niche 精细结构。SameLabel@K（cell type 检索率）与 Precision@K（与 RM-Ideal 排序的秩相关）是两个独立维度，不能用同一 mask 逻辑处理。 MIHD 与原始 STAIG 超参数不对齐（lr 0.001 vs 0.0005、num_layers 2 vs 1、num_epochs 550 vs 300、weight_decay 1e-4 vs 1e-5）是当前性能差距的主要根因；算法对齐后必须逐项对齐超参数才能复现论文最优结果。 PCA+UNI2+STAIG 是 MIHD 当前最优且最稳定的组合（ARI 0.45+）；GCN 独立预训练后融合效果差（ARI 0.09-0.37）的根本原因是 GCN 训练阶段缺乏多模态对齐信号，解决方案是实现多模态拼接的端到端训练。 调试 (debugging) rpy2 的 numpy2ri.activate() 在循环调用时必须配对 deactivate()，否则多次调用会损坏转换器栈，导致 numpy→R 数组维度错误（‘svd dimension is zero’）；应用 try/finally 确保清理。原始 STAIG 单次调用不暴露此问题，多 section 循环场景才会触发。 CPU 和 GPU 上的随机数生成器即使设定相同 seed，生成的序列也不相同；在要求精确复现训练过程时，随机 mask 的设备选择会影响最终结果，必须严格对齐。 实验日志与实际运行结果之间容易出现时间戳或覆盖不一致问题；实验记录应与实验执行脚本耦合，自动写入而非手动补录，当前项目存在 ‘CSV 有数据但 markdown 无记录’ 的系统性风险。 架构 (architecture) WWL 算法要求 query 和 reference 子图共享哈希表并使用无碰撞的全局节点 ID，实现时需引入节点偏移量（offset = adata_q.n_obs）；Hamming 距离需按维度归一化（除以 K+1）才能保证 W ∈ [0,1]。 工具 (tools) CUBLAS_WORKSPACE_CONFIG=’:4096:8’ 必须在所有 GPU 模块入口统一设置，否则跨 run 结果不可复现；这是复现研究实验的隐性前提，应在项目初始化阶段统一配置。 timm 创建 UNI2 模型必须显式传递完整架构参数（img_size、patch_size、depth、num_heads、embed_dim 等），否则位置编码重采样时维度不匹配导致预训练权重加载失败。 大图的 PIL→numpy 转换是高代价操作，在逐 spot 循环中重复执行是严重的性能反模式；应在循环外一次性转换，循环内用 numpy 切片（零拷贝），可实现 10-50 倍加速。 在 HPC 多 conda 环境中，优先用已有依赖（scipy linprog）作为可选库（POT）的回退，而非强制安装新包，可提升代码在不同环境中的可移植性。 AI 使用备注 有效模式:\n✓ 逐行对比原始论文源码定位实现偏差，系统性修复多个协同问题（STAIG 4 项对齐） ✓ 并行启动多个子任务同时分析不同代码模块（STAIG ARI 差距根因定位） ✓ POT → scipy 回退策略：在环境受限的 HPC 中设计无额外依赖的算法实现 ✓ 预分配输出张量 + numpy 零拷贝切片的性能优化模式 局限性:\n✗ 未能主动验证输出指标的业务合理性（SameLabel@50=0 通过代码检查但数值明显异常，需用户介入发现） ✗ 混淆方法论本质差异：将 staig_fusion（原始两阶段）和 staig_fusion_e2e（自研端到端变体）概念混用，向用户推荐了错误命令 ✗ 未能主动识别隐性工程需求（CUBLAS 确定性配置缺失） ✗ 在算法架构设计上理解不足，E2E 框架初始实现未考虑多模态特征在 GCN 输入层融合的根本设计 ✗ 未能主动同步更新实验文档，导致 experiments_log.md 滞后于 CSV 数据 下周展望 下周重点：①完成端到端 GCN+STAIG 真正多模态拼接架构（feat=concat(gene,img) 作为 GCN 输入层），这是本周明确但未实现的关键架构改进；②逐项对齐 STAIG 超参数（lr/num_layers/num_epochs/weight_decay）并验证是否能复现论文最优性能；③将 RM-Ideal 评估扩展到所有 fusion 策略的横向对比，形成系统性评估报告；④考虑将实验记录写入与脚本执行耦合，解决文档滞后的系统性风险。\nToken 用量统计 每日费用趋势 日期 Token (百万) 费用 ($) 2026-02-02 0.4 0.17 2026-02-05 2.5 1.94 2026-02-07 4.5 0.93 2026-02-08 3.3 1.59 峰值日: 2026-02-05 — $1.94 / 2.5M tokens\nClaude Code 指标 数值 总 Token 10,633,735 输入 Token 21,844 输出 Token 1,237 Cache 创建 1,266,691 Cache 读取 9,343,963 总费用 $4.63 模型使用分布 模型 费用 ($) 输入 Token 输出 Token claude-sonnet-4-5-20250929 1.82 17,927 142 claude-haiku-4-5-20251001 1.72 1,415 964 claude-opus-4-6 1.07 2,502 131 ",
+  "wordCount" : "773",
+  "inLanguage": "en",
+  "datePublished": "2026-02-08T23:59:00-05:00",
+  "dateModified": "2026-02-08T23:59:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/weekly/2026-w06-weekly/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/weekly/">Weekly Summaries</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Weekly Summary 2026-W06
+    </h1>
+    <div class="post-meta"><span title='2026-02-08 23:59:00 -0500 EST'>February 8, 2026</span>&nbsp;·&nbsp;<span>4 min</span>
+
+
+      
+      <div class="meta-item">
+        <span id="busuanzi_container_page_pv">
+           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
+        </span>
+     </div>
+
+    </div>
+  </header> 
+  <div class="post-content"><h1 id="周报--2026-w06-2026-02-02--2026-02-08">周报 — 2026-W06 (2026-02-02 ~ 2026-02-08)<a hidden class="anchor" aria-hidden="true" href="#周报--2026-w06-2026-02-02--2026-02-08">#</a></h1>
+<blockquote>
+<p>本周核心工作围绕 MIHD 空间转录组基准框架的深度修复与完善展开，历时 5 天系统性地对齐了 STAIG 原始论文实现（ARI 从 0.09 跃升至 0.54），补全了实验文档，并引入了基于 WWL 图核的 RM-Ideal 评估体系。同期完成了 QueST 项目的 RM-Ideal 集成与文档建设，形成了可量化 embedding 空间 niche 捕获能力的端到端评估工具链。</p>
+</blockquote>
+<h2 id="本周概览">本周概览<a hidden class="anchor" aria-hidden="true" href="#本周概览">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>日期范围</td>
+          <td>2026-02-02 ~ 2026-02-08</td>
+      </tr>
+      <tr>
+          <td>活跃天数</td>
+          <td>5 / 7</td>
+      </tr>
+      <tr>
+          <td>总对话数</td>
+          <td>14</td>
+      </tr>
+      <tr>
+          <td>涉及项目</td>
+          <td>3</td>
+      </tr>
+      <tr>
+          <td>完成任务</td>
+          <td>20</td>
+      </tr>
+      <tr>
+          <td>进行中任务</td>
+          <td>3</td>
+      </tr>
+      <tr>
+          <td>总 Token</td>
+          <td>10,633,735</td>
+      </tr>
+      <tr>
+          <td>总费用</td>
+          <td>$4.63</td>
+      </tr>
+      <tr>
+          <td>日均费用</td>
+          <td>$1.16</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="项目进展">项目进展<a hidden class="anchor" aria-hidden="true" href="#项目进展">#</a></h2>
+<h3 id="mihd多模态空间转录组基准框架-5-天活跃---active">MIHD（多模态空间转录组基准框架） (5 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#mihd多模态空间转录组基准框架-5-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>重建 experiments_log.md（36 条记录），补全最佳结果 ARI 0.528 的文档</li>
+<li>修复 STAIG Strict 模式与原始论文的 4 项关键对齐差异（ImageNet归一化、patch尺寸、StandardScaler、CPU随机mask），ARI 从 0.09 跃升至 0.54</li>
+<li>修复 STAIGTrainer.py 的 4 项算法对齐：自适应边Dropout、基因Clip、边权重方向、Tau衰减</li>
+<li>修复 apply_fusion() 缺少 **kwargs 导致的致命 Bug</li>
+<li>修复 mclust 在多 section 循环中的随机崩溃（numpy2ri activate/deactivate 不配对）</li>
+<li>Patch 提取性能优化，速度提升 10-50 倍</li>
+<li>通过对比 train_img_config.yaml 定位超参数不对齐根因（lr/num_layers/num_epochs/weight_decay）</li>
+<li>创建 utils/rm_ideal.py 模块和 scripts/evaluate_rm_ideal.py CLI，完成 RM-Ideal 评估首次端到端运行（Spearman r=0.424，SameLabel@50=1.0）</li>
+<li>新增 spatial_utils.py 中 build_grid_connectivity() 和 bfs_k_hop() 函数</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ 端到端 GCN+STAIG 真正多模态拼接架构（feat=concat(gene,img) 作为 GCN 输入层）尚未实现</li>
+<li>⚠️ 超参数对齐工作已定位但尚未逐项验证</li>
+</ul>
+<h3 id="quest空间转录组评估-2-天活跃---active">QueST（空间转录组评估） (2 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#quest空间转录组评估-2-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>创建 CLAUDE.md 项目文档（架构说明、数据流、关键约定）</li>
+<li>在 src/utils.py 中实现 RM-Ideal 四个核心函数（wwl_node_features、_wasserstein_distance、rm_score、compute_rm_ideal_scores），8/8 单元测试通过</li>
+<li>在 trainer.py 中新增 compute_rm_scores() 批量评估方法</li>
+</ul>
+<h2 id="关键任务">关键任务<a hidden class="anchor" aria-hidden="true" href="#关键任务">#</a></h2>
+<ul>
+<li>✅ <strong>STAIG Strict 模式 4 项对齐修复（MIHD）</strong> (2026-02-07) — 对比原始 STAIG 发现并修复 4 个关键差异：跳过 ImageNet 归一化、patch 尺寸改为 256×256、去除 StandardScaler、随机 mask 强制在 CPU 生成。ARI 从 ~0.09 跃升至 0.5435。</li>
+<li>✅ <strong>分析 GCN+STAIG 性能差距并定位 STAIGTrainer 4 项实现差异</strong> (2026-02-05) — 从 experiments_log.md 提取实验数据，发现 GCN+STAIG ARI 在 0.09-0.37 之间极不稳定，逐行对比原始 STAIG 源码定位自适应边Dropout、基因Clip缺失、边权重方向、Tau衰减 4 个关键差异。</li>
+<li>✅ <strong>修复 STAIGTrainer.py 的 4 项算法对齐问题</strong> (2026-02-05) — 实现 adaptive_dropout_adj()，添加基因 Clip，修正边权重方向，添加 Tau 衰减参数，6 项集成测试通过。</li>
+<li>🔄 <strong>端到端 GCN+STAIG 融合框架实现（STAIGTrainerE2E）</strong> (2026-02-05) — 创建 STAIGTrainerE2E.py，修复 apply_fusion() 致命 Bug，添加 gene_preprocessing 四种模式。当前 ARI=0.050，真正的多模态拼接端到端训练架构尚未实现。</li>
+<li>✅ <strong>发现并定位 MIHD 与原始 STAIG 超参数不对齐问题</strong> (2026-02-05) — 对比 train_img_config.yaml，定位 lr(0.001 vs 0.0005)、num_layers(2 vs 1)、num_epochs(550 vs 300)、weight_decay(1e-4 vs 1e-5) 四处差距，确认为当前性能差距的主要根因。</li>
+<li>✅ <strong>QueST src/utils.py 新增 RM-Ideal 四个核心函数</strong> (2026-02-08) — 实现 WWL 消息传递 + Wasserstein 最优传输算法，8/8 单元测试通过。</li>
+<li>✅ <strong>在 DLPFC 151508 数据上完成 RM-Ideal 首次端到端评估</strong> (2026-02-08) — Spearman r=0.424，SameLabel@50=1.0，RM-Ideal 缓存已持久化，形成多 embedding 方法横向比较的评估基线。</li>
+<li>✅ <strong>mclust &lsquo;svd dimension is zero&rsquo; 崩溃修复</strong> (2026-02-07) — 修复 cluster_with_mclust() 在 12 个 section 循环中随机崩溃的 bug：用 try/finally 配对 numpy2ri.activate()/deactivate()，过滤零方差列，替换 NaN/Inf。</li>
+<li>✅ <strong>MIHD utils/rm_ideal.py 核心模块与 evaluate_rm_ideal.py CLI 创建</strong> (2026-02-08) — 移植 WWL 算法，创建 RMIdealEvaluator 类（支持 .npy 缓存），实现 NicheQueryEvaluator（支持标签/空间/索引三种 niche 定义），计算 Spearman、Precision@K、SameLabel@K。</li>
+<li>✅ <strong>补全 MIHD experiments_log.md</strong> (2026-02-03) — 从 experiment_comparison.csv（36 条记录）重建完整实验日志，填补之前仅有 14 条的缺口，确保最佳结果 ARI 0.528 可追溯。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="1-staig-strict-模式-ari-仅-009与原始-staig045差距巨大-mihd-2026-02-07">1. STAIG Strict 模式 ARI 仅 ~0.09，与原始 STAIG（~0.45+）差距巨大 [MIHD] (2026-02-07)<a hidden class="anchor" aria-hidden="true" href="#1-staig-strict-模式-ari-仅-009与原始-staig045差距巨大-mihd-2026-02-07">#</a></h3>
+<p><strong>解决方案:</strong> 定位并修复 4 个关键差异：UNI encoder 跳过 ImageNet 归一化（原始 STAIG 只用 ToTensor）、patch 尺寸改为 256×256、去除 projection head 后的 StandardScaler、drop_feature 随机 mask 强制在 CPU 生成。修复后 ARI=0.5435。</p>
+<h3 id="2-apply_fusion-函数签名缺少-kwargsstaig_fusion_e2e-策略运行时抛出-nameerror-mihd-2026-02-05">2. apply_fusion() 函数签名缺少 **kwargs，staig_fusion_e2e 策略运行时抛出 NameError [MIHD] (2026-02-05)<a hidden class="anchor" aria-hidden="true" href="#2-apply_fusion-函数签名缺少-kwargsstaig_fusion_e2e-策略运行时抛出-nameerror-mihd-2026-02-05">#</a></h3>
+<p><strong>解决方案:</strong> 在函数签名末尾添加 **kwargs，在 staig_fusion_e2e 分支通过 kwargs.get(&lsquo;gene_expr_raw&rsquo;) 读取传入的原始基因表达。</p>
+<h3 id="3-mclust-在-12-个-section-循环调用中随机报错-error-in-svddata-nu0-a-dimension-is-zero-mihd-2026-02-07">3. mclust 在 12 个 section 循环调用中随机报错 &lsquo;Error in svd(data, nu=0): a dimension is zero&rsquo; [MIHD] (2026-02-07)<a hidden class="anchor" aria-hidden="true" href="#3-mclust-在-12-个-section-循环调用中随机报错-error-in-svddata-nu0-a-dimension-is-zero-mihd-2026-02-07">#</a></h3>
+<p><strong>解决方案:</strong> 用 try/finally 配对 numpy2ri.activate()/deactivate()，防止转换器栈积累损坏；同时过滤零方差列、替换 NaN/Inf，强制转为 float64 连续数组。</p>
+<h3 id="4-experiments_logmd-仅记录-14-条实验36-条-csv-数据大量缺失最佳结果-ari-0528-完全未被记录-mihd-2026-02-03">4. experiments_log.md 仅记录 ~14 条实验，36 条 CSV 数据大量缺失，最佳结果 ARI 0.528 完全未被记录 [MIHD] (2026-02-03)<a hidden class="anchor" aria-hidden="true" href="#4-experiments_logmd-仅记录-14-条实验36-条-csv-数据大量缺失最佳结果-ari-0528-完全未被记录-mihd-2026-02-03">#</a></h3>
+<p><strong>解决方案:</strong> 从 experiment_comparison.csv 完整重建 experiments_log.md，覆盖所有 36 条记录，并新建 BENCHMARK_RESULTS_SUMMARY.md 汇总关键发现。</p>
+<h3 id="5-samelabelk-指标全部为-0评估结果明显异常-mihd--quest-2026-02-08">5. SameLabel@K 指标全部为 0，评估结果明显异常 [MIHD / QueST] (2026-02-08)<a hidden class="anchor" aria-hidden="true" href="#5-samelabelk-指标全部为-0评估结果明显异常-mihd--quest-2026-02-08">#</a></h3>
+<p><strong>解决方案:</strong> 修正计算逻辑：同标签检索率应在全体有效 spot（含 niche 成员）上计算，而非将 niche 成员排除后计算（排除仅适用于 Precision@K 的自匹配去偏）。</p>
+<h3 id="6-wwl-算法中-query-和-reference-子图节点-id-冲突共享哈希表时-key-碰撞-mihd-2026-02-08">6. WWL 算法中 query 和 reference 子图节点 ID 冲突，共享哈希表时 key 碰撞 [MIHD] (2026-02-08)<a hidden class="anchor" aria-hidden="true" href="#6-wwl-算法中-query-和-reference-子图节点-id-冲突共享哈希表时-key-碰撞-mihd-2026-02-08">#</a></h3>
+<p><strong>解决方案:</strong> 为 reference 子图节点添加偏移量 offset = adata_q.n_obs，保证两组节点 ID 全局唯一。</p>
+<h3 id="7-uni2-加载时出现-shape-invalid-错误gpu-非确定性导致实验结果跨-run-不可复现-mihd-2026-02-05">7. UNI2 加载时出现 shape invalid 错误，GPU 非确定性导致实验结果跨 run 不可复现 [MIHD] (2026-02-05)<a hidden class="anchor" aria-hidden="true" href="#7-uni2-加载时出现-shape-invalid-错误gpu-非确定性导致实验结果跨-run-不可复现-mihd-2026-02-05">#</a></h3>
+<p><strong>解决方案:</strong> UNI2 需显式传递完整 timm 架构参数（img_size、patch_size、embed_dim 等）；在所有关键模块入口统一添加 CUBLAS_WORKSPACE_CONFIG=&rsquo;:4096:8&rsquo;。</p>
+<h3 id="8-pot最优传输库在当前-conda-环境中未安装阻塞-rm-ideal-实现-mihd-2026-02-08">8. POT（最优传输库）在当前 conda 环境中未安装，阻塞 RM-Ideal 实现 [MIHD] (2026-02-08)<a hidden class="anchor" aria-hidden="true" href="#8-pot最优传输库在当前-conda-环境中未安装阻塞-rm-ideal-实现-mihd-2026-02-08">#</a></h3>
+<p><strong>解决方案:</strong> 实现 POT → scipy.optimize.linprog 的回退策略，无需新增依赖。</p>
+<h2 id="学习收获">学习收获<a hidden class="anchor" aria-hidden="true" href="#学习收获">#</a></h2>
+<h3 id="领域知识-domain">领域知识 (domain)<a hidden class="anchor" aria-hidden="true" href="#领域知识-domain">#</a></h3>
+<ul>
+<li>原始 STAIG 三个核心机制：①自适应边 Dropout（rand() &gt;= edge_prob）使高相似度边更容易被丢弃，强迫模型学习跨域通用表示；②Tau 从高温度（26）衰减模拟退火；③GCN 以 feat=concat(gene_expr, img_emb) 为节点特征端到端训练，而非分阶段独立编码后融合——这三点共同构成 STAIG 性能的核心保障。</li>
+<li>原始 STAIG 使用 UNI 提取图像 patch 时不做 ImageNet 归一化（只有 Resize+ToTensor），这与大多数视觉编码器的标准做法相反；复现论文时必须严格对照原始预处理代码，不能依赖常识。</li>
+<li>RM-Ideal（WWL 图核 + Wasserstein 距离）是衡量空间 niche 结构相似度的 ground truth 指标，与 embedding 余弦相似度相关但不等价（Spearman r~0.42），说明 embedding 仅中等程度地捕获了 niche 精细结构。SameLabel@K（cell type 检索率）与 Precision@K（与 RM-Ideal 排序的秩相关）是两个独立维度，不能用同一 mask 逻辑处理。</li>
+<li>MIHD 与原始 STAIG 超参数不对齐（lr 0.001 vs 0.0005、num_layers 2 vs 1、num_epochs 550 vs 300、weight_decay 1e-4 vs 1e-5）是当前性能差距的主要根因；算法对齐后必须逐项对齐超参数才能复现论文最优结果。</li>
+<li>PCA+UNI2+STAIG 是 MIHD 当前最优且最稳定的组合（ARI 0.45+）；GCN 独立预训练后融合效果差（ARI 0.09-0.37）的根本原因是 GCN 训练阶段缺乏多模态对齐信号，解决方案是实现多模态拼接的端到端训练。</li>
+</ul>
+<h3 id="调试-debugging">调试 (debugging)<a hidden class="anchor" aria-hidden="true" href="#调试-debugging">#</a></h3>
+<ul>
+<li>rpy2 的 numpy2ri.activate() 在循环调用时必须配对 deactivate()，否则多次调用会损坏转换器栈，导致 numpy→R 数组维度错误（&lsquo;svd dimension is zero&rsquo;）；应用 try/finally 确保清理。原始 STAIG 单次调用不暴露此问题，多 section 循环场景才会触发。</li>
+<li>CPU 和 GPU 上的随机数生成器即使设定相同 seed，生成的序列也不相同；在要求精确复现训练过程时，随机 mask 的设备选择会影响最终结果，必须严格对齐。</li>
+<li>实验日志与实际运行结果之间容易出现时间戳或覆盖不一致问题；实验记录应与实验执行脚本耦合，自动写入而非手动补录，当前项目存在 &lsquo;CSV 有数据但 markdown 无记录&rsquo; 的系统性风险。</li>
+</ul>
+<h3 id="架构-architecture">架构 (architecture)<a hidden class="anchor" aria-hidden="true" href="#架构-architecture">#</a></h3>
+<ul>
+<li>WWL 算法要求 query 和 reference 子图共享哈希表并使用无碰撞的全局节点 ID，实现时需引入节点偏移量（offset = adata_q.n_obs）；Hamming 距离需按维度归一化（除以 K+1）才能保证 W ∈ [0,1]。</li>
+</ul>
+<h3 id="工具-tools">工具 (tools)<a hidden class="anchor" aria-hidden="true" href="#工具-tools">#</a></h3>
+<ul>
+<li>CUBLAS_WORKSPACE_CONFIG=&rsquo;:4096:8&rsquo; 必须在所有 GPU 模块入口统一设置，否则跨 run 结果不可复现；这是复现研究实验的隐性前提，应在项目初始化阶段统一配置。</li>
+<li>timm 创建 UNI2 模型必须显式传递完整架构参数（img_size、patch_size、depth、num_heads、embed_dim 等），否则位置编码重采样时维度不匹配导致预训练权重加载失败。</li>
+<li>大图的 PIL→numpy 转换是高代价操作，在逐 spot 循环中重复执行是严重的性能反模式；应在循环外一次性转换，循环内用 numpy 切片（零拷贝），可实现 10-50 倍加速。</li>
+<li>在 HPC 多 conda 环境中，优先用已有依赖（scipy linprog）作为可选库（POT）的回退，而非强制安装新包，可提升代码在不同环境中的可移植性。</li>
+</ul>
+<h2 id="ai-使用备注">AI 使用备注<a hidden class="anchor" aria-hidden="true" href="#ai-使用备注">#</a></h2>
+<p><strong>有效模式:</strong></p>
+<ul>
+<li>✓ 逐行对比原始论文源码定位实现偏差，系统性修复多个协同问题（STAIG 4 项对齐）</li>
+<li>✓ 并行启动多个子任务同时分析不同代码模块（STAIG ARI 差距根因定位）</li>
+<li>✓ POT → scipy 回退策略：在环境受限的 HPC 中设计无额外依赖的算法实现</li>
+<li>✓ 预分配输出张量 + numpy 零拷贝切片的性能优化模式</li>
+</ul>
+<p><strong>局限性:</strong></p>
+<ul>
+<li>✗ 未能主动验证输出指标的业务合理性（SameLabel@50=0 通过代码检查但数值明显异常，需用户介入发现）</li>
+<li>✗ 混淆方法论本质差异：将 staig_fusion（原始两阶段）和 staig_fusion_e2e（自研端到端变体）概念混用，向用户推荐了错误命令</li>
+<li>✗ 未能主动识别隐性工程需求（CUBLAS 确定性配置缺失）</li>
+<li>✗ 在算法架构设计上理解不足，E2E 框架初始实现未考虑多模态特征在 GCN 输入层融合的根本设计</li>
+<li>✗ 未能主动同步更新实验文档，导致 experiments_log.md 滞后于 CSV 数据</li>
+</ul>
+<h2 id="下周展望">下周展望<a hidden class="anchor" aria-hidden="true" href="#下周展望">#</a></h2>
+<p>下周重点：①完成端到端 GCN+STAIG 真正多模态拼接架构（feat=concat(gene,img) 作为 GCN 输入层），这是本周明确但未实现的关键架构改进；②逐项对齐 STAIG 超参数（lr/num_layers/num_epochs/weight_decay）并验证是否能复现论文最优性能；③将 RM-Ideal 评估扩展到所有 fusion 策略的横向对比，形成系统性评估报告；④考虑将实验记录写入与脚本执行耦合，解决文档滞后的系统性风险。</p>
+<h2 id="token-用量统计">Token 用量统计<a hidden class="anchor" aria-hidden="true" href="#token-用量统计">#</a></h2>
+<p><img alt="每日 Token 趋势" loading="lazy" src="https://tzj2006.github.io/images/weekly/2026-W06-weekly-tokens.png"></p>
+<h3 id="每日费用趋势">每日费用趋势<a hidden class="anchor" aria-hidden="true" href="#每日费用趋势">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>日期</th>
+          <th>Token (百万)</th>
+          <th>费用 ($)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2026-02-02</td>
+          <td>0.4</td>
+          <td>0.17</td>
+      </tr>
+      <tr>
+          <td>2026-02-05</td>
+          <td>2.5</td>
+          <td>1.94</td>
+      </tr>
+      <tr>
+          <td>2026-02-07</td>
+          <td>4.5</td>
+          <td>0.93</td>
+      </tr>
+      <tr>
+          <td>2026-02-08</td>
+          <td>3.3</td>
+          <td>1.59</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>峰值日:</strong> 2026-02-05 — $1.94 / 2.5M tokens</p>
+<h3 id="claude-code">Claude Code<a hidden class="anchor" aria-hidden="true" href="#claude-code">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>10,633,735</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>21,844</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>1,237</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>1,266,691</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>9,343,963</td>
+      </tr>
+      <tr>
+          <td>总费用</td>
+          <td>$4.63</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="模型使用分布">模型使用分布<a hidden class="anchor" aria-hidden="true" href="#模型使用分布">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>费用 ($)</th>
+          <th>输入 Token</th>
+          <th>输出 Token</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-sonnet-4-5-20250929</td>
+          <td>1.82</td>
+          <td>17,927</td>
+          <td>142</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>1.72</td>
+          <td>1,415</td>
+          <td>964</td>
+      </tr>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>1.07</td>
+          <td>2,502</td>
+          <td>131</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+    <span>
+        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
+        · 总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
