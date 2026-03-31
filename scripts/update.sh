@@ -18,11 +18,30 @@ SRC_DIR="content"                   # 存放 .md 的根目录
 IMAGE_DIR="static/images"           # 图片的根目录
 PUBLIC_DIR="public"                 # Hugo 输出目录（也是 git 仓库）
 TIMESTAMP_FILE=".last_build"        # 记录“上次构建时间”的文件
-REPLACEMENT="https://tzj2006.github.io"           # "../../static" → 此字符串
+CONFIG_FILE="config.yml"
 PATTERN='\.\./\.\./static'          # sed 中用的正则
 COMPRESS_SCRIPT="compress_image.py" # 压缩脚本路径
 COMMIT_MESSAGE="update website: $(date '+%Y-%m-%d %H:%M:%S')"
 # ───────────────────────────────────────────────────────────────
+
+get_site_base_url() {
+  local line url
+  line=$(grep -m1 '^baseURL:' "$CONFIG_FILE" || true)
+  if [ -z "$line" ]; then
+    echo "ERROR: could not find baseURL in $CONFIG_FILE" >&2
+    exit 1
+  fi
+
+  url=$(printf '%s' "$line" | sed -E 's/^baseURL:[[:space:]]*//')
+  url="${url%\"}"
+  url="${url#\"}"
+  url="${url%\'}"
+  url="${url#\'}"
+  url="${url%/}"
+  printf '%s' "$url"
+}
+
+REPLACEMENT="$(get_site_base_url)"
 
 # 若无时间戳文件，则创建一个很久以前的时间戳
 if [ ! -f "$TIMESTAMP_FILE" ]; then
@@ -38,7 +57,7 @@ fi
 
 echo
 echo "─────────────────────────────────────────────────"
-echo "▶ Step 1/6：检查 content/ 下哪些 .md 文件自上次构建以来被修改："
+echo "▶ Step 1/5：检查 content/ 下哪些 .md 文件自上次构建以来被修改："
 MODIFIED_MD=$(find "$SRC_DIR" -type f -name '*.md' -newer "$TIMESTAMP_FILE")
 
 if [ -n "$MODIFIED_MD" ]; then
@@ -63,7 +82,7 @@ fi
 
 echo
 echo "─────────────────────────────────────────────────"
-echo "▶ Step 2/6：检查并压缩 static/ 下修改过的图片文件："
+echo "▶ Step 2/5：检查并压缩 static/ 下修改过的图片文件："
 MODIFIED_IMG=$(find "$IMAGE_DIR" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -newer "$TIMESTAMP_FILE")
 
 if [ -n "$MODIFIED_IMG" ]; then
@@ -88,7 +107,7 @@ fi
 
 echo
 echo "─────────────────────────────────────────────────"
-echo "▶ Step 3/6：清理 public/（保留 .git 及其全部内容）…"
+echo "▶ Step 3/5：清理 public/（保留 .git 及其全部内容）…"
 
 if [ -d "$PUBLIC_DIR" ]; then
   find "$PUBLIC_DIR" -mindepth 1 \( -path "$PUBLIC_DIR/.git" -o -path "$PUBLIC_DIR/.git/*" \) -prune -o -exec rm -rf {} +
@@ -100,7 +119,7 @@ fi
 
 echo
 echo "─────────────────────────────────────────────────"
-echo "▶ Step 4/6：运行 Hugo 生成 public/ …"
+echo "▶ Step 4/5：运行 Hugo 生成 public/ …"
 hugo
 echo "✔ Hugo 构建完成：'${PUBLIC_DIR}/' 已更新。"
 
