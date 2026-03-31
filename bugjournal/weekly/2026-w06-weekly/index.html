@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Weekly Summary 2026-W06 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal, Weekly Summary">
+<meta name="description" content="本周（2026-02-06~07）工作集中在两条主线：一是对MIHD项目的staig_fusion与原始STAIG之间ARI性能差距（0.21→目标0.56）进行系统性根因诊断，识别并量化了五个关键实现差异，完成了严格对齐覆盖改造的代码层工作；二是对benchmark工具完成工程化升级，修复报告柱状图渲染bug、实现端到端GitHub Pages自动发布流水线与CLI交互上传功能。此外记录了一次英语托福口语练习（个人学习）。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/weekly/2026-w06-weekly/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.74275d3de94d719fb7098f21c29c7cbda35c9c6ca6621dbdcbd629ecff2aa1ac.css" integrity="sha256-dCddPelNcZ&#43;3CY8hwpx8vaNcnGymYh29y9Yp7P8qoaw=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/weekly/2026-w06-weekly/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://tzj2006.github.io/bugjournal/weekly/2026-w06-weekly/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Weekly Summary 2026-W06">
+  <meta property="og:description" content="本周（2026-02-06~07）工作集中在两条主线：一是对MIHD项目的staig_fusion与原始STAIG之间ARI性能差距（0.21→目标0.56）进行系统性根因诊断，识别并量化了五个关键实现差异，完成了严格对齐覆盖改造的代码层工作；二是对benchmark工具完成工程化升级，修复报告柱状图渲染bug、实现端到端GitHub Pages自动发布流水线与CLI交互上传功能。此外记录了一次英语托福口语练习（个人学习）。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-08T23:59:00-05:00">
+    <meta property="article:modified_time" content="2026-02-08T23:59:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Weekly Summary 2026-W06">
+  <meta name="twitter:description" content="本周（2026-02-06~07）工作集中在两条主线：一是对MIHD项目的staig_fusion与原始STAIG之间ARI性能差距（0.21→目标0.56）进行系统性根因诊断，识别并量化了五个关键实现差异，完成了严格对齐覆盖改造的代码层工作；二是对benchmark工具完成工程化升级，修复报告柱状图渲染bug、实现端到端GitHub Pages自动发布流水线与CLI交互上传功能。此外记录了一次英语托福口语练习（个人学习）。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Weekly Summaries",
+      "item": "https://tzj2006.github.io/bugjournal/weekly/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Weekly Summary 2026-W06",
+      "item": "https://tzj2006.github.io/bugjournal/weekly/2026-w06-weekly/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Weekly Summary 2026-W06",
+  "name": "Weekly Summary 2026-W06",
+  "description": "本周（2026-02-06~07）工作集中在两条主线：一是对MIHD项目的staig_fusion与原始STAIG之间ARI性能差距（0.21→目标0.56）进行系统性根因诊断，识别并量化了五个关键实现差异，完成了严格对齐覆盖改造的代码层工作；二是对benchmark工具完成工程化升级，修复报告柱状图渲染bug、实现端到端GitHub Pages自动发布流水线与CLI交互上传功能。此外记录了一次英语托福口语练习（个人学习）。",
+  "keywords": [
+    "Bug Journal", "Weekly Summary"
+  ],
+  "articleBody": "周报 — 2026-W06 (2026-02-02 ~ 2026-02-08) 本周（2026-02-06~07）工作集中在两条主线：一是对MIHD项目的staig_fusion与原始STAIG之间ARI性能差距（0.21→目标0.56）进行系统性根因诊断，识别并量化了五个关键实现差异，完成了严格对齐覆盖改造的代码层工作；二是对benchmark工具完成工程化升级，修复报告柱状图渲染bug、实现端到端GitHub Pages自动发布流水线与CLI交互上传功能。此外记录了一次英语托福口语练习（个人学习）。\n本周概览 指标 数值 日期范围 2026-02-02 ~ 2026-02-08 活跃天数 1 / 7 总对话数 2 涉及项目 2 完成任务 7 进行中任务 2 总 Token 88,552,896 总费用 $28.25 Claude Code Token 4,682,683 Claude Code 费用 $1.00 Codex Token 83,870,213 Codex 费用 $27.25 日均费用 $14.12 项目进展 MIHD / STAIG Fusion (1 天活跃) — 🔄 active 完成项:\n系统比对原始STAIG notebook与MIHD实现，识别出五个可量化的关键差异并按优先级排序 定位最关键根因：全分辨率图像（13332×13332）坐标仍乘hires缩放系数（0.15），patch取点严重偏离组织区域 完成staig_fusion严格语义对齐的代码改造（4个核心文件），实现默认mclust、HVG原始特征、STAIG超参数profile、空间majority vote refine 修复mclust不可用时静默降级为kmeans的问题，添加embedding形状前置验证 识别基因预处理顺序相反的问题（MIHD先HVG再normalize/log/scale，原始STAIG相反） 阻塞项:\n⚠️ 坐标尺度混用为最高优先级修复项，改造后运行时验证仍待执行 ⚠️ mclust dimension is zero根本原因（上游哪一步产生空embedding）待下次运行后确认 ⚠️ HPC环境未完整安装rpy2和R mclust包，静默降级风险尚未完全消除 Benchmark Tool（gadget） (1 天活跃) — 🔄 active 完成项:\n修复bar chart高分短柱渲染bug（锁定Plotly JS CDN版本、强制list类型、rangemode=‘tozero’） 实现完整GitHub Pages公开提交流水线：relay校验/去重/脱敏→repository_dispatch→队列文件→日批处理→自动部署 新增scripts/ingest_submissions.py（校验/去重/清洗）和scripts/submit_result.py 实现三条GitHub Actions工作流（accept-submission、daily-publish、pages-deploy） 为benchmark CLI添加交互式上传提示，支持–upload/–no-upload及环境变量配置 移除Historical Trends区块并修复AttributeError 阻塞项:\n⚠️ GPU利用率低问题（CPU/GPU双低，单线程I/O等待瓶颈）未完全解决，等待用户选择优化方案 英语学习（TOEFL） (1 天活跃) — 🔄 active 完成项:\n完成托福综合口语第4题练习（Bystander Effect），获得4.5/5评分 本周累计练习4道题，分数从3.5提升至4.5，主要短板为主谓一致语法错误 关键任务 ✅ 诊断STAIG fusion与原始STAIG的ARI/NMI性能差距 (2026-02-06) — 系统比对两套代码路径，识别并量化五个根因：①全分辨率图像坐标尺度混用（最关键）；②mclust静默降级为kmeans；③基因预处理顺序相反；④伪标签簇数300 vs 80；⑤超参数与图像transform差异 ✅ 实现GitHub Pages自动发布流水线 (2026-02-06) — 新增relay架构、三条GitHub Actions工作流，实现端到端公开数据收集、去重、清洗与自动发布 🔄 实现STAIG fusion严格对齐覆盖改造 (2026-02-06) — 修改4个核心文件实现严格STAIG语义对齐，语法验证通过，运行时遇mclust dimension错误，完整验证待进行 ✅ 修复benchmark报告柱状图渲染bug (2026-02-06) — 锁定Plotly JS CDN版本至3.3.1，将Series改为list，设置rangemode=‘tozero’，彻底修复高分短柱问题 🔄 修复mclust dimension is zero运行时错误 (2026-02-06) — 在Python层加embedding形状前置验证（2D、行列非零、样本数\u003e=簇数），根本原因待下次运行后确认 ✅ 为benchmark CLI添加交互式上传提示 (2026-02-06) — 运行结束后询问用户是否上传，支持–upload/–no-upload/–relay-url及BENCHMARK_RELAY_URL环境变量 问题与解决方案 1. MIHD staig_fusion的ARI（0.21/0.4849）远低于原始STAIG（0.562），根因不明 [MIHD / STAIG Fusion] (2026-02-06) 解决方案: 系统比对两套代码路径，识别五个根因并按优先级排序：①全分辨率图像（13332×13332）坐标仍乘hires缩放系数（0.15），patch取点严重偏离组织区域（最关键）；②mclust在HPC不可用致静默降级为kmeans；③基因预处理顺序相反；④伪标签簇数300 vs 80；⑤超参数未完整对齐\n2. Plotly bar chart渲染错误：高分对应短柱，视觉逻辑倒置 [Benchmark Tool] (2026-02-06) 解决方案: 根因为Plotly 6.x使用binary-encoded数组序列化，与旧版CDN不兼容。解决方案：锁定CDN版本与Python包版本一致（3.3.1），强制传入Python list，设置rangemode=‘tozero’\n3. strict STAIG模式强制覆盖视觉编码器为UNI，用户以为在用UNI2，行为不透明 [MIHD / STAIG Fusion] (2026-02-06) 解决方案: 在日志中加明确的编码器覆盖提示；UNI2进度条不显示是因为实际运行的是UNI\n4. create_trend_chart AttributeError：方法被注释但generate_html中仍有调用 [Benchmark Tool] (2026-02-06) 解决方案: 添加返回空图的存根方法并彻底移除调用方代码\n学习收获 架构 (architecture) GitHub Pages公开提交的正确分层架构：公共用户→relay（校验/限流/脱敏）→repository_dispatch→队列文件→日批处理（去重/清洗/append CSV）→commit/push→Pages自动部署。relay中间层是保护仓库写权限的关键隔离层 接口名称的语义必须与实际行为严格一致：‘staig_fusion’名字天然承诺了等同于STAIG的语义，允许默认行为有重大差异会造成大量隐性错误；全局覆盖行为（如强制编码器为UNI）必须在日志中明确提示 调试 (debugging) Plotly 6.x默认使用binary-encoded数组序列化，与旧版CDN不兼容时导致bar长度解析错误。解决方案：严格锁定CDN版本与Python包版本一致，强制传入Python list而非pandas Series CPU和GPU利用率同时低说明程序在单线程I/O等待，而非CPU是瓶颈；视觉特征提取的性能瓶颈通常在数据预处理（patch提取）而非模型forward pass R接口（如mclust）在Python中出错时信息不直观，应在Python端加充分前置验证并提供含shape信息的明确报错；R包不可用时若静默退化必须加明显警告，不能无提示地改变算法行为 领域知识 (domain) MIHD与原始STAIG存在五个可量化的关键实现差异（优先级排序）：①全分辨率图像坐标尺度混用（最关键）；②mclust静默降级；③基因预处理顺序相反；④伪标签簇数差异；⑤超参数与图像transform差异。ARI差距（0.21→0.56）主要由①②③决定 AI 使用备注 有效模式:\n✓ 系统性跨仓库代码比对：通过逐行对比两套代码库，量化识别多个实现差异，并按优先级排序 ✓ 多轮工具调用配合人类观察：AI发现坐标尺度问题（技术细节），用户发现UNI/UNI2编码器覆盖问题（运行时观察），形成互补 ✓ 架构设计补充：人类提出核心安全直觉（上传前确认、安全隔离），AI翻译为完整可执行的技术架构 局限性:\n✗ 修复操作不够彻底：删除趋势图时初次只移除调用未同时处理函数定义，需二次修复 ✗ 容易忽视已有的全局覆盖逻辑：添加UNI2 tqdm时未意识到strict模式会强制覆盖视觉编码器 ✗ 未预先检查HPC环境可用模块（如scanpy），导致验证遇ModuleNotFoundError，增加调试轮次 ✗ 对GPU利用率低问题给出多个方案选项，但未主动建议用profile工具（py-spy、nvprof）精确定位实际瓶颈 下周展望 下周最高优先级为验证STAIG严格对齐改造的运行时效果：①修复坐标尺度混用问题（全分辨率图像不应再乘hires缩放系数），这是ARI提升的最关键一步；②确认mclust dimension is zero的上游根因并修复；③安装rpy2和R mclust包以消除HPC环境静默降级风险。benchmark工具方面可选择性推进GPU利用率优化（DataLoader多进程或patch缓存预提取方案）。英语学习方面继续针对主谓一致等语法弱点进行针对性练习。\nToken 用量统计 每日费用趋势 日期 Token (百万) 费用 ($) 2026-02-06 51.6 16.44 unknown 36.9 11.81 峰值日: 2026-02-06 — $16.44 / 51.6M tokens\nClaude Code 指标 数值 总 Token 4,682,683 输入 Token 309 输出 Token 542 Cache 创建 459,558 Cache 读取 4,222,274 总费用 $1.00 模型使用分布 模型 费用 ($) 输入 Token 输出 Token claude-haiku-4-5-20251001 1.00 309 542 Codex 指标 数值 总 Token 83,870,213 输入 Token 83,524,009 输出 Token 346,204 推理 Token 156,104 Cache 读取 78,577,792 总费用 $27.25 模型使用分布 模型 费用 ($) 输入 Token 输出 Token 推理 Token gpt-5.3-codex 7.15 59,503,049 248,276 122,926 gpt-5.2-codex 4.96 24,020,960 97,928 33,178 ",
+  "wordCount" : "336",
+  "inLanguage": "en",
+  "datePublished": "2026-02-08T23:59:00-05:00",
+  "dateModified": "2026-02-08T23:59:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/weekly/2026-w06-weekly/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span>bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/weekly/">Weekly Summaries</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Weekly Summary 2026-W06
+    </h1>
+    <div class="post-meta"><span title='2026-02-08 23:59:00 -0500 EST'>February 8, 2026</span>&nbsp;·&nbsp;<span>2 min</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="周报--2026-w06-2026-02-02--2026-02-08">周报 — 2026-W06 (2026-02-02 ~ 2026-02-08)<a hidden class="anchor" aria-hidden="true" href="#周报--2026-w06-2026-02-02--2026-02-08">#</a></h1>
+<blockquote>
+<p>本周（2026-02-06~07）工作集中在两条主线：一是对MIHD项目的staig_fusion与原始STAIG之间ARI性能差距（0.21→目标0.56）进行系统性根因诊断，识别并量化了五个关键实现差异，完成了严格对齐覆盖改造的代码层工作；二是对benchmark工具完成工程化升级，修复报告柱状图渲染bug、实现端到端GitHub Pages自动发布流水线与CLI交互上传功能。此外记录了一次英语托福口语练习（个人学习）。</p>
+</blockquote>
+<h2 id="本周概览">本周概览<a hidden class="anchor" aria-hidden="true" href="#本周概览">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>日期范围</td>
+          <td>2026-02-02 ~ 2026-02-08</td>
+      </tr>
+      <tr>
+          <td>活跃天数</td>
+          <td>1 / 7</td>
+      </tr>
+      <tr>
+          <td>总对话数</td>
+          <td>2</td>
+      </tr>
+      <tr>
+          <td>涉及项目</td>
+          <td>2</td>
+      </tr>
+      <tr>
+          <td>完成任务</td>
+          <td>7</td>
+      </tr>
+      <tr>
+          <td>进行中任务</td>
+          <td>2</td>
+      </tr>
+      <tr>
+          <td>总 Token</td>
+          <td>88,552,896</td>
+      </tr>
+      <tr>
+          <td>总费用</td>
+          <td>$28.25</td>
+      </tr>
+      <tr>
+          <td>Claude Code Token</td>
+          <td>4,682,683</td>
+      </tr>
+      <tr>
+          <td>Claude Code 费用</td>
+          <td>$1.00</td>
+      </tr>
+      <tr>
+          <td>Codex Token</td>
+          <td>83,870,213</td>
+      </tr>
+      <tr>
+          <td>Codex 费用</td>
+          <td>$27.25</td>
+      </tr>
+      <tr>
+          <td>日均费用</td>
+          <td>$14.12</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="项目进展">项目进展<a hidden class="anchor" aria-hidden="true" href="#项目进展">#</a></h2>
+<h3 id="mihd--staig-fusion-1-天活跃---active">MIHD / STAIG Fusion (1 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#mihd--staig-fusion-1-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>系统比对原始STAIG notebook与MIHD实现，识别出五个可量化的关键差异并按优先级排序</li>
+<li>定位最关键根因：全分辨率图像（13332×13332）坐标仍乘hires缩放系数（0.15），patch取点严重偏离组织区域</li>
+<li>完成staig_fusion严格语义对齐的代码改造（4个核心文件），实现默认mclust、HVG原始特征、STAIG超参数profile、空间majority vote refine</li>
+<li>修复mclust不可用时静默降级为kmeans的问题，添加embedding形状前置验证</li>
+<li>识别基因预处理顺序相反的问题（MIHD先HVG再normalize/log/scale，原始STAIG相反）</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ 坐标尺度混用为最高优先级修复项，改造后运行时验证仍待执行</li>
+<li>⚠️ mclust dimension is zero根本原因（上游哪一步产生空embedding）待下次运行后确认</li>
+<li>⚠️ HPC环境未完整安装rpy2和R mclust包，静默降级风险尚未完全消除</li>
+</ul>
+<h3 id="benchmark-toolgadget-1-天活跃---active">Benchmark Tool（gadget） (1 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#benchmark-toolgadget-1-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>修复bar chart高分短柱渲染bug（锁定Plotly JS CDN版本、强制list类型、rangemode=&lsquo;tozero&rsquo;）</li>
+<li>实现完整GitHub Pages公开提交流水线：relay校验/去重/脱敏→repository_dispatch→队列文件→日批处理→自动部署</li>
+<li>新增scripts/ingest_submissions.py（校验/去重/清洗）和scripts/submit_result.py</li>
+<li>实现三条GitHub Actions工作流（accept-submission、daily-publish、pages-deploy）</li>
+<li>为benchmark CLI添加交互式上传提示，支持&ndash;upload/&ndash;no-upload及环境变量配置</li>
+<li>移除Historical Trends区块并修复AttributeError</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ GPU利用率低问题（CPU/GPU双低，单线程I/O等待瓶颈）未完全解决，等待用户选择优化方案</li>
+</ul>
+<h3 id="英语学习toefl-1-天活跃---active">英语学习（TOEFL） (1 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#英语学习toefl-1-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>完成托福综合口语第4题练习（Bystander Effect），获得4.5/5评分</li>
+<li>本周累计练习4道题，分数从3.5提升至4.5，主要短板为主谓一致语法错误</li>
+</ul>
+<h2 id="关键任务">关键任务<a hidden class="anchor" aria-hidden="true" href="#关键任务">#</a></h2>
+<ul>
+<li>✅ <strong>诊断STAIG fusion与原始STAIG的ARI/NMI性能差距</strong> (2026-02-06) — 系统比对两套代码路径，识别并量化五个根因：①全分辨率图像坐标尺度混用（最关键）；②mclust静默降级为kmeans；③基因预处理顺序相反；④伪标签簇数300 vs 80；⑤超参数与图像transform差异</li>
+<li>✅ <strong>实现GitHub Pages自动发布流水线</strong> (2026-02-06) — 新增relay架构、三条GitHub Actions工作流，实现端到端公开数据收集、去重、清洗与自动发布</li>
+<li>🔄 <strong>实现STAIG fusion严格对齐覆盖改造</strong> (2026-02-06) — 修改4个核心文件实现严格STAIG语义对齐，语法验证通过，运行时遇mclust dimension错误，完整验证待进行</li>
+<li>✅ <strong>修复benchmark报告柱状图渲染bug</strong> (2026-02-06) — 锁定Plotly JS CDN版本至3.3.1，将Series改为list，设置rangemode=&lsquo;tozero&rsquo;，彻底修复高分短柱问题</li>
+<li>🔄 <strong>修复mclust dimension is zero运行时错误</strong> (2026-02-06) — 在Python层加embedding形状前置验证（2D、行列非零、样本数&gt;=簇数），根本原因待下次运行后确认</li>
+<li>✅ <strong>为benchmark CLI添加交互式上传提示</strong> (2026-02-06) — 运行结束后询问用户是否上传，支持&ndash;upload/&ndash;no-upload/&ndash;relay-url及BENCHMARK_RELAY_URL环境变量</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="1-mihd-staig_fusion的ari02104849远低于原始staig0562根因不明-mihd--staig-fusion-2026-02-06">1. MIHD staig_fusion的ARI（0.21/0.4849）远低于原始STAIG（0.562），根因不明 [MIHD / STAIG Fusion] (2026-02-06)<a hidden class="anchor" aria-hidden="true" href="#1-mihd-staig_fusion的ari02104849远低于原始staig0562根因不明-mihd--staig-fusion-2026-02-06">#</a></h3>
+<p><strong>解决方案:</strong> 系统比对两套代码路径，识别五个根因并按优先级排序：①全分辨率图像（13332×13332）坐标仍乘hires缩放系数（0.15），patch取点严重偏离组织区域（最关键）；②mclust在HPC不可用致静默降级为kmeans；③基因预处理顺序相反；④伪标签簇数300 vs 80；⑤超参数未完整对齐</p>
+<h3 id="2-plotly-bar-chart渲染错误高分对应短柱视觉逻辑倒置-benchmark-tool-2026-02-06">2. Plotly bar chart渲染错误：高分对应短柱，视觉逻辑倒置 [Benchmark Tool] (2026-02-06)<a hidden class="anchor" aria-hidden="true" href="#2-plotly-bar-chart渲染错误高分对应短柱视觉逻辑倒置-benchmark-tool-2026-02-06">#</a></h3>
+<p><strong>解决方案:</strong> 根因为Plotly 6.x使用binary-encoded数组序列化，与旧版CDN不兼容。解决方案：锁定CDN版本与Python包版本一致（3.3.1），强制传入Python list，设置rangemode=&lsquo;tozero&rsquo;</p>
+<h3 id="3-strict-staig模式强制覆盖视觉编码器为uni用户以为在用uni2行为不透明-mihd--staig-fusion-2026-02-06">3. strict STAIG模式强制覆盖视觉编码器为UNI，用户以为在用UNI2，行为不透明 [MIHD / STAIG Fusion] (2026-02-06)<a hidden class="anchor" aria-hidden="true" href="#3-strict-staig模式强制覆盖视觉编码器为uni用户以为在用uni2行为不透明-mihd--staig-fusion-2026-02-06">#</a></h3>
+<p><strong>解决方案:</strong> 在日志中加明确的编码器覆盖提示；UNI2进度条不显示是因为实际运行的是UNI</p>
+<h3 id="4-create_trend_chart-attributeerror方法被注释但generate_html中仍有调用-benchmark-tool-2026-02-06">4. create_trend_chart AttributeError：方法被注释但generate_html中仍有调用 [Benchmark Tool] (2026-02-06)<a hidden class="anchor" aria-hidden="true" href="#4-create_trend_chart-attributeerror方法被注释但generate_html中仍有调用-benchmark-tool-2026-02-06">#</a></h3>
+<p><strong>解决方案:</strong> 添加返回空图的存根方法并彻底移除调用方代码</p>
+<h2 id="学习收获">学习收获<a hidden class="anchor" aria-hidden="true" href="#学习收获">#</a></h2>
+<h3 id="架构-architecture">架构 (architecture)<a hidden class="anchor" aria-hidden="true" href="#架构-architecture">#</a></h3>
+<ul>
+<li>GitHub Pages公开提交的正确分层架构：公共用户→relay（校验/限流/脱敏）→repository_dispatch→队列文件→日批处理（去重/清洗/append CSV）→commit/push→Pages自动部署。relay中间层是保护仓库写权限的关键隔离层</li>
+<li>接口名称的语义必须与实际行为严格一致：&lsquo;staig_fusion&rsquo;名字天然承诺了等同于STAIG的语义，允许默认行为有重大差异会造成大量隐性错误；全局覆盖行为（如强制编码器为UNI）必须在日志中明确提示</li>
+</ul>
+<h3 id="调试-debugging">调试 (debugging)<a hidden class="anchor" aria-hidden="true" href="#调试-debugging">#</a></h3>
+<ul>
+<li>Plotly 6.x默认使用binary-encoded数组序列化，与旧版CDN不兼容时导致bar长度解析错误。解决方案：严格锁定CDN版本与Python包版本一致，强制传入Python list而非pandas Series</li>
+<li>CPU和GPU利用率同时低说明程序在单线程I/O等待，而非CPU是瓶颈；视觉特征提取的性能瓶颈通常在数据预处理（patch提取）而非模型forward pass</li>
+<li>R接口（如mclust）在Python中出错时信息不直观，应在Python端加充分前置验证并提供含shape信息的明确报错；R包不可用时若静默退化必须加明显警告，不能无提示地改变算法行为</li>
+</ul>
+<h3 id="领域知识-domain">领域知识 (domain)<a hidden class="anchor" aria-hidden="true" href="#领域知识-domain">#</a></h3>
+<ul>
+<li>MIHD与原始STAIG存在五个可量化的关键实现差异（优先级排序）：①全分辨率图像坐标尺度混用（最关键）；②mclust静默降级；③基因预处理顺序相反；④伪标签簇数差异；⑤超参数与图像transform差异。ARI差距（0.21→0.56）主要由①②③决定</li>
+</ul>
+<h2 id="ai-使用备注">AI 使用备注<a hidden class="anchor" aria-hidden="true" href="#ai-使用备注">#</a></h2>
+<p><strong>有效模式:</strong></p>
+<ul>
+<li>✓ 系统性跨仓库代码比对：通过逐行对比两套代码库，量化识别多个实现差异，并按优先级排序</li>
+<li>✓ 多轮工具调用配合人类观察：AI发现坐标尺度问题（技术细节），用户发现UNI/UNI2编码器覆盖问题（运行时观察），形成互补</li>
+<li>✓ 架构设计补充：人类提出核心安全直觉（上传前确认、安全隔离），AI翻译为完整可执行的技术架构</li>
+</ul>
+<p><strong>局限性:</strong></p>
+<ul>
+<li>✗ 修复操作不够彻底：删除趋势图时初次只移除调用未同时处理函数定义，需二次修复</li>
+<li>✗ 容易忽视已有的全局覆盖逻辑：添加UNI2 tqdm时未意识到strict模式会强制覆盖视觉编码器</li>
+<li>✗ 未预先检查HPC环境可用模块（如scanpy），导致验证遇ModuleNotFoundError，增加调试轮次</li>
+<li>✗ 对GPU利用率低问题给出多个方案选项，但未主动建议用profile工具（py-spy、nvprof）精确定位实际瓶颈</li>
+</ul>
+<h2 id="下周展望">下周展望<a hidden class="anchor" aria-hidden="true" href="#下周展望">#</a></h2>
+<p>下周最高优先级为验证STAIG严格对齐改造的运行时效果：①修复坐标尺度混用问题（全分辨率图像不应再乘hires缩放系数），这是ARI提升的最关键一步；②确认mclust dimension is zero的上游根因并修复；③安装rpy2和R mclust包以消除HPC环境静默降级风险。benchmark工具方面可选择性推进GPU利用率优化（DataLoader多进程或patch缓存预提取方案）。英语学习方面继续针对主谓一致等语法弱点进行针对性练习。</p>
+<h2 id="token-用量统计">Token 用量统计<a hidden class="anchor" aria-hidden="true" href="#token-用量统计">#</a></h2>
+<h3 id="每日费用趋势">每日费用趋势<a hidden class="anchor" aria-hidden="true" href="#每日费用趋势">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>日期</th>
+          <th>Token (百万)</th>
+          <th>费用 ($)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2026-02-06</td>
+          <td>51.6</td>
+          <td>16.44</td>
+      </tr>
+      <tr>
+          <td>unknown</td>
+          <td>36.9</td>
+          <td>11.81</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>峰值日:</strong> 2026-02-06 — $16.44 / 51.6M tokens</p>
+<h3 id="claude-code">Claude Code<a hidden class="anchor" aria-hidden="true" href="#claude-code">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>4,682,683</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>309</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>542</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>459,558</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>4,222,274</td>
+      </tr>
+      <tr>
+          <td>总费用</td>
+          <td>$1.00</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="模型使用分布">模型使用分布<a hidden class="anchor" aria-hidden="true" href="#模型使用分布">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>费用 ($)</th>
+          <th>输入 Token</th>
+          <th>输出 Token</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>1.00</td>
+          <td>309</td>
+          <td>542</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="codex">Codex<a hidden class="anchor" aria-hidden="true" href="#codex">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>83,870,213</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>83,524,009</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>346,204</td>
+      </tr>
+      <tr>
+          <td>推理 Token</td>
+          <td>156,104</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>78,577,792</td>
+      </tr>
+      <tr>
+          <td>总费用</td>
+          <td>$27.25</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="模型使用分布-1">模型使用分布<a hidden class="anchor" aria-hidden="true" href="#模型使用分布-1">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>费用 ($)</th>
+          <th>输入 Token</th>
+          <th>输出 Token</th>
+          <th>推理 Token</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>gpt-5.3-codex</td>
+          <td>7.15</td>
+          <td>59,503,049</td>
+          <td>248,276</td>
+          <td>122,926</td>
+      </tr>
+      <tr>
+          <td>gpt-5.2-codex</td>
+          <td>4.96</td>
+          <td>24,020,960</td>
+          <td>97,928</td>
+          <td>33,178</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
