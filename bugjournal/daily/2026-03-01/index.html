@@ -7,13 +7,10 @@
 <meta name="robots" content="index, follow">
 <title>Bug Journal 2026-03-01 | TzJ&#39;s Net</title>
 <meta name="keywords" content="Bug Journal">
-<meta name="description" content="三台设备并行推进：DCC完成VisiumHD crop10large三源annotation对比可视化（Pathologist/STHD/STAIG Fusion，Silhouette=0.343）与MIHD仓库六阶段大规模重构（删除41个死文件，修复drop_feature语义bug，440个实验dry_run验证通过）；天河完成BC-RNN Stack_D0错误注入流水线（11个tip_over场景&#43;MP4）、Pi0.5 Phoenix九任务基准评测（整体SR 4.2%）、诊断Coffee零成功率根因（缺失57维object观测键）并修复，最终成功启动Pi0.5 LoRA六GPU并行训练（77.7GB/100%利用率）；MacBook修复daily_summary工具逻辑（finalize机制&#43;&ndash;sync逐天处理）、批量生成13&#43;天历史日报，并完成Desktop Video播放模式三个Bug修复与Liquid Glass UI重设计。">
+<meta name="description" content="跨 DCC 和 tianhe 双服务器并行推进四个项目：DCC 完成 VisiumHD 三种 annotation 可视化与 STAIG fusion 多模态运行（Silhouette 0.343），并对 MIHD 仓库实施 6 阶段大规模清理重构（删除 ~250K 代码）；tianhe 完成 Pi0.5 9任务基础模型评估（4.2% SR）、定位修复 Coffee BC-RNN object 观测键缺失、开发 BC-RNN Stack_D0 错误场景生成流水线（修复4层图像 bug 生成11个场景），并修复4个启动 bug 后成功以 6×A800 GPU 100% 利用率启动 Pi0.5 LoRA 9任务并行微调。">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-01/">
-
-<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-  <meta name="referrer" content="no-referrer-when-downgrade">
-<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.5d8457bde854c92d430fe3a1fe97e1568cd5ec227da794125f7f55b439dd2cec.css" integrity="sha256-XYRXvehUyS1DD&#43;Oh/pfhVozV7CJ9p5QSX39VtDndLOw=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.74275d3de94d719fb7098f21c29c7cbda35c9c6ca6621dbdcbd629ecff2aa1ac.css" integrity="sha256-dCddPelNcZ&#43;3CY8hwpx8vaNcnGymYh29y9Yp7P8qoaw=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://tzj2006.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
@@ -73,36 +70,10 @@
         document.querySelector("html").dataset.theme = 'light';
     }
 
-</script>
-
-<script type="text/javascript" async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-</script>
-
-
-<script src="https://tzj2006.github.io/js/checkbox-state.min.481208bf28be32dd7419d90065130144ba9a464a94857de0dc07fd19d3f2f6f3.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css" integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ" crossorigin="anonymous">
-
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js" integrity="sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY" crossorigin="anonymous"></script>
-
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js" integrity="sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR" crossorigin="anonymous"
-    onload="renderMathInElement(document.body);"></script>
-
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderMathInElement(document.body, {
-        delimiters: [
-            {left: "$$", right: "$$", display: true},
-            {left: "$", right: "$", display: false}
-        ]
-    });
-});
-</script>
-<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-01/">
+</script><meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-01/">
   <meta property="og:site_name" content="TzJ&#39;s Net">
   <meta property="og:title" content="Bug Journal 2026-03-01">
-  <meta property="og:description" content="三台设备并行推进：DCC完成VisiumHD crop10large三源annotation对比可视化（Pathologist/STHD/STAIG Fusion，Silhouette=0.343）与MIHD仓库六阶段大规模重构（删除41个死文件，修复drop_feature语义bug，440个实验dry_run验证通过）；天河完成BC-RNN Stack_D0错误注入流水线（11个tip_over场景&#43;MP4）、Pi0.5 Phoenix九任务基准评测（整体SR 4.2%）、诊断Coffee零成功率根因（缺失57维object观测键）并修复，最终成功启动Pi0.5 LoRA六GPU并行训练（77.7GB/100%利用率）；MacBook修复daily_summary工具逻辑（finalize机制&#43;–sync逐天处理）、批量生成13&#43;天历史日报，并完成Desktop Video播放模式三个Bug修复与Liquid Glass UI重设计。">
+  <meta property="og:description" content="跨 DCC 和 tianhe 双服务器并行推进四个项目：DCC 完成 VisiumHD 三种 annotation 可视化与 STAIG fusion 多模态运行（Silhouette 0.343），并对 MIHD 仓库实施 6 阶段大规模清理重构（删除 ~250K 代码）；tianhe 完成 Pi0.5 9任务基础模型评估（4.2% SR）、定位修复 Coffee BC-RNN object 观测键缺失、开发 BC-RNN Stack_D0 错误场景生成流水线（修复4层图像 bug 生成11个场景），并修复4个启动 bug 后成功以 6×A800 GPU 100% 利用率启动 Pi0.5 LoRA 9任务并行微调。">
   <meta property="og:locale" content="en_us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="bugjournal">
@@ -111,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Bug Journal 2026-03-01">
-  <meta name="twitter:description" content="三台设备并行推进：DCC完成VisiumHD crop10large三源annotation对比可视化（Pathologist/STHD/STAIG Fusion，Silhouette=0.343）与MIHD仓库六阶段大规模重构（删除41个死文件，修复drop_feature语义bug，440个实验dry_run验证通过）；天河完成BC-RNN Stack_D0错误注入流水线（11个tip_over场景&#43;MP4）、Pi0.5 Phoenix九任务基准评测（整体SR 4.2%）、诊断Coffee零成功率根因（缺失57维object观测键）并修复，最终成功启动Pi0.5 LoRA六GPU并行训练（77.7GB/100%利用率）；MacBook修复daily_summary工具逻辑（finalize机制&#43;–sync逐天处理）、批量生成13&#43;天历史日报，并完成Desktop Video播放模式三个Bug修复与Liquid Glass UI重设计。">
+  <meta name="twitter:description" content="跨 DCC 和 tianhe 双服务器并行推进四个项目：DCC 完成 VisiumHD 三种 annotation 可视化与 STAIG fusion 多模态运行（Silhouette 0.343），并对 MIHD 仓库实施 6 阶段大规模清理重构（删除 ~250K 代码）；tianhe 完成 Pi0.5 9任务基础模型评估（4.2% SR）、定位修复 Coffee BC-RNN object 观测键缺失、开发 BC-RNN Stack_D0 错误场景生成流水线（修复4层图像 bug 生成11个场景），并修复4个启动 bug 后成功以 6×A800 GPU 100% 利用率启动 Pi0.5 LoRA 9任务并行微调。">
 
 
 <script type="application/ld+json">
@@ -146,12 +117,12 @@ document.addEventListener("DOMContentLoaded", function() {
   "@type": "BlogPosting",
   "headline": "Bug Journal 2026-03-01",
   "name": "Bug Journal 2026-03-01",
-  "description": "三台设备并行推进：DCC完成VisiumHD crop10large三源annotation对比可视化（Pathologist/STHD/STAIG Fusion，Silhouette=0.343）与MIHD仓库六阶段大规模重构（删除41个死文件，修复drop_feature语义bug，440个实验dry_run验证通过）；天河完成BC-RNN Stack_D0错误注入流水线（11个tip_over场景+MP4）、Pi0.5 Phoenix九任务基准评测（整体SR 4.2%）、诊断Coffee零成功率根因（缺失57维object观测键）并修复，最终成功启动Pi0.5 LoRA六GPU并行训练（77.7GB/100%利用率）；MacBook修复daily_summary工具逻辑（finalize机制+\u0026ndash;sync逐天处理）、批量生成13+天历史日报，并完成Desktop Video播放模式三个Bug修复与Liquid Glass UI重设计。",
+  "description": "跨 DCC 和 tianhe 双服务器并行推进四个项目：DCC 完成 VisiumHD 三种 annotation 可视化与 STAIG fusion 多模态运行（Silhouette 0.343），并对 MIHD 仓库实施 6 阶段大规模清理重构（删除 ~250K 代码）；tianhe 完成 Pi0.5 9任务基础模型评估（4.2% SR）、定位修复 Coffee BC-RNN object 观测键缺失、开发 BC-RNN Stack_D0 错误场景生成流水线（修复4层图像 bug 生成11个场景），并修复4个启动 bug 后成功以 6×A800 GPU 100% 利用率启动 Pi0.5 LoRA 9任务并行微调。",
   "keywords": [
     "Bug Journal"
   ],
-  "articleBody": "日报 — 2026-03-01 三台设备并行推进：DCC完成VisiumHD crop10large三源annotation对比可视化（Pathologist/STHD/STAIG Fusion，Silhouette=0.343）与MIHD仓库六阶段大规模重构（删除41个死文件，修复drop_feature语义bug，440个实验dry_run验证通过）；天河完成BC-RNN Stack_D0错误注入流水线（11个tip_over场景+MP4）、Pi0.5 Phoenix九任务基准评测（整体SR 4.2%）、诊断Coffee零成功率根因（缺失57维object观测键）并修复，最终成功启动Pi0.5 LoRA六GPU并行训练（77.7GB/100%利用率）；MacBook修复daily_summary工具逻辑（finalize机制+–sync逐天处理）、批量生成13+天历史日报，并完成Desktop Video播放模式三个Bug修复与Liquid Glass UI重设计。\n今日任务 架构与策略 ✅ MIHD仓库六阶段大规模清理重构（DCC） — 执行预先规划的六阶段重构：Phase 1删除30+死文件（~250K代码+5.3MB图片）；Phase 2从3488行run_benchmark.py monolith提取共享函数至utils/data_loader、models/staig_utils（新建）、models/vision_extractors（新建）、models/Fusion、utils/clustering；Phase 3删除run_benchmark.py及5个依赖模型；Phase 4提取STAIG公共函数并修复BasicContrastive.py的drop_feature逻辑bug（\u003e= 改为 \u003c）；Phase 5-6更新所有文档，pipeline dry_run验证通过（440个实验计划）。人类在计划阶段通过grep逐一验证41个文件导入关系并制定精确迁移表，是整个重构成功的关键前提。 ✅ Coffee BC-RNN 0% SR根因诊断与修复（tianhe） — 定位Coffee D0/D1在600 epoch训练中成功率始终为0的根因：BC-RNN配置模板缺少Coffee任务必需的object键（57维物体状态，包含pod和pod_holder相对位姿）。通过h5py数据集查验确认所有9个任务均含该键，在TASK_DEFS中添加extra_low_dim=[“object”]，修改cmd_generate_configs支持per-task观测覆盖，重新生成9个配置文件。另外发现Coffee环境初始化存在物体穿模/卡住的独立环境bug，需单独修复。 ✅ VisiumHD crop10large 三源annotation对比可视化（DCC） — 实现三层次annotation可视化体系：(1) Pathologist annotation——发现r_big//4坐标映射规则，将Zenodo CSV以100%匹配率映射到17502个8um bins，生成H\u0026E+annotation双面板，识别Neoplasm/Connective Tissue/Non-neoplastic Epithelium/Smooth Muscle四类；(2) STHD细胞类型预测——将276968个2um bin的85种细胞类型通过majority vote聚合至8um粒度，96.3%匹配率；(3) STAIG多模态融合聚类——经5轮bug修复（路径、坐标加载、mclust fallback、stdout buffering）成功完成PCA gene+UNI2 vision+STAIG GCN fusion，300 epochs，Silhouette=0.343。scGPT可视化从mclust（预计6小时）切换为KMeans，2分钟完成11个section（ARI=0.1695）。同步改进STHD和MIHD的CLAUDE.md。 ✅ BC-RNN Stack_D0 错误注入与可视化流水线（tianhe） — 修复BC-RNN视觉策略推理三个关键配置bug（相机使能、84×84分辨率、HWC→CHW转置），创建benchmark_v4_stack.yaml配置，修改2_visualize_scene.py支持policy场景（NPZ加载、跳过demo replay），创建batch_visualize_policy_scenes.py，成功从50次rollout生成11个tip_over错误场景并批量渲染为MP4。使用srun –overlap复用已有interactive job资源。 ✅ Pi0.5 Phoenix全任务基准评测（tianhe/DCC） — 完成Pi0.5 Phoenix（step 99999）在9个MimicGen任务各50 episodes的评估：Stack_D0 24%、Stack_D1 12%，Coffee/StackThree/ThreePieceAssembly均接近0%，整体SR 4.2%（19/450）。确认此为预训练基线权重的零样本迁移性能，两次Pi0.5 fine-tune任务（Job 46551/46553）均未完成100k步，需重新训练。 ✅ Pi0.5 LoRA微调管线搭建与6GPU并行训练启动（tianhe） — 创建scripts/train_pi05_benchmark.py（convert-data/compute-norms/train/eval/report五种子命令）；在lipeida/openpi的config.py注册18个训练/推理config（9任务×finetune+inference）；完成9个MimicGen→LeRobot v2.1格式转换，batch转换段错误后改为逐个运行；验证coffee_d0 norm_stats（223K帧，8D state，7D action）；修复训练启动4个连续bug（JAX_PLATFORMS=cpu缺失、norm_stats路径错误、–no-overwrite标志形式、WANDB_MODE=disabled）；最终6个任务在GPU 1-6以XLA_PYTHON_CLIENT_MEM_FRACTION=0.95并行运行（77.7GB显存/100%利用率）。 ✅ Desktop Video播放模式Bug修复与UI优化（MacBook） — 修复三个联动Bug：(1) PowerSave/PowerSave+新窗口创建时仅处理当前屏幕，改为委托全局评估；(2) Automatic模式缺少低电量感知，注册NSProcessInfoPowerStateDidChange，低电量时切换省电+行为（anyOverlayCompletelyCovered阈值）；(3) 将updatePlaybackStateForAllScreens()移入AppState.playbackMode.didSet实现单一真相源。UI优化：移除GeneralSettingsView中与PlaybackSettingsView重复的控件；重设计CombinedGlassClock为macOS Tahoe原生风格（.regular glass、独立胶囊容器、去阴影）；统一4处时钟定位常量（clockVerticalPositionFactor=0.85）；改用dateFormat(fromTemplate:)区域感知日期格式。xcodebuild全部通过。 ✅ daily_summary工具改进（MacBook） — 实现merge finalize机制（双重条件：date",
-  "wordCount" : "511",
+  "articleBody": "日报 — 2026-03-01 今日概览 做了什么： 跨 DCC/tianhe 双服务器推进空间转录组学工具链（STHD/MIHD）和机器人学习基准（Error Recovery Benchmark）：DCC 聚焦 VisiumHD 多模态数据分析与仓库架构重构，tianhe 聚焦模型评估、配置缺陷修复、错误场景生成与 Pi0.5 LoRA 微调启动。 怎么做的： DCC 通过 grep 依赖分析→批量迁移→dry_run 验证的安全重构流程，以及修复4处 HD 路径适配 bug 完成多模态 pipeline；tianhe 通过 TensorBoard API 监控训练、HDF5 数据集结构对比定位配置缺陷、迭代调试图像格式适配，以及逐步修复 JAX 环境变量等4个训练启动 bug。 有什么用： MIHD 仓库完成大规模精简（删除41文件/~250K代码），确立清晰模块架构；Coffee BC-RNN 缺陷根因定位并修复；Pi0.5 LoRA 9任务并行训练在 6×A800 上稳定运行；Error Recovery Benchmark 获得首批 BC-RNN 高成功率数据和 Pi0.5 基线评估，基础设施文档体系完整建立。 DCC 做了什么： 完成 STHD CLAUDE.md 深度改进、VisiumHD 三种 annotation 可视化（病理学家/STHD/STAIG）、MIHD pipeline HD 适配 bug 修复、STAIG fusion 端到端运行、scGPT 11切片 KMeans 可视化、MIHD 6阶段清理重构、2026-02-28 日报补写。 怎么做的： 逐步调试 HD 数据路径（发现 r_big//4 映射规律）、修复 vision encoder/fusion/mclust 等4处问题；重构按「grep验证→建新模块→更新引用→删旧文件」顺序，dry_run 验证440个实验计划通过；用 KMeans 替换不可用的 mclust。 有什么用： MIHD 首次在 VisiumHD 上完成 pca×uni2×staig_fusion 多模态融合（Silhouette=0.343 vs PCA 0.086）；仓库删除41文件/~250K代码+5.3MB图片，drop_feature bug 修复；scGPT 11切片可视化从预计6+小时压缩至2分钟。 tianhe 做了什么： 完成 Pi0.5 9任务基础模型评估（4.2% SR）、Coffee BC-RNN object 观测键缺失修复、BC-RNN Stack_D0 错误场景生成流水线开发（11个场景+MP4）、~530GB GPU VRAM 清理、BC-RNN 9任务训练监控、项目文件 v4.17/v4.18 整理、Pi0.5 LoRA 9任务并行微调成功启动（修复4个bug）。 怎么做的： 通过 SLURM srun –overlap 在 an49 节点执行 GPU 任务；对比 HDF5 数据集结构定位 Coffee 配置缺陷；迭代修复 robomimic BC-RNN 图像观测4层问题；修复 JAX_PLATFORMS/norm_stats路径/布尔参数/W\u0026B 4个训练启动 bug；使用 CPU+子采样+并行将 norm_stats 计算从10+分钟降至2.5分钟。 有什么用： BC-RNN Stack 任务 epoch 22 即达64% SR，验证数据质量；Coffee 缺陷修复为复杂任务重训奠定基础；Pi0.5 LoRA 在 6×A800（77.7GB/卡，利用率100%）稳定运行，9任务微调基础设施完整搭建。 跨 DCC 和 tianhe 双服务器并行推进四个项目：DCC 完成 VisiumHD 三种 annotation 可视化与 STAIG fusion 多模态运行（Silhouette 0.343），并对 MIHD 仓库实施 6 阶段大规模清理重构（删除 ~250K 代码）；tianhe 完成 Pi0.5 9任务基础模型评估（4.2% SR）、定位修复 Coffee BC-RNN object 观测键缺失、开发 BC-RNN Stack_D0 错误场景生成流水线（修复4层图像 bug 生成11个场景），并修复4个启动 bug 后成功以 6×A800 GPU 100% 利用率启动 Pi0.5 LoRA 9任务并行微调。\n今日任务 架构与策略 ✅ VisiumHD barcode映射发现与三种annotation可视化 — 发现 r_big//4 映射规律（17502/17502 完整匹配），生成病理学家annotation（4种组织类型：Neoplasm 48.6%/Connective 29.5%等）、STHD细胞类型（85类→11粗类 majority vote，96.3%匹配）、STAIG fusion聚类三种对比可视化，建立 VisiumHD 数据分析基线。 ✅ MIHD pipeline HD数据集适配与STAIG fusion端到端运行 — 修复4处 HD 路径适配 bug（find_spatial_image 增加 cropped_fullres.tif 模式、vision encoder data_root 传递、fusion 阶段 spatial coords 加载、mclust→KMeans fallback），完成 VisiumHD crop10large 的 pca×uni2×staig_fusion 全流程（patch提取5.5分钟、UNI2 GPU推理5分钟、STAIG训练6分钟，Silhouette=0.343）。 ✅ MIHD仓库6阶段清理重构（删除~250K代码） — Phase1 删除41个死文件（~250K代码+5.3MB图片）；Phase2 将 run_benchmark.py 共享函数迁移至6个模块（staig_utils、vision_extractors、Fusion、clustering等），更新全部 pipeline/ 导入；Phase3 删除 run_benchmark.py 单体及5个依赖模型；Phase4 提取 STAIG 公共代码并修复 BasicContrastive 的 drop_feature 逻辑反转 bug（\u003e= 改为 \u003c）；Phase5 更新全部文档；Phase6 dry_run 验证440个实验通过。 ✅ Coffee BC-RNN配置缺陷定位与修复（object观测键） — 通过对比 HDF5 数据集实际 obs 键结构，AI 独立发现 BC-RNN 配置模板缺失 object 观测键（Coffee 需57维物体状态：Pod/Machine/Holder位置+相对姿态+铰链角），为全部9个任务添加 extra_low_dim=[‘object’]，重新生成并验证全部配置文件，修复 Coffee 0% SR 的根本原因。 ✅ BC-RNN Stack_D0错误场景生成流水线开发 — 修复 robomimic BC-RNN 图像观测接入的4层连续 bug（enable_camera 检测、json.loads 解析 checkpoint config、84×84分辨率自动检测、HWC→CHW转置+float32归一化），创建 configs/benchmark_v4_stack.yaml 和 scripts/batch_visualize_policy_scenes.py，最终生成11个 tip_over 错误场景和11个 MP4 可视化视频。 ✅ Pi0.5 LoRA 9任务微调流水线搭建与成功启动 — 创建 train_pi05_benchmark.py（5子命令），向 openpi/config.py 注册18个配置（9 finetune+9 inference），修复 vla_server.py 的 IMAGE_KEY_MAP 前缀匹配缺陷；完成9个任务 HDF5→LeRobot 数据转换（逐任务避免OOM segfault），CPU并行+子采样在2.5分钟内完成全部 norm_stats；修复4个启动 bug（JAX_PLATFORMS=cpu、assets路径、–no-overwrite、WANDB_MODE=disabled），以 GPU 1-6、XLA_MEM=95% 成功启动6任务并行训练（GPU利用率100%，77.7GB/卡）。 ✅ Pi0.5 Phoenix 9任务基础模型评估 — 监控9个 MimicGen 任务各50次 rollout 评估，获取最终结果：总SR=4.2%（19/450），Stack_D0（24%）和 Stack_D1（12%）有实质成功，其余7个任务0-2%；确认第三次训练已成功完成至99999步（前两次因 SLURM 时限和 orbax 冲突失败）。 🔄 Coffee BC-RNN rollout可视化与环境初始化问题排查 — 生成 coffee_d0 rollout 视频（742KB），用户观看后发现环境初始化存在物体穿模/卡死问题（simulator bug 而非模型问题），开始调查 Coffee env kwargs 但会话截断，修复未完成。 实现与修复 ✅ GPU VRAM清理与BC-RNN 9任务训练监控 — 发现并清理 an49 节点约530GB 闲置 VRAM（zhaoganlong Phoenix serve_policy 407GB + 两个旧VLA server各61GB）；监控9个 BC-RNN 任务：stack_d0（64%@epoch22）、stack_d1（44%）、coffee（0%）、stack_three/threading/three_piece_assembly 均达58-96%@epoch300-420。 ✅ 基础设施参考文档创建与项目文件整理v4.17/v4.18 — 创建 docs/infrastructure_reference.md（649场景/9类错误/6检测器/4注入器/完整 pipeline 流程图，13章节）；v4.17 整理：archive/ 四层目录归档旧文件，合并 VLM 教程，创建 EXTERNAL_DEPENDENCIES.md；v4.18 整理：提取 create_env()/load_task_registry() 到 script_utils.py（消除~210行重复代码），更新 CLAUDE.md 新增 M14 评估命令说明。 ✅ scGPT 11切片 KMeans 可视化 — 终止耗时的 mclust 任务（已运行2小时完成2/11），改用 KMeans 在2分钟内完成全部11个 DLPFC 切片，平均 ARI=0.1695，NMI=0.2772。 ✅ STHD CLAUDE.md 深度改进 — 分析 STHD 所有核心模块，补充之前遗漏的6个模块说明（frontline.py、qcmask.py 等）、概率模型优化目标、Numba JIT 细节、pdata TSV 格式和 patch 重叠处理逻辑。 ✅ 2026-02-28日报补写（MIHD实验指标与可视化） — 补充第五章实验结果汇总和第六章输出文件清单，包含151673多模态 benchmark 表格、Vision Refinement 前后对比、60+张可视化超链接。 问题与解决方案 关键问题 1. VisiumHD HD数据集路径适配：vision encoder 图像路径、spatial coords 加载、fusion 阶段多处查找均假设 DLPFC 目录结构而失败 解决方案: 三处修复：find_spatial_image() 增加 cropped_fullres.tif 模式识别；vision encoder 调用时将 crop_dir.parent 作为 data_root；fusion 阶段直接从 adata.obsm[‘spatial’] 加载坐标绕过路径查找\n关键洞察: pipeline 设计假设 DLPFC 扁平目录结构（data_root/section_id/），HD 数据需在调用层做映射而非修改 encoder 内部逻辑；路径抽象层设计应预留对不同数据集结构的适配接口\n2. 长时间任务进度不可见：GPU利用率0%但显存满载，无法判断是CPU瓶颈还是模型被 eager 加载导致空转 解决方案: PYTHONUNBUFFERED=1 + 关键循环添加 tqdm；compute_norm_stats.py 需同时设置 CUDA_VISIBLE_DEVICES=\"\" + JAX_PLATFORMS=cpu 强制CPU模式（根因：PaligemmaTokenizer 在 get_config().model 调用时 eager 加载到所有可见 GPU，但 norm_stats 只需 dataset transforms）\n关键洞察: GPU util=0 可能是 CPU 预处理瓶颈或模型 eager 加载但无推理计算；两者通过 nvidia-smi 显存占用模式可区分；norm_stats 完全不需要模型推理，应默认 CPU 模式运行\n3. Coffee BC-RNN loss正常收敛（-7.66→-15.4）但 SR 始终0%，而 Stack 同等配置 epoch 20即达64% 解决方案: 对比 HDF5 数据集实际 obs 键结构，发现 Coffee 需57维 object 状态（多阶段精确操作必需：Pod/Machine/Holder位置+相对姿态+铰链角），配置模板缺失；为全部9个任务添加 extra_low_dim=[‘object’] 覆盖并重新生成配置\n关键洞察: BC-RNN 配置的观测键必须与任务复杂度匹配；Coffee 是多阶段精确操作，单靠 84×84 图像无法提供足够的空间精度信息；配置 bug 的表现（loss 正常但 SR=0）与模型能力不足高度相似，需通过数据集结构对比才能区分\n4. robomimic BC-RNN 图像观测接入失败：4层连续问题（enable_camera/checkpoint config格式/分辨率/图像格式） 解决方案: ① 从 checkpoint config 字段（JSON字符串，需 json.loads 而非直接访问 dict）检测 rgb modality 自动启用 camera；② 从 shape_metadata 读取实际图像尺寸（84×84）传给 create_env；③ _prepare_image_obs() 手动做 HWC→CHW 转置和 uint8→float32/255 归一化\n关键洞察: robomimic checkpoint config 以 JSON 字符串存储（非 dict，与直觉不符）；绕过标准 rollout 流程时，ObsUtils.process_obs 自动完成的格式转换需手动补充\n5. Pi0.5 LoRA 训练启动4个连续阻塞性 bug：JAX CPU 强制失效、norm_stats 路径错误、布尔参数格式、W\u0026B 代理阻塞 解决方案: ① JAX CPU 模式需同时设 CUDA_VISIBLE_DEVICES=\"\" + JAX_PLATFORMS=cpu（后者不可省略）；② norm_stats 实际输出到 assets//benchmark//norm_stats.json，非 checkpoints/；③ argparse 布尔 flag 用 –no-overwrite，不能用 –overwrite=False；④ HPC 计算节点无出站网络，需预设 WANDB_MODE=disabled\n关键洞察: JAX XLA 后端检测独立于 CUDA 环境变量；openpi norm_stats 路径与 dataset_name 强绑定写入 assets/；HPC 计算节点应默认禁用所有依赖外网的日志系统\n6. MIHD run_benchmark.py 单体被 pipeline/ 大量 import 导致无法直接删除；BasicContrastive.py 中 drop_feature 逻辑反转 解决方案: 系统性 grep 确认所有引用点，按「建新模块→更新引用→删旧文件」顺序迁移；修复 drop_feature：\u003e= drop_prob 改为 \u003c drop_prob，从 staig_utils 导入已修正版本\n关键洞察: 大型重构迁移顺序至关重要；同名函数在3个文件中可能有3个变体，合并前需仔细比对语义（\u003e / \u003e= / \u003c 边界条件差异可导致功能完全相反）\n一般问题 7. SLURM srun 命令在有 interactive session 的节点上挂起；orbax checkpoint resume 冲突（Destination …/5000 already exists） 解决方案: srun 添加 –overlap 允许共享执行；orbax resume 需显式设置 overwrite=True 或提前清除已存在的 step 目录\n关键洞察: SLURM interactive job 默认独占分配；orbax resume=True 不自动覆盖已存在 step 目录，是 JAX 生态训练框架的通用陷阱\n8. Bash 工具在 tianhe 节点多次完全失效（echo/true/pwd 全部 exit code 1），无法执行任何 shell 命令 解决方案: 改用 Read/Write/Edit/Glob 工具完成所有文件操作（Write 可隐式创建父目录替代 mkdir）；需 shell 的任务明确标记为待用户执行事项\n关键洞察: Claude Code 文件工具集可替代大多数 Bash 文件操作；Bash 失效时应主动切换策略并向用户说明，而非卡住等待\n人类思路 vs AI 思路 战略层面 GPU资源异常的主动发现与优化决策 角色 思路 人类 多次主动发现 GPU util=0 但显存满载的异象（VisiumHD patch提取卡在CPU、norm_stats 加载全量模型、an49 闲置530GB VRAM），主动叫停并追问根因；基于 JAX 内存机制知识主动要求 XLA_PYTHON_CLIENT_MEM_FRACTION=0.95，并将训练 GPU 从1-4扩展至1-6（对集群资源有全局视角） AI 倾向等待任务完成而不主动审计资源；被动响应 GPU 异常；norm_stats 场景下通过 agent 追踪源码提供精确根因定位（PaligemmaTokenizer eager 加载）；被动分析内存优化利弊，未主动建议 差异分析: 人类通过 nvidia-smi 和先验知识主动发现系统层异常并给出优化方向；AI 在根因分析深度上有优势但缺乏主动监控意识，未能发现 GPU 5-6 可用资源\n执行权限与节奏控制（多次拒绝 ExitPlanMode） 角色 思路 人类 对大规模文件操作、GPU集群任务批量提交、训练提交等不可逆操作，多次拒绝AI的自动执行请求，要求先审阅方案或从单任务开始渐进验证 AI 完成规划后倾向立即请求执行授权，期望一次性完成全部工作，最大化并行和自动化程度 差异分析: 人类对不可逆操作保持严格审核节奏；渐进式验证（先跑单任务确认再批量）在 HPC 资源受限环境中更合理；AI 系统性低估了审核和渐进验证的必要性\nBC-RNN缺陷根因的独立发现 角色 思路 人类 发现 Coffee loss 正常但 SR=0% 的异常现象，提出诊断请求，未给出具体假设 AI 系统性对比 Coffee/Stack 配置文件→检查 HDF5 数据集实际 obs 键结构（发现 object:57维）→分析任务复杂度差异→独立得出「缺失 object 键」结论（全程无人类假设引导） 差异分析: AI 在系统性数据/代码对比中的根因定位能力强于人类直觉；人类凭异常模式发现问题存在，AI 通过结构化探索发现根因\nCoffee simulator bug vs 模型学习失败的识别 角色 思路 人类 观看 rollout 视频后立即识别出是环境初始化的物体穿模/卡死问题（simulator bug），而非模型问题 AI 基于0% SR 给出的初步解释是模型未能学习任务，倾向于从数据/超参数/任务难度角度归因 差异分析: 视觉直觉和 simulator 经验使人类能快速区分物理错误和学习失败；AI 缺乏对 simulator 视觉异常的直接感知能力，容易将 simulator bug 归因为模型能力问题\n务实工程决策（工具替换与诊断范围） 角色 思路 人类 直接决策用 KMeans 替换 mclust（环境约束下换工具比修复依赖更高效）；对 Pi0.5 训练失败选择「仅诊断不修复」（第三次已成功至99999步，先看评估结果再决定是否重训） AI 倾向于修复现有工具（安装 rpy2）或提供完整诊断+修复方案，未优先考虑「现有 checkpoint 已可评估」这一关键约束 差异分析: 人类做出更务实的资源优先级判断；AI 倾向完整性和修复导向，有时忽视关键约束条件（「第三次已成功」这一事实）\nAI 局限性 重要局限 缺乏主动的长时间任务健康检查：在 GPU 空转、进程卡住等异常情况下依赖用户主动发现，而非定期检查；应对所有超过5分钟的任务设置主动监控机制，而非等待输出或被动响应 外部工具/库集成前缺乏预防性验证：未预先检查 mclust/rpy2 可用性、外部脚本 CLI 接口（compute_norm_stats.py 参数格式）、大批量操作的内存消耗（LeRobot 转换 segfault）、图像格式约定（robosuite HWC vs robomimic CHW），导致多轮失败后才修复；图像观测4层 bug 是系统性预见性不足的集中体现 路径和环境假设过于具体：MIHD pipeline 硬编码了 DLPFC 目录结构；脚本错误假设 norm_stats 输出到 checkpoints/；JAX CPU 强制遗漏 JAX_PLATFORMS=cpu；H5 未主动预判 HPC 节点无出站网络（W\u0026B），均导致初次执行失败后才修复 归因偏差：将 Coffee simulator 环境初始化 bug（物体穿模/卡死）误判为模型学习能力不足，直到用户观看视频才纠正；缺乏对 simulator 视觉异常的感知手段 倾向批量自动化执行：在大型流水线中未主动询问用户是否需要逐步验证，需要用户多次干预才能控制执行粒度；kill 旧进程后未意识到 launcher 已用新 PID 重启子进程，需3轮 kill 操作 一般局限 Bash 工具失效时无法诊断根因，只能被动绕过；SubAgent 探索报告有时基于文档推断而非实际文件系统扫描，返回与实际目录结构不符的推断性结论 今日收获 核心收获 VisiumHD 坐标映射：2um bin 的 r_big//4 得到8um grid row（col同理）；annotation barcode 格式 s_008um_{row:05d}_{col:05d}-1；MIHD 在 VisiumHD 上 pca×uni2×staig_fusion Silhouette=0.343，显著优于纯 PCA 的 0.086，验证多模态融合对 HD 数据的有效性 robomimic BC-RNN 推理关键配置：checkpoint config 以 JSON 字符串存储（需 json.loads，非直接 dict 访问）；shape_metadata 记录实际图像尺寸；绕过标准 rollout 时需手动 HWC→CHW 转置和 uint8→float32/255 归一化（robomimic 标准 rollout 中 ObsUtils.process_obs 自动完成） JAX/Pi0.5 训练关键配置：① 强制 CPU 需同时设 CUDA_VISIBLE_DEVICES=\"\" + JAX_PLATFORMS=cpu；② XLA_PYTHON_CLIENT_MEM_FRACTION=0.95 对 A800 80GB 有效（61→77.7GB）；③ HPC 节点必须预设 WANDB_MODE=disabled；④ argparse 布尔 flag 用 –no-overwrite，不能用 –flag=False；⑤ openpi norm_stats 路径为 assets//benchmark//norm_stats.json（非 checkpoints/） BC-RNN 配置与任务复杂度匹配：Coffee 需57维 object 状态（多阶段精确操作必需）；Stack 简单叠放仅需图像；orbax resume=True 不自动覆盖已存在 step 目录，需显式 overwrite=True（JAX 生态通用陷阱） 大型仓库重构方法论：系统性 grep 验证所有导入依赖→按「建新→更新引用→删旧」顺序执行→dry_run 验证；同名函数多变体合并前需仔细比对边界条件（\u003e vs \u003e= vs \u003c 可导致功能完全相反） BC-RNN vs Pi0.5 能力对比：BC-RNN 简单任务（Stack D0/D1, Threading D0）epoch 22 即达 64-100% SR；复杂多步任务（Coffee, ThreePieceAssembly D1）有明确能力上限（600 epoch 仍接近0%）；Pi0.5 基础模型 4.2% SR，LoRA 微调效果待验证 norm_stats 计算加速：仅需 dataset transforms，完全不需要模型推理；CPU模式 + –max-frames 10000 子采样 + 9任务并行，从10+分钟降至2.5分钟（156 batches 足够统计稳定） 实践收获 SLURM HPC 调试技巧：srun –overlap 在有 interactive session 的节点附加执行命令（直接 SSH 被 pam_slurm_adopt 阻断）；nohup bash 脚本子进程不随父进程退出，kill 时需分别处理 launcher 和子进程 会话摘要 STHD ✅ STHD 代码库分析与 CLAUDE.md 深度改进 00:06:57.489 | claude_code 读取 STHD 所有核心模块，补充之前遗漏的6个模块说明（frontline.py、qcmask.py、roi.py、sim.py 等）、概率模型优化目标、Numba JIT 并行化细节、pdata TSV 格式和 patch 重叠处理逻辑；探索 VisiumHD 共享数据目录，确认 crop10/crop10large 均有 STHD 预测结果。\nMIHD ✅ VisiumHD三种annotation可视化 + STAIG fusion端到端 + scGPT KMeans可视化 00:06:22.389 | claude_code 发现 r_big//4 barcode 映射规律（100%匹配），生成病理学家/STHD/STAIG fusion 三种对比可视化；修复4处 HD 路径适配 bug 后完成 pca×uni2×staig_fusion 全流程（Silhouette=0.343 vs PCA 0.086）；终止耗时 mclust 任务改用 KMeans，11切片可视化从6+小时压缩至2分钟（ARI=0.1695）。\n✅ MIHD仓库6阶段清理重构 + 2026-02-28日报补写 02:46:18.544 | claude_code 按用户提供的6阶段重构计划执行：删除41个死文件（~250K代码），将 run_benchmark.py 共享函数迁移至6个模块，删除单体及5个依赖模型，提取 STAIG 公共代码并修复 drop_feature 逻辑反转 bug，更新全部文档，dry_run 验证440个实验通过。同期补写2026-02-28日报，含151673多模态 benchmark 表格和60+张可视化超链接。\nError Recovery Benchmark 🔄 Pi0.5 9任务评估完成 + Coffee BC-RNN配置修复 + v4.17文件整理 + Pi0.5 LoRA数据准备 00:09:05.761 | claude_code 获取 Pi0.5 评估结果（总SR=4.2%，Stack最高24%）；诊断 Pi0.5 前两次训练失败（SLURM时限+orbax冲突），确认第三次已完成99999步；AI 独立发现 Coffee 0% SR 根因（缺失57维 object 观测键），修复并验证9个配置文件；完成 v4.17 文件整理（archive/四层目录、VLM教程合并、EXTERNAL_DEPENDENCIES.md）；完成8/9任务 LeRobot 数据转换，编写训练启动脚本，ExitPlanMode 被拒。\n🔄 BC-RNN Stack_D0错误场景生成流水线（4个bug修复）+ 基础设施文档 + GPU清理 + 训练监控 01:10:59.841 | claude_code 迭代修复4层图像观测 bug（enable_camera 检测/json.loads 解析/84×84分辨率自动检测/HWC→CHW转置），成功生成11个 tip_over 错误场景和 MP4 视频；清理 an49 闲置530GB VRAM；创建 docs/infrastructure_reference.md（649场景/9类错误/完整组件文档，13章节）；监控7个 BC-RNN 任务（stack 接近满分，coffee 完全失败）；发现 coffee rollout 视频有环境初始化 simulator bug，修复未完成。\n✅ BC-RNN首批评估 + v4.18代码整理 + Pi0.5 LoRA流水线验证与成功启动（4个bug修复） 21:48:48.390 | claude_code TensorBoard API 获取首批评估（stack_d0=64%@epoch22，coffee=0%）；实施 v4.18 整理（提取 script_utils.py 消除~210行重复代码，更新 CLAUDE.md）；验证 coffee_d0 完整链路（1000 demos/2.4GB），逐任务完成9个数据集转换（批量 segfault 后改为逐任务）；修复4个 Pi0.5 训练启动 bug（JAX_PLATFORMS/assets路径/–no-overwrite/W\u0026B），扩展至 GPU 1-6+XLA_MEM=0.95，最终以6块 A800 GPU 77.7GB/卡100%利用率稳定运行9任务并行 LoRA 微调。\nToken 用量 总览 指标 数值 总 Token 89,955,645 输入 Token 145,331 输出 Token 187,297 Cache 创建 3,559,531 Cache 读取 86,063,486 Cache 命中率 96.0% 总费用 (USD) $54.9985 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 23,709 111,184 2,047,068 70,767,659 $51.0761 92.9% claude-haiku-4-5-20251001 121,622 76,113 1,512,463 15,295,827 $3.9223 7.1% 各设备用量 设备 总 Token 输入 输出 费用 DCC 8,323,086 4,161 22,420 $6.0188 tianhe 81,632,559 141,170 164,877 $48.9797 ",
+  "wordCount" : "1266",
   "inLanguage": "en",
   "datePublished": "2026-03-01T00:00:00-05:00",
   "dateModified": "2026-03-01T00:00:00-05:00",
@@ -253,78 +224,82 @@ document.addEventListener("DOMContentLoaded", function() {
     <h1 class="post-title entry-hint-parent">
       Bug Journal 2026-03-01
     </h1>
-    <div class="post-meta"><span title='2026-03-01 00:00:00 -0500 EST'>March 1, 2026</span>&nbsp;·&nbsp;<span>3 min</span>
+    <div class="post-meta"><span title='2026-03-01 00:00:00 -0500 EST'>March 1, 2026</span>&nbsp;·&nbsp;<span>6 min</span>
 
-
-      
-      <div class="meta-item">
-        <span id="busuanzi_container_page_pv">
-           &nbsp; People Read: <span id="busuanzi_value_page_pv"></span>
-        </span>
-     </div>
-
-    </div>
+</div>
   </header> 
   <div class="post-content"><h1 id="日报--2026-03-01">日报 — 2026-03-01<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-01">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 跨 DCC/tianhe 双服务器推进空间转录组学工具链（STHD/MIHD）和机器人学习基准（Error Recovery Benchmark）：DCC 聚焦 VisiumHD 多模态数据分析与仓库架构重构，tianhe 聚焦模型评估、配置缺陷修复、错误场景生成与 Pi0.5 LoRA 微调启动。</li>
+<li><strong>怎么做的：</strong> DCC 通过 grep 依赖分析→批量迁移→dry_run 验证的安全重构流程，以及修复4处 HD 路径适配 bug 完成多模态 pipeline；tianhe 通过 TensorBoard API 监控训练、HDF5 数据集结构对比定位配置缺陷、迭代调试图像格式适配，以及逐步修复 JAX 环境变量等4个训练启动 bug。</li>
+<li><strong>有什么用：</strong> MIHD 仓库完成大规模精简（删除41文件/~250K代码），确立清晰模块架构；Coffee BC-RNN 缺陷根因定位并修复；Pi0.5 LoRA 9任务并行训练在 6×A800 上稳定运行；Error Recovery Benchmark 获得首批 BC-RNN 高成功率数据和 Pi0.5 基线评估，基础设施文档体系完整建立。</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成 STHD CLAUDE.md 深度改进、VisiumHD 三种 annotation 可视化（病理学家/STHD/STAIG）、MIHD pipeline HD 适配 bug 修复、STAIG fusion 端到端运行、scGPT 11切片 KMeans 可视化、MIHD 6阶段清理重构、2026-02-28 日报补写。</li>
+<li><strong>怎么做的：</strong> 逐步调试 HD 数据路径（发现 r_big//4 映射规律）、修复 vision encoder/fusion/mclust 等4处问题；重构按「grep验证→建新模块→更新引用→删旧文件」顺序，dry_run 验证440个实验计划通过；用 KMeans 替换不可用的 mclust。</li>
+<li><strong>有什么用：</strong> MIHD 首次在 VisiumHD 上完成 pca×uni2×staig_fusion 多模态融合（Silhouette=0.343 vs PCA 0.086）；仓库删除41文件/~250K代码+5.3MB图片，drop_feature bug 修复；scGPT 11切片可视化从预计6+小时压缩至2分钟。</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成 Pi0.5 9任务基础模型评估（4.2% SR）、Coffee BC-RNN object 观测键缺失修复、BC-RNN Stack_D0 错误场景生成流水线开发（11个场景+MP4）、~530GB GPU VRAM 清理、BC-RNN 9任务训练监控、项目文件 v4.17/v4.18 整理、Pi0.5 LoRA 9任务并行微调成功启动（修复4个bug）。</li>
+<li><strong>怎么做的：</strong> 通过 SLURM srun &ndash;overlap 在 an49 节点执行 GPU 任务；对比 HDF5 数据集结构定位 Coffee 配置缺陷；迭代修复 robomimic BC-RNN 图像观测4层问题；修复 JAX_PLATFORMS/norm_stats路径/布尔参数/W&amp;B 4个训练启动 bug；使用 CPU+子采样+并行将 norm_stats 计算从10+分钟降至2.5分钟。</li>
+<li><strong>有什么用：</strong> BC-RNN Stack 任务 epoch 22 即达64% SR，验证数据质量；Coffee 缺陷修复为复杂任务重训奠定基础；Pi0.5 LoRA 在 6×A800（77.7GB/卡，利用率100%）稳定运行，9任务微调基础设施完整搭建。</li>
+</ul>
 <blockquote>
-<p>三台设备并行推进：DCC完成VisiumHD crop10large三源annotation对比可视化（Pathologist/STHD/STAIG Fusion，Silhouette=0.343）与MIHD仓库六阶段大规模重构（删除41个死文件，修复drop_feature语义bug，440个实验dry_run验证通过）；天河完成BC-RNN Stack_D0错误注入流水线（11个tip_over场景+MP4）、Pi0.5 Phoenix九任务基准评测（整体SR 4.2%）、诊断Coffee零成功率根因（缺失57维object观测键）并修复，最终成功启动Pi0.5 LoRA六GPU并行训练（77.7GB/100%利用率）；MacBook修复daily_summary工具逻辑（finalize机制+&ndash;sync逐天处理）、批量生成13+天历史日报，并完成Desktop Video播放模式三个Bug修复与Liquid Glass UI重设计。</p>
+<p>跨 DCC 和 tianhe 双服务器并行推进四个项目：DCC 完成 VisiumHD 三种 annotation 可视化与 STAIG fusion 多模态运行（Silhouette 0.343），并对 MIHD 仓库实施 6 阶段大规模清理重构（删除 ~250K 代码）；tianhe 完成 Pi0.5 9任务基础模型评估（4.2% SR）、定位修复 Coffee BC-RNN object 观测键缺失、开发 BC-RNN Stack_D0 错误场景生成流水线（修复4层图像 bug 生成11个场景），并修复4个启动 bug 后成功以 6×A800 GPU 100% 利用率启动 Pi0.5 LoRA 9任务并行微调。</p>
 </blockquote>
 <h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
 <h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
 <ul>
-<li>✅ <strong>MIHD仓库六阶段大规模清理重构（DCC）</strong> — 执行预先规划的六阶段重构：Phase 1删除30+死文件（~250K代码+5.3MB图片）；Phase 2从3488行run_benchmark.py monolith提取共享函数至utils/data_loader、models/staig_utils（新建）、models/vision_extractors（新建）、models/Fusion、utils/clustering；Phase 3删除run_benchmark.py及5个依赖模型；Phase 4提取STAIG公共函数并修复BasicContrastive.py的drop_feature逻辑bug（&gt;= 改为 &lt;）；Phase 5-6更新所有文档，pipeline dry_run验证通过（440个实验计划）。人类在计划阶段通过grep逐一验证41个文件导入关系并制定精确迁移表，是整个重构成功的关键前提。</li>
-<li>✅ <strong>Coffee BC-RNN 0% SR根因诊断与修复（tianhe）</strong> — 定位Coffee D0/D1在600 epoch训练中成功率始终为0的根因：BC-RNN配置模板缺少Coffee任务必需的object键（57维物体状态，包含pod和pod_holder相对位姿）。通过h5py数据集查验确认所有9个任务均含该键，在TASK_DEFS中添加extra_low_dim=[&ldquo;object&rdquo;]，修改cmd_generate_configs支持per-task观测覆盖，重新生成9个配置文件。另外发现Coffee环境初始化存在物体穿模/卡住的独立环境bug，需单独修复。</li>
-<li>✅ <strong>VisiumHD crop10large 三源annotation对比可视化（DCC）</strong> — 实现三层次annotation可视化体系：(1) Pathologist annotation——发现r_big//4坐标映射规则，将Zenodo CSV以100%匹配率映射到17502个8um bins，生成H&amp;E+annotation双面板，识别Neoplasm/Connective Tissue/Non-neoplastic Epithelium/Smooth Muscle四类；(2) STHD细胞类型预测——将276968个2um bin的85种细胞类型通过majority vote聚合至8um粒度，96.3%匹配率；(3) STAIG多模态融合聚类——经5轮bug修复（路径、坐标加载、mclust fallback、stdout buffering）成功完成PCA gene+UNI2 vision+STAIG GCN fusion，300 epochs，Silhouette=0.343。scGPT可视化从mclust（预计6小时）切换为KMeans，2分钟完成11个section（ARI=0.1695）。同步改进STHD和MIHD的CLAUDE.md。</li>
-<li>✅ <strong>BC-RNN Stack_D0 错误注入与可视化流水线（tianhe）</strong> — 修复BC-RNN视觉策略推理三个关键配置bug（相机使能、84×84分辨率、HWC→CHW转置），创建benchmark_v4_stack.yaml配置，修改2_visualize_scene.py支持policy场景（NPZ加载、跳过demo replay），创建batch_visualize_policy_scenes.py，成功从50次rollout生成11个tip_over错误场景并批量渲染为MP4。使用srun &ndash;overlap复用已有interactive job资源。</li>
-<li>✅ <strong>Pi0.5 Phoenix全任务基准评测（tianhe/DCC）</strong> — 完成Pi0.5 Phoenix（step 99999）在9个MimicGen任务各50 episodes的评估：Stack_D0 24%、Stack_D1 12%，Coffee/StackThree/ThreePieceAssembly均接近0%，整体SR 4.2%（19/450）。确认此为预训练基线权重的零样本迁移性能，两次Pi0.5 fine-tune任务（Job 46551/46553）均未完成100k步，需重新训练。</li>
-<li>✅ <strong>Pi0.5 LoRA微调管线搭建与6GPU并行训练启动（tianhe）</strong> — 创建scripts/train_pi05_benchmark.py（convert-data/compute-norms/train/eval/report五种子命令）；在lipeida/openpi的config.py注册18个训练/推理config（9任务×finetune+inference）；完成9个MimicGen→LeRobot v2.1格式转换，batch转换段错误后改为逐个运行；验证coffee_d0 norm_stats（223K帧，8D state，7D action）；修复训练启动4个连续bug（JAX_PLATFORMS=cpu缺失、norm_stats路径错误、&ndash;no-overwrite标志形式、WANDB_MODE=disabled）；最终6个任务在GPU 1-6以XLA_PYTHON_CLIENT_MEM_FRACTION=0.95并行运行（77.7GB显存/100%利用率）。</li>
-<li>✅ <strong>Desktop Video播放模式Bug修复与UI优化（MacBook）</strong> — 修复三个联动Bug：(1) PowerSave/PowerSave+新窗口创建时仅处理当前屏幕，改为委托全局评估；(2) Automatic模式缺少低电量感知，注册NSProcessInfoPowerStateDidChange，低电量时切换省电+行为（anyOverlayCompletelyCovered阈值）；(3) 将updatePlaybackStateForAllScreens()移入AppState.playbackMode.didSet实现单一真相源。UI优化：移除GeneralSettingsView中与PlaybackSettingsView重复的控件；重设计CombinedGlassClock为macOS Tahoe原生风格（.regular glass、独立胶囊容器、去阴影）；统一4处时钟定位常量（clockVerticalPositionFactor=0.85）；改用dateFormat(fromTemplate:)区域感知日期格式。xcodebuild全部通过。</li>
-<li>✅ <strong>daily_summary工具改进（MacBook）</strong> — 实现merge finalize机制（双重条件：date&lt;today AND 所有源log均_finalized → 报告标记_finalized=True，下次自动跳过），新增&ndash;force参数覆盖检查并传递给子进程；修复merge &ndash;sync无&ndash;date参数时将所有日期合并为单批次的问题，改为委托给_cmd_merge_sync_all()逐天处理。两项改进均保持与export finalize机制的语义一致性。</li>
+<li>✅ <strong>VisiumHD barcode映射发现与三种annotation可视化</strong> — 发现 r_big//4 映射规律（17502/17502 完整匹配），生成病理学家annotation（4种组织类型：Neoplasm 48.6%/Connective 29.5%等）、STHD细胞类型（85类→11粗类 majority vote，96.3%匹配）、STAIG fusion聚类三种对比可视化，建立 VisiumHD 数据分析基线。</li>
+<li>✅ <strong>MIHD pipeline HD数据集适配与STAIG fusion端到端运行</strong> — 修复4处 HD 路径适配 bug（find_spatial_image 增加 cropped_fullres.tif 模式、vision encoder data_root 传递、fusion 阶段 spatial coords 加载、mclust→KMeans fallback），完成 VisiumHD crop10large 的 pca×uni2×staig_fusion 全流程（patch提取5.5分钟、UNI2 GPU推理5分钟、STAIG训练6分钟，Silhouette=0.343）。</li>
+<li>✅ <strong>MIHD仓库6阶段清理重构（删除~250K代码）</strong> — Phase1 删除41个死文件（~250K代码+5.3MB图片）；Phase2 将 run_benchmark.py 共享函数迁移至6个模块（staig_utils、vision_extractors、Fusion、clustering等），更新全部 pipeline/ 导入；Phase3 删除 run_benchmark.py 单体及5个依赖模型；Phase4 提取 STAIG 公共代码并修复 BasicContrastive 的 drop_feature 逻辑反转 bug（&gt;= 改为 &lt;）；Phase5 更新全部文档；Phase6 dry_run 验证440个实验通过。</li>
+<li>✅ <strong>Coffee BC-RNN配置缺陷定位与修复（object观测键）</strong> — 通过对比 HDF5 数据集实际 obs 键结构，AI 独立发现 BC-RNN 配置模板缺失 object 观测键（Coffee 需57维物体状态：Pod/Machine/Holder位置+相对姿态+铰链角），为全部9个任务添加 extra_low_dim=[&lsquo;object&rsquo;]，重新生成并验证全部配置文件，修复 Coffee 0% SR 的根本原因。</li>
+<li>✅ <strong>BC-RNN Stack_D0错误场景生成流水线开发</strong> — 修复 robomimic BC-RNN 图像观测接入的4层连续 bug（enable_camera 检测、json.loads 解析 checkpoint config、84×84分辨率自动检测、HWC→CHW转置+float32归一化），创建 configs/benchmark_v4_stack.yaml 和 scripts/batch_visualize_policy_scenes.py，最终生成11个 tip_over 错误场景和11个 MP4 可视化视频。</li>
+<li>✅ <strong>Pi0.5 LoRA 9任务微调流水线搭建与成功启动</strong> — 创建 train_pi05_benchmark.py（5子命令），向 openpi/config.py 注册18个配置（9 finetune+9 inference），修复 vla_server.py 的 IMAGE_KEY_MAP 前缀匹配缺陷；完成9个任务 HDF5→LeRobot 数据转换（逐任务避免OOM segfault），CPU并行+子采样在2.5分钟内完成全部 norm_stats；修复4个启动 bug（JAX_PLATFORMS=cpu、assets路径、&ndash;no-overwrite、WANDB_MODE=disabled），以 GPU 1-6、XLA_MEM=95% 成功启动6任务并行训练（GPU利用率100%，77.7GB/卡）。</li>
+<li>✅ <strong>Pi0.5 Phoenix 9任务基础模型评估</strong> — 监控9个 MimicGen 任务各50次 rollout 评估，获取最终结果：总SR=4.2%（19/450），Stack_D0（24%）和 Stack_D1（12%）有实质成功，其余7个任务0-2%；确认第三次训练已成功完成至99999步（前两次因 SLURM 时限和 orbax 冲突失败）。</li>
+<li>🔄 <strong>Coffee BC-RNN rollout可视化与环境初始化问题排查</strong> — 生成 coffee_d0 rollout 视频（742KB），用户观看后发现环境初始化存在物体穿模/卡死问题（simulator bug 而非模型问题），开始调查 Coffee env kwargs 但会话截断，修复未完成。</li>
 </ul>
 <h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
 <ul>
-<li>🔄 <strong>BC-RNN九任务训练监控（tianhe）</strong> — 监控9个MimicGen任务BC-RNN训练进度：epoch 20时Stack_D0 64%、Stack_D1 44%（良好收敛），Coffee 0%（后发现环境初始化穿模bug，config缺失object键已修复，待重新训练）。清理an49节点约407GB闲置GPU显存（3个过时VLA server进程）。</li>
-<li>✅ <strong>项目文件整理v4.17/v4.18与文档更新（tianhe）</strong> — v4.17：创建archive/目录结构，归档过时文档、mimicgen_workspace v1-v3遗留代码，合并VLM教程（完整版721行取代旧版331行），创建README.md/.gitignore/docs/EXTERNAL_DEPENDENCIES.md。v4.18：将3个脚本中重复的create_env()/load_task_registry()（约210行）提取到scripts/script_utils.py，归档batch_visualize.py等过时脚本，更新项目全景总结至v4.18（LOC统计、新脚本目录、版本历史）。</li>
-<li>✅ <strong>批量生成历史结构化日报（MacBook）</strong> — 在MacBook上批量运行gadget/summarize工具，为2026-02-01至02-28共13+天历史日期生成结构化JSON日报，涵盖MIHD、ErrorRecoveryBenchmark、CalendarPro、gadget、DesktopVideo等多项目。部分复杂日期（02-14、02-16、02-28等）因内容过多触发API 32K token超限，合并不完整，需设置CLAUDE_CODE_MAX_OUTPUT_TOKENS环境变量。</li>
+<li>✅ <strong>GPU VRAM清理与BC-RNN 9任务训练监控</strong> — 发现并清理 an49 节点约530GB 闲置 VRAM（zhaoganlong Phoenix serve_policy 407GB + 两个旧VLA server各61GB）；监控9个 BC-RNN 任务：stack_d0（64%@epoch22）、stack_d1（44%）、coffee（0%）、stack_three/threading/three_piece_assembly 均达58-96%@epoch300-420。</li>
+<li>✅ <strong>基础设施参考文档创建与项目文件整理v4.17/v4.18</strong> — 创建 docs/infrastructure_reference.md（649场景/9类错误/6检测器/4注入器/完整 pipeline 流程图，13章节）；v4.17 整理：archive/ 四层目录归档旧文件，合并 VLM 教程，创建 EXTERNAL_DEPENDENCIES.md；v4.18 整理：提取 create_env()/load_task_registry() 到 script_utils.py（消除~210行重复代码），更新 CLAUDE.md 新增 M14 评估命令说明。</li>
+<li>✅ <strong>scGPT 11切片 KMeans 可视化</strong> — 终止耗时的 mclust 任务（已运行2小时完成2/11），改用 KMeans 在2分钟内完成全部11个 DLPFC 切片，平均 ARI=0.1695，NMI=0.2772。</li>
+<li>✅ <strong>STHD CLAUDE.md 深度改进</strong> — 分析 STHD 所有核心模块，补充之前遗漏的6个模块说明（frontline.py、qcmask.py 等）、概率模型优化目标、Numba JIT 细节、pdata TSV 格式和 patch 重叠处理逻辑。</li>
+<li>✅ <strong>2026-02-28日报补写（MIHD实验指标与可视化）</strong> — 补充第五章实验结果汇总和第六章输出文件清单，包含151673多模态 benchmark 表格、Vision Refinement 前后对比、60+张可视化超链接。</li>
 </ul>
 <h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
 <h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
-<h4 id="1-mihd-pipeline大量from-scriptsrun_benchmark-import3488行monolith文件无法直接删除">1. MIHD pipeline大量from scripts.run_benchmark import&hellip;，3488行monolith文件无法直接删除<a hidden class="anchor" aria-hidden="true" href="#1-mihd-pipeline大量from-scriptsrun_benchmark-import3488行monolith文件无法直接删除">#</a></h4>
-<p><strong>解决方案:</strong> 人类通过grep逐一验证41个文件导入关系制定精确迁移表；AI按表将共享函数迁移至正确模块，grep验证零残留引用后删除原文件，pipeline dry_run通过</p>
-<p><strong>关键洞察:</strong> 大型代码库清理的关键是人类主导的依赖分析；「先迁移后删除，grep全验证」是避免ImportError的必要步骤；代码合并本身是一种安全审计，自然发现同名函数间的语义差异bug</p>
-<h4 id="2-coffee-bc-rnn训练600-epoch成功率始终为0训练loss正常收敛而stack同配置达98-sr">2. Coffee BC-RNN训练600 epoch成功率始终为0%，训练Loss正常收敛，而Stack同配置达98% SR<a hidden class="anchor" aria-hidden="true" href="#2-coffee-bc-rnn训练600-epoch成功率始终为0训练loss正常收敛而stack同配置达98-sr">#</a></h4>
-<p><strong>解决方案:</strong> h5py查验发现所有9个BC-RNN配置模板均缺少object键（57维物体状态）；在TASK_DEFS中添加extra_low_dim=[&ldquo;object&rdquo;]，修改cmd_generate_configs支持per-task覆盖，重新生成9个配置；另发现Coffee环境初始化穿模的独立bug需单独修复</p>
-<p><strong>关键洞察:</strong> Stack靠图像即可，Coffee（多阶段精细操作）必须有低维物体状态；统一模板不适用于不同观测需求的任务；评估0% SR时应首先检查观测键而非归因于训练超参</p>
-<h4 id="3-visiumhd-hd数据集在staig-fusion-pipeline上连续遇到5类兼容性问题路径格式不兼容8um-bin坐标加载失败barcode格式与dlpfc不同mclust在大数据量下崩溃kmeans-fallback含nan崩溃stdout-buffering导致进度不可见">3. VisiumHD HD数据集在STAIG fusion pipeline上连续遇到5类兼容性问题：路径格式不兼容、8um bin坐标加载失败（barcode格式与DLPFC不同）、mclust在大数据量下崩溃、KMeans fallback含NaN崩溃、stdout buffering导致进度不可见<a hidden class="anchor" aria-hidden="true" href="#3-visiumhd-hd数据集在staig-fusion-pipeline上连续遇到5类兼容性问题路径格式不兼容8um-bin坐标加载失败barcode格式与dlpfc不同mclust在大数据量下崩溃kmeans-fallback含nan崩溃stdout-buffering导致进度不可见">#</a></h4>
-<p><strong>解决方案:</strong> 逐轮修复：修正HD路径格式（find_spatial_image新增cropped_fullres.tif模式）；适配HD坐标加载逻辑（crop_dir.parent作为data_root）；KMeans fallback添加nan_to_num；改用文件系统轮询监控进度</p>
-<p><strong>关键洞察:</strong> VisiumHD（8um bins）与DLPFC（55um spots）在barcode格式和坐标系统上均不兼容，需在调用链的多个层次分别适配；多bug级联时逐一修复比整体重构更高效</p>
-<h4 id="4-bc-rnn视觉策略推理连续三个格式错误keyerror-agentview_image未启用相机croprandomizer断言失败分辨率256256-vs-8484图像维度错误hwc-vs-chw">4. BC-RNN视觉策略推理连续三个格式错误：KeyError &lsquo;agentview_image&rsquo;（未启用相机）、CropRandomizer断言失败（分辨率256×256 vs 84×84）、图像维度错误（HWC vs CHW）<a hidden class="anchor" aria-hidden="true" href="#4-bc-rnn视觉策略推理连续三个格式错误keyerror-agentview_image未启用相机croprandomizer断言失败分辨率256256-vs-8484图像维度错误hwc-vs-chw">#</a></h4>
-<p><strong>解决方案:</strong> 从checkpoint的shape_metadata自动检测image obs keys并设置enable_camera=True；读取训练分辨率传入create_env()；在policy_adapter.py中添加HWC→CHW转置和uint8→float32归一化</p>
-<p><strong>关键洞察:</strong> BC-RNN视觉策略推理三重必要条件缺任一均在不同层崩溃且报错各异；checkpoint的config字段是JSON字符串而非dict，需先json.loads()解析</p>
-<h4 id="5-compute_norm_statspy将pi05模型铺满8块gpu各61gb-vram但gpu利用率0cuda_visible_devices设置后jax仍尝试初始化cuda后端而崩溃">5. compute_norm_stats.py将Pi0.5模型铺满8块GPU（各~61GB VRAM）但GPU利用率0%；CUDA_VISIBLE_DEVICES=&ldquo;&ldquo;设置后JAX仍尝试初始化CUDA后端而崩溃<a hidden class="anchor" aria-hidden="true" href="#5-compute_norm_statspy将pi05模型铺满8块gpu各61gb-vram但gpu利用率0cuda_visible_devices设置后jax仍尝试初始化cuda后端而崩溃">#</a></h4>
-<p><strong>解决方案:</strong> 同时设置CUDA_VISIBLE_DEVICES=&ldquo;&ldquo;和JAX_PLATFORMS=cpu强制CPU-only模式；添加&ndash;max-frames子采样+9任务并行，大幅缩短计算时间</p>
-<p><strong>关键洞察:</strong> openpi框架get_config()阶段eagerly实例化PaligemmaTokenizer并分发到所有可见GPU；JAX_PLATFORMS=cpu是阻止这一行为的额外必要变量，CUDA_VISIBLE_DEVICES单独设置不够</p>
-<h4 id="6-zenodo病理学家annotation-csv的barcode格式s_008um_rrrrr_ccccc-1与adataobs中r_bigc_big2um网格坐标无法直接匹配">6. Zenodo病理学家annotation CSV的barcode格式（s_008um_RRRRR_CCCCC-1）与adata.obs中r_big/c_big（2um网格坐标）无法直接匹配<a hidden class="anchor" aria-hidden="true" href="#6-zenodo病理学家annotation-csv的barcode格式s_008um_rrrrr_ccccc-1与adataobs中r_bigc_big2um网格坐标无法直接匹配">#</a></h4>
-<p><strong>解决方案:</strong> 通过分析barcodes_included字段发现r_big//4的坐标映射规则，构造匹配barcode实现100%匹配（17502/17502）</p>
-<p><strong>关键洞察:</strong> VisiumHD的8um bin是4×4个2um bin的聚合，整除而非除法；barcodes_included字段是发现这个映射关系的关键线索</p>
-<h4 id="7-basiccontrastivepy的drop_feature存在隐性语义bugmask条件为-drop_prob而非-drop_prob导致丢弃概率反向低drop_prob时反而丢弃更多特征">7. BasicContrastive.py的drop_feature()存在隐性语义bug：mask条件为&gt;= drop_prob而非&lt; drop_prob，导致丢弃概率反向，低drop_prob时反而丢弃更多特征<a hidden class="anchor" aria-hidden="true" href="#7-basiccontrastivepy的drop_feature存在隐性语义bugmask条件为-drop_prob而非-drop_prob导致丢弃概率反向低drop_prob时反而丢弃更多特征">#</a></h4>
-<p><strong>解决方案:</strong> 重构提取三份同名函数为单一来源（staig_utils.py），过程中对比各版本实现差异，以STAIGTrainerE2E的正确版本（&lt; drop_prob）为准，BasicContrastive.py改为从staig_utils导入</p>
-<p><strong>关键洞察:</strong> 三份同名函数分散在不同文件是bug温床；代码合并本身起到了安全审计效果</p>
-<h4 id="8-pi05-lora训练启动连续4个bugjax-cpu初始化失败norm_stats路径错误检测路径与实际输出路径不符布尔标志解析错误overwritefalsewb-proxyerror无限重试">8. Pi0.5 LoRA训练启动连续4个bug：JAX CPU初始化失败、norm_stats路径错误（检测路径与实际输出路径不符）、布尔标志解析错误（&ndash;overwrite=False）、W&amp;B ProxyError无限重试<a hidden class="anchor" aria-hidden="true" href="#8-pi05-lora训练启动连续4个bugjax-cpu初始化失败norm_stats路径错误检测路径与实际输出路径不符布尔标志解析错误overwritefalsewb-proxyerror无限重试">#</a></h4>
-<p><strong>解决方案:</strong> 逐一修复：JAX_PLATFORMS=cpu+CUDA_VISIBLE_DEVICES；实地find确认实际路径为assets/<config>/benchmark/mimicgen_<task>/norm_stats.json；改用&ndash;no-overwrite标志；设置WANDB_MODE=disabled；修改脚本后先kill launcher进程再用新配置重启</p>
-<p><strong>关键洞察:</strong> HPC计算节点无外网访问，批量训练应默认禁用W&amp;B；修改启动脚本后需同时终止正在运行的launcher，否则其按旧配置自动恢复子进程</p>
-<h4 id="9-srun在已有interactive-session时阻塞不响应ssh直连被pam_slurm_adopt拒绝">9. srun在已有interactive session时阻塞不响应，SSH直连被pam_slurm_adopt拒绝<a hidden class="anchor" aria-hidden="true" href="#9-srun在已有interactive-session时阻塞不响应ssh直连被pam_slurm_adopt拒绝">#</a></h4>
-<p><strong>解决方案:</strong> 使用srun &ndash;overlap &ndash;jobid=<ID> bash -c &ldquo;&hellip;&quot;，在同一job allocation内共享已有资源</p>
-<p><strong>关键洞察:</strong> &ndash;overlap是GPU集群快速迭代调试时复用已有interactive job的关键技巧，避免重新排队等待资源</p>
-<h4 id="10-desktop-video播放模式三个联动bugpowersave全局委托缺失automatic无低电量感知模式切换未触发全局重评估状态重评估分散在generalsettingsviewonchange和desktop_videoappconfirmchanges多处">10. Desktop Video播放模式三个联动Bug：PowerSave+全局委托缺失、Automatic无低电量感知、模式切换未触发全局重评估；状态重评估分散在GeneralSettingsView.onChange和Desktop_VideoApp.confirmChanges()多处<a hidden class="anchor" aria-hidden="true" href="#10-desktop-video播放模式三个联动bugpowersave全局委托缺失automatic无低电量感知模式切换未触发全局重评估状态重评估分散在generalsettingsviewonchange和desktop_videoappconfirmchanges多处">#</a></h4>
-<p><strong>解决方案:</strong> 将updatePlaybackStateForAllScreens()移入AppState.playbackMode.didSet（单一真相源，防抖guard）；AppDelegate注册NSProcessInfoPowerStateDidChange，低电量时automatic分支使用anyOverlayCompletelyCovered()阈值</p>
-<p><strong>关键洞察:</strong> 将全局副作用集中到@Published属性的didSet是单一真相源原则的体现；NSProcessInfoPowerStateDidChange是macOS标准低电量通知，无需轮询</p>
-<h4 id="11-merge-finalize机制缺失导致sync-all每次重新处理所有历史日期merge-sync无日期参数时将所有日期合并为单批次">11. merge finalize机制缺失导致&ndash;sync-all每次重新处理所有历史日期；merge &ndash;sync无日期参数时将所有日期合并为单批次<a hidden class="anchor" aria-hidden="true" href="#11-merge-finalize机制缺失导致sync-all每次重新处理所有历史日期merge-sync无日期参数时将所有日期合并为单批次">#</a></h4>
-<p><strong>解决方案:</strong> 实现与export一致的_finalized双重条件（date&lt;today AND 所有源log均_finalized）自动标记报告；无&ndash;date的&ndash;sync委托给_cmd_merge_sync_all()逐天处理，一行修改解决行为不一致问题</p>
-<p><strong>关键洞察:</strong> finalize双重条件缺一不可：时间维度保证非当天数据，完整性维度保证多设备数据已全量上传；两个相似功能行为应保持一致</p>
+<h4 id="1-visiumhd-hd数据集路径适配vision-encoder-图像路径spatial-coords-加载fusion-阶段多处查找均假设-dlpfc-目录结构而失败">1. VisiumHD HD数据集路径适配：vision encoder 图像路径、spatial coords 加载、fusion 阶段多处查找均假设 DLPFC 目录结构而失败<a hidden class="anchor" aria-hidden="true" href="#1-visiumhd-hd数据集路径适配vision-encoder-图像路径spatial-coords-加载fusion-阶段多处查找均假设-dlpfc-目录结构而失败">#</a></h4>
+<p><strong>解决方案:</strong> 三处修复：find_spatial_image() 增加 cropped_fullres.tif 模式识别；vision encoder 调用时将 crop_dir.parent 作为 data_root；fusion 阶段直接从 adata.obsm[&lsquo;spatial&rsquo;] 加载坐标绕过路径查找</p>
+<p><strong>关键洞察:</strong> pipeline 设计假设 DLPFC 扁平目录结构（data_root/section_id/），HD 数据需在调用层做映射而非修改 encoder 内部逻辑；路径抽象层设计应预留对不同数据集结构的适配接口</p>
+<h4 id="2-长时间任务进度不可见gpu利用率0但显存满载无法判断是cpu瓶颈还是模型被-eager-加载导致空转">2. 长时间任务进度不可见：GPU利用率0%但显存满载，无法判断是CPU瓶颈还是模型被 eager 加载导致空转<a hidden class="anchor" aria-hidden="true" href="#2-长时间任务进度不可见gpu利用率0但显存满载无法判断是cpu瓶颈还是模型被-eager-加载导致空转">#</a></h4>
+<p><strong>解决方案:</strong> PYTHONUNBUFFERED=1 + 关键循环添加 tqdm；compute_norm_stats.py 需同时设置 CUDA_VISIBLE_DEVICES=&quot;&quot; + JAX_PLATFORMS=cpu 强制CPU模式（根因：PaligemmaTokenizer 在 get_config().model 调用时 eager 加载到所有可见 GPU，但 norm_stats 只需 dataset transforms）</p>
+<p><strong>关键洞察:</strong> GPU util=0 可能是 CPU 预处理瓶颈或模型 eager 加载但无推理计算；两者通过 nvidia-smi 显存占用模式可区分；norm_stats 完全不需要模型推理，应默认 CPU 模式运行</p>
+<h4 id="3-coffee-bc-rnn-loss正常收敛-766-154但-sr-始终0而-stack-同等配置-epoch-20即达64">3. Coffee BC-RNN loss正常收敛（-7.66→-15.4）但 SR 始终0%，而 Stack 同等配置 epoch 20即达64%<a hidden class="anchor" aria-hidden="true" href="#3-coffee-bc-rnn-loss正常收敛-766-154但-sr-始终0而-stack-同等配置-epoch-20即达64">#</a></h4>
+<p><strong>解决方案:</strong> 对比 HDF5 数据集实际 obs 键结构，发现 Coffee 需57维 object 状态（多阶段精确操作必需：Pod/Machine/Holder位置+相对姿态+铰链角），配置模板缺失；为全部9个任务添加 extra_low_dim=[&lsquo;object&rsquo;] 覆盖并重新生成配置</p>
+<p><strong>关键洞察:</strong> BC-RNN 配置的观测键必须与任务复杂度匹配；Coffee 是多阶段精确操作，单靠 84×84 图像无法提供足够的空间精度信息；配置 bug 的表现（loss 正常但 SR=0）与模型能力不足高度相似，需通过数据集结构对比才能区分</p>
+<h4 id="4-robomimic-bc-rnn-图像观测接入失败4层连续问题enable_cameracheckpoint-config格式分辨率图像格式">4. robomimic BC-RNN 图像观测接入失败：4层连续问题（enable_camera/checkpoint config格式/分辨率/图像格式）<a hidden class="anchor" aria-hidden="true" href="#4-robomimic-bc-rnn-图像观测接入失败4层连续问题enable_cameracheckpoint-config格式分辨率图像格式">#</a></h4>
+<p><strong>解决方案:</strong> ① 从 checkpoint config 字段（JSON字符串，需 json.loads 而非直接访问 dict）检测 rgb modality 自动启用 camera；② 从 shape_metadata 读取实际图像尺寸（84×84）传给 create_env；③ _prepare_image_obs() 手动做 HWC→CHW 转置和 uint8→float32/255 归一化</p>
+<p><strong>关键洞察:</strong> robomimic checkpoint config 以 JSON 字符串存储（非 dict，与直觉不符）；绕过标准 rollout 流程时，ObsUtils.process_obs 自动完成的格式转换需手动补充</p>
+<h4 id="5-pi05-lora-训练启动4个连续阻塞性-bugjax-cpu-强制失效norm_stats-路径错误布尔参数格式wb-代理阻塞">5. Pi0.5 LoRA 训练启动4个连续阻塞性 bug：JAX CPU 强制失效、norm_stats 路径错误、布尔参数格式、W&amp;B 代理阻塞<a hidden class="anchor" aria-hidden="true" href="#5-pi05-lora-训练启动4个连续阻塞性-bugjax-cpu-强制失效norm_stats-路径错误布尔参数格式wb-代理阻塞">#</a></h4>
+<p><strong>解决方案:</strong> ① JAX CPU 模式需同时设 CUDA_VISIBLE_DEVICES=&quot;&quot; + JAX_PLATFORMS=cpu（后者不可省略）；② norm_stats 实际输出到 assets/<config>/benchmark/<dataset>/norm_stats.json，非 checkpoints/；③ argparse 布尔 flag 用 &ndash;no-overwrite，不能用 &ndash;overwrite=False；④ HPC 计算节点无出站网络，需预设 WANDB_MODE=disabled</p>
+<p><strong>关键洞察:</strong> JAX XLA 后端检测独立于 CUDA 环境变量；openpi norm_stats 路径与 dataset_name 强绑定写入 assets/；HPC 计算节点应默认禁用所有依赖外网的日志系统</p>
+<h4 id="6-mihd-run_benchmarkpy-单体被-pipeline-大量-import-导致无法直接删除basiccontrastivepy-中-drop_feature-逻辑反转">6. MIHD run_benchmark.py 单体被 pipeline/ 大量 import 导致无法直接删除；BasicContrastive.py 中 drop_feature 逻辑反转<a hidden class="anchor" aria-hidden="true" href="#6-mihd-run_benchmarkpy-单体被-pipeline-大量-import-导致无法直接删除basiccontrastivepy-中-drop_feature-逻辑反转">#</a></h4>
+<p><strong>解决方案:</strong> 系统性 grep 确认所有引用点，按「建新模块→更新引用→删旧文件」顺序迁移；修复 drop_feature：&gt;= drop_prob 改为 &lt; drop_prob，从 staig_utils 导入已修正版本</p>
+<p><strong>关键洞察:</strong> 大型重构迁移顺序至关重要；同名函数在3个文件中可能有3个变体，合并前需仔细比对语义（&gt; / &gt;= / &lt; 边界条件差异可导致功能完全相反）</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="7-slurm-srun-命令在有-interactive-session-的节点上挂起orbax-checkpoint-resume-冲突destination-5000-already-exists">7. SLURM srun 命令在有 interactive session 的节点上挂起；orbax checkpoint resume 冲突（Destination &hellip;/5000 already exists）<a hidden class="anchor" aria-hidden="true" href="#7-slurm-srun-命令在有-interactive-session-的节点上挂起orbax-checkpoint-resume-冲突destination-5000-already-exists">#</a></h4>
+<p><strong>解决方案:</strong> srun 添加 &ndash;overlap 允许共享执行；orbax resume 需显式设置 overwrite=True 或提前清除已存在的 step 目录</p>
+<p><strong>关键洞察:</strong> SLURM interactive job 默认独占分配；orbax resume=True 不自动覆盖已存在 step 目录，是 JAX 生态训练框架的通用陷阱</p>
+<h4 id="8-bash-工具在-tianhe-节点多次完全失效echotruepwd-全部-exit-code-1无法执行任何-shell-命令">8. Bash 工具在 tianhe 节点多次完全失效（echo/true/pwd 全部 exit code 1），无法执行任何 shell 命令<a hidden class="anchor" aria-hidden="true" href="#8-bash-工具在-tianhe-节点多次完全失效echotruepwd-全部-exit-code-1无法执行任何-shell-命令">#</a></h4>
+<p><strong>解决方案:</strong> 改用 Read/Write/Edit/Glob 工具完成所有文件操作（Write 可隐式创建父目录替代 mkdir）；需 shell 的任务明确标记为待用户执行事项</p>
+<p><strong>关键洞察:</strong> Claude Code 文件工具集可替代大多数 Bash 文件操作；Bash 失效时应主动切换策略并向用户说明，而非卡住等待</p>
 <h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
 <h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
-<h4 id="coffee任务失败的根本原因识别">Coffee任务失败的根本原因识别<a hidden class="anchor" aria-hidden="true" href="#coffee任务失败的根本原因识别">#</a></h4>
+<h4 id="gpu资源异常的主动发现与优化决策">GPU资源异常的主动发现与优化决策<a hidden class="anchor" aria-hidden="true" href="#gpu资源异常的主动发现与优化决策">#</a></h4>
 <table>
   <thead>
       <tr>
@@ -335,16 +310,16 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>人类</td>
-          <td>提供关键对比观察（Stack同配置98% SR，Coffee 0%，Loss正常收敛）；通过观看MP4视频几秒内识别出Coffee环境初始化穿模bug；决策「诊断后暂不修复config，先处理环境bug」</td>
+          <td>多次主动发现 GPU util=0 但显存满载的异象（VisiumHD patch提取卡在CPU、norm_stats 加载全量模型、an49 闲置530GB VRAM），主动叫停并追问根因；基于 JAX 内存机制知识主动要求 XLA_PYTHON_CLIENT_MEM_FRACTION=0.95，并将训练 GPU 从1-4扩展至1-6（对集群资源有全局视角）</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>通过代码分析和h5py数据集交叉验证系统锁定object键缺失根因（57维），量化维度和内容，完整修复9个任务配置；从数值指标（Loss下降）无法判断出环境穿模问题</td>
+          <td>倾向等待任务完成而不主动审计资源；被动响应 GPU 异常；norm_stats 场景下通过 agent 追踪源码提供精确根因定位（PaligemmaTokenizer eager 加载）；被动分析内存优化利弊，未主动建议</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> 人类用视觉直觉发现了AI分析大量日志也未能发现的环境bug；AI的价值在于系统性的技术深度调查和实施</p>
-<h4 id="大规模代码库重构的依赖关系分析">大规模代码库重构的依赖关系分析<a hidden class="anchor" aria-hidden="true" href="#大规模代码库重构的依赖关系分析">#</a></h4>
+<p><strong>差异分析:</strong> 人类通过 nvidia-smi 和先验知识主动发现系统层异常并给出优化方向；AI 在根因分析深度上有优势但缺乏主动监控意识，未能发现 GPU 5-6 可用资源</p>
+<h4 id="执行权限与节奏控制多次拒绝-exitplanmode">执行权限与节奏控制（多次拒绝 ExitPlanMode）<a hidden class="anchor" aria-hidden="true" href="#执行权限与节奏控制多次拒绝-exitplanmode">#</a></h4>
 <table>
   <thead>
       <tr>
@@ -355,16 +330,16 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>人类</td>
-          <td>人类在执行前独立通过grep逐一验证41个文件的导入关系（含跨文件间接依赖），制定精确的函数迁移表；承担了架构分析和风险识别的核心工作</td>
+          <td>对大规模文件操作、GPU集群任务批量提交、训练提交等不可逆操作，多次拒绝AI的自动执行请求，要求先审阅方案或从单任务开始渐进验证</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>AI在收到完整计划后按图索骥执行：迁移函数、更新导入、验证零残留、运行dry_run；独立发现test_batch_correction.py等计划外的级联死文件</td>
+          <td>完成规划后倾向立即请求执行授权，期望一次性完成全部工作，最大化并行和自动化程度</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> 人类承担最关键的架构分析（若让AI自主分析，大概率遗漏间接依赖）；AI承担繁琐的多文件编辑执行工作，两者分工明确</p>
-<h4 id="gpu资源效率监控与资源浪费识别">GPU资源效率监控与资源浪费识别<a hidden class="anchor" aria-hidden="true" href="#gpu资源效率监控与资源浪费识别">#</a></h4>
+<p><strong>差异分析:</strong> 人类对不可逆操作保持严格审核节奏；渐进式验证（先跑单任务确认再批量）在 HPC 资源受限环境中更合理；AI 系统性低估了审核和渐进验证的必要性</p>
+<h4 id="bc-rnn缺陷根因的独立发现">BC-RNN缺陷根因的独立发现<a hidden class="anchor" aria-hidden="true" href="#bc-rnn缺陷根因的独立发现">#</a></h4>
 <table>
   <thead>
       <tr>
@@ -375,16 +350,16 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>人类</td>
-          <td>用户主动发现GPU占用0%（compute_norm_stats铺满8块GPU但无计算）、识别an49节点闲置VLA server占用407GB显存，要求停止进程先排查；主动提出将XLA_PYTHON_CLIENT_MEM_FRACTION提升至0.95并扩展至6 GPU并行</td>
+          <td>发现 Coffee loss 正常但 SR=0% 的异常现象，提出诊断请求，未给出具体假设</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>AI启动训练后专注查看日志进度，未主动检查GPU利用率；训练稳定后认为任务完成，未主动提出显存或GPU数量优化</td>
+          <td>系统性对比 Coffee/Stack 配置文件→检查 HDF5 数据集实际 obs 键结构（发现 object:57维）→分析任务复杂度差异→独立得出「缺失 object 键」结论（全程无人类假设引导）</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> 用户对HPC计算资源效率有直觉感知和主动优化意识，最终使显存从61GB提升至77.7GB；AI解决功能问题但缺乏性能层面的主动思考</p>
-<h4 id="desktop-video省电模式语义与自动模式设计">Desktop Video省电+模式语义与自动模式设计<a hidden class="anchor" aria-hidden="true" href="#desktop-video省电模式语义与自动模式设计">#</a></h4>
+<p><strong>差异分析:</strong> AI 在系统性数据/代码对比中的根因定位能力强于人类直觉；人类凭异常模式发现问题存在，AI 通过结构化探索发现根因</p>
+<h4 id="coffee-simulator-bug-vs-模型学习失败的识别">Coffee simulator bug vs 模型学习失败的识别<a hidden class="anchor" aria-hidden="true" href="#coffee-simulator-bug-vs-模型学习失败的识别">#</a></h4>
 <table>
   <thead>
       <tr>
@@ -395,16 +370,16 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>人类</td>
-          <td>明确省电+模式「任意屏幕被遮挡即暂停全部」；设计自动模式=正常电量→省电行为，低电量→省电+行为，充分复用现有阈值函数（anyOverlayCompletelyCovered vs allOverlaysCompletelyCovered）</td>
+          <td>观看 rollout 视频后立即识别出是环境初始化的物体穿模/卡死问题（simulator bug），而非模型问题</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>最初实现省电+时使用allOverlaysCompletelyCovered（与预期语义相反）；被纠正后能正确实现，但若无指引会设计为独立逻辑而非复用现有模式</td>
+          <td>基于0% SR 给出的初步解释是模型未能学习任务，倾向于从数据/超参数/任务难度角度归因</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> 人类从用户体验角度思考「最保守省电策略」并充分复用现有代码结构；AI的默认阈值假设与实际需求完全相反</p>
-<h4 id="算法与工具的效率权衡mclust-vs-kmeans">算法与工具的效率权衡（mclust vs KMeans）<a hidden class="anchor" aria-hidden="true" href="#算法与工具的效率权衡mclust-vs-kmeans">#</a></h4>
+<p><strong>差异分析:</strong> 视觉直觉和 simulator 经验使人类能快速区分物理错误和学习失败；AI 缺乏对 simulator 视觉异常的直接感知能力，容易将 simulator bug 归因为模型能力问题</p>
+<h4 id="务实工程决策工具替换与诊断范围">务实工程决策（工具替换与诊断范围）<a hidden class="anchor" aria-hidden="true" href="#务实工程决策工具替换与诊断范围">#</a></h4>
 <table>
   <thead>
       <tr>
@@ -415,67 +390,65 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>人类</td>
-          <td>在得知mclust需要6小时后立即提议切换KMeans，判断可视化探索阶段不需要mclust精度，2分钟完成全部11个section</td>
+          <td>直接决策用 KMeans 替换 mclust（环境约束下换工具比修复依赖更高效）；对 Pi0.5 训练失败选择「仅诊断不修复」（第三次已成功至99999步，先看评估结果再决定是否重训）</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>默认使用mclust（与DLPFC benchmark保持一致），未主动评估时间成本或提出替代方案</td>
+          <td>倾向于修复现有工具（安装 rpy2）或提供完整诊断+修复方案，未优先考虑「现有 checkpoint 已可评估」这一关键约束</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> 用户的工程实用主义快速识别不合理的时间成本；AI优先保持实验一致性，对算法的规模复杂度缺乏主动的计算量预估</p>
+<p><strong>差异分析:</strong> 人类做出更务实的资源优先级判断；AI 倾向完整性和修复导向，有时忽视关键约束条件（「第三次已成功」这一事实）</p>
 <h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
 <h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
 <ul>
-<li>从数值指标（Loss下降、训练完成）无法判断任务是否真正可学习；Coffee环境初始化穿模bug隐藏在训练日志之外，需要人类通过视频直觉在几秒内发现AI分析大量日志也未能识别的根本问题</li>
-<li>无法独立完成大规模重构的依赖关系分析，需要人类通过grep逐一验证导入关系并制定迁移计划；自主分析时大概率遗漏间接依赖链，例如死脚本被其他死脚本引用的级联依赖</li>
-<li>新数据集接入现有pipeline时缺乏系统性的兼容性预检能力：VisiumHD HD适配需要5轮迭代，BC-RNN视觉配置需要3轮，每次只修复表面报错而无法一次性识别所有差异点</li>
-<li>对HPC计算资源效率缺乏主动监控意识：未预见compute_norm_stats的GPU eager加载问题、未主动检查GPU利用率是否合理、未预见JAX_PLATFORMS=cpu的必要性，均需用户提醒后才响应；训练稳定运行后不会主动寻求显存或并行度优化</li>
+<li>缺乏主动的长时间任务健康检查：在 GPU 空转、进程卡住等异常情况下依赖用户主动发现，而非定期检查；应对所有超过5分钟的任务设置主动监控机制，而非等待输出或被动响应</li>
+<li>外部工具/库集成前缺乏预防性验证：未预先检查 mclust/rpy2 可用性、外部脚本 CLI 接口（compute_norm_stats.py 参数格式）、大批量操作的内存消耗（LeRobot 转换 segfault）、图像格式约定（robosuite HWC vs robomimic CHW），导致多轮失败后才修复；图像观测4层 bug 是系统性预见性不足的集中体现</li>
+<li>路径和环境假设过于具体：MIHD pipeline 硬编码了 DLPFC 目录结构；脚本错误假设 norm_stats 输出到 checkpoints/；JAX CPU 强制遗漏 JAX_PLATFORMS=cpu；H5 未主动预判 HPC 节点无出站网络（W&amp;B），均导致初次执行失败后才修复</li>
+<li>归因偏差：将 Coffee simulator 环境初始化 bug（物体穿模/卡死）误判为模型学习能力不足，直到用户观看视频才纠正；缺乏对 simulator 视觉异常的感知手段</li>
+<li>倾向批量自动化执行：在大型流水线中未主动询问用户是否需要逐步验证，需要用户多次干预才能控制执行粒度；kill 旧进程后未意识到 launcher 已用新 PID 重启子进程，需3轮 kill 操作</li>
 </ul>
 <h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
 <ul>
-<li>PlaybackMode阈值语义的默认假设与用户需求相反（猜测对称逻辑而非用户意图的「任意遮挡即暂停」）；HPC/GPU场景下将「内存」默认理解为CPU RAM而非GPU VRAM，需要人类明确纠正</li>
-<li>多次ExitPlanMode被拒绝，说明计划存在未解决技术问题或细化程度不足，或用户倾向直接给出计划并执行而非走正式审批流程；AI未能识别「用户已给出完整计划」这一信号</li>
-<li>批量历史日报合并时多次触发32K token输出上限，未主动预估复杂合并报告的输出体积；Bash工具失效时缺乏有效诊断手段，只能被动等待或用文件工具降级替代</li>
+<li>Bash 工具失效时无法诊断根因，只能被动绕过；SubAgent 探索报告有时基于文档推断而非实际文件系统扫描，返回与实际目录结构不符的推断性结论</li>
 </ul>
 <h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
 <h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
 <ul>
-<li>BC-RNN观测键对复杂任务至关重要：统一config模板只含eef_pos/quat/gripper_qpos，Stack等简单任务（堆叠方块）靠图像即可达98%，但Coffee/Threading等多阶段精细操作必须包含低维物体状态（57维object键）；评估0% SR时应首先检查观测键覆盖，而非归因于训练超参或模型容量</li>
-<li>大型代码库清理的可靠流程：人类先grep全面建立依赖图（含间接依赖链）→制定精确迁移表→按反向依赖顺序执行（先迁移共享函数，再删除原文件）→grep验证零残留→dry_run验证。代码合并本身是安全审计：统一三份同名函数时自然发现BasicContrastive.py的drop_feature语义bug（&gt;= vs &lt;）</li>
-<li>BC-RNN视觉策略推理三重必要条件：①enable_camera=True，②分辨率与训练时一致（从checkpoint shape_metadata读取），③HWC→CHW转置+float32归一化。缺任一均在不同层崩溃且报错各异；checkpoint的config字段是JSON字符串，需json.loads()解析</li>
-<li>视频可视化是机器人学习debug最快的工具：Coffee训练Loss正常下降但rollout视频直接暴露环境初始化穿模，比分析所有训练曲线更快定位根本问题；训练指标正常不等于任务真正可学习</li>
-<li>JAX CPU强制模式需同时设置两个环境变量：CUDA_VISIBLE_DEVICES=&quot;&quot;（对CUDA驱动生效）和JAX_PLATFORMS=cpu（对JAX后端发现机制生效），缺一不可；openpi的get_config()阶段eagerly实例化PaligemmaTokenizer并分发到所有可见GPU，凡是CPU-only预处理步骤均应设置这两个变量；XLA_PYTHON_CLIENT_MEM_FRACTION=0.95可将A800显存利用从61GB提升至77.7GB</li>
-<li>VisiumHD多分辨率坐标体系：8um bin = 4×4个2um bin聚合，坐标映射规则r_big//4（整除而非除法）；三层次annotation框架（Pathologist真值/STHD细胞类型/STAIG无监督聚类）为空间组学pipeline提供了多粒度基准参考，STAIG fusion（Silhouette=0.343）远优于scGPT image-only（ARI≈0.17）</li>
-<li>Pi0.5 Phoenix在MimicGen任务上整体SR 4.2%代表零样本迁移能力上限；BC-RNN Stack 98%代表有监督训练上限；两者训练条件不同不可直接比较，为LoRA微调提供了具体的基线参考</li>
+<li>VisiumHD 坐标映射：2um bin 的 r_big//4 得到8um grid row（col同理）；annotation barcode 格式 s_008um_{row:05d}_{col:05d}-1；MIHD 在 VisiumHD 上 pca×uni2×staig_fusion Silhouette=0.343，显著优于纯 PCA 的 0.086，验证多模态融合对 HD 数据的有效性</li>
+<li>robomimic BC-RNN 推理关键配置：checkpoint config 以 JSON 字符串存储（需 json.loads，非直接 dict 访问）；shape_metadata 记录实际图像尺寸；绕过标准 rollout 时需手动 HWC→CHW 转置和 uint8→float32/255 归一化（robomimic 标准 rollout 中 ObsUtils.process_obs 自动完成）</li>
+<li>JAX/Pi0.5 训练关键配置：① 强制 CPU 需同时设 CUDA_VISIBLE_DEVICES=&quot;&quot; + JAX_PLATFORMS=cpu；② XLA_PYTHON_CLIENT_MEM_FRACTION=0.95 对 A800 80GB 有效（61→77.7GB）；③ HPC 节点必须预设 WANDB_MODE=disabled；④ argparse 布尔 flag 用 &ndash;no-overwrite，不能用 &ndash;flag=False；⑤ openpi norm_stats 路径为 assets/<config>/benchmark/<dataset>/norm_stats.json（非 checkpoints/）</li>
+<li>BC-RNN 配置与任务复杂度匹配：Coffee 需57维 object 状态（多阶段精确操作必需）；Stack 简单叠放仅需图像；orbax resume=True 不自动覆盖已存在 step 目录，需显式 overwrite=True（JAX 生态通用陷阱）</li>
+<li>大型仓库重构方法论：系统性 grep 验证所有导入依赖→按「建新→更新引用→删旧」顺序执行→dry_run 验证；同名函数多变体合并前需仔细比对边界条件（&gt; vs &gt;= vs &lt; 可导致功能完全相反）</li>
+<li>BC-RNN vs Pi0.5 能力对比：BC-RNN 简单任务（Stack D0/D1, Threading D0）epoch 22 即达 64-100% SR；复杂多步任务（Coffee, ThreePieceAssembly D1）有明确能力上限（600 epoch 仍接近0%）；Pi0.5 基础模型 4.2% SR，LoRA 微调效果待验证</li>
+<li>norm_stats 计算加速：仅需 dataset transforms，完全不需要模型推理；CPU模式 + &ndash;max-frames 10000 子采样 + 9任务并行，从10+分钟降至2.5分钟（156 batches 足够统计稳定）</li>
 </ul>
 <h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
 <ul>
-<li>daily_summary finalize双重条件：时间条件（date&lt;today）保证非当天进行中数据，完整性条件（所有设备源log均_finalized）保证多设备数据已全量上传，两者缺一不可；两个行为相似的命令（&ndash;sync无日期、&ndash;sync-all）应复用现有逻辑保持语义一致</li>
-<li>Slurm &ndash;overlap允许在已有interactive job资源上叠加运行新命令，避免重新排队；HPC计算节点无外网应默认WANDB_MODE=disabled；修改训练启动脚本后需先kill launcher进程再重启，否则launcher按旧配置自动恢复子进程</li>
-<li>macOS播放模式设计：将全局副作用集中到@Published属性的didSet实现单一真相源；NSProcessInfoPowerStateDidChange+isLowPowerModeEnabled实现无轮询低电量感知；Liquid Glass媒体场景使用.regular glass（而非.clear）提供背景隔离，不依赖shadow；DateFormatter.dateFormat(fromTemplate:locale:)生成区域感知日期格式</li>
+<li>SLURM HPC 调试技巧：srun &ndash;overlap 在有 interactive session 的节点附加执行命令（直接 SSH 被 pam_slurm_adopt 阻断）；nohup bash 脚本子进程不随父进程退出，kill 时需分别处理 launcher 和子进程</li>
 </ul>
 <h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
-<h3 id="sthdmihddcc">STHD/MIHD（DCC）<a hidden class="anchor" aria-hidden="true" href="#sthdmihddcc">#</a></h3>
-<p><strong>🔄 VisiumHD crop10large三源annotation对比可视化与STAIG Fusion HD适配</strong>
+<h3 id="sthd">STHD<a hidden class="anchor" aria-hidden="true" href="#sthd">#</a></h3>
+<p><strong>✅ STHD 代码库分析与 CLAUDE.md 深度改进</strong>
 <em>00:06:57.489 | claude_code</em>
-在DCC集群完成STHD/MIHD双项目CLAUDE.md深度改进，随后实现VisiumHD crop10large三层次annotation体系：Pathologist annotation通过r_big//4坐标映射100%匹配；STHD细胞类型预测通过majority vote聚合（96.3%匹配）；STAIG GCN Fusion经5轮bug修复成功运行（300 epochs，Silhouette=0.343）。scGPT可视化从mclust（预计6小时）切换为KMeans，2分钟完成11个section（ARI=0.1695）。MIHD代码精简优化规划因用户中断ExitPlanMode未进入实施。</p>
-<h3 id="mihddcc">MIHD（DCC）<a hidden class="anchor" aria-hidden="true" href="#mihddcc">#</a></h3>
-<p><strong>✅ 执行六阶段MIHD仓库大规模清理重构</strong>
+读取 STHD 所有核心模块，补充之前遗漏的6个模块说明（frontline.py、qcmask.py、roi.py、sim.py 等）、概率模型优化目标、Numba JIT 并行化细节、pdata TSV 格式和 patch 重叠处理逻辑；探索 VisiumHD 共享数据目录，确认 crop10/crop10large 均有 STHD 预测结果。</p>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>✅ VisiumHD三种annotation可视化 + STAIG fusion端到端 + scGPT KMeans可视化</strong>
+<em>00:06:22.389 | claude_code</em>
+发现 r_big//4 barcode 映射规律（100%匹配），生成病理学家/STHD/STAIG fusion 三种对比可视化；修复4处 HD 路径适配 bug 后完成 pca×uni2×staig_fusion 全流程（Silhouette=0.343 vs PCA 0.086）；终止耗时 mclust 任务改用 KMeans，11切片可视化从6+小时压缩至2分钟（ARI=0.1695）。</p>
+<p><strong>✅ MIHD仓库6阶段清理重构 + 2026-02-28日报补写</strong>
 <em>02:46:18.544 | claude_code</em>
-用户提供完整六阶段重构计划（含grep验证的41个死文件清单和精确函数迁移表），AI执行：删除所有死文件，新建models/staig_utils.py和models/vision_extractors.py，将共享函数迁移至正确模块，更新所有pipeline导入，删除run_benchmark.py（3488行）及5个依赖模型，提取STAIG公共函数并修复BasicContrastive.py的drop_feature逻辑bug（&gt;= → &lt;），更新所有文档，pipeline dry_run验证通过（440个实验计划）。</p>
-<h3 id="errorrecoverybenchmarktianhe">ErrorRecoveryBenchmark（tianhe）<a hidden class="anchor" aria-hidden="true" href="#errorrecoverybenchmarktianhe">#</a></h3>
-<p><strong>🔄 BC-RNN错误注入流水线、Pi0.5 Phoenix评测、Coffee根因诊断修复、Pi0.5 LoRA六GPU训练启动</strong>
+按用户提供的6阶段重构计划执行：删除41个死文件（~250K代码），将 run_benchmark.py 共享函数迁移至6个模块，删除单体及5个依赖模型，提取 STAIG 公共代码并修复 drop_feature 逻辑反转 bug，更新全部文档，dry_run 验证440个实验通过。同期补写2026-02-28日报，含151673多模态 benchmark 表格和60+张可视化超链接。</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 Pi0.5 9任务评估完成 + Coffee BC-RNN配置修复 + v4.17文件整理 + Pi0.5 LoRA数据准备</strong>
+<em>00:09:05.761 | claude_code</em>
+获取 Pi0.5 评估结果（总SR=4.2%，Stack最高24%）；诊断 Pi0.5 前两次训练失败（SLURM时限+orbax冲突），确认第三次已完成99999步；AI 独立发现 Coffee 0% SR 根因（缺失57维 object 观测键），修复并验证9个配置文件；完成 v4.17 文件整理（archive/四层目录、VLM教程合并、EXTERNAL_DEPENDENCIES.md）；完成8/9任务 LeRobot 数据转换，编写训练启动脚本，ExitPlanMode 被拒。</p>
+<p><strong>🔄 BC-RNN Stack_D0错误场景生成流水线（4个bug修复）+ 基础设施文档 + GPU清理 + 训练监控</strong>
 <em>01:10:59.841 | claude_code</em>
-在an49 GPU节点完成四项工作：(1) 修复BC-RNN视觉策略推理三个关键配置bug，生成11个tip_over错误场景并批量渲染MP4；(2) Pi0.5 Phoenix在9个MimicGen任务基准评测完成（整体SR 4.2%，Stack_D0最高24%），确认两次fine-tune任务（Job 46551/46553）均未完成，需重训；(3) 诊断Coffee BC-RNN 0% SR根因（config模板缺失57维object观测键），修复9个任务配置，另发现Coffee环境初始化穿模的独立bug；(4) 搭建Pi0.5 LoRA微调管线（18个configs，9个数据集转换），修复4个连续启动bug，最终6任务在GPU 1-6以XLA_PYTHON_CLIENT_MEM_FRACTION=0.95并行运行。清理an49节点约407GB闲置GPU显存。</p>
-<h3 id="gadgetsummarizemacbook">gadget/summarize（MacBook）<a hidden class="anchor" aria-hidden="true" href="#gadgetsummarizemacbook">#</a></h3>
-<p><strong>🔄 merge finalize机制实现、&ndash;sync逻辑修复、历史日报批量生成</strong>
-<em>03:31:19.876 | claude_code</em>
-实现merge finalize机制（双重条件自动标记_finalized，新增&ndash;force参数）；修复merge &ndash;sync无日期参数时将所有日期合并为单批次的问题，改为委托_cmd_merge_sync_all()逐天处理。随后批量运行daily_summary.py为2026-02-01至02-28共13+天历史日期生成结构化JSON日报，覆盖MIHD、ErrorRecovery、CalendarPro、gadget、DesktopVideo等项目；部分复杂日期（02-14、02-16、02-28等）因内容过多触发API 32K token超限导致合并不完整，需设置CLAUDE_CODE_MAX_OUTPUT_TOKENS。</p>
-<h3 id="desktopvideomacbook">DesktopVideo（MacBook）<a hidden class="anchor" aria-hidden="true" href="#desktopvideomacbook">#</a></h3>
-<p><strong>✅ 播放模式三个Bug修复与Liquid Glass屏保时钟UI重设计</strong>
-<em>21:26:28.000 | claude_code</em>
-实现三个播放模式bug修复：AppState.didSet集中重评估（单一真相源），SharedWallpaperWindowManager委托全局评估方法，AppDelegate注册NSProcessInfoPowerStateDidChange低电量感知（低电量时automatic切换省电+阈值anyOverlayCompletelyCovered）。同步更新Localizable.xcstrings（5种语言）和ChangeLog.md，xcodebuild通过。UI优化：移除GeneralSettingsView中与PlaybackSettingsView重复的控件；重设计CombinedGlassClock为macOS Tahoe原生风格（.regular glass、独立胶囊容器、去阴影、clockVerticalPositionFactor=0.85常量统一4处）；改用dateFormat(fromTemplate:)区域感知日期格式；xcodebuild通过。</p>
+迭代修复4层图像观测 bug（enable_camera 检测/json.loads 解析/84×84分辨率自动检测/HWC→CHW转置），成功生成11个 tip_over 错误场景和 MP4 视频；清理 an49 闲置530GB VRAM；创建 docs/infrastructure_reference.md（649场景/9类错误/完整组件文档，13章节）；监控7个 BC-RNN 任务（stack 接近满分，coffee 完全失败）；发现 coffee rollout 视频有环境初始化 simulator bug，修复未完成。</p>
+<p><strong>✅ BC-RNN首批评估 + v4.18代码整理 + Pi0.5 LoRA流水线验证与成功启动（4个bug修复）</strong>
+<em>21:48:48.390 | claude_code</em>
+TensorBoard API 获取首批评估（stack_d0=64%@epoch22，coffee=0%）；实施 v4.18 整理（提取 script_utils.py 消除~210行重复代码，更新 CLAUDE.md）；验证 coffee_d0 完整链路（1000 demos/2.4GB），逐任务完成9个数据集转换（批量 segfault 后改为逐任务）；修复4个 Pi0.5 训练启动 bug（JAX_PLATFORMS/assets路径/&ndash;no-overwrite/W&amp;B），扩展至 GPU 1-6+XLA_MEM=0.95，最终以6块 A800 GPU 77.7GB/卡100%利用率稳定运行9任务并行 LoRA 微调。</p>
 <h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
 <h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
 <table>
@@ -488,31 +461,31 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>总 Token</td>
-          <td>100,437,375</td>
+          <td>89,955,645</td>
       </tr>
       <tr>
           <td>输入 Token</td>
-          <td>149,655</td>
+          <td>145,331</td>
       </tr>
       <tr>
           <td>输出 Token</td>
-          <td>271,922</td>
+          <td>187,297</td>
       </tr>
       <tr>
           <td>Cache 创建</td>
-          <td>6,576,589</td>
+          <td>3,559,531</td>
       </tr>
       <tr>
           <td>Cache 读取</td>
-          <td>93,439,209</td>
+          <td>86,063,486</td>
       </tr>
       <tr>
           <td>Cache 命中率</td>
-          <td>93.4%</td>
+          <td>96.0%</td>
       </tr>
       <tr>
           <td>总费用 (USD)</td>
-          <td>$70.2337</td>
+          <td>$54.9985</td>
       </tr>
   </tbody>
 </table>
@@ -532,30 +505,21 @@ document.addEventListener("DOMContentLoaded", function() {
   <tbody>
       <tr>
           <td>claude-opus-4-6</td>
-          <td>27,644</td>
-          <td>122,228</td>
-          <td>2,244,633</td>
-          <td>74,584,485</td>
-          <td>$54.5151</td>
-          <td>77.6%</td>
+          <td>23,709</td>
+          <td>111,184</td>
+          <td>2,047,068</td>
+          <td>70,767,659</td>
+          <td>$51.0761</td>
+          <td>92.9%</td>
       </tr>
       <tr>
           <td>claude-haiku-4-5-20251001</td>
-          <td>121,843</td>
-          <td>85,544</td>
-          <td>1,657,417</td>
-          <td>17,757,394</td>
-          <td>$4.3971</td>
-          <td>6.3%</td>
-      </tr>
-      <tr>
-          <td>claude-sonnet-4-6</td>
-          <td>168</td>
-          <td>64,150</td>
-          <td>2,674,539</td>
-          <td>1,097,330</td>
-          <td>$11.3215</td>
-          <td>16.1%</td>
+          <td>121,622</td>
+          <td>76,113</td>
+          <td>1,512,463</td>
+          <td>15,295,827</td>
+          <td>$3.9223</td>
+          <td>7.1%</td>
       </tr>
   </tbody>
 </table>
@@ -577,13 +541,6 @@ document.addEventListener("DOMContentLoaded", function() {
           <td>4,161</td>
           <td>22,420</td>
           <td>$6.0188</td>
-      </tr>
-      <tr>
-          <td>MacBook</td>
-          <td>10,481,730</td>
-          <td>4,324</td>
-          <td>84,625</td>
-          <td>$15.2352</td>
       </tr>
       <tr>
           <td>tianhe</td>
@@ -613,11 +570,6 @@ document.addEventListener("DOMContentLoaded", function() {
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
         <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
     </span>
-    <span>
-        · 本站访客数：<span id="busuanzi_value_site_uv"></span>
-        · 总访问量：<span id="busuanzi_value_site_pv"></span>
-    </span>
-    
 </footer>
 <a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
