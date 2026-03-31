@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-12 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="在天河服务器上调试 VLA 机器人评估环境的多层依赖问题，同时优化 GPU 监控工具的显示逻辑">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-12/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.74275d3de94d719fb7098f21c29c7cbda35c9c6ca6621dbdcbd629ecff2aa1ac.css" integrity="sha256-dCddPelNcZ&#43;3CY8hwpx8vaNcnGymYh29y9Yp7P8qoaw=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-12/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-12/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-12/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-12">
+  <meta property="og:description" content="在天河服务器上调试 VLA 机器人评估环境的多层依赖问题，同时优化 GPU 监控工具的显示逻辑">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-12T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-12T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-12">
+  <meta name="twitter:description" content="在天河服务器上调试 VLA 机器人评估环境的多层依赖问题，同时优化 GPU 监控工具的显示逻辑">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "每日摘要",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-03-12",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/2026-03-12/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-12",
+  "name": "Bug Journal 2026-03-12",
+  "description": "在天河服务器上调试 VLA 机器人评估环境的多层依赖问题，同时优化 GPU 监控工具的显示逻辑",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-12 今日概览 做了什么： 修复 VLA/RoboTwin 评估环境的 torch/torchvision 版本不匹配和 curobo CUDA 扩展 ABI 兼容性问题，并改进 GPU 监控工具 gpumon.py 的终端宽度与进程显示逻辑 怎么做的： 逐层排查依赖链错误（torchvision 升级 → curobo JIT 编译路径修复 → checkpoint 路径核查），通过设置 CUDA_HOME+CPATH 指向 conda 内部 CUDA 头文件目录从源码重新编译 curobo 有什么用： 解决了 torch 2.7.1 环境下两个关键依赖冲突，评估脚本可以正常启动并运行到模型加载阶段，为后续机器人策略评估扫清了环境障碍 在天河服务器上调试 VLA 机器人评估环境的多层依赖问题，同时优化 GPU 监控工具的显示逻辑\n今日任务 架构与策略 🔄 VLA eval.sh 运行环境修复 — 修复 bash eval.sh place_dual_shoes demo_clean pi05_robotwin2 demo_clean 0 2 运行失败：依次解决 torchvision 版本不匹配（0.21.0→0.22.1）、curobo CUDA 扩展 ABI 不兼容（源码重编译），剩余 checkpoint_id=5000 路径不存在问题待解决（可用 checkpoint：15000/25000/29999） 实现与修复 🔄 gpumon.py 显示逻辑优化 — 修复 GPU 监控工具输出超宽（\u003e100列）和进程重复显示问题；AI 实现了全局去重，但用户纠正为每进程在每张 GPU 上只显示一次，会话中断，任务未完全完成 问题与解决方案 关键问题 1. curobo 预编译 .so 文件与 torch 2.7.1 ABI 不兼容（undefined symbol: torchInternalAssertFail），JIT 重新编译因缺少 ninja 和 CUDA 头文件而失败 解决方案: 安装 ninja，设置 CUDA_HOME 为 conda 环境根目录，CPATH 指向 envs/RefineVLA/targets/x86_64-linux/include/，执行 pip install -e . 从源码重编译 curobo\n关键洞察: conda 安装的 CUDA toolkit 头文件在 envs//targets/x86_64-linux/include/ 而非 /usr/local/cuda/include/；编译 CUDA 扩展时必须将 CUDA_HOME 和 CPATH 指向此路径\n2. torch 2.7.1+cu126 与 torchvision 0.21.0 版本不匹配，torchvision::nms 算子注册失败 解决方案: 升级 torchvision 至 0.22.1+cu126（pip install torchvision==0.22.1 –index-url https://download.pytorch.org/whl/cu126）\n关键洞察: torch 2.7.x 必须搭配 torchvision 0.22.x；torchvision .so 文件链接的是 torch C++ ABI，大版本升级后必须同步升级\n一般问题 3. checkpoint 路径 policy/pi05/checkpoints/pi05_robotwin2/demo_clean/5000/assets/ 不存在，deploy_policy.yml 默认 checkpoint_id=5000，但实际可用为 15000/25000/29999 解决方案: 会话中断未解决；需将 deploy_policy.yml 中 checkpoint_id 改为可用值（如 29999）或通过 eval.sh 参数传入\n关键洞察: eval.sh 传入的 checkpoint_id 参数需与实际训练产物对应，yml 默认值 5000 仅为占位符\n4. gpumon.py 输出宽度超过终端宽度，进程在多 GPU 下重复出现 解决方案: 重写进程表逻辑，限制输出为 80 列，过滤 multiprocessing worker/wandb-core 等子进程噪声\n关键洞察: AI 将需求理解为全局去重（每进程出现一次），实际需求是每 (进程, GPU) 对去重（每进程在每张 GPU 上各出现一次）\n人类思路 vs AI 思路 战略层面 gpumon.py 进程去重粒度的理解 角色 思路 人类 人类清楚区分了「进程与 GPU 的多对多关系」：期望每个 (进程, GPU) 对只显示一次，而非全局每进程只显示一次 AI AI 实现全局去重——每进程只出现一次，GPU 列用逗号连接所有使用的卡号（如 0,1,5,7） 差异分析: AI 的方案丢失了进程与具体 GPU 的对应关系；人类需求在保留多卡对应的同时去除冗余行\n实现层面 依赖环境调试的主导权 角色 思路 人类 人类采用迭代驱动策略：每次修复一个错误后重跑脚本观察新错误，多次主动拒绝 AI 的工具调用（find 命令、ExitPlanMode）以控制节奏 AI AI 负责逐层根因分析和技术执行，能够识别 torch→torchvision→curobo 的完整依赖链并提出修复方案 差异分析: 人类掌握执行节奏和范围控制，AI 提供诊断和实现能力；分工明确但人类的多次干预延长了调试周期\nAI 局限性 重要局限 AI 误解 gpumon.py 的去重粒度需求，将「每 (进程, GPU) 对去重」实现为「全局每进程去重」，需用户明确纠正才发现错误 一般局限 CUDA 头文件路径排查需多次尝试（pip nvidia 包路径 → 系统 /usr/local/cuda → conda targets 目录），AI 未能根据环境结构一次定位正确路径 AI 在路径不确定时倾向于使用 find 全局搜索，该行为被用户拒绝；应优先利用已知环境结构（conda env 布局）推断路径 今日收获 核心收获 conda 环境中安装 CUDA toolkit 时，头文件位于 envs//targets/x86_64-linux/include/（而非 /usr/local/cuda/include/）；编译 CUDA 扩展需设置 CUDA_HOME= 和 CPATH= torch 大版本升级后，所有依赖 torch C++ ABI 的 CUDA 扩展（torchvision、curobo 等预编译 .so 文件）都需要重新编译或升级版本；torch 2.7.x 对应 torchvision 0.22.x curobo 的预编译 .so 文件与当前 torch 不兼容时，删除 .so 后用 pip install -e . 从源码重建是可行的快速修复路径，关键是正确设置 CUDA 编译环境 会话摘要 RoboBrain GPU Monitor 🔄 gpumon.py 终端宽度限制与进程显示去重优化 15:48:28.705 | claude_code 用户展示了 gpumon.py 的超宽输出与进程重复问题，要求修复。AI 重写进程表逻辑，将宽度限制为 80 列并实现全局进程去重。用户随即纠正：正确需求是每进程在每张 GPU 上只显示一次而非全局去重，会话被中断，二次修复未能完成。\nVLA RoboTwin pi05 🔄 eval.sh 依赖链修复：torchvision 升级 + curobo 源码重编译 + checkpoint 路径问题发现 02:34:02.614 | claude_code 按计划升级 torchvision 至 0.22.1 成功后，出现 curobo CUDA 扩展 ABI 不兼容错误。AI 安装 ninja，删除旧 .so 文件，在 conda 环境 targets/x86_64-linux/include/ 目录中找到 CUDA 头文件，设置 CUDA_HOME+CPATH 后成功从源码编译 curobo。再次运行脚本后发现 checkpoint_id=5000 路径不存在（实际可用 15000/25000/29999），会话在分析参数映射时被中断。\n🔄 eval.sh 首次报错分析：torch/torchvision 版本不匹配诊断与修复计划 02:23:18.758 | claude_code 用户运行 eval.sh 出现 torchvision::nms 算子不存在错误。AI 确诊为 torch 2.7.1 与 torchvision 0.21.0 版本不匹配，制定升级 torchvision 至 0.22.1 的计划。用户选择升级方案但拒绝了 AI 直接执行的 ExitPlanMode，会话以等待用户指令结束。\nToken 用量 总览 指标 数值 总 Token 1,970,396 输入 Token 62 输出 Token 3,342 Cache 创建 199,634 Cache 读取 1,767,358 Cache 命中率 89.9% 总费用 (USD) $2.2153 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 62 3,342 199,634 1,767,358 $2.2153 100.0% ",
+  "wordCount" : "450",
+  "inLanguage": "zh",
+  "datePublished": "2026-03-12T00:00:00-05:00",
+  "dateModified": "2026-03-12T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/daily/2026-03-12/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                    <ul class="lang-switch"><li>|</li>
+                        <li>
+                            <a href="https://tzj2006.github.io/" title="English"
+                                aria-label="English">English</a>
+                        </li>
+                    </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/zh/">主页</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/daily/">每日摘要</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-12
+    </h1>
+    <div class="post-meta"><span title='2026-03-12 00:00:00 -0500 -0500'>2026年3月12日</span>&nbsp;·&nbsp;<span>3 分钟</span>&nbsp;|&nbsp;<span>语言:</span>
+<ul class="i18n_list">
+    <li>
+        <a href="https://tzj2006.github.io/bugjournal/daily/2026-03-12/">English</a>
+    </li>
+</ul>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-12">日报 — 2026-03-12<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-12">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 修复 VLA/RoboTwin 评估环境的 torch/torchvision 版本不匹配和 curobo CUDA 扩展 ABI 兼容性问题，并改进 GPU 监控工具 gpumon.py 的终端宽度与进程显示逻辑</li>
+<li><strong>怎么做的：</strong> 逐层排查依赖链错误（torchvision 升级 → curobo JIT 编译路径修复 → checkpoint 路径核查），通过设置 CUDA_HOME+CPATH 指向 conda 内部 CUDA 头文件目录从源码重新编译 curobo</li>
+<li><strong>有什么用：</strong> 解决了 torch 2.7.1 环境下两个关键依赖冲突，评估脚本可以正常启动并运行到模型加载阶段，为后续机器人策略评估扫清了环境障碍</li>
+</ul>
+<blockquote>
+<p>在天河服务器上调试 VLA 机器人评估环境的多层依赖问题，同时优化 GPU 监控工具的显示逻辑</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>🔄 <strong>VLA eval.sh 运行环境修复</strong> — 修复 bash eval.sh place_dual_shoes demo_clean pi05_robotwin2 demo_clean 0 2 运行失败：依次解决 torchvision 版本不匹配（0.21.0→0.22.1）、curobo CUDA 扩展 ABI 不兼容（源码重编译），剩余 checkpoint_id=5000 路径不存在问题待解决（可用 checkpoint：15000/25000/29999）</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>🔄 <strong>gpumon.py 显示逻辑优化</strong> — 修复 GPU 监控工具输出超宽（&gt;100列）和进程重复显示问题；AI 实现了全局去重，但用户纠正为每进程在每张 GPU 上只显示一次，会话中断，任务未完全完成</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-curobo-预编译-so-文件与-torch-271-abi-不兼容undefined-symbol-torchinternalassertfailjit-重新编译因缺少-ninja-和-cuda-头文件而失败">1. curobo 预编译 .so 文件与 torch 2.7.1 ABI 不兼容（undefined symbol: torchInternalAssertFail），JIT 重新编译因缺少 ninja 和 CUDA 头文件而失败<a hidden class="anchor" aria-hidden="true" href="#1-curobo-预编译-so-文件与-torch-271-abi-不兼容undefined-symbol-torchinternalassertfailjit-重新编译因缺少-ninja-和-cuda-头文件而失败">#</a></h4>
+<p><strong>解决方案:</strong> 安装 ninja，设置 CUDA_HOME 为 conda 环境根目录，CPATH 指向 envs/RefineVLA/targets/x86_64-linux/include/，执行 pip install -e . 从源码重编译 curobo</p>
+<p><strong>关键洞察:</strong> conda 安装的 CUDA toolkit 头文件在 envs/<name>/targets/x86_64-linux/include/ 而非 /usr/local/cuda/include/；编译 CUDA 扩展时必须将 CUDA_HOME 和 CPATH 指向此路径</p>
+<h4 id="2-torch-271cu126-与-torchvision-0210-版本不匹配torchvisionnms-算子注册失败">2. torch 2.7.1+cu126 与 torchvision 0.21.0 版本不匹配，torchvision::nms 算子注册失败<a hidden class="anchor" aria-hidden="true" href="#2-torch-271cu126-与-torchvision-0210-版本不匹配torchvisionnms-算子注册失败">#</a></h4>
+<p><strong>解决方案:</strong> 升级 torchvision 至 0.22.1+cu126（pip install torchvision==0.22.1 &ndash;index-url <a href="https://download.pytorch.org/whl/cu126">https://download.pytorch.org/whl/cu126</a>）</p>
+<p><strong>关键洞察:</strong> torch 2.7.x 必须搭配 torchvision 0.22.x；torchvision .so 文件链接的是 torch C++ ABI，大版本升级后必须同步升级</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="3-checkpoint-路径-policypi05checkpointspi05_robotwin2demo_clean5000assets-不存在deploy_policyyml-默认-checkpoint_id5000但实际可用为-150002500029999">3. checkpoint 路径 policy/pi05/checkpoints/pi05_robotwin2/demo_clean/5000/assets/ 不存在，deploy_policy.yml 默认 checkpoint_id=5000，但实际可用为 15000/25000/29999<a hidden class="anchor" aria-hidden="true" href="#3-checkpoint-路径-policypi05checkpointspi05_robotwin2demo_clean5000assets-不存在deploy_policyyml-默认-checkpoint_id5000但实际可用为-150002500029999">#</a></h4>
+<p><strong>解决方案:</strong> 会话中断未解决；需将 deploy_policy.yml 中 checkpoint_id 改为可用值（如 29999）或通过 eval.sh 参数传入</p>
+<p><strong>关键洞察:</strong> eval.sh 传入的 checkpoint_id 参数需与实际训练产物对应，yml 默认值 5000 仅为占位符</p>
+<h4 id="4-gpumonpy-输出宽度超过终端宽度进程在多-gpu-下重复出现">4. gpumon.py 输出宽度超过终端宽度，进程在多 GPU 下重复出现<a hidden class="anchor" aria-hidden="true" href="#4-gpumonpy-输出宽度超过终端宽度进程在多-gpu-下重复出现">#</a></h4>
+<p><strong>解决方案:</strong> 重写进程表逻辑，限制输出为 80 列，过滤 multiprocessing worker/wandb-core 等子进程噪声</p>
+<p><strong>关键洞察:</strong> AI 将需求理解为全局去重（每进程出现一次），实际需求是每 (进程, GPU) 对去重（每进程在每张 GPU 上各出现一次）</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="gpumonpy-进程去重粒度的理解">gpumon.py 进程去重粒度的理解<a hidden class="anchor" aria-hidden="true" href="#gpumonpy-进程去重粒度的理解">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类清楚区分了「进程与 GPU 的多对多关系」：期望每个 (进程, GPU) 对只显示一次，而非全局每进程只显示一次</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 实现全局去重——每进程只出现一次，GPU 列用逗号连接所有使用的卡号（如 0,1,5,7）</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI 的方案丢失了进程与具体 GPU 的对应关系；人类需求在保留多卡对应的同时去除冗余行</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="依赖环境调试的主导权">依赖环境调试的主导权<a hidden class="anchor" aria-hidden="true" href="#依赖环境调试的主导权">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类采用迭代驱动策略：每次修复一个错误后重跑脚本观察新错误，多次主动拒绝 AI 的工具调用（find 命令、ExitPlanMode）以控制节奏</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 负责逐层根因分析和技术执行，能够识别 torch→torchvision→curobo 的完整依赖链并提出修复方案</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类掌握执行节奏和范围控制，AI 提供诊断和实现能力；分工明确但人类的多次干预延长了调试周期</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>AI 误解 gpumon.py 的去重粒度需求，将「每 (进程, GPU) 对去重」实现为「全局每进程去重」，需用户明确纠正才发现错误</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>CUDA 头文件路径排查需多次尝试（pip nvidia 包路径 → 系统 /usr/local/cuda → conda targets 目录），AI 未能根据环境结构一次定位正确路径</li>
+<li>AI 在路径不确定时倾向于使用 find 全局搜索，该行为被用户拒绝；应优先利用已知环境结构（conda env 布局）推断路径</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>conda 环境中安装 CUDA toolkit 时，头文件位于 envs/<name>/targets/x86_64-linux/include/（而非 /usr/local/cuda/include/）；编译 CUDA 扩展需设置 CUDA_HOME=&lt;conda_env_root&gt; 和 CPATH=&lt;targets_include&gt;</li>
+<li>torch 大版本升级后，所有依赖 torch C++ ABI 的 CUDA 扩展（torchvision、curobo 等预编译 .so 文件）都需要重新编译或升级版本；torch 2.7.x 对应 torchvision 0.22.x</li>
+<li>curobo 的预编译 .so 文件与当前 torch 不兼容时，删除 .so 后用 pip install -e . 从源码重建是可行的快速修复路径，关键是正确设置 CUDA 编译环境</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="robobrain-gpu-monitor">RoboBrain GPU Monitor<a hidden class="anchor" aria-hidden="true" href="#robobrain-gpu-monitor">#</a></h3>
+<p><strong>🔄 gpumon.py 终端宽度限制与进程显示去重优化</strong>
+<em>15:48:28.705 | claude_code</em>
+用户展示了 gpumon.py 的超宽输出与进程重复问题，要求修复。AI 重写进程表逻辑，将宽度限制为 80 列并实现全局进程去重。用户随即纠正：正确需求是每进程在每张 GPU 上只显示一次而非全局去重，会话被中断，二次修复未能完成。</p>
+<h3 id="vla-robotwin-pi05">VLA RoboTwin pi05<a hidden class="anchor" aria-hidden="true" href="#vla-robotwin-pi05">#</a></h3>
+<p><strong>🔄 eval.sh 依赖链修复：torchvision 升级 + curobo 源码重编译 + checkpoint 路径问题发现</strong>
+<em>02:34:02.614 | claude_code</em>
+按计划升级 torchvision 至 0.22.1 成功后，出现 curobo CUDA 扩展 ABI 不兼容错误。AI 安装 ninja，删除旧 .so 文件，在 conda 环境 targets/x86_64-linux/include/ 目录中找到 CUDA 头文件，设置 CUDA_HOME+CPATH 后成功从源码编译 curobo。再次运行脚本后发现 checkpoint_id=5000 路径不存在（实际可用 15000/25000/29999），会话在分析参数映射时被中断。</p>
+<p><strong>🔄 eval.sh 首次报错分析：torch/torchvision 版本不匹配诊断与修复计划</strong>
+<em>02:23:18.758 | claude_code</em>
+用户运行 eval.sh 出现 torchvision::nms 算子不存在错误。AI 确诊为 torch 2.7.1 与 torchvision 0.21.0 版本不匹配，制定升级 torchvision 至 0.22.1 的计划。用户选择升级方案但拒绝了 AI 直接执行的 ExitPlanMode，会话以等待用户指令结束。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>1,970,396</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>62</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>3,342</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>199,634</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>1,767,358</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>89.9%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$2.2153</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>62</td>
+          <td>3,342</td>
+          <td>199,634</td>
+          <td>1,767,358</td>
+          <td>$2.2153</td>
+          <td>100.0%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-24 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="TzJsDesktop完成gadget summarize模块重构（2930行→8模块&#43;72测试）、summarize skill论文式六章节升级、ccplan工具链全面修复，以及TokenMonitor从macOS专属到跨平台&#43;ccusage MCP后端的架构规划与Phase A/E实现启动；tianhe完成BOSS基准代码库CLAUDE.md创建和LiPM训练器5个Bug定位，但受API连接故障影响上午中断约6小时。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-24/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.74275d3de94d719fb7098f21c29c7cbda35c9c6ca6621dbdcbd629ecff2aa1ac.css" integrity="sha256-dCddPelNcZ&#43;3CY8hwpx8vaNcnGymYh29y9Yp7P8qoaw=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-24/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-24/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-24/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-24">
+  <meta property="og:description" content="TzJsDesktop完成gadget summarize模块重构（2930行→8模块&#43;72测试）、summarize skill论文式六章节升级、ccplan工具链全面修复，以及TokenMonitor从macOS专属到跨平台&#43;ccusage MCP后端的架构规划与Phase A/E实现启动；tianhe完成BOSS基准代码库CLAUDE.md创建和LiPM训练器5个Bug定位，但受API连接故障影响上午中断约6小时。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-24T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-24T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-24">
+  <meta name="twitter:description" content="TzJsDesktop完成gadget summarize模块重构（2930行→8模块&#43;72测试）、summarize skill论文式六章节升级、ccplan工具链全面修复，以及TokenMonitor从macOS专属到跨平台&#43;ccusage MCP后端的架构规划与Phase A/E实现启动；tianhe完成BOSS基准代码库CLAUDE.md创建和LiPM训练器5个Bug定位，但受API连接故障影响上午中断约6小时。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "每日摘要",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-03-24",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/2026-03-24/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-24",
+  "name": "Bug Journal 2026-03-24",
+  "description": "TzJsDesktop完成gadget summarize模块重构（2930行→8模块+72测试）、summarize skill论文式六章节升级、ccplan工具链全面修复，以及TokenMonitor从macOS专属到跨平台+ccusage MCP后端的架构规划与Phase A/E实现启动；tianhe完成BOSS基准代码库CLAUDE.md创建和LiPM训练器5个Bug定位，但受API连接故障影响上午中断约6小时。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-24 今日概览 做了什么： 两台设备协同推进代码质量与架构演进：TzJsDesktop完成gadget工具链重大重构（summarize 2930行拆分为8模块、skill升级为论文式六章节）、ccplan工作流修复，并启动TokenMonitor从macOS专属到跨平台+ccusage MCP后端的全面架构重构；tianhe完成BOSS机器人基准代码库文档创建和LiPM电池模型训练器Bug审查 怎么做的： TzJsDesktop使用ccplan结构化规划（假设验证→对抗Critic审查→审批门）与多并行Agent（Critic/Red Team/Explore/Feasibility）进行架构决策，先写47个导入烟雾测试建立安全网再执行重构，ECL YAML文档持久化TokenMonitor关键架构决策；tianhe使用Explore Agent深度分析代码库，静态逻辑分析审查训练器代码 有什么用： gadget summarize从技术债（2930行零测试）转为可维护包结构（72测试+论文式文档工具）；ccplan工作流修复解决多Phase中断问题；TokenMonitor完成Cargo.toml/tauri.conf.json/commands.rs等核心跨平台清理并创建四个MCP Bridge Rust模块；BOSS代码库获得入门文档，LiPM训练器获得5个Bug修复建议 TzJsDesktop 做了什么： 完成gadget summarize模块重构（2930行→8模块+72测试）和summarize skill论文式六章节重设计（新增/code-summarize命令）；修复ccplan工具链（重命名+工作流修复+code-summarizer/optimizer安装）；完成TokenMonitor CLAUDE.md改进、完整架构规划（ccusage MCP+SSH+跨平台五阶段）、用户教程编写，并启动Phase A MCP Bridge四模块和Phase E跨平台代码清理 怎么做的： 重构前先写47个导入烟雾测试建立安全网，经Critic Agent发现12个问题（2个CRITICAL）后修订；ccplan修复通过添加CONTINUOUS EXECUTION MANDATE和10个→NEXT:过渡指令解决Phase中断；TokenMonitor使用ccplan多轮验证确定架构方案，Feasibility Agent发现Windows tray约束，Explore Agent发现ccusage MCP server更优方案，直接实现Rust代码并创建ECL文档 有什么用： summarize包从零测试变为72测试覆盖（8个模块可独立维护），skill升级为具有叙事价值的论文式文档工具；ccplan工作流修复后多Phase任务不再提前终止；TokenMonitor获得完整架构蓝图（ECL文档）、四个新MCP Bridge模块及核心文件的跨平台清理 tianhe 做了什么： 为BOSS（观测空间偏移长任务基准）创建CLAUDE.md文档，定位form_boss_44_dataset.py数据集路径错误，对比分析两版本评估脚本4类差异；审查LiPM电池模型trainer.py发现5个逻辑Bug；chenlu用户上午遭遇约6次API连接失败中断约6小时 怎么做的： 用Explore Agent深度分析BOSS代码库架构；逐行对比两版本eval脚本识别affected/unaffected设计差异；静态分析trainer.py逐行逻辑；下午13:41通过默认连接恢复并完成审查 有什么用： BOSS代码库获得入门文档，数据集路径错误得到定位；LiPM trainer发现5个逻辑Bug（含重复GPU转移、变量名错误、backbone.eval()被覆盖）；网络连接问题影响上午效率约6小时 TzJsDesktop完成gadget summarize模块重构（2930行→8模块+72测试）、summarize skill论文式六章节升级、ccplan工具链全面修复，以及TokenMonitor从macOS专属到跨平台+ccusage MCP后端的架构规划与Phase A/E实现启动；tianhe完成BOSS基准代码库CLAUDE.md创建和LiPM训练器5个Bug定位，但受API连接故障影响上午中断约6小时。\n今日任务 架构与策略 ✅ gadget summarize模块重构（2930行→8模块+72测试） — 将daily_summary.py从2930行拆分为config/remote/parsers/usage/summarizer/formatter/daily/cli共8个模块，消除mcp_server/monthly_summary/weekly_summary三处sys.path.insert hack，先写47个导入烟雾测试建立安全网，再并行提取模块，72/72测试全通过，保留daily_summary.py向后兼容shim，同步更新三处外部导入链 ✅ ccplan工具链全面升级（重命名+工作流修复+skills安装） — 将cchelper目录重命名为ccplan；修复工作流中断根因（添加CONTINUOUS EXECUTION MANDATE全局约束、10个→NEXT:过渡指令、9个multi-turn protocol）；解压并适配code-summarizer和code-optimizer两个.skill ZIP包；将ccplan/summarize/optimize全部安装到~/.claude/skills/ ✅ TokenMonitor 跨平台+ccusage MCP+SSH架构规划 — 通过ccplan多轮验证完成三大改造的完整规划：ccusage MCP server（@ccusage/mcp）替换Rust token后端、SSH远程预处理脚本（grep+jq过滤）降低传输量、渐进式五阶段（Phase A-E）迁移计划。关键决策：移除rate limit、保留change_stats/subagent_stats并完成集成、混合tray显示方案（macOS set_title + Win/Linux tooltip）。ECL文档完整记录所有决策。 ✅ gadget summarize skill升级（/code-summarize命令+论文式六章节重设计） — 在新增/code-summarize命令（支持默认./目录、递归扫描30+种代码扩展名、≤10文件对话内/\u003e10文件生成SUMMARY.md）基础上，进一步将skill从扁平四维度升级为论文式六章节格式（Highlights→Introduction→Architecture→Implementation→Results→Conclusion\u0026Future Work），含规模自适应（≤3/4-10/11-50/50+文件）和Results三级数据源降级策略，创建ECL规划文档 🔄 TokenMonitor Phase A MCP Bridge四模块实现 — 创建四个Rust模块：detect.rs（跨平台Node.js/ccusage检测，支持nvm/fnm/volta/Homebrew多路径）、mcp_process.rs（MCP进程生命周期管理，stdio JSON-RPC，健康检查自动重启）、mcp_client.rs（高层MCP客户端，完整ccusage JSON类型定义）、mcp_adapter.rs（ccusage响应→UsagePayload适配层）。lib.rs已更新注册新模块，因cargo不在PATH编译验证未完成。 🔄 TokenMonitor Phase E 跨平台代码清理 — Cargo.toml移除macos-private-api和objc2系列四个crate；tauri.conf.json移除macOSPrivateApi/transparent并添加Windows(NSIS)/Linux(AppImage/deb)配置；commands.rs删除~350行glass/NSVisualEffectView代码并简化AppState；lib.rs移除macOS-only初始化；tray_render.rs改为跨平台主题检测；所有平台添加set_tooltip()。因cargo不在PATH，编译验证未完成。 ✅ BOSS代码库CLAUDE.md创建与调试 — 为BOSS（观测空间偏移长任务基准）创建CLAUDE.md，涵盖conda环境、训练/评估命令、三级挑战（CH1/CH2_2/CH2_3）和RAMG数据增强；定位form_boss_44_dataset.py因datasets/下同时存在libero_10和libero_90两文件夹的报错根因；详细对比affected/unaffected两版本评估脚本4类差异（mapping.json模型映射、wrist_camera可选参数、视频录制时机、路径命名） ✅ LiPM trainer.py逻辑审查 — 静态分析trainer.py，发现5个逻辑问题：第74行重复调用batch_cuda、第147行变量名错误(test_datasets→test_dataset)、net.train()覆盖backbone.eval()影响BatchNorm/Dropout行为、缺少’mae’键的KeyError防护、条件判断iter_count%N==N-1语义不直观，每个问题均提供具体位置和修复建议 实现与修复 ✅ TokenMonitor CLAUDE.md改进 — 补充macOS-only平台约束、npm run release命令、pre-commit hook说明、Rate limits获取机制（Keychain OAuth+session文件）、Pricing更新指南（PRICING_VERSION常量）、Tray渲染原理、ccusage/子目录标注等缺失内容 ✅ TokenMonitor用户安装使用教程 — 创建docs/tutorial.md，覆盖安装（DMG下载和源码构建）、三层界面导航（Provider/Period/Charts）、实时燃烧率和5h计费窗口、Rate Limits面板、完整Settings参考及故障排除，含ASCII示意图 ✅ rclone同步数据到Google Drive — 执行sync.py push同步research的cache/projects/reports及3个配置文件到gdrive:gadget，其余目录本机不存在跳过，操作快速完成无报错 问题与解决方案 关键问题 1. daily_summary.py过大（2930行）且存在sys.path hack和零测试覆盖，Critic审查发现mcp_server.py导入会全断（CRITICAL） 解决方案: 先写47个烟雾测试覆盖所有外部导入契约，再按功能区块拆分为8个模块，用相对导入替换sys.path.insert，保留daily_summary.py作为向后兼容shim，同步更新三个外部消费者的导入链\n关键洞察: 先写迁移烟雾测试再拆分——测试是重构的安全网；对抗性Critic在需求阶段发现CRITICAL问题比实施后修复成本低一个数量级\n2. ccplan工作流在Phase边界提前终止，9/10个Phase缺少multi-turn protocol 解决方案: 在SKILL.md顶部添加CONTINUOUS EXECUTION MANDATE全局约束（仅3种情况可暂停），每个Phase末尾添加→NEXT:过渡指令（10/10全覆盖），补齐Phase 3/5/6/7/9的multi-turn protocol\n关键洞察: AI提前终止的根因是指令结构缺陷而非能力限制——添加明确的强制性结构化约束比添加建议性描述更有效\n3. Windows/Linux系统托盘图标是固定方形（16×16或32×32 px），Tauri v2的set_title()在Windows/Linux上无效，无法像macOS一样在图标旁显示可读金额文字 解决方案: 采用混合方案：macOS保持set_title()原生文字；所有平台添加set_tooltip()（鼠标悬停显示完整金额）；Windows/Linux方形图标内可选渲染简短数字（如’$12’），使用fontdue或ab_glyph+tiny_skia进行像素渲染\n关键洞察: 跨平台UI统一不能以牺牲可读性为代价，最优策略是在每个平台上采用该平台最自然的显示方式而非强制一致\n4. ccusage生态由5个独立npm包组成，每次查询需启动独立子进程（冷启动1-5秒延迟），多provider聚合逻辑需在TokenMonitor侧重新实现 解决方案: 改用ccusage MCP server（@ccusage/mcp）作为统一接口：常驻进程无启动延迟，已实现多provider路由（stdio JSON-RPC），TokenMonitor只需维护单一IPC通道\n关键洞察: 生态内已有解决多provider聚合问题的工具（MCP server），调研生态内现有解决方案比自行实现效率更高\n5. SSH远程读取Claude Code JSONL日志时，单个session文件可达几十到几百MB，全量rsync在慢速连接上不现实 解决方案: SSH到远程后执行轻量级shell预处理脚本（grep+jq），仅提取含model/tokens/costUSD的usage行，以tar打包传输，传输量从MB级降至KB级\n关键洞察: 远程数据获取的瓶颈在传输而非处理，将过滤逻辑前移到服务端是经典的’push computation to data’模式\n6. summarize skill初始七章节结构冗余（Introduction与Motivation重叠、Experiments暗示必须执行代码），且纯prompt skill无法直接执行代码 解决方案: 调整为六章节（合并Introduction+Motivation、拆分Methods为Architecture+Implementation、Experiments改名Results）；Results设计三级降级策略（读取实际输出→README示例→代码逻辑推断并标注[基于代码逻辑推断]）\n关键洞察: 学术论文框架直接移植到代码文档有语义错配，需按软件工程自然分层重新映射；降级策略比强制执行更健壮\n一般问题 7. form_boss_44_dataset.py报错：datasets/下同时存在libero_10和libero_90两个文件夹，脚本要求恰好一个子目录 解决方案: 删除或移走libero_10后重新运行，脚本将唯一子目录重命名为boss_44\n关键洞察: 错误信息’More than one folder found’不够具体，需读源码才能理解脚本的单子目录前提假设\n8. cargo命令不在Git Bash的PATH中（Windows环境），Phase A和Phase E的所有Rust代码修改均未经编译验证 解决方案: 暂未解决，需用户在配置了Rust工具链的PowerShell或CMD中手动执行cargo check\n关键洞察: Windows Git Bash（MSYS2）的PATH与系统PATH独立，工具链安装后需显式添加到Git Bash PATH或切换终端环境\n9. tianhe设备多次API连接失败（ConnectionRefused/FailedToOpenSocket），影响chenlu用户上午约6小时工作效率 解决方案: 多次重试后恢复，13:41通过默认配置恢复连接，用户尝试配置自定义base_url（bigmodel.cn）但不稳定\n关键洞察: 代理/API路由配置不稳定是连接失败主因，需要稳定网络环境或完善的fallback配置\n人类思路 vs AI 思路 战略层面 工具/技能设计决策（单一职责 vs 论文式叙事框架） 角色 思路 人类 人类明确提出summarize和optimize应分开（单一职责），并提出用学术论文格式（Highlights→Future Work）描述代码——这是跨领域类比，将软件工程文档与科研论文叙事结构对齐，why和impact优先于what AI AI现有skill是扁平四维度技术性总结，注重代码事实描述（what/how），缺乏叙事动机和演进视角；对工具是否分离无主动判断，倾向于描述可能性而不做取舍 差异分析: 人类在工具设计层面有更清晰的单一职责判断和叙事框架创新；AI提供了落地细节（章节调整、降级策略、规模自适应），人类提供了框架——架构直觉引导了工具设计\n工作流问题诊断（ccplan多Phase中断） 角色 思路 人类 从使用体验出发：‘调用时有很多流程没有走完就结束了’，直接定性为workflow问题 AI 深度分析SKILL.md后识别出三类结构性根因：Phase边界缺过渡指令、全局约束缺失、multi-turn protocol不完整 差异分析: 人类提供用户体验层面的症状，AI提供系统结构层面的根因分析——两者互补形成完整诊断链\n架构方案选择（重构方案 vs ccusage集成架构） 角色 思路 人类 批准方案A（最小拆分+包化）并要求一次性解决三个问题（比AI默认分阶段更激进）；在ccusage架构中最终选择了MCP server方案 AI 重构时推荐方案A与人类判断一致但默认分阶段；ccusage时初始推荐子进程调用，经Explore Agent研究后自主发现MCP server更优并更新推荐 差异分析: 人类的’一次性解决’要求比AI默认的分阶段建议更激进；AI对生态工具的认知需要主动探索才能补全，自主二次迭代后达成更优方案\nBOSS评估框架OSS设计理解 角色 思路 人类 直接请AI对比两个文件差异，没有预设期望 AI 识别出核心设计思想：affected版本通过mapping.json将修改后任务映射回原始训练模型，实现’用原始模型在修改环境评估鲁棒性’（OSS测试范式） 差异分析: AI能从代码差异中提炼高层设计意图，人类的开放性问题引导了AI输出具有研究价值的分析\n功能取舍与dead code认知 角色 思路 人类 快速决定移除rate limit功能（大幅简化架构）；询问change_stats/subagent_stats是什么后决定保留并完成集成——表明对自己项目中已有dead code功能缺乏了解 AI 规划时呈现保留/移除/改用ccusage blocks三个选项，本身倾向保留某种rate limit视图；change_stats等模块的功能AI清楚但未主动在规划阶段解释 差异分析: 人类的务实简化思维（移除非核心功能降低复杂度）vs AI的功能保全倾向；AI需要更主动地在规划阶段解释现有功能价值，而不是默认用户了解自己的代码库\nAI 局限性 重要局限 无法验证自身修改效果：ccplan工作流修复只能静态确认结构存在，无法在同一会话运行多Phase任务验证实际效果；Windows Git Bash中cargo不在PATH，Phase A和Phase E的所有Rust代码修改（四个新模块+多文件修改）均未经编译验证，潜在存在类型错误或API不兼容问题 关键约束遗漏需专项Agent发现：跨平台规划初期未主动考虑Windows/Linux tray固定方形16-32px约束，需Feasibility Agent才发现；对ccusage生态的认知需专项Explore Agent才能补全（发现MCP server存在），导致选项评估经历迭代更新 一般局限 代码生成存在冗余与不完整风险：提取daily.py和cli.py模块时产生重复_parse_date()函数；mcp_server.py部分weekly_summary导入更新可能不完整（_resolve_output_dir来源跨模块），需额外测试确认导入链正确 API连接完全依赖外部网络基础设施，ConnectionRefused/FailedToOpenSocket时无法降级工作，影响整个设备上的用户效率约6小时 今日收获 核心收获 迁移烟雾测试优先模式：重构大文件前先将所有外部导入契约写为测试（47个），重构后立即验证后向兼容性，将问题暴露在开发阶段而非生产阶段 AI工作流的CONTINUOUS EXECUTION MANDATE设计模式：多Phase工具的Phase边界必须有明确→NEXT:强制过渡（而非建议性文字），每个Phase需要独立的multi-turn protocol，否则AI会在Phase边界’礼貌停下’ 对抗性Critic/审查在规划阶段的高ROI：Critic发现12个问题（2个CRITICAL），Feasibility Agent发现Windows tray尺寸约束，均在实施前发现，节省大量返工成本。并行Critic+Red Team+Feasibility多Agent模式能系统性发现单次思考遗漏的约束 跨平台tray显示需要平台感知的混合策略：macOS菜单栏可横向扩展（set_title有效），Windows/Linux托盘是固定方形小图标（16-32px），应在每个平台采用最自然的UX模式（set_title vs tooltip vs 图标内短数字）而非强制视觉统一 论文式代码文档结构（六章节：Highlights/Introduction/Architecture/Implementation/Results/Conclusion\u0026Future Work）比扁平技术维度更能传达代码的why（动机）和impact（意义），对几个月后回来重读自己项目的开发者价值最大 ccusage MCP server优于CLI子进程调用：常驻进程无冷启动延迟（vs 1-5秒）、已实现多provider路由、标准JSON-RPC协议易于集成。生态内已有解决方案应优先调研而非自行实现。 ECL YAML文档是解决多会话复杂项目context rot的有效机制：持久化已验证需求、架构决策、对抗审查结果和当前状态，任何Agent都可从此继续工作 BOSS中affected评估脚本的OSS设计：通过mapping.json将修改后任务映射回原始训练模型，实现观测空间偏移下的鲁棒性评估；视频录制时机差异（step前vs后）反映了OSS研究中对’原始观测’的不同关注 实践收获 ccplan Phase 0代码库扫描是高价值投入：提前识别所有macOS依赖点（objc2四个crate、NSVisualEffectView等），使Phase E实施可精准定位所有需要修改的位置 .skill文件是ZIP格式（zipfile.ZipFile可解压），从Claude.ai导出后需适配Claude Code格式（添加origin:custom、移除上传路径引用）；本地安装路径为~/.claude/skills//SKILL.md 会话摘要 gadget (summarize全面升级) ✅ summarize模块重构（2930行→8模块+72测试）+ /code-summarize命令新增 + skill论文式六章节重设计 20:28:25.974 | claude_code 全天对gadget summarize进行三层升级：(1) 通过ccplan规划，经Critic发现12个问题（mcp_server导入断裂等2个CRITICAL），执行2930行→8模块重构，先写47个导入烟雾测试建立安全网，72/72测试全通过，mcp_server+monthly+weekly导入链全部更新；(2) 新增/code-summarize命令（支持默认./目录、递归扫描、智能输出）；(3) 将skill从扁平四维度升级为论文式六章节格式，含规模自适应和Results三级降级策略，创建ECL规划文档。\ngadget (skills工具链) ✅ ccplan重命名+工作流中断修复+code-summarizer/optimizer安装 19:58:03.000 | claude_code 将cchelper重命名为ccplan，修复工作流中断根因（CONTINUOUS EXECUTION MANDATE+10个→NEXT:过渡指令+9个multi-turn protocol）；解压适配code-summarizer和code-optimizer两个.skill ZIP包（添加origin:custom、移除上传路径引用）；将全部skills安装到~/.claude/skills/并验证4个文件正确就位。\nTokenMonitor ✅ CLAUDE.md改进+完整架构规划（跨平台+ccusage MCP+SSH）+用户教程 21:32:04.982 | claude_code 深度分析TokenMonitor代码库（Tauri v2+Svelte 5+Rust）并补充CLAUDE.md关键缺失内容；通过ccplan多轮验证规划三大改造，关键路径：Explore Agent发现ccusage MCP server优于子进程调用，Feasibility Agent发现Windows tray尺寸约束，确定混合tray方案和五阶段迁移计划，ECL文档完整记录所有决策；创建docs/tutorial.md完整用户指南（安装/界面/Settings/故障排除）。\n🔄 Phase A MCP Bridge四模块实现 + Phase E跨平台代码清理 21:32:04.982 | claude_code Phase A创建四个Rust模块（detect/mcp_process/mcp_client/mcp_adapter），覆盖跨平台检测、进程生命周期、高层客户端、适配层，lib.rs已更新；Phase E完成Cargo.toml移除objc2系列依赖、tauri.conf.json添加Win/Linux配置、commands.rs删除~350行glass代码、tray_render.rs跨平台改造、所有平台添加set_tooltip()。两个Phase均因cargo不在PATH而编译验证未完成。\nBOSS (Robot Benchmark) ✅ BOSS机器人基准代码库CLAUDE.md创建、数据集错误修复、双评估脚本对比 03:18:28.244 | claude_code 在tianhe服务器为BOSS创建CLAUDE.md（训练/评估命令、三级挑战、RAMG数据增强）；定位form_boss_44_dataset.py因libero_10和libero_90两文件夹并存导致的报错并给出修复方案；详细对比两版本eval脚本4类差异，识别affected版本通过mapping.json实现OSS鲁棒性评估的核心设计意图。\nLiPM (Battery Model) ✅ LiPM电池模型trainer.py逻辑审查，发现5个潜在Bug 13:41:51.723 | claude_code 在多次连接失败后（07:14-13:37约6小时中断）恢复连接，审查trainer.py发现5个问题：第74行重复batch_cuda调用、第147行变量名错误(test_datasets→test_dataset)、net.train()覆盖backbone.eval()效果、缺少’mae’键的KeyError防护、条件判断语义不直观。每个问题提供具体位置和修复建议，等待用户确认后执行。\ngadget (rclone同步) ✅ rclone同步research数据到Google Drive 19:54:55.000 | claude_code 执行sync.py push同步research的cache/projects/reports及配置文件到gdrive:gadget，其余目录不存在跳过，操作快速完成无报错。\nToken 用量 总览 指标 数值 总 Token 72,270,498 输入 Token 66,172 输出 Token 184,347 Cache 创建 4,384,306 Cache 读取 67,635,673 Cache 命中率 93.9% 总费用 (USD) $57.9935 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 14,240 138,802 3,468,093 60,808,633 $55.7437 96.1% claude-haiku-4-5-20251001 41,370 42,557 865,843 6,649,518 $2.0014 3.5% glm-4.7 10,445 1,397 0 60,102 $0.0000 0.0% claude-sonnet-4-6 117 1,591 50,370 117,420 $0.2483 0.4% 各设备用量 设备 总 Token 输入 输出 费用 tianhe 8,945,880 15,430 19,177 $7.9326 TzJsDesktop 63,324,618 50,742 165,170 $50.0609 ",
+  "wordCount" : "510",
+  "inLanguage": "zh",
+  "datePublished": "2026-03-24T00:00:00-05:00",
+  "dateModified": "2026-03-24T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/daily/2026-03-24/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                    <ul class="lang-switch"><li>|</li>
+                        <li>
+                            <a href="https://tzj2006.github.io/" title="English"
+                                aria-label="English">English</a>
+                        </li>
+                    </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/zh/">主页</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/daily/">每日摘要</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-24
+    </h1>
+    <div class="post-meta"><span title='2026-03-24 00:00:00 -0500 -0500'>2026年3月24日</span>&nbsp;·&nbsp;<span>3 分钟</span>&nbsp;|&nbsp;<span>语言:</span>
+<ul class="i18n_list">
+    <li>
+        <a href="https://tzj2006.github.io/bugjournal/daily/2026-03-24/">English</a>
+    </li>
+</ul>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-24">日报 — 2026-03-24<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-24">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 两台设备协同推进代码质量与架构演进：TzJsDesktop完成gadget工具链重大重构（summarize 2930行拆分为8模块、skill升级为论文式六章节）、ccplan工作流修复，并启动TokenMonitor从macOS专属到跨平台+ccusage MCP后端的全面架构重构；tianhe完成BOSS机器人基准代码库文档创建和LiPM电池模型训练器Bug审查</li>
+<li><strong>怎么做的：</strong> TzJsDesktop使用ccplan结构化规划（假设验证→对抗Critic审查→审批门）与多并行Agent（Critic/Red Team/Explore/Feasibility）进行架构决策，先写47个导入烟雾测试建立安全网再执行重构，ECL YAML文档持久化TokenMonitor关键架构决策；tianhe使用Explore Agent深度分析代码库，静态逻辑分析审查训练器代码</li>
+<li><strong>有什么用：</strong> gadget summarize从技术债（2930行零测试）转为可维护包结构（72测试+论文式文档工具）；ccplan工作流修复解决多Phase中断问题；TokenMonitor完成Cargo.toml/tauri.conf.json/commands.rs等核心跨平台清理并创建四个MCP Bridge Rust模块；BOSS代码库获得入门文档，LiPM训练器获得5个Bug修复建议</li>
+</ul>
+<h3 id="tzjsdesktop">TzJsDesktop<a hidden class="anchor" aria-hidden="true" href="#tzjsdesktop">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成gadget summarize模块重构（2930行→8模块+72测试）和summarize skill论文式六章节重设计（新增/code-summarize命令）；修复ccplan工具链（重命名+工作流修复+code-summarizer/optimizer安装）；完成TokenMonitor CLAUDE.md改进、完整架构规划（ccusage MCP+SSH+跨平台五阶段）、用户教程编写，并启动Phase A MCP Bridge四模块和Phase E跨平台代码清理</li>
+<li><strong>怎么做的：</strong> 重构前先写47个导入烟雾测试建立安全网，经Critic Agent发现12个问题（2个CRITICAL）后修订；ccplan修复通过添加CONTINUOUS EXECUTION MANDATE和10个→NEXT:过渡指令解决Phase中断；TokenMonitor使用ccplan多轮验证确定架构方案，Feasibility Agent发现Windows tray约束，Explore Agent发现ccusage MCP server更优方案，直接实现Rust代码并创建ECL文档</li>
+<li><strong>有什么用：</strong> summarize包从零测试变为72测试覆盖（8个模块可独立维护），skill升级为具有叙事价值的论文式文档工具；ccplan工作流修复后多Phase任务不再提前终止；TokenMonitor获得完整架构蓝图（ECL文档）、四个新MCP Bridge模块及核心文件的跨平台清理</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 为BOSS（观测空间偏移长任务基准）创建CLAUDE.md文档，定位form_boss_44_dataset.py数据集路径错误，对比分析两版本评估脚本4类差异；审查LiPM电池模型trainer.py发现5个逻辑Bug；chenlu用户上午遭遇约6次API连接失败中断约6小时</li>
+<li><strong>怎么做的：</strong> 用Explore Agent深度分析BOSS代码库架构；逐行对比两版本eval脚本识别affected/unaffected设计差异；静态分析trainer.py逐行逻辑；下午13:41通过默认连接恢复并完成审查</li>
+<li><strong>有什么用：</strong> BOSS代码库获得入门文档，数据集路径错误得到定位；LiPM trainer发现5个逻辑Bug（含重复GPU转移、变量名错误、backbone.eval()被覆盖）；网络连接问题影响上午效率约6小时</li>
+</ul>
+<blockquote>
+<p>TzJsDesktop完成gadget summarize模块重构（2930行→8模块+72测试）、summarize skill论文式六章节升级、ccplan工具链全面修复，以及TokenMonitor从macOS专属到跨平台+ccusage MCP后端的架构规划与Phase A/E实现启动；tianhe完成BOSS基准代码库CLAUDE.md创建和LiPM训练器5个Bug定位，但受API连接故障影响上午中断约6小时。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>gadget summarize模块重构（2930行→8模块+72测试）</strong> — 将daily_summary.py从2930行拆分为config/remote/parsers/usage/summarizer/formatter/daily/cli共8个模块，消除mcp_server/monthly_summary/weekly_summary三处sys.path.insert hack，先写47个导入烟雾测试建立安全网，再并行提取模块，72/72测试全通过，保留daily_summary.py向后兼容shim，同步更新三处外部导入链</li>
+<li>✅ <strong>ccplan工具链全面升级（重命名+工作流修复+skills安装）</strong> — 将cchelper目录重命名为ccplan；修复工作流中断根因（添加CONTINUOUS EXECUTION MANDATE全局约束、10个→NEXT:过渡指令、9个multi-turn protocol）；解压并适配code-summarizer和code-optimizer两个.skill ZIP包；将ccplan/summarize/optimize全部安装到~/.claude/skills/</li>
+<li>✅ <strong>TokenMonitor 跨平台+ccusage MCP+SSH架构规划</strong> — 通过ccplan多轮验证完成三大改造的完整规划：ccusage MCP server（@ccusage/mcp）替换Rust token后端、SSH远程预处理脚本（grep+jq过滤）降低传输量、渐进式五阶段（Phase A-E）迁移计划。关键决策：移除rate limit、保留change_stats/subagent_stats并完成集成、混合tray显示方案（macOS set_title + Win/Linux tooltip）。ECL文档完整记录所有决策。</li>
+<li>✅ <strong>gadget summarize skill升级（/code-summarize命令+论文式六章节重设计）</strong> — 在新增/code-summarize命令（支持默认./目录、递归扫描30+种代码扩展名、≤10文件对话内/&gt;10文件生成SUMMARY.md）基础上，进一步将skill从扁平四维度升级为论文式六章节格式（Highlights→Introduction→Architecture→Implementation→Results→Conclusion&amp;Future Work），含规模自适应（≤3/4-10/11-50/50+文件）和Results三级数据源降级策略，创建ECL规划文档</li>
+<li>🔄 <strong>TokenMonitor Phase A MCP Bridge四模块实现</strong> — 创建四个Rust模块：detect.rs（跨平台Node.js/ccusage检测，支持nvm/fnm/volta/Homebrew多路径）、mcp_process.rs（MCP进程生命周期管理，stdio JSON-RPC，健康检查自动重启）、mcp_client.rs（高层MCP客户端，完整ccusage JSON类型定义）、mcp_adapter.rs（ccusage响应→UsagePayload适配层）。lib.rs已更新注册新模块，因cargo不在PATH编译验证未完成。</li>
+<li>🔄 <strong>TokenMonitor Phase E 跨平台代码清理</strong> — Cargo.toml移除macos-private-api和objc2系列四个crate；tauri.conf.json移除macOSPrivateApi/transparent并添加Windows(NSIS)/Linux(AppImage/deb)配置；commands.rs删除~350行glass/NSVisualEffectView代码并简化AppState；lib.rs移除macOS-only初始化；tray_render.rs改为跨平台主题检测；所有平台添加set_tooltip()。因cargo不在PATH，编译验证未完成。</li>
+<li>✅ <strong>BOSS代码库CLAUDE.md创建与调试</strong> — 为BOSS（观测空间偏移长任务基准）创建CLAUDE.md，涵盖conda环境、训练/评估命令、三级挑战（CH1/CH2_2/CH2_3）和RAMG数据增强；定位form_boss_44_dataset.py因datasets/下同时存在libero_10和libero_90两文件夹的报错根因；详细对比affected/unaffected两版本评估脚本4类差异（mapping.json模型映射、wrist_camera可选参数、视频录制时机、路径命名）</li>
+<li>✅ <strong>LiPM trainer.py逻辑审查</strong> — 静态分析trainer.py，发现5个逻辑问题：第74行重复调用batch_cuda、第147行变量名错误(test_datasets→test_dataset)、net.train()覆盖backbone.eval()影响BatchNorm/Dropout行为、缺少&rsquo;mae&rsquo;键的KeyError防护、条件判断iter_count%N==N-1语义不直观，每个问题均提供具体位置和修复建议</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>TokenMonitor CLAUDE.md改进</strong> — 补充macOS-only平台约束、npm run release命令、pre-commit hook说明、Rate limits获取机制（Keychain OAuth+session文件）、Pricing更新指南（PRICING_VERSION常量）、Tray渲染原理、ccusage/子目录标注等缺失内容</li>
+<li>✅ <strong>TokenMonitor用户安装使用教程</strong> — 创建docs/tutorial.md，覆盖安装（DMG下载和源码构建）、三层界面导航（Provider/Period/Charts）、实时燃烧率和5h计费窗口、Rate Limits面板、完整Settings参考及故障排除，含ASCII示意图</li>
+<li>✅ <strong>rclone同步数据到Google Drive</strong> — 执行sync.py push同步research的cache/projects/reports及3个配置文件到gdrive:gadget，其余目录本机不存在跳过，操作快速完成无报错</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-daily_summarypy过大2930行且存在syspath-hack和零测试覆盖critic审查发现mcp_serverpy导入会全断critical">1. daily_summary.py过大（2930行）且存在sys.path hack和零测试覆盖，Critic审查发现mcp_server.py导入会全断（CRITICAL）<a hidden class="anchor" aria-hidden="true" href="#1-daily_summarypy过大2930行且存在syspath-hack和零测试覆盖critic审查发现mcp_serverpy导入会全断critical">#</a></h4>
+<p><strong>解决方案:</strong> 先写47个烟雾测试覆盖所有外部导入契约，再按功能区块拆分为8个模块，用相对导入替换sys.path.insert，保留daily_summary.py作为向后兼容shim，同步更新三个外部消费者的导入链</p>
+<p><strong>关键洞察:</strong> 先写迁移烟雾测试再拆分——测试是重构的安全网；对抗性Critic在需求阶段发现CRITICAL问题比实施后修复成本低一个数量级</p>
+<h4 id="2-ccplan工作流在phase边界提前终止910个phase缺少multi-turn-protocol">2. ccplan工作流在Phase边界提前终止，9/10个Phase缺少multi-turn protocol<a hidden class="anchor" aria-hidden="true" href="#2-ccplan工作流在phase边界提前终止910个phase缺少multi-turn-protocol">#</a></h4>
+<p><strong>解决方案:</strong> 在SKILL.md顶部添加CONTINUOUS EXECUTION MANDATE全局约束（仅3种情况可暂停），每个Phase末尾添加→NEXT:过渡指令（10/10全覆盖），补齐Phase 3/5/6/7/9的multi-turn protocol</p>
+<p><strong>关键洞察:</strong> AI提前终止的根因是指令结构缺陷而非能力限制——添加明确的强制性结构化约束比添加建议性描述更有效</p>
+<h4 id="3-windowslinux系统托盘图标是固定方形1616或3232-pxtauri-v2的set_title在windowslinux上无效无法像macos一样在图标旁显示可读金额文字">3. Windows/Linux系统托盘图标是固定方形（16×16或32×32 px），Tauri v2的set_title()在Windows/Linux上无效，无法像macOS一样在图标旁显示可读金额文字<a hidden class="anchor" aria-hidden="true" href="#3-windowslinux系统托盘图标是固定方形1616或3232-pxtauri-v2的set_title在windowslinux上无效无法像macos一样在图标旁显示可读金额文字">#</a></h4>
+<p><strong>解决方案:</strong> 采用混合方案：macOS保持set_title()原生文字；所有平台添加set_tooltip()（鼠标悬停显示完整金额）；Windows/Linux方形图标内可选渲染简短数字（如&rsquo;$12&rsquo;），使用fontdue或ab_glyph+tiny_skia进行像素渲染</p>
+<p><strong>关键洞察:</strong> 跨平台UI统一不能以牺牲可读性为代价，最优策略是在每个平台上采用该平台最自然的显示方式而非强制一致</p>
+<h4 id="4-ccusage生态由5个独立npm包组成每次查询需启动独立子进程冷启动1-5秒延迟多provider聚合逻辑需在tokenmonitor侧重新实现">4. ccusage生态由5个独立npm包组成，每次查询需启动独立子进程（冷启动1-5秒延迟），多provider聚合逻辑需在TokenMonitor侧重新实现<a hidden class="anchor" aria-hidden="true" href="#4-ccusage生态由5个独立npm包组成每次查询需启动独立子进程冷启动1-5秒延迟多provider聚合逻辑需在tokenmonitor侧重新实现">#</a></h4>
+<p><strong>解决方案:</strong> 改用ccusage MCP server（@ccusage/mcp）作为统一接口：常驻进程无启动延迟，已实现多provider路由（stdio JSON-RPC），TokenMonitor只需维护单一IPC通道</p>
+<p><strong>关键洞察:</strong> 生态内已有解决多provider聚合问题的工具（MCP server），调研生态内现有解决方案比自行实现效率更高</p>
+<h4 id="5-ssh远程读取claude-code-jsonl日志时单个session文件可达几十到几百mb全量rsync在慢速连接上不现实">5. SSH远程读取Claude Code JSONL日志时，单个session文件可达几十到几百MB，全量rsync在慢速连接上不现实<a hidden class="anchor" aria-hidden="true" href="#5-ssh远程读取claude-code-jsonl日志时单个session文件可达几十到几百mb全量rsync在慢速连接上不现实">#</a></h4>
+<p><strong>解决方案:</strong> SSH到远程后执行轻量级shell预处理脚本（grep+jq），仅提取含model/tokens/costUSD的usage行，以tar打包传输，传输量从MB级降至KB级</p>
+<p><strong>关键洞察:</strong> 远程数据获取的瓶颈在传输而非处理，将过滤逻辑前移到服务端是经典的&rsquo;push computation to data&rsquo;模式</p>
+<h4 id="6-summarize-skill初始七章节结构冗余introduction与motivation重叠experiments暗示必须执行代码且纯prompt-skill无法直接执行代码">6. summarize skill初始七章节结构冗余（Introduction与Motivation重叠、Experiments暗示必须执行代码），且纯prompt skill无法直接执行代码<a hidden class="anchor" aria-hidden="true" href="#6-summarize-skill初始七章节结构冗余introduction与motivation重叠experiments暗示必须执行代码且纯prompt-skill无法直接执行代码">#</a></h4>
+<p><strong>解决方案:</strong> 调整为六章节（合并Introduction+Motivation、拆分Methods为Architecture+Implementation、Experiments改名Results）；Results设计三级降级策略（读取实际输出→README示例→代码逻辑推断并标注[基于代码逻辑推断]）</p>
+<p><strong>关键洞察:</strong> 学术论文框架直接移植到代码文档有语义错配，需按软件工程自然分层重新映射；降级策略比强制执行更健壮</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="7-form_boss_44_datasetpy报错datasets下同时存在libero_10和libero_90两个文件夹脚本要求恰好一个子目录">7. form_boss_44_dataset.py报错：datasets/下同时存在libero_10和libero_90两个文件夹，脚本要求恰好一个子目录<a hidden class="anchor" aria-hidden="true" href="#7-form_boss_44_datasetpy报错datasets下同时存在libero_10和libero_90两个文件夹脚本要求恰好一个子目录">#</a></h4>
+<p><strong>解决方案:</strong> 删除或移走libero_10后重新运行，脚本将唯一子目录重命名为boss_44</p>
+<p><strong>关键洞察:</strong> 错误信息&rsquo;More than one folder found&rsquo;不够具体，需读源码才能理解脚本的单子目录前提假设</p>
+<h4 id="8-cargo命令不在git-bash的path中windows环境phase-a和phase-e的所有rust代码修改均未经编译验证">8. cargo命令不在Git Bash的PATH中（Windows环境），Phase A和Phase E的所有Rust代码修改均未经编译验证<a hidden class="anchor" aria-hidden="true" href="#8-cargo命令不在git-bash的path中windows环境phase-a和phase-e的所有rust代码修改均未经编译验证">#</a></h4>
+<p><strong>解决方案:</strong> 暂未解决，需用户在配置了Rust工具链的PowerShell或CMD中手动执行cargo check</p>
+<p><strong>关键洞察:</strong> Windows Git Bash（MSYS2）的PATH与系统PATH独立，工具链安装后需显式添加到Git Bash PATH或切换终端环境</p>
+<h4 id="9-tianhe设备多次api连接失败connectionrefusedfailedtoopensocket影响chenlu用户上午约6小时工作效率">9. tianhe设备多次API连接失败（ConnectionRefused/FailedToOpenSocket），影响chenlu用户上午约6小时工作效率<a hidden class="anchor" aria-hidden="true" href="#9-tianhe设备多次api连接失败connectionrefusedfailedtoopensocket影响chenlu用户上午约6小时工作效率">#</a></h4>
+<p><strong>解决方案:</strong> 多次重试后恢复，13:41通过默认配置恢复连接，用户尝试配置自定义base_url（bigmodel.cn）但不稳定</p>
+<p><strong>关键洞察:</strong> 代理/API路由配置不稳定是连接失败主因，需要稳定网络环境或完善的fallback配置</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="工具技能设计决策单一职责-vs-论文式叙事框架">工具/技能设计决策（单一职责 vs 论文式叙事框架）<a hidden class="anchor" aria-hidden="true" href="#工具技能设计决策单一职责-vs-论文式叙事框架">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类明确提出summarize和optimize应分开（单一职责），并提出用学术论文格式（Highlights→Future Work）描述代码——这是跨领域类比，将软件工程文档与科研论文叙事结构对齐，why和impact优先于what</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI现有skill是扁平四维度技术性总结，注重代码事实描述（what/how），缺乏叙事动机和演进视角；对工具是否分离无主动判断，倾向于描述可能性而不做取舍</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类在工具设计层面有更清晰的单一职责判断和叙事框架创新；AI提供了落地细节（章节调整、降级策略、规模自适应），人类提供了框架——架构直觉引导了工具设计</p>
+<h4 id="工作流问题诊断ccplan多phase中断">工作流问题诊断（ccplan多Phase中断）<a hidden class="anchor" aria-hidden="true" href="#工作流问题诊断ccplan多phase中断">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>从使用体验出发：&lsquo;调用时有很多流程没有走完就结束了&rsquo;，直接定性为workflow问题</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>深度分析SKILL.md后识别出三类结构性根因：Phase边界缺过渡指令、全局约束缺失、multi-turn protocol不完整</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类提供用户体验层面的症状，AI提供系统结构层面的根因分析——两者互补形成完整诊断链</p>
+<h4 id="架构方案选择重构方案-vs-ccusage集成架构">架构方案选择（重构方案 vs ccusage集成架构）<a hidden class="anchor" aria-hidden="true" href="#架构方案选择重构方案-vs-ccusage集成架构">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>批准方案A（最小拆分+包化）并要求一次性解决三个问题（比AI默认分阶段更激进）；在ccusage架构中最终选择了MCP server方案</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>重构时推荐方案A与人类判断一致但默认分阶段；ccusage时初始推荐子进程调用，经Explore Agent研究后自主发现MCP server更优并更新推荐</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类的&rsquo;一次性解决&rsquo;要求比AI默认的分阶段建议更激进；AI对生态工具的认知需要主动探索才能补全，自主二次迭代后达成更优方案</p>
+<h4 id="boss评估框架oss设计理解">BOSS评估框架OSS设计理解<a hidden class="anchor" aria-hidden="true" href="#boss评估框架oss设计理解">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>直接请AI对比两个文件差异，没有预设期望</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>识别出核心设计思想：affected版本通过mapping.json将修改后任务映射回原始训练模型，实现&rsquo;用原始模型在修改环境评估鲁棒性&rsquo;（OSS测试范式）</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI能从代码差异中提炼高层设计意图，人类的开放性问题引导了AI输出具有研究价值的分析</p>
+<h4 id="功能取舍与dead-code认知">功能取舍与dead code认知<a hidden class="anchor" aria-hidden="true" href="#功能取舍与dead-code认知">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>快速决定移除rate limit功能（大幅简化架构）；询问change_stats/subagent_stats是什么后决定保留并完成集成——表明对自己项目中已有dead code功能缺乏了解</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>规划时呈现保留/移除/改用ccusage blocks三个选项，本身倾向保留某种rate limit视图；change_stats等模块的功能AI清楚但未主动在规划阶段解释</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类的务实简化思维（移除非核心功能降低复杂度）vs AI的功能保全倾向；AI需要更主动地在规划阶段解释现有功能价值，而不是默认用户了解自己的代码库</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>无法验证自身修改效果：ccplan工作流修复只能静态确认结构存在，无法在同一会话运行多Phase任务验证实际效果；Windows Git Bash中cargo不在PATH，Phase A和Phase E的所有Rust代码修改（四个新模块+多文件修改）均未经编译验证，潜在存在类型错误或API不兼容问题</li>
+<li>关键约束遗漏需专项Agent发现：跨平台规划初期未主动考虑Windows/Linux tray固定方形16-32px约束，需Feasibility Agent才发现；对ccusage生态的认知需专项Explore Agent才能补全（发现MCP server存在），导致选项评估经历迭代更新</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>代码生成存在冗余与不完整风险：提取daily.py和cli.py模块时产生重复_parse_date()函数；mcp_server.py部分weekly_summary导入更新可能不完整（_resolve_output_dir来源跨模块），需额外测试确认导入链正确</li>
+<li>API连接完全依赖外部网络基础设施，ConnectionRefused/FailedToOpenSocket时无法降级工作，影响整个设备上的用户效率约6小时</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>迁移烟雾测试优先模式：重构大文件前先将所有外部导入契约写为测试（47个），重构后立即验证后向兼容性，将问题暴露在开发阶段而非生产阶段</li>
+<li>AI工作流的CONTINUOUS EXECUTION MANDATE设计模式：多Phase工具的Phase边界必须有明确→NEXT:强制过渡（而非建议性文字），每个Phase需要独立的multi-turn protocol，否则AI会在Phase边界&rsquo;礼貌停下&rsquo;</li>
+<li>对抗性Critic/审查在规划阶段的高ROI：Critic发现12个问题（2个CRITICAL），Feasibility Agent发现Windows tray尺寸约束，均在实施前发现，节省大量返工成本。并行Critic+Red Team+Feasibility多Agent模式能系统性发现单次思考遗漏的约束</li>
+<li>跨平台tray显示需要平台感知的混合策略：macOS菜单栏可横向扩展（set_title有效），Windows/Linux托盘是固定方形小图标（16-32px），应在每个平台采用最自然的UX模式（set_title vs tooltip vs 图标内短数字）而非强制视觉统一</li>
+<li>论文式代码文档结构（六章节：Highlights/Introduction/Architecture/Implementation/Results/Conclusion&amp;Future Work）比扁平技术维度更能传达代码的why（动机）和impact（意义），对几个月后回来重读自己项目的开发者价值最大</li>
+<li>ccusage MCP server优于CLI子进程调用：常驻进程无冷启动延迟（vs 1-5秒）、已实现多provider路由、标准JSON-RPC协议易于集成。生态内已有解决方案应优先调研而非自行实现。</li>
+<li>ECL YAML文档是解决多会话复杂项目context rot的有效机制：持久化已验证需求、架构决策、对抗审查结果和当前状态，任何Agent都可从此继续工作</li>
+<li>BOSS中affected评估脚本的OSS设计：通过mapping.json将修改后任务映射回原始训练模型，实现观测空间偏移下的鲁棒性评估；视频录制时机差异（step前vs后）反映了OSS研究中对&rsquo;原始观测&rsquo;的不同关注</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>ccplan Phase 0代码库扫描是高价值投入：提前识别所有macOS依赖点（objc2四个crate、NSVisualEffectView等），使Phase E实施可精准定位所有需要修改的位置</li>
+<li>.skill文件是ZIP格式（zipfile.ZipFile可解压），从Claude.ai导出后需适配Claude Code格式（添加origin:custom、移除上传路径引用）；本地安装路径为~/.claude/skills/<name>/SKILL.md</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="gadget-summarize全面升级">gadget (summarize全面升级)<a hidden class="anchor" aria-hidden="true" href="#gadget-summarize全面升级">#</a></h3>
+<p><strong>✅ summarize模块重构（2930行→8模块+72测试）+ /code-summarize命令新增 + skill论文式六章节重设计</strong>
+<em>20:28:25.974 | claude_code</em>
+全天对gadget summarize进行三层升级：(1) 通过ccplan规划，经Critic发现12个问题（mcp_server导入断裂等2个CRITICAL），执行2930行→8模块重构，先写47个导入烟雾测试建立安全网，72/72测试全通过，mcp_server+monthly+weekly导入链全部更新；(2) 新增/code-summarize命令（支持默认./目录、递归扫描、智能输出）；(3) 将skill从扁平四维度升级为论文式六章节格式，含规模自适应和Results三级降级策略，创建ECL规划文档。</p>
+<h3 id="gadget-skills工具链">gadget (skills工具链)<a hidden class="anchor" aria-hidden="true" href="#gadget-skills工具链">#</a></h3>
+<p><strong>✅ ccplan重命名+工作流中断修复+code-summarizer/optimizer安装</strong>
+<em>19:58:03.000 | claude_code</em>
+将cchelper重命名为ccplan，修复工作流中断根因（CONTINUOUS EXECUTION MANDATE+10个→NEXT:过渡指令+9个multi-turn protocol）；解压适配code-summarizer和code-optimizer两个.skill ZIP包（添加origin:custom、移除上传路径引用）；将全部skills安装到~/.claude/skills/并验证4个文件正确就位。</p>
+<h3 id="tokenmonitor">TokenMonitor<a hidden class="anchor" aria-hidden="true" href="#tokenmonitor">#</a></h3>
+<p><strong>✅ CLAUDE.md改进+完整架构规划（跨平台+ccusage MCP+SSH）+用户教程</strong>
+<em>21:32:04.982 | claude_code</em>
+深度分析TokenMonitor代码库（Tauri v2+Svelte 5+Rust）并补充CLAUDE.md关键缺失内容；通过ccplan多轮验证规划三大改造，关键路径：Explore Agent发现ccusage MCP server优于子进程调用，Feasibility Agent发现Windows tray尺寸约束，确定混合tray方案和五阶段迁移计划，ECL文档完整记录所有决策；创建docs/tutorial.md完整用户指南（安装/界面/Settings/故障排除）。</p>
+<p><strong>🔄 Phase A MCP Bridge四模块实现 + Phase E跨平台代码清理</strong>
+<em>21:32:04.982 | claude_code</em>
+Phase A创建四个Rust模块（detect/mcp_process/mcp_client/mcp_adapter），覆盖跨平台检测、进程生命周期、高层客户端、适配层，lib.rs已更新；Phase E完成Cargo.toml移除objc2系列依赖、tauri.conf.json添加Win/Linux配置、commands.rs删除~350行glass代码、tray_render.rs跨平台改造、所有平台添加set_tooltip()。两个Phase均因cargo不在PATH而编译验证未完成。</p>
+<h3 id="boss-robot-benchmark">BOSS (Robot Benchmark)<a hidden class="anchor" aria-hidden="true" href="#boss-robot-benchmark">#</a></h3>
+<p><strong>✅ BOSS机器人基准代码库CLAUDE.md创建、数据集错误修复、双评估脚本对比</strong>
+<em>03:18:28.244 | claude_code</em>
+在tianhe服务器为BOSS创建CLAUDE.md（训练/评估命令、三级挑战、RAMG数据增强）；定位form_boss_44_dataset.py因libero_10和libero_90两文件夹并存导致的报错并给出修复方案；详细对比两版本eval脚本4类差异，识别affected版本通过mapping.json实现OSS鲁棒性评估的核心设计意图。</p>
+<h3 id="lipm-battery-model">LiPM (Battery Model)<a hidden class="anchor" aria-hidden="true" href="#lipm-battery-model">#</a></h3>
+<p><strong>✅ LiPM电池模型trainer.py逻辑审查，发现5个潜在Bug</strong>
+<em>13:41:51.723 | claude_code</em>
+在多次连接失败后（07:14-13:37约6小时中断）恢复连接，审查trainer.py发现5个问题：第74行重复batch_cuda调用、第147行变量名错误(test_datasets→test_dataset)、net.train()覆盖backbone.eval()效果、缺少&rsquo;mae&rsquo;键的KeyError防护、条件判断语义不直观。每个问题提供具体位置和修复建议，等待用户确认后执行。</p>
+<h3 id="gadget-rclone同步">gadget (rclone同步)<a hidden class="anchor" aria-hidden="true" href="#gadget-rclone同步">#</a></h3>
+<p><strong>✅ rclone同步research数据到Google Drive</strong>
+<em>19:54:55.000 | claude_code</em>
+执行sync.py push同步research的cache/projects/reports及配置文件到gdrive:gadget，其余目录不存在跳过，操作快速完成无报错。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>72,270,498</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>66,172</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>184,347</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>4,384,306</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>67,635,673</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>93.9%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$57.9935</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>14,240</td>
+          <td>138,802</td>
+          <td>3,468,093</td>
+          <td>60,808,633</td>
+          <td>$55.7437</td>
+          <td>96.1%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>41,370</td>
+          <td>42,557</td>
+          <td>865,843</td>
+          <td>6,649,518</td>
+          <td>$2.0014</td>
+          <td>3.5%</td>
+      </tr>
+      <tr>
+          <td>glm-4.7</td>
+          <td>10,445</td>
+          <td>1,397</td>
+          <td>0</td>
+          <td>60,102</td>
+          <td>$0.0000</td>
+          <td>0.0%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>117</td>
+          <td>1,591</td>
+          <td>50,370</td>
+          <td>117,420</td>
+          <td>$0.2483</td>
+          <td>0.4%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>tianhe</td>
+          <td>8,945,880</td>
+          <td>15,430</td>
+          <td>19,177</td>
+          <td>$7.9326</td>
+      </tr>
+      <tr>
+          <td>TzJsDesktop</td>
+          <td>63,324,618</td>
+          <td>50,742</td>
+          <td>165,170</td>
+          <td>$50.0609</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

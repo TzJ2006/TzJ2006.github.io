@@ -7,7 +7,7 @@
 <meta name="robots" content="index, follow">
 <title>Bug Journal 2026-03-21 | TzJ&#39;s Net</title>
 <meta name="keywords" content="Bug Journal">
-<meta name="description" content="在 tianhe HPC 集群完成 error_recovery_benchmark 从参数调优到架构级轨迹分段重构的全链路修复（1222 个训练场景，threading subtypes 从 3 升至 25），同时在 TzJsDesktop 修复 gadget 基础设施关键 bug 并将 ECC 工具链全员升级至 opus &#43; max thinking。">
+<meta name="description" content="Completed full-stack repairs on error_recovery_benchmark in the tianhe HPC cluster — from parameter tuning to architectural trajectory segmentation refactoring (1,222 training scenes, threading subtypes increased from 3 to 25) — while fixing critical gadget infrastructure bugs on TzJsDesktop and upgrading the entire ECC toolchain to opus &#43; max thinking.">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-21/">
 <link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.74275d3de94d719fb7098f21c29c7cbda35c9c6ca6621dbdcbd629ecff2aa1ac.css" integrity="sha256-dCddPelNcZ&#43;3CY8hwpx8vaNcnGymYh29y9Yp7P8qoaw=" rel="preload stylesheet" as="style">
@@ -19,6 +19,7 @@
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
 <link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-21/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-21/">
 <noscript>
     <style>
         #theme-toggle,
@@ -73,7 +74,7 @@
 </script><meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-21/">
   <meta property="og:site_name" content="TzJ&#39;s Net">
   <meta property="og:title" content="Bug Journal 2026-03-21">
-  <meta property="og:description" content="在 tianhe HPC 集群完成 error_recovery_benchmark 从参数调优到架构级轨迹分段重构的全链路修复（1222 个训练场景，threading subtypes 从 3 升至 25），同时在 TzJsDesktop 修复 gadget 基础设施关键 bug 并将 ECC 工具链全员升级至 opus &#43; max thinking。">
+  <meta property="og:description" content="Completed full-stack repairs on error_recovery_benchmark in the tianhe HPC cluster — from parameter tuning to architectural trajectory segmentation refactoring (1,222 training scenes, threading subtypes increased from 3 to 25) — while fixing critical gadget infrastructure bugs on TzJsDesktop and upgrading the entire ECC toolchain to opus &#43; max thinking.">
   <meta property="og:locale" content="en_us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="bugjournal">
@@ -82,7 +83,7 @@
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Bug Journal 2026-03-21">
-  <meta name="twitter:description" content="在 tianhe HPC 集群完成 error_recovery_benchmark 从参数调优到架构级轨迹分段重构的全链路修复（1222 个训练场景，threading subtypes 从 3 升至 25），同时在 TzJsDesktop 修复 gadget 基础设施关键 bug 并将 ECC 工具链全员升级至 opus &#43; max thinking。">
+  <meta name="twitter:description" content="Completed full-stack repairs on error_recovery_benchmark in the tianhe HPC cluster — from parameter tuning to architectural trajectory segmentation refactoring (1,222 training scenes, threading subtypes increased from 3 to 25) — while fixing critical gadget infrastructure bugs on TzJsDesktop and upgrading the entire ECC toolchain to opus &#43; max thinking.">
 
 
 <script type="application/ld+json">
@@ -117,12 +118,12 @@
   "@type": "BlogPosting",
   "headline": "Bug Journal 2026-03-21",
   "name": "Bug Journal 2026-03-21",
-  "description": "在 tianhe HPC 集群完成 error_recovery_benchmark 从参数调优到架构级轨迹分段重构的全链路修复（1222 个训练场景，threading subtypes 从 3 升至 25），同时在 TzJsDesktop 修复 gadget 基础设施关键 bug 并将 ECC 工具链全员升级至 opus + max thinking。",
+  "description": "Completed full-stack repairs on error_recovery_benchmark in the tianhe HPC cluster — from parameter tuning to architectural trajectory segmentation refactoring (1,222 training scenes, threading subtypes increased from 3 to 25) — while fixing critical gadget infrastructure bugs on TzJsDesktop and upgrading the entire ECC toolchain to opus + max thinking.",
   "keywords": [
     "Bug Journal"
   ],
-  "articleBody": "日报 — 2026-03-21 今日概览 做了什么： 两大项目并行推进：error_recovery_benchmark 完成了从单点参数修复到架构级轨迹分段重构的完整闭环（含 pipeline contract 对齐、大规模训练场景生成），gadget 修复了跨设备数据同步断层和日报生成的关键 bug。 怎么做的： 在 tianhe 通过系统性代码审查（3 并行 agent + 日志聚合统计）、分阶段修复（参数调整→架构重构）和 Slurm 并行作业大规模验证；在 TzJsDesktop 通过精准代码定位修复 npx 挂起 bug，并用 sed 批量升级 ECC 全部 agent 模型配置。 有什么用： benchmark 训练数据覆盖从 88/174 subtypes 提升至 130+/160 subtypes，threading 任务 subtypes 翻 8 倍；gadget 日报 pipeline 恢复可用，ECC 推理能力升至最高档（opus + effortLevel: max）。 DCC 做了什么： 对本地 main 分支与 GitHub origin/main 的历史分叉进行强制同步。 怎么做的： 通过 git fetch + git diff –stat 确认本地无独有代码后执行 git reset –hard origin/main。 有什么用： 代码库与 GitHub 保持一致，rclone sync.py 等新功能在 DCC 上可用。 TzJsDesktop 做了什么： 修复 gadget 项目 git 合并冲突、配置 rclone 数据同步、修复 npx 子进程挂起 bug，完善文档，完成 ECC 全局 agent 模型升级；同时查看新旧 opportunity scan 对比结果，发现 three_piece_assembly 意外回退。 怎么做的： git reset –hard 对齐远端、Path.as_posix() 修复 Windows 路径 bug、npx –yes 参数跳过交互提示、sed 批量替换 agent 配置；运行 opportunity scanner 获取新扫描数据并对比各任务变化。 有什么用： gadget 数据同步恢复、日报生成 pipeline 不再卡死、ECC 全员升至 opus + max thinking；精确定位 three_piece_assembly -19 回退问题，推动后续排查。 tianhe 做了什么： 完成 error_recovery_benchmark 全链路修复：代码审查发现根因（phase detection 失效、objects[0] 歧义）→ 参数修复（7 类 error skill）→ 架构重构（轨迹分段 + contract 对齐 Step 1-7）→ 大规模训练场景生成（1222 scenes）→ 机会图重扫（threading 3→25）→ 排查 three_piece_assembly 退化根因。 怎么做的： 并行多 agent 代码审查、bash 日志统计、python 数据验证、逐文件修改（7 个 error skill 文件 + 5 个 framework 文件）、sbatch Slurm 并行作业（96 workers）。 有什么用： 训练场景成功率从约 55% 升至 81%（130/160 subtypes 满 10/10），threading 修复效果最显著，three_piece_assembly 退化根因已定位，修复方案就绪。 在 tianhe HPC 集群完成 error_recovery_benchmark 从参数调优到架构级轨迹分段重构的全链路修复（1222 个训练场景，threading subtypes 从 3 升至 25），同时在 TzJsDesktop 修复 gadget 基础设施关键 bug 并将 ECC 工具链全员升级至 opus + max thinking。\n今日任务 架构与策略 ✅ 系统性 Contract 修复方案设计（轨迹分段架构） — 识别出 detector→injector→validator→generator 整链路 contract 不一致，确立按物体交互分段轨迹（InteractionSegmenter）为核心修复方向，每段明确当前目标物体，彻底绕过 phase detection 缺陷；plan 文件创建并更新，为 Step 1-7 实施提供完整上下文。 ✅ 13 个 Error Skill 全面代码审查及训练数据生成根因调查 — 通过 3 个并行 agent 对所有 error skill 的 can_inject/inject/validate 进行完整代码审查，发现 5 类实现 bug；聚合 42 个并行日志统计失败原因（gripper not closed 1698 次、displacement 不足 1390 次等）；通过 bash 统计 opportunity map phase 分布，发现 threading 全部 372 个 opportunity 仅标记为 pre_reach，pick_place 完全缺少 reach/grasp 阶段，确认 phase detection 失效是核心根因。 ✅ Error Skill 参数系统性修复（Fix A-G + Fix 5-6） — 针对 7 类 error skill 完成 24 处参数修改（offset 下限、步数、速度方向、验证阈值）；修复 get_target_object() 优先在 graspable 物体中搜索（Fix 5）、InteractionSegmenter 限定 graspable 候选集（Fix 6）；所有 139 个单元测试通过。 ✅ 实施轨迹分段 + Contract 对齐（Step 1-7 + 6 遗漏修复） — 新增 InteractionSegment dataclass 和 InteractionSegmenter；修改 CleanTrajectory 支持分段序列化；修改 OpportunityScanner 从 segment 获取 target_object/phase/other_objects；修复 13 个 skill 的 objects[0] 语义（e01-e13）；修复 e02 夹爪方向、e11 freeze_steps 硬编码；补齐 target_pos 到 trajectory_context；修复 e12/e10 config key 漂移；修复 context_replay.py 使用 error_spec.target；修复 EnvWrapper._sim_body_name2id 子字符串 fallback；139 个单元测试全部通过。 🔄 three_piece_assembly 扫描退化根因排查（23→4 subtypes） — 通过分析 NPZ 文件（无 interaction_segments_json）、scan 日志（879/887 帧为 pre_reach）和 collect 脚本（从未调用 segment_interactions()），定位 4 个根因：collect 脚本未集成分段器、replay_and_label_phases() 未传 target_object 导致使用不可移动底座 base 做 phase 检测、scanner fallback 覆盖坏标签、缺少防御性逻辑。修复方案已制定，代码实施待开始。 ✅ gadget: 修复 npx 子进程永久挂起 bug — fetch_codex_usage_full() 和 fetch_ccusage_full() 中 npx 调用未加 –yes，在 capture_output=True 模式下等待安装确认而卡死；在所有 3 处 npx 调用添加 –yes 参数后问题解决，日报生成 pipeline 恢复正常。 ✅ gadget: ECC 全员 opus + max thinking 升级 — 深入阅读 ECC 各组件（5 个核心 agent、4 个 skill、hooks 系统），通过 sed 批量替换将 27 个 agent 从 sonnet/haiku 升级到 opus（doc-updater 保留 sonnet），settings.json effortLevel 改为 max（用户主动告知的新版功能）。 ✅ 训练场景大规模并行生成（多轮 Slurm 作业） — 经历三轮场景生成：第一轮（Fix A-G 后）96 workers 生成 1209 scenes（158/160 subtype 成功）；第二轮（Fix 5-6 后）32 workers 生成 1159 scenes（107/160 满 10/10）；第三轮（Step 1-7 后）96 workers 在 an53 节点 32 分 49 秒生成 1222 scenes（130/160 subtypes 满）。 ✅ 全 6 任务 collect + scan 验证与机会图重扫 — 多次重跑全 6 个任务的 collect+scan；最终扫描：threading 3→25（+22），pick_place 21→23（+2），three_piece_assembly 23→4（-19），总计 130→135（+5）；验证了 target_pos 修复对 threading 的显著效果，同时发现 three_piece_assembly 意外回退。 ✅ gadget: monthly_summary.py 添加 Codex 用量聚合支持 — 新增 aggregate_token_usage、combine_usage_summaries 等函数，在月度汇总中独立统计 codex_token_usage，生成 combined_token_usage_summary，并同步更新 README 文档说明。 实现与修复 ✅ gadget: git 同步与 rclone 数据配置 — 修复 DCC 和 TzJsDesktop 的 git 合并冲突（git reset –hard origin/main 对齐远端）；创建 ~/.config/gadget/sync.json，修复 sync.py 中 Windows 反斜杠 bug（Path.as_posix()），成功从 Google Drive 拉取全部个人数据。 ✅ CLAUDE.md / AGENTS.md 审查与更新（ErrorRecoveryBenchmark） — 执行 /init 对现有 CLAUDE.md 进行审查，补充缺失的 Makefile 目标（v5-training、v5-mass-gen 等）、训练脚本、6 个未文档化的 pipeline 脚本；通过 Codex 生成 358 词的 AGENTS.md 贡献者指南，覆盖项目结构、构建测试命令、代码风格和 PR 规范。 问题与解决方案 关键问题 1. threading/pick_place 等多物体任务中 phase detection 系统性失效：threading 全部帧标记为 pre_reach，pick_place 缺失 reach/grasp 阶段，导致 12/13 个 skill 无法找到 opportunity 解决方案: 根因：phase detection 依赖单个物体与 EEF 的距离，在特殊几何（针形 needle）或多物体场景下根本站不住脚。根本修复：新增 InteractionSegmenter，按物体交互（EEF 接近度 + 夹爪状态 + 共运动检测）分段轨迹，每段有明确 target_object 和 phase，彻底绕过 phase detection。\n关键洞察: phase detection 的单物体假设是架构层面的设计缺陷，无法通过调参修复；轨迹分段是更根本的解决方案，不修补而是绕过缺陷抽象。\n2. v5 pipeline 整链路 target_object 歧义：OpportunityScanner/skill.inject()/validate()/ContextReplayEngine 均默认 objects[0]，在多物体场景中系统性选错操作目标；trajectory_context 缺少 target_pos 导致 drop 类 skill 过滤条件形同虚设 解决方案: Step 1-7 全链路透传 target_object 和 target_pos；修复 13 个 skill 的 objects[0] 语义；在 trajectory_context 构建后写入 target_pos；context_replay.py 使用 error_spec.target。\n关键洞察: 多物体任务中 objects[0] 是字典插入序第一个物体，语义完全错误但不报错，导致所有基于物体状态的判断（displacement/gripper/pose）系统性误判。\n3. Error skill 注入参数与验证阈值系统性不匹配，导致 41+ 个 subtype 生成 0 个场景（位移不足、夹爪夹空、物体不脱手、碰撞力不足等 5 类根因） 解决方案: 归纳 5 大根因并针对性修改 7 个文件 24 处参数（降低验证阈值、增加步数、调整速度方向）；drop 类 skill 施加微弱初速度（Z=-0.15m/s）辅助脱手。\n关键洞察: 注入参数下限必须与验证阈值配套：降低注入下限时必须同步降低验证阈值；drop 类不能只依赖重力，需主动初速度克服摩擦。\n4. collect 脚本从未调用 segment_interactions()，NPZ 缺少分段数据；three_piece_assembly 中 InteractionSegmenter 和 get_target_object() 误将 base fixture 选为 target，导致 scan 从 23 退化至 4 subtypes 解决方案: Fix 5-6 将 target 搜索限定在 graspable 物体（有 grasp_geoms 配置）；collect 脚本需补调 segment_interactions()；replay_and_label_phases() 需传入 target_object；scanner 需修复标签覆盖时序。（fixture 部分已修，collect 集成待实施）\n关键洞察: 实现了分段器但未接入数据收集管道，contract 对齐必须追踪存储层持久化——单元测试通过不代表 E2E 正常。\n5. python summarize/daily_summary.py 永久卡在 @ccusage/codex 步骤，无输出无报错 解决方案: subprocess.run(capture_output=True) 将 stdin 重定向到 DEVNULL，npx 首次安装确认提示无限等待；在所有 3 处 npx 调用添加 –yes 参数跳过交互确认。\n关键洞察: capture_output=True 模式下调用任何可能有交互提示的 CLI 工具，必须显式传入 –yes/-y 等参数，否则会无限挂起而非超时。\n6. HPC 多重障碍：共享登录节点 32+ workers 同时 fork + import 重量级库导致 IO 竞争崩溃；ai 分区强制要求 gpu:a800:1 即使任务是纯 CPU；sbatch –wrap 使用 /bin/sh 不支持 source/conda 命令；MUJOCO_GL=osmesa 在部分节点无法初始化 解决方案: 提交 Slurm 独占节点作业（96 core）；接受 1 GPU 但以 MUJOCO_GL=disabled 运行（物理仿真无需 GL）；sbatch 命令包裹在 bash -c 中，conda init 改用 . 代替 source。\n关键洞察: MuJoCo 物理仿真（enable_camera=False）是纯 CPU 任务；sbatch –wrap 默认使用 /bin/sh 而非用户登录 shell；workers 数应精确匹配申请的 –cpus-per-task。\n一般问题 7. e02 drop_in_transit settle 阶段 action[-1]=-1.0 注释写 ‘Open gripper’ 但实际是关闭夹爪，导致已掉落物体被重新抓住，drop 失败；e11 validate() 阈值 min_progress * 30 硬编码而 inject() 从 config 读取 freeze_steps，判定标准不一致 解决方案: e02 改为 action[-1]=1.0（robosuite OSC 1.0=打开）；e11 添加 freeze_steps = self.config.get(‘freeze_steps’, 30) 统一来源。\n关键洞察: robosuite 夹爪 action 符号与直觉和注释相反（-1=关，1=开），日志中表现为 drop 指标为 0，容易被误判为物理执行失败而非控制命令错误。\n8. YAML config key 与 Python 代码读取 key 不匹配（lateral_offset vs lateral_offset_range、rotation_offset vs rotation_range、reverse_steps vs regression_range），相关 skill 始终使用硬编码默认值 解决方案: 添加双 key fallback（先找新名再找旧名），reverse_steps 处理从固定值改为范围采样。\n关键洞察: config key 演化未同步更新代码，getdefault 机制掩盖了错误——配置被忽略但程序不报错，是高隐蔽性 bug。\n9. git pull 触发大量合并冲突（13 个文件），AI 默认走「保留双方修改」流程导致大量弯路；sync.py 在 Windows 上生成反斜杠的 rclone 远端路径导致同步失败 解决方案: 用户指出应以远端为准；执行 git reset –hard origin/main 直接对齐；将 str(Path(remote_rel).parent) 改为 Path(remote_rel).parent.as_posix()。\n关键洞察: 冲突解决策略取决于业务意图，AI 应在操作前先询问而非默认走复杂合并路径；Windows pathlib.Path 传给外部命令时必须显式调用 as_posix()。\n人类思路 vs AI 思路 战略层面 问题性质判断：系统性 Contract 不一致 vs 孤立点 bug 角色 思路 人类 明确指出生成失败不是单一 skill 调阈值的问题，而是 detector→injector→validator→generator 整条链路 contract 不一致，分为三个层次：detector 被错过、validator 永远不过、generator 遇到连续失败提前停。 AI 发现了多个孤立代码 bug 和 phase detection 失效现象，倾向于逐个修复，缺乏对整条链路的系统性视角。 差异分析: 人类从架构视角定义了问题本质，直接改变了整个修复方案的方向；AI 更擅长在局部范围内快速定位具体 bug，但缺乏跨模块数据流的整体视角。\n核心修复方向：轨迹分段（绕过 phase detection）vs 修补 phase detection 角色 思路 人类 提出按物体交互分段轨迹的根本性架构方案——每段明确当前目标物体，gripper 检测通过物体与夹爪的共同位置判断，彻底绕过 phase detection 缺陷。 AI 仅发现了 phase detection 失效的症状，提议修复 get_task_completion_stages() 的单物体假设，停留在修补层面。 差异分析: 人类直接提出了更优雅的架构解——不修补而是绕过；AI 思路停留在错误的抽象层次上打补丁，会导致大量对特殊 case 的临时处理。\n识别局部修复的系统性遗漏（6 个未覆盖问题） 角色 思路 人类 在 AI 完成 7 步计划后，系统性审查指出：target_pos 未传递、fallback phase 逻辑未修、config 漂移只修了一半、e05/e06/e09 仍用 objects[0]、error_spec.target 未使用、three_piece_assembly body-name 告警。 AI 完成了 7 步计划，通过单元测试（139 通过）验证，但未系统验证所有 skill 和调用点，缺乏对已修改模块的整体数据流回顾。 差异分析: 人类从数据契约角度而非单文件角度进行整体性系统审查；AI 倾向于按计划执行后认为完成，缺乏全局回顾的主动性。\n任务物体数量等基本假设的验证 角色 思路 人类 快速纠正了 AI 对 pick_place（1 个 → 4 个物体）和 threading（无抓取 → 必须抓取 needle）的基本假设错误。 AI 未优先读取任务配置 YAML 就基于代码推断任务结构，导致部分分析建立在错误前提上。 差异分析: 人类凭借先验知识直接识别基本假设错误；AI 应先读配置文件验证，「配置文件是地图，代码是地形，要先看地图」。\nGPU 资源需求与 workers 数量配置 角色 思路 人类 指出场景生成是纯 CPU 无需 GPU；持续纠正 AI 多申请 GPU（8→1）；明确 workers 数应精确匹配申请的 CPU 核心数（而非 AI 的保守估计 8-16）。 AI 默认认为 MuJoCo 仿真需要 GPU 渲染，未主动检查 enable_camera 参数；倾向于最大化资源配置，未对齐实际节点核数。 差异分析: 人类从任务本质判断资源需求，AI 依赖表面印象且未先读代码验证假设；这类错误导致了多次无效 Slurm 作业提交。\nECC 模型选择策略与新版功能感知 角色 思路 人类 要求「所有部分使用最新的 opus 4.6 with max thinking」，并主动告知存在新版 effortLevel: max 选项。 AI 初始推荐「核心 Opus + 其他 Sonnet」平衡成本方案；错误地告知用户 high 是 effortLevel 最高级别。 差异分析: 用户优先考虑能力最大化而非成本；用户掌握了 AI 未知的新版功能，是信息不对称的典型案例，AI 应主动声明知识可能存在版本滞后。\nnpx 挂起根因诊断（AI 系统性排查 vs 人类症状描述） 角色 思路 人类 提供准确症状（卡在 @ccusage/codex 步骤无输出），但不清楚具体根因。 AI 系统性排除假设：检查数据量 → 实测命令 → 定位 capture_output + 缺少 –yes 的根因；整个诊断链条清晰高效。 差异分析: AI 的系统性诊断流程比直觉判断更高效；人类提供精准症状，AI 负责执行推断链条——这是少数 AI 表现明显优于直觉的场景。\nsubtype 数量异常警觉与精确统计 角色 思路 人类 自行统计出 48 个失败 subtype（按 5 类根因逐一列出文件路径、行号和日志示例）；注意到 130 subtypes 不够（理论 174），主动追问并推动重新扫描。 AI 分类框架基本正确但粒度较粗，未精确统计 48 这个数字；汇报 130 subtypes 时未预警与预期 174 的差距。 差异分析: 人类对预期结果有先验判断，发现与实际值不符并追问；AI 只汇报观测结果，缺乏主动的合理性校验意识。\nAI 局限性 重要局限 面对复杂系统问题时，倾向于定位孤立代码 bug，缺乏从数据流全链路视角（detector→injector→validator→generator）分析 contract 不一致的能力，需要人类从架构层面指引才能提升分析维度。 完成局部修复计划后缺乏主动的全局数据流验证：e05/e06/e09 三个 skill、target_pos 传递缺失、collect 脚本未集成 segment_interactions() 等多个遗漏均需人类系统性审查才能发现；单元测试通过给了错误的「完成感」。 未优先读取任务配置文件（task YAML）就对任务结构做出推断，导致分析建立在错误前提（pick_place 物体数量、threading 是否有抓取）上；应先读配置文件验证基本假设再开始分析。 未主动检查 enable_camera 参数就假设需要 GPU；多次被纠正后仍在 Slurm 脚本中申请过多 GPU，对运行环境资源需求评估不准确且容易遗忘用户在多轮对话中设定的局部偏好。 在 git 合并冲突场景中，默认执行「保留双方修改、逐文件解决冲突」的复杂流程，未先询问用户意图（丢弃本地 vs 保留本地），导致大量无效操作后被纠正。 three_piece_assembly 退化（23→4 subtypes）在 AI 汇报时被呈现为「正常结果」，未主动预警并分析；分析失败时也未能主动穷举所有同类型文件（e05/e06/e09 被遗漏），需要人类显式列出才能补全。 不了解 Claude Code 最新功能（effortLevel: max），错误地告知用户 high 是最高级别；对快速迭代的工具生态存在知识滞后，应主动声明可能存在新版本功能未知。 今日收获 核心收获 Pipeline contract 对齐必须追踪完整数据流：不仅要修改代码处理逻辑，还必须确保数据在存储层被持久化（如 segment_interactions() 结果写入 NPZ）；否则重新加载时数据丢失，修复对后续流程无效。单元测试通过 ≠ E2E 正确。 多物体机器人操作任务中，target_object 必须作为一等公民在 detector/injector/validator 三个阶段全程透传；objects[0] 是字典插入序第一个物体，在多物体场景中语义完全错误且不会报错，导致所有基于物体状态的判断系统性误判。 分析复杂系统问题前，必须先读取所有相关配置文件验证基本假设（如任务有多少物体、任务类型）——「配置文件是地图，代码是地形，要先看地图」。 系统性修复后必须对所有任务做 before/after 对比验证，不能仅凭单元测试通过就认为没有副作用；threading +22 和 three_piece_assembly -19 同时出现正说明了这一点。 Error skill 注入参数下限必须与验证阈值配套调整：降低注入下限时必须同步降低验证阈值（min_displacement、min_rotation_deviation 等），否则注入仍然无法通过验证。Drop 类 error 不能只依赖重力，需施加微弱初始下推速度（Z=-0.15m/s）辅助脱手克服摩擦。 subprocess.run(capture_output=True) 会将 stdin 重定向到 DEVNULL，调用 npx 等可能有交互提示的 CLI 工具时必须传入 –yes/-y 等参数显式跳过，否则会无限挂起而非超时。 日志聚合统计（Counter）比逐条阅读更有效定位系统性 bug：1698 次 gripper not closed 直接指向 target_object 歧义，而非真正的夹爪执行问题；数据量驱动的根因分析优于主观猜测。 MuJoCo 物理仿真（enable_camera=False）是纯 CPU 任务，MUJOCO_GL=disabled 可完全绕过 OpenGL；HPC 共享节点不适合大规模并行 subprocess，应通过 Slurm 独占节点，workers 数精确匹配 –cpus-per-task；Slurm sbatch –wrap 默认使用 /bin/sh，需显式包裹 bash -c。 graspable 物体与 fixture 在多物体 MuJoCo 任务中必须区分；task_config 的 grasp_geoms 字段可作为过滤依据，避免 EEF 轨迹经过 fixture 上方时误判 target；other_objects 仍需保留 fixture 供碰撞判断，只在 target 搜索时过滤。 robosuite OSC 控制器夹爪 action 符号与直觉和注释相反（-1.0=关闭，1.0=打开），日志中表现为 drop 相关指标为 0，容易被误判为物理执行失败而非控制命令错误。robosuite MuJoCo body 命名与 task config 存在映射不一致，需要模糊匹配 fallback。 ECC v1.9.0 新增 effortLevel: max，配合全员 opus 模型将 AI 推理能力配置到最高档，是基础设施层面的一次性投资。Windows pathlib.Path 传给外部命令（rclone、git 等）时必须使用 .as_posix() 转为正斜杠。 会话摘要 ErrorRecoveryBenchmark ✅ 代码审查与根因调查：CLAUDE.md 更新、13 个 skill 全面审查、phase detection 失效发现、系统性 contract 问题确立 02:19:30.892 | claude_code + codex 通过 /init 审查并更新 CLAUDE.md（补充 Makefile 目标、训练脚本、未文档化 pipeline 脚本）；通过 3 个并行 agent 对 13 个 error skill 完整代码审查，发现 5 类 bug（e02 夹爪方向反转、e7 空字典、e11 硬编码阈值、YAML key 不匹配等）；通过 bash 统计 opportunity map phase 分布，发现 threading 全部 195 帧标记为 pre_reach，确认 phase detection 失效是核心根因；人类指出系统性问题本质（整条链路 contract 不一致），确立「轨迹分段」为根本修复方向；Codex 同步生成 AGENTS.md 贡献者指南（358 词）。\n🔄 架构修复实施：Step 1-7 轨迹分段 + Contract 对齐 + 6 遗漏修复 + 大规模场景生成 + 扫描验证与退化排查 03:46:21.126 | claude_code 系统性实施 7 步计划：新增 InteractionSegment/InteractionSegmenter、修改 CleanTrajectory 分段序列化、修改 OpportunityScanner 和 ContextReplayEngine 透传 target_object、修复 7 个 skill 的 objects[0] 语义和 2 个显式 bug；人类审查后补充 6 个遗漏修复（target_pos、fallback phase、config 漂移、e05/e06/e09 语义、error_spec.target、body-name fallback）；sbatch job 50015 在 an53 节点 32 分 49 秒生成 1222 scenes；重扫结果：threading 3→25（+22），three_piece_assembly 23→4（-19）；通过 NPZ 分析和 collect 脚本审查定位退化根因（collect 未调用 segment_interactions()），修复方案制定完毕待实施。\n✅ 参数修复与初步场景生成：Fix A-G（7 类 error skill）+ Fix 5-6（graspable 过滤）+ 并行场景生成 + 48 subtype 根因分析 17:31:04.519 | claude_code 实施 Fix A-G：修改 7 个文件 24 处参数，96 workers Slurm 作业生成 1209 scenes（158/160 subtype 成功）；实施 Fix 5-6：限定 graspable 物体候选集修复 three_piece_assembly target 误识别，重跑全 6 任务 collect+scan 验证；32 workers 生成 1159 scenes（107/160 满 10/10）；用户提供精确 48 个失败 subtype 分类（含文件路径、行号），AI 读取 7 个 skill 源码确认 5 类系统性根因，写入修复 plan 文件。\ngadget ✅ 基础设施修复与工具链升级：git 同步、rclone 配置、npx bug 修复、ECC 全员 opus 升级、Codex 月度聚合支持 02:35:05.863 | claude_code + codex 修复 DCC 和 TzJsDesktop 的 git 合并冲突（git reset –hard origin/main 对齐远端，避免了 AI 默认走的复杂合并路径）；创建 rclone 同步配置，修复 Windows 反斜杠 bug（Path.as_posix()）后成功拉取全部个人数据；精确定位 daily_summary.py 卡在 @ccusage/codex 步骤的根因（npx 无 –yes 在 capture_output 模式下无限等待），在 3 处添加 –yes 参数修复；深入阅读 ECC 组件后通过 sed 批量将 27 个 agent 升级至 opus（doc-updater 保留 sonnet）、effortLevel 设为 max（用户主动告知新功能）；通过 Codex 新增 monthly_summary.py Codex 用量聚合函数，同步更新 README 文档；research/CLAUDE.md 补充未记录的 CLI 参数。\nToken 用量 Claude Code 总览 指标 数值 总 Token 39,706,094 输入 Token 47,162 输出 Token 108,045 Cache 创建 2,303,350 Cache 读取 37,247,537 Cache 命中率 94.2% 总费用 (USD) $26.1748 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 21,301 43,156 1,138,906 29,102,427 $22.9125 87.5% claude-haiku-4-5-20251001 23,791 58,982 963,158 7,767,682 $2.2994 8.8% claude-sonnet-4-6 2,070 5,907 201,286 377,428 $0.9629 3.7% 各设备用量 设备 总 Token 输入 输出 费用 tianhe 32,492,898 43,924 77,886 $22.1018 TzJsDesktop 7,213,196 3,238 30,159 $4.0730 Codex 总览 指标 数值 总 Token 9,917,937 输入 Token 9,827,688 输出 Token 90,249 推理 Token 43,171 Cache 读取 8,714,880 总费用 (USD) $6.3145 模型明细 模型 输入 输出 推理 Cache 读取 费用 占比 gpt-5.4 9,827,688 90,249 43,171 8,714,880 $6.3145 100.0% ",
-  "wordCount" : "1646",
+  "articleBody": "Daily Log — 2026-03-21 Today’s Overview What was done: Two major projects progressed in parallel: error_recovery_benchmark completed a full cycle from single-point parameter fixes to architectural trajectory segmentation refactoring (including pipeline contract alignment and large-scale training scene generation); gadget fixed critical bugs in cross-device data sync and daily report generation. How it was done: On tianhe, through systematic code review (3 parallel agents + log aggregation statistics), phased fixes (parameter adjustment → architectural refactoring), and large-scale validation via Slurm parallel jobs; on TzJsDesktop, by precisely locating and fixing the npx hang bug, and using sed to batch-upgrade all ECC agent model configurations. Why it matters: Benchmark training data coverage improved from 88/174 subtypes to 130+/160 subtypes, with threading task subtypes increasing 8x; the gadget daily report pipeline is restored, and ECC inference capability is now at maximum (opus + effortLevel: max). DCC What was done: Force-synchronized the local main branch with GitHub origin/main after a historical divergence. How it was done: Confirmed no unique local code via git fetch + git diff --stat, then executed git reset --hard origin/main. Why it matters: Codebase is now in sync with GitHub, making new features like rclone sync.py available on DCC. TzJsDesktop What was done: Fixed git merge conflicts in the gadget project, configured rclone data sync, fixed the npx subprocess hang bug, improved documentation, completed a global ECC agent model upgrade, and reviewed new vs. old opportunity scan comparisons — discovering an unexpected regression in three_piece_assembly. How it was done: git reset --hard to align with remote, Path.as_posix() to fix the Windows path bug, npx --yes to skip interactive prompts, sed for batch agent config replacement; ran the opportunity scanner to get fresh scan data and compared task-by-task changes. Why it matters: Gadget data sync restored, daily report generation pipeline no longer hangs, ECC upgraded to opus + max thinking across the board; pinpointed the three_piece_assembly -19 regression and initiated follow-up investigation. tianhe What was done: Completed the full-stack repair of error_recovery_benchmark: code review identified root causes (phase detection failure, objects[0] ambiguity) → parameter fixes (7 error skill types) → architectural refactoring (trajectory segmentation + contract alignment Steps 1–7) → large-scale training scene generation (1,222 scenes) → opportunity map rescan (threading 3→25) → root cause analysis of three_piece_assembly regression. How it was done: Parallel multi-agent code review, bash log statistics, Python data validation, file-by-file modifications (7 error skill files + 5 framework files), sbatch Slurm parallel jobs (96 workers). Why it matters: Training scene success rate improved from ~55% to 81% (130/160 subtypes achieving 10/10); threading showed the most significant improvement; the root cause of the three_piece_assembly regression has been identified and a fix is ready. Completed full-stack repairs on error_recovery_benchmark in the tianhe HPC cluster — from parameter tuning to architectural trajectory segmentation refactoring (1,222 training scenes, threading subtypes increased from 3 to 25) — while fixing critical gadget infrastructure bugs on TzJsDesktop and upgrading the entire ECC toolchain to opus + max thinking.\nToday’s Tasks Architecture \u0026 Strategy ✅ Systematic Contract Fix Design (Trajectory Segmentation Architecture) — Identified contract inconsistencies across the entire detector→injector→validator→generator pipeline; established trajectory segmentation by object interaction (InteractionSegmenter) as the core fix direction, with each segment having a clearly defined current target object to entirely bypass phase detection defects. Plan file created and updated, providing full context for Steps 1–7 implementation. ✅ Comprehensive Code Review of 13 Error Skills and Root Cause Investigation of Training Data Generation — Used 3 parallel agents to perform a complete code review of can_inject/inject/validate across all error skills, uncovering 5 categories of implementation bugs; aggregated 42 parallel log files to count failure causes (gripper not closed: 1,698 times; insufficient displacement: 1,390 times; etc.); used bash to analyze the phase distribution in the opportunity map, discovering that all 372 threading opportunities were labeled as pre_reach with pick_place entirely missing reach/grasp phases — confirming phase detection failure as the core root cause. ✅ Systematic Error Skill Parameter Fixes (Fix A–G + Fix 5–6) — Applied 24 parameter changes across 7 error skill types (offset lower bounds, step counts, velocity directions, validation thresholds); fixed get_target_object() to prioritize searching within graspable objects (Fix 5); restricted InteractionSegmenter to the graspable candidate set (Fix 6); all 139 unit tests pass. ✅ Trajectory Segmentation + Contract Alignment Implementation (Steps 1–7 + 6 Missed Fixes) — Added InteractionSegment dataclass and InteractionSegmenter; updated CleanTrajectory to support segment serialization; updated OpportunityScanner to retrieve target_object/phase/other_objects from segments; fixed objects[0] semantics across 13 skills (e01–e13); fixed e02 gripper direction and e11 freeze_steps hardcoding; added target_pos to trajectory_context; fixed e12/e10 config key drift; fixed context_replay.py to use error_spec.target; fixed EnvWrapper._sim_body_name2id substring fallback; all 139 unit tests pass. 🔄 three_piece_assembly Scan Regression Root Cause Analysis (23→4 subtypes) — By analyzing NPZ files (missing interaction_segments_json), scan logs (879/887 frames labeled pre_reach), and the collect script (never calls segment_interactions()), identified 4 root causes: collect script not integrated with the segmenter, replay_and_label_phases() not passing target_object (causing immovable base fixture to be used for phase detection), scanner fallback overwriting bad labels, and missing defensive logic. Fix plan drafted; code implementation pending. ✅ gadget: Fixed npx Subprocess Permanent Hang Bug — npx calls in fetch_codex_usage_full() and fetch_ccusage_full() lacked --yes, causing them to wait indefinitely for install confirmation in capture_output=True mode; adding --yes to all 3 npx calls resolved the issue and restored the daily report generation pipeline. ✅ gadget: ECC Full Upgrade to opus + max thinking — Thoroughly reviewed ECC components (5 core agents, 4 skills, hooks system); used sed to batch-upgrade 27 agents from sonnet/haiku to opus (doc-updater kept at sonnet); changed settings.json effortLevel to max (a new feature the user proactively informed me of). ✅ Large-Scale Parallel Training Scene Generation (Multiple Slurm Jobs) — Three rounds of scene generation: Round 1 (after Fix A–G): 96 workers, 1,209 scenes (158/160 subtype success); Round 2 (after Fix 5–6): 32 workers, 1,159 scenes (107/160 achieving 10/10); Round 3 (after Steps 1–7): 96 workers on node an53, 1,222 scenes in 32 min 49 sec (130/160 subtypes satisfied). ✅ Full 6-Task collect + scan Validation and Opportunity Map Rescan — Re-ran collect+scan for all 6 tasks multiple times; final scan results: threading 3→25 (+22), pick_place 21→23 (+2), three_piece_assembly 23→4 (−19), total 130→135 (+5); validated the significant effect of the target_pos fix on threading while discovering the unexpected three_piece_assembly regression. ✅ gadget: Added Codex Usage Aggregation Support to monthly_summary.py — Added functions including aggregate_token_usage and combine_usage_summaries; independently tracks codex_token_usage in monthly summaries and generates combined_token_usage_summary; README documentation updated accordingly. Implementation \u0026 Fixes ✅ gadget: Git Sync and rclone Data Configuration — Fixed git merge conflicts on DCC and TzJsDesktop (git reset --hard origin/main to align with remote); created ~/.config/gadget/sync.json; fixed the Windows backslash bug in sync.py (Path.as_posix()); successfully pulled all personal data from Google Drive. ✅ CLAUDE.md / AGENTS.md Review and Update (ErrorRecoveryBenchmark) — Ran /init to review and update CLAUDE.md, adding missing Makefile targets (v5-training, v5-mass-gen, etc.), training scripts, and 6 undocumented pipeline scripts; generated a 358-word AGENTS.md contributor guide via Codex covering project structure, build/test commands, code style, and PR standards. Problems and Solutions Critical Issues 1. Systematic phase detection failure across multi-object tasks (threading/pick_place, etc.): all threading frames labeled pre_reach, pick_place missing reach/grasp phases, causing 12/13 skills to find no opportunities Solution: Root cause: phase detection relies on the distance between a single object and the EEF, which fundamentally fails with unusual geometry (needle shape) or multi-object scenarios. Core fix: added InteractionSegmenter to segment trajectories by object interaction (EEF proximity + gripper state + co-motion detection), giving each segment a clearly defined target_object and phase, entirely bypassing phase detection.\nKey Insight: The single-object assumption in phase detection is an architectural design flaw that cannot be fixed by tuning parameters; trajectory segmentation is a more fundamental solution that circumvents the flawed abstraction rather than patching it.\n2. Pipeline-wide target_object ambiguity in v5: OpportunityScanner/skill.inject()/validate()/ContextReplayEngine all default to objects[0], systematically selecting the wrong operation target in multi-object scenarios; missing target_pos in trajectory_context renders drop-type skill filtering conditions ineffective Solution: Steps 1–7 propagate target_object and target_pos through the entire pipeline; fixed objects[0] semantics in 13 skills; wrote target_pos to trajectory_context after construction; context_replay.py uses error_spec.target.\nKey Insight: In multi-object tasks, objects[0] is the first object by dictionary insertion order — semantically incorrect but raises no errors — causing all object-state-based judgments (displacement/gripper/pose) to be systematically wrong.\n3. Systematic mismatch between error skill injection parameters and validation thresholds, causing 41+ subtypes to generate 0 scenes (5 root causes: insufficient displacement, empty gripper, object won’t release, insufficient collision force, etc.) Solution: Categorized 5 root causes and made targeted fixes across 7 files with 24 parameter changes (lowered validation thresholds, increased step counts, adjusted velocity directions); drop-type skills now apply a slight initial velocity (Z=−0.15 m/s) to assist object release.\nKey Insight: Injection parameter lower bounds must be calibrated against validation thresholds: when lowering the injection lower bound, the validation threshold must be lowered simultaneously; drop-type errors cannot rely solely on gravity and need an active initial velocity to overcome friction.\n4. The collect script never calls segment_interactions(), so NPZ files lack segmentation data; in three_piece_assembly, InteractionSegmenter and get_target_object() incorrectly select the base fixture as the target, causing scan results to regress from 23 to 4 subtypes Solution: Fix 5–6 restricts target search to graspable objects (those with grasp_geoms configured); collect script needs to call segment_interactions(); replay_and_label_phases() needs to pass target_object; scanner needs to fix label override timing. (Fixture part fixed; collect integration pending.)\nKey Insight: The segmenter was implemented but never integrated into the data collection pipeline; contract alignment must track storage-layer persistence — passing unit tests does not mean E2E correctness.\n5. python summarize/daily_summary.py permanently hangs at the @ccusage/codex step with no output and no errors Solution: subprocess.run(capture_output=True) redirects stdin to DEVNULL; npx’s first-run install confirmation prompt waits indefinitely; adding --yes to all 3 npx calls skips the interactive confirmation.\nKey Insight: When calling any CLI tool that may have interactive prompts in capture_output=True mode, --yes/-y or equivalent flags must be explicitly passed; otherwise the process hangs indefinitely rather than timing out.\n6. Multiple HPC obstacles: 32+ workers simultaneously forking and importing heavy libraries on a shared login node caused IO contention crashes; the ai partition forces gpu:a800:1 even for purely CPU tasks; sbatch –wrap uses /bin/sh which doesn’t support source/conda; MUJOCO_GL=osmesa fails to initialize on some nodes Solution: Submitted a Slurm exclusive-node job (96 cores); accepted 1 GPU but ran with MUJOCO_GL=disabled (physics simulation needs no GL); wrapped sbatch commands in bash -c, replaced source with . for conda init.\nKey Insight: MuJoCo physics simulation (enable_camera=False) is a purely CPU task; sbatch –wrap defaults to /bin/sh, not the user’s login shell; worker count should exactly match the requested –cpus-per-task.\nGeneral Issues 7. In e02 drop_in_transit, the settle phase has action[-1]=-1.0 commented ‘Open gripper’ but actually closes the gripper, causing an already-dropped object to be re-grasped and the drop to fail; in e11, validate() threshold uses min_progress * 30 hardcoded while inject() reads freeze_steps from config, making the evaluation criteria inconsistent Solution: Changed e02 to action[-1]=1.0 (in robosuite OSC, 1.0 = open); added freeze_steps = self.config.get('freeze_steps', 30) in e11 to unify the source.\nKey Insight: robosuite gripper action sign is counter-intuitive and opposite to comments (−1=close, 1=open); in logs this appears as drop metrics of 0, easily misinterpreted as a physical execution failure rather than a control command error.\n8. YAML config keys don’t match the keys read in Python code (lateral_offset vs. lateral_offset_range; rotation_offset vs. rotation_range; reverse_steps vs. regression_range), causing affected skills to always use hardcoded defaults Solution: Added dual-key fallback (check new name first, then old name); reverse_steps handling changed from a fixed value to range sampling.\nKey Insight: Config key evolution was not synchronized with the code; the getdefault mechanism masked the error — the config was silently ignored with no crash, making this a highly insidious bug.\n9. git pull triggered merge conflicts in 13 files; AI defaulted to the “preserve both sides” flow, causing many wasted steps; sync.py on Windows generated backslash-based rclone remote paths, causing sync failures Solution: User indicated remote should take precedence; executed git reset --hard origin/main to align directly; changed str(Path(remote_rel).parent) to Path(remote_rel).parent.as_posix().\nKey Insight: Conflict resolution strategy depends on business intent; AI should ask before acting rather than defaulting to a complex merge path; Windows pathlib.Path must explicitly call .as_posix() when passing paths to external commands.\nHuman Thinking vs. AI Thinking Strategic Level Problem Classification: Systemic Contract Inconsistency vs. Isolated Point Bugs Role Approach Human Explicitly identified that generation failures were not a matter of tuning thresholds in individual skills, but rather contract inconsistencies across the entire detector→injector→validator→generator pipeline, breaking it down into three levels: detectors being missed, validators never passing, and generators stopping early after consecutive failures. AI Found multiple isolated code bugs and phase detection failure symptoms; tended toward fixing them one by one, lacking a systemic view of the full pipeline. Analysis: The human defined the nature of the problem from an architectural perspective, directly changing the direction of the entire fix strategy; AI is better at quickly pinpointing specific bugs locally but lacks a holistic view of cross-module data flow.\nCore Fix Direction: Trajectory Segmentation (Bypass phase detection) vs. Patching phase detection Role Approach Human Proposed a fundamental architectural solution — segment trajectories by object interaction, with each segment having a clearly defined current target object and gripper detection based on co-position of object and EEF — entirely bypassing the phase detection flaw. AI Only identified the symptoms of phase detection failure and proposed fixing the single-object assumption in get_task_completion_stages(), remaining at the patch level. Analysis: The human proposed a more elegant architectural solution — bypassing rather than patching; AI’s thinking was stuck patching at the wrong level of abstraction, which would have led to many ad hoc workarounds for special cases.\nIdentifying Systemic Gaps in Local Fixes (6 Uncovered Issues) Role Approach Human After AI completed the 7-step plan, a systematic review identified: target_pos not being passed, fallback phase logic not fixed, config drift only half-fixed, e05/e06/e09 still using objects[0], error_spec.target not used, three_piece_assembly body-name warnings. AI Completed the 7-step plan and validated with unit tests (139 passing), but did not systematically verify all skills and call sites; lacked initiative in reviewing the overall data flow of modified modules. Analysis: The human reviewed the entire system from a data contract perspective rather than file by file; AI tends to consider tasks complete after executing the plan, lacking the initiative for a global post-hoc review.\nValidating Basic Assumptions About Task Object Counts Role Approach Human Quickly corrected AI’s basic assumption errors about pick_place (1 → 4 objects) and threading (no grasping → must grasp needle). AI Made inferences about task structure from code without first reading the task configuration YAML, causing parts of the analysis to be built on incorrect premises. Analysis: The human identified basic assumption errors from prior knowledge; AI should first read config files to verify assumptions before beginning analysis — “config files are the map, code is the terrain; read the map first.”\nGPU Resource Requirements and Worker Count Configuration Role Approach Human Pointed out that scene generation is purely CPU-based with no GPU needed; repeatedly corrected AI over-requesting GPUs (8→1); clarified that worker count should exactly match the requested CPU core count (rather than AI’s conservative estimate of 8–16). AI Defaulted to assuming MuJoCo simulation requires GPU rendering without first checking the enable_camera parameter; tended to maximize resource allocation without aligning to actual node core counts. Analysis: The human assessed resource needs from the nature of the task; AI relied on surface-level assumptions and did not read the code to verify before acting — these errors led to multiple wasted Slurm job submissions.\nECC Model Selection Strategy and Awareness of New Features Role Approach Human Required “the latest opus 4.6 with max thinking for all components” and proactively informed AI that a new effortLevel: max option existed. AI Initially recommended a balanced cost approach of “opus for core + sonnet for others”; incorrectly told the user that high was the highest effortLevel. Analysis: The user prioritized maximizing capability over cost; the user knew about new features that AI was unaware of — a classic case of information asymmetry; AI should proactively declare that its knowledge of rapidly evolving tools may be outdated.\nnpx Hang Root Cause Diagnosis (AI Systematic Investigation vs. Human Symptom Description) Role Approach Human Provided accurate symptoms (hung at @ccusage/codex step with no output) but was unclear on the specific root cause. AI Systematically eliminated hypotheses: checked data volume → tested command directly → pinpointed capture_output + missing –yes as root cause; the entire diagnostic chain was clear and efficient. Analysis: AI’s systematic diagnostic process was more efficient than intuitive guessing; the human provided precise symptoms while AI executed the inference chain — one of the few scenarios where AI clearly outperforms intuition.\nAlertness to Subtype Count Anomalies and Precise Statistics Role Approach Human Self-counted 48 failing subtypes (listing file paths, line numbers, and log examples for each of 5 root cause categories); noticed that 130 subtypes was insufficient (theoretical 174) and proactively asked follow-up questions to drive a rescan. AI Classification framework was roughly correct but too coarse; did not accurately count the 48 number; when reporting 130 subtypes, did not proactively flag the gap against the expected 174. Analysis: The human had prior expectations about results and noticed when they didn’t match actuals; AI only reported observed results without proactive sanity-checking.\nAI Limitations Key Limitations When facing complex systemic problems, AI tends to locate isolated code bugs and lacks the ability to analyze contract inconsistencies across the full data flow (detector→injector→validator→generator); it requires human guidance at the architectural level to elevate its analytical perspective. After completing local fix plans, AI lacks initiative for global data flow validation: multiple gaps — including three skills (e05/e06/e09), missing target_pos propagation, and the collect script not integrating segment_interactions() — all required human systematic review to discover; passing unit tests created a false sense of completion. AI makes inferences about task structure without first reading task configuration files (task YAML), causing analyses to be built on incorrect premises (pick_place object count, whether threading involves grasping); configuration files should always be read first to validate basic assumptions before beginning analysis. AI assumed GPU was needed without first checking the enable_camera parameter; despite repeated corrections, Slurm scripts continued to request too many GPUs; AI inaccurately assesses runtime resource requirements and tends to forget user preferences set in earlier turns of a multi-round conversation. In git merge conflict scenarios, AI defaults to the complex “preserve both sides, resolve file by file” workflow without first asking for user intent (discard local vs. keep local), resulting in much wasted effort before being corrected. The three_piece_assembly regression (23→4 subtypes) was presented as a “normal result” in AI’s report without proactive flagging or analysis; when analyzing failures, AI also failed to proactively enumerate all files of the same type (e05/e06/e09 were missed) until the human explicitly listed them. AI is unaware of the latest Claude Code features (effortLevel: max) and incorrectly told the user that high was the highest level; AI has a knowledge lag on rapidly evolving tool ecosystems and should proactively declare that newer features may be unknown to it. Today’s Takeaways Core Takeaways Pipeline contract alignment must track the complete data flow: it’s not enough to fix the processing logic in code — you must also ensure data is persisted at the storage layer (e.g., segment_interactions() results written to NPZ); otherwise data is lost on reload and fixes have no effect on downstream processes. Passing unit tests ≠ E2E correctness. In multi-object robot manipulation tasks, target_object must be treated as a first-class citizen propagated through all three stages of detector/injector/validator; objects[0] is the first object by dictionary insertion order, semantically wrong in multi-object scenarios and will not raise an error, causing all object-state-based judgments to be systematically incorrect. Before analyzing a complex system problem, all relevant configuration files must be read to validate basic assumptions (e.g., how many objects a task has, what type of task it is) — “config files are the map, code is the terrain; read the map first.” After systematic fixes, a before/after comparison across all tasks must be performed; you cannot assume there are no side effects just because unit tests pass. The simultaneous threading +22 and three_piece_assembly −19 results prove exactly this. Error skill injection parameter lower bounds must be adjusted in tandem with validation thresholds: when lowering the injection lower bound, validation thresholds (min_displacement, min_rotation_deviation, etc.) must be lowered simultaneously; otherwise injections still fail validation. Drop-type errors cannot rely solely on gravity and need a slight initial downward velocity (Z=−0.15 m/s) to overcome friction and assist release. subprocess.run(capture_output=True) redirects stdin to DEVNULL; when calling any CLI tool that may have interactive prompts (such as npx), --yes/-y or equivalent flags must be explicitly passed; otherwise the process hangs indefinitely rather than timing out. Log aggregation statistics (Counter) are far more effective than reading individual log lines for identifying systemic bugs: 1,698 instances of “gripper not closed” pointed directly to target_object ambiguity, not actual gripper execution problems; data-driven root cause analysis is superior to subjective guessing. MuJoCo physics simulation (enable_camera=False) is a purely CPU task; MUJOCO_GL=disabled completely bypasses OpenGL. HPC shared nodes are not suitable for large-scale parallel subprocesses — use exclusive Slurm nodes with worker count exactly matching –cpus-per-task; sbatch –wrap defaults to /bin/sh, so commands must be explicitly wrapped in bash -c. Graspable objects and fixtures must be distinguished in multi-object MuJoCo tasks; the grasp_geoms field in task_config serves as a filter criterion to avoid misidentifying target when the EEF trajectory passes above a fixture. other_objects should still include fixtures for collision detection — only filter them out when searching for the target. robosuite OSC controller gripper action sign is counter-intuitive and opposite to comments (−1.0=close, 1.0=open); in logs this appears as drop-related metrics of 0, easily misinterpreted as physical execution failure rather than a control command error. robosuite MuJoCo body naming has mapping inconsistencies with task configs, requiring fuzzy-match fallback. ECC v1.9.0 added effortLevel: max; combined with full opus models, this brings AI inference capability to its maximum configuration — a one-time infrastructure investment. Windows pathlib.Path must use .as_posix() when passing paths to external commands (rclone, git, etc.). Session Summaries ErrorRecoveryBenchmark ✅ Code Review \u0026 Root Cause Investigation: CLAUDE.md update, comprehensive review of 13 skills, phase detection failure discovery, systemic contract issues established 02:19:30.892 | claude_code + codex Reviewed and updated CLAUDE.md via /init (adding Makefile targets, training scripts, and undocumented pipeline scripts); performed a comprehensive code review of 13 error skills using 3 parallel agents, uncovering 5 bug categories (e02 gripper direction reversed, e7 empty dict, e11 hardcoded thresholds, YAML key mismatches, etc.); used bash to analyze phase distribution in the opportunity map, finding all 195 threading frames labeled as pre_reach — confirming phase detection failure as the core root cause; human identified the systemic nature of the problem (contract inconsistency across the full pipeline) and established “trajectory segmentation” as the fundamental fix direction; Codex concurrently generated a 358-word AGENTS.md contributor guide.\n🔄 Architectural Fix Implementation: Steps 1–7 Trajectory Segmentation + Contract Alignment + 6 Missed Fixes + Large-Scale Scene Generation + Scan Validation and Regression Analysis 03:46:21.126 | claude_code Systematically implemented the 7-step plan: added InteractionSegment/InteractionSegmenter, updated CleanTrajectory for segment serialization, updated OpportunityScanner and ContextReplayEngine to propagate target_object, fixed objects[0] semantics in 7 skills and 2 explicit bugs; human review identified 6 missed fixes (target_pos, fallback phase, config drift, e05/e06/e09 semantics, error_spec.target, body-name fallback); sbatch job 50015 generated 1,222 scenes on node an53 in 32 min 49 sec; rescan results: threading 3→25 (+22), three_piece_assembly 23→4 (−19); NPZ analysis and collect script review identified the regression root cause (collect never called segment_interactions()); fix plan drafted, awaiting implementation.\n✅ Parameter Fixes and Initial Scene Generation: Fix A–G (7 error skill types) + Fix 5–6 (graspable filtering) + Parallel Scene Generation + 48-Subtype Root Cause Analysis 17:31:04.519 | claude_code Implemented Fix A–G: 24 parameter changes across 7 files; 96-worker Slurm job generated 1,209 scenes (158/160 subtype success); implemented Fix 5–6: restricted graspable candidate set to fix three_piece_assembly target misidentification; re-ran collect+scan validation for all 6 tasks; 32-worker job generated 1,159 scenes (107/160 achieving 10/10); user provided precise 48-subtype failure classification (with file paths and line numbers); AI read 7 skill source files and confirmed 5 systemic root causes, documenting the fix plan.\ngadget ✅ Infrastructure Fixes and Toolchain Upgrade: git sync, rclone config, npx bug fix, ECC full opus upgrade, Codex monthly aggregation support 02:35:05.863 | claude_code + codex Fixed git merge conflicts on DCC and TzJsDesktop (git reset –hard origin/main to align with remote, avoiding the complex merge path AI would have defaulted to); created rclone sync configuration, fixed the Windows backslash bug (Path.as_posix()), and successfully pulled all personal data; precisely identified the root cause of daily_summary.py hanging at the @ccusage/codex step (npx missing –yes, waiting indefinitely in capture_output mode), added –yes to 3 locations to fix; after thoroughly reviewing ECC components, batch-upgraded 27 agents to opus (doc-updater kept at sonnet) and set effortLevel to max (new feature the user proactively informed me of) using sed; added Codex usage aggregation functions to monthly_summary.py via Codex, updated README documentation; supplemented undocumented CLI parameters in research/CLAUDE.md.\nToken Usage Claude Code Overview Metric Value Total Tokens 39,706,094 Input Tokens 47,162 Output Tokens 108,045 Cache Creation 2,303,350 Cache Read 37,247,537 Cache Hit Rate 94.2% Total Cost (USD) $26.1748 Model Breakdown Model Input Output Cache Creation Cache Read Cost Share claude-opus-4-6 21,301 43,156 1,138,906 29,102,427 $22.9125 87.5% claude-haiku-4-5-20251001 23,791 58,982 963,158 7,767,682 $2.2994 8.8% claude-sonnet-4-6 2,070 5,907 201,286 377,428 $0.9629 3.7% Usage by Device Device Total Tokens Input Output Cost tianhe 32,492,898 43,924 77,886 $22.1018 TzJsDesktop 7,213,196 3,238 30,159 $4.0730 Codex Overview Metric Value Total Tokens 9,917,937 Input Tokens 9,827,688 Output Tokens 90,249 Reasoning Tokens 43,171 Cache Read 8,714,880 Total Cost (USD) $6.3145 Model Breakdown Model Input Output Reasoning Cache Read Cost Share gpt-5.4 9,827,688 90,249 43,171 8,714,880 $6.3145 100.0% ",
+  "wordCount" : "4324",
   "inLanguage": "en",
   "datePublished": "2026-03-21T00:00:00-05:00",
   "dateModified": "2026-03-21T00:00:00-05:00",
@@ -230,342 +231,347 @@
     <h1 class="post-title entry-hint-parent">
       Bug Journal 2026-03-21
     </h1>
-    <div class="post-meta"><span title='2026-03-21 00:00:00 -0500 -0500'>March 21, 2026</span>&nbsp;·&nbsp;<span>8 min</span>
+    <div class="post-meta"><span title='2026-03-21 00:00:00 -0500 -0500'>March 21, 2026</span>&nbsp;·&nbsp;<span>21 min</span>&nbsp;|&nbsp;<span>Translations:</span>
+<ul class="i18n_list">
+    <li>
+        <a href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-21/">中文</a>
+    </li>
+</ul>
 
 </div>
   </header> 
-  <div class="post-content"><h1 id="日报--2026-03-21">日报 — 2026-03-21<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-21">#</a></h1>
-<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+  <div class="post-content"><h1 id="daily-log--2026-03-21">Daily Log — 2026-03-21<a hidden class="anchor" aria-hidden="true" href="#daily-log--2026-03-21">#</a></h1>
+<h2 id="todays-overview">Today&rsquo;s Overview<a hidden class="anchor" aria-hidden="true" href="#todays-overview">#</a></h2>
 <ul>
-<li><strong>做了什么：</strong> 两大项目并行推进：error_recovery_benchmark 完成了从单点参数修复到架构级轨迹分段重构的完整闭环（含 pipeline contract 对齐、大规模训练场景生成），gadget 修复了跨设备数据同步断层和日报生成的关键 bug。</li>
-<li><strong>怎么做的：</strong> 在 tianhe 通过系统性代码审查（3 并行 agent + 日志聚合统计）、分阶段修复（参数调整→架构重构）和 Slurm 并行作业大规模验证；在 TzJsDesktop 通过精准代码定位修复 npx 挂起 bug，并用 sed 批量升级 ECC 全部 agent 模型配置。</li>
-<li><strong>有什么用：</strong> benchmark 训练数据覆盖从 88/174 subtypes 提升至 130+/160 subtypes，threading 任务 subtypes 翻 8 倍；gadget 日报 pipeline 恢复可用，ECC 推理能力升至最高档（opus + effortLevel: max）。</li>
+<li><strong>What was done:</strong> Two major projects progressed in parallel: error_recovery_benchmark completed a full cycle from single-point parameter fixes to architectural trajectory segmentation refactoring (including pipeline contract alignment and large-scale training scene generation); gadget fixed critical bugs in cross-device data sync and daily report generation.</li>
+<li><strong>How it was done:</strong> On tianhe, through systematic code review (3 parallel agents + log aggregation statistics), phased fixes (parameter adjustment → architectural refactoring), and large-scale validation via Slurm parallel jobs; on TzJsDesktop, by precisely locating and fixing the npx hang bug, and using sed to batch-upgrade all ECC agent model configurations.</li>
+<li><strong>Why it matters:</strong> Benchmark training data coverage improved from 88/174 subtypes to 130+/160 subtypes, with threading task subtypes increasing 8x; the gadget daily report pipeline is restored, and ECC inference capability is now at maximum (opus + effortLevel: max).</li>
 </ul>
 <h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
 <ul>
-<li><strong>做了什么：</strong> 对本地 main 分支与 GitHub origin/main 的历史分叉进行强制同步。</li>
-<li><strong>怎么做的：</strong> 通过 git fetch + git diff &ndash;stat 确认本地无独有代码后执行 git reset &ndash;hard origin/main。</li>
-<li><strong>有什么用：</strong> 代码库与 GitHub 保持一致，rclone sync.py 等新功能在 DCC 上可用。</li>
+<li><strong>What was done:</strong> Force-synchronized the local main branch with GitHub origin/main after a historical divergence.</li>
+<li><strong>How it was done:</strong> Confirmed no unique local code via <code>git fetch</code> + <code>git diff --stat</code>, then executed <code>git reset --hard origin/main</code>.</li>
+<li><strong>Why it matters:</strong> Codebase is now in sync with GitHub, making new features like <code>rclone sync.py</code> available on DCC.</li>
 </ul>
 <h3 id="tzjsdesktop">TzJsDesktop<a hidden class="anchor" aria-hidden="true" href="#tzjsdesktop">#</a></h3>
 <ul>
-<li><strong>做了什么：</strong> 修复 gadget 项目 git 合并冲突、配置 rclone 数据同步、修复 npx 子进程挂起 bug，完善文档，完成 ECC 全局 agent 模型升级；同时查看新旧 opportunity scan 对比结果，发现 three_piece_assembly 意外回退。</li>
-<li><strong>怎么做的：</strong> git reset &ndash;hard 对齐远端、Path.as_posix() 修复 Windows 路径 bug、npx &ndash;yes 参数跳过交互提示、sed 批量替换 agent 配置；运行 opportunity scanner 获取新扫描数据并对比各任务变化。</li>
-<li><strong>有什么用：</strong> gadget 数据同步恢复、日报生成 pipeline 不再卡死、ECC 全员升至 opus + max thinking；精确定位 three_piece_assembly -19 回退问题，推动后续排查。</li>
+<li><strong>What was done:</strong> Fixed git merge conflicts in the gadget project, configured rclone data sync, fixed the npx subprocess hang bug, improved documentation, completed a global ECC agent model upgrade, and reviewed new vs. old opportunity scan comparisons — discovering an unexpected regression in three_piece_assembly.</li>
+<li><strong>How it was done:</strong> <code>git reset --hard</code> to align with remote, <code>Path.as_posix()</code> to fix the Windows path bug, <code>npx --yes</code> to skip interactive prompts, <code>sed</code> for batch agent config replacement; ran the opportunity scanner to get fresh scan data and compared task-by-task changes.</li>
+<li><strong>Why it matters:</strong> Gadget data sync restored, daily report generation pipeline no longer hangs, ECC upgraded to opus + max thinking across the board; pinpointed the three_piece_assembly -19 regression and initiated follow-up investigation.</li>
 </ul>
 <h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
 <ul>
-<li><strong>做了什么：</strong> 完成 error_recovery_benchmark 全链路修复：代码审查发现根因（phase detection 失效、objects[0] 歧义）→ 参数修复（7 类 error skill）→ 架构重构（轨迹分段 + contract 对齐 Step 1-7）→ 大规模训练场景生成（1222 scenes）→ 机会图重扫（threading 3→25）→ 排查 three_piece_assembly 退化根因。</li>
-<li><strong>怎么做的：</strong> 并行多 agent 代码审查、bash 日志统计、python 数据验证、逐文件修改（7 个 error skill 文件 + 5 个 framework 文件）、sbatch Slurm 并行作业（96 workers）。</li>
-<li><strong>有什么用：</strong> 训练场景成功率从约 55% 升至 81%（130/160 subtypes 满 10/10），threading 修复效果最显著，three_piece_assembly 退化根因已定位，修复方案就绪。</li>
+<li><strong>What was done:</strong> Completed the full-stack repair of error_recovery_benchmark: code review identified root causes (phase detection failure, objects[0] ambiguity) → parameter fixes (7 error skill types) → architectural refactoring (trajectory segmentation + contract alignment Steps 1–7) → large-scale training scene generation (1,222 scenes) → opportunity map rescan (threading 3→25) → root cause analysis of three_piece_assembly regression.</li>
+<li><strong>How it was done:</strong> Parallel multi-agent code review, bash log statistics, Python data validation, file-by-file modifications (7 error skill files + 5 framework files), sbatch Slurm parallel jobs (96 workers).</li>
+<li><strong>Why it matters:</strong> Training scene success rate improved from ~55% to 81% (130/160 subtypes achieving 10/10); threading showed the most significant improvement; the root cause of the three_piece_assembly regression has been identified and a fix is ready.</li>
 </ul>
 <blockquote>
-<p>在 tianhe HPC 集群完成 error_recovery_benchmark 从参数调优到架构级轨迹分段重构的全链路修复（1222 个训练场景，threading subtypes 从 3 升至 25），同时在 TzJsDesktop 修复 gadget 基础设施关键 bug 并将 ECC 工具链全员升级至 opus + max thinking。</p>
+<p>Completed full-stack repairs on error_recovery_benchmark in the tianhe HPC cluster — from parameter tuning to architectural trajectory segmentation refactoring (1,222 training scenes, threading subtypes increased from 3 to 25) — while fixing critical gadget infrastructure bugs on TzJsDesktop and upgrading the entire ECC toolchain to opus + max thinking.</p>
 </blockquote>
-<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
-<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<h2 id="todays-tasks">Today&rsquo;s Tasks<a hidden class="anchor" aria-hidden="true" href="#todays-tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
 <ul>
-<li>✅ <strong>系统性 Contract 修复方案设计（轨迹分段架构）</strong> — 识别出 detector→injector→validator→generator 整链路 contract 不一致，确立按物体交互分段轨迹（InteractionSegmenter）为核心修复方向，每段明确当前目标物体，彻底绕过 phase detection 缺陷；plan 文件创建并更新，为 Step 1-7 实施提供完整上下文。</li>
-<li>✅ <strong>13 个 Error Skill 全面代码审查及训练数据生成根因调查</strong> — 通过 3 个并行 agent 对所有 error skill 的 can_inject/inject/validate 进行完整代码审查，发现 5 类实现 bug；聚合 42 个并行日志统计失败原因（gripper not closed 1698 次、displacement 不足 1390 次等）；通过 bash 统计 opportunity map phase 分布，发现 threading 全部 372 个 opportunity 仅标记为 pre_reach，pick_place 完全缺少 reach/grasp 阶段，确认 phase detection 失效是核心根因。</li>
-<li>✅ <strong>Error Skill 参数系统性修复（Fix A-G + Fix 5-6）</strong> — 针对 7 类 error skill 完成 24 处参数修改（offset 下限、步数、速度方向、验证阈值）；修复 get_target_object() 优先在 graspable 物体中搜索（Fix 5）、InteractionSegmenter 限定 graspable 候选集（Fix 6）；所有 139 个单元测试通过。</li>
-<li>✅ <strong>实施轨迹分段 + Contract 对齐（Step 1-7 + 6 遗漏修复）</strong> — 新增 InteractionSegment dataclass 和 InteractionSegmenter；修改 CleanTrajectory 支持分段序列化；修改 OpportunityScanner 从 segment 获取 target_object/phase/other_objects；修复 13 个 skill 的 objects[0] 语义（e01-e13）；修复 e02 夹爪方向、e11 freeze_steps 硬编码；补齐 target_pos 到 trajectory_context；修复 e12/e10 config key 漂移；修复 context_replay.py 使用 error_spec.target；修复 EnvWrapper._sim_body_name2id 子字符串 fallback；139 个单元测试全部通过。</li>
-<li>🔄 <strong>three_piece_assembly 扫描退化根因排查（23→4 subtypes）</strong> — 通过分析 NPZ 文件（无 interaction_segments_json）、scan 日志（879/887 帧为 pre_reach）和 collect 脚本（从未调用 segment_interactions()），定位 4 个根因：collect 脚本未集成分段器、replay_and_label_phases() 未传 target_object 导致使用不可移动底座 base 做 phase 检测、scanner fallback 覆盖坏标签、缺少防御性逻辑。修复方案已制定，代码实施待开始。</li>
-<li>✅ <strong>gadget: 修复 npx 子进程永久挂起 bug</strong> — fetch_codex_usage_full() 和 fetch_ccusage_full() 中 npx 调用未加 &ndash;yes，在 capture_output=True 模式下等待安装确认而卡死；在所有 3 处 npx 调用添加 &ndash;yes 参数后问题解决，日报生成 pipeline 恢复正常。</li>
-<li>✅ <strong>gadget: ECC 全员 opus + max thinking 升级</strong> — 深入阅读 ECC 各组件（5 个核心 agent、4 个 skill、hooks 系统），通过 sed 批量替换将 27 个 agent 从 sonnet/haiku 升级到 opus（doc-updater 保留 sonnet），settings.json effortLevel 改为 max（用户主动告知的新版功能）。</li>
-<li>✅ <strong>训练场景大规模并行生成（多轮 Slurm 作业）</strong> — 经历三轮场景生成：第一轮（Fix A-G 后）96 workers 生成 1209 scenes（158/160 subtype 成功）；第二轮（Fix 5-6 后）32 workers 生成 1159 scenes（107/160 满 10/10）；第三轮（Step 1-7 后）96 workers 在 an53 节点 32 分 49 秒生成 1222 scenes（130/160 subtypes 满）。</li>
-<li>✅ <strong>全 6 任务 collect + scan 验证与机会图重扫</strong> — 多次重跑全 6 个任务的 collect+scan；最终扫描：threading 3→25（+22），pick_place 21→23（+2），three_piece_assembly 23→4（-19），总计 130→135（+5）；验证了 target_pos 修复对 threading 的显著效果，同时发现 three_piece_assembly 意外回退。</li>
-<li>✅ <strong>gadget: monthly_summary.py 添加 Codex 用量聚合支持</strong> — 新增 aggregate_token_usage、combine_usage_summaries 等函数，在月度汇总中独立统计 codex_token_usage，生成 combined_token_usage_summary，并同步更新 README 文档说明。</li>
+<li>✅ <strong>Systematic Contract Fix Design (Trajectory Segmentation Architecture)</strong> — Identified contract inconsistencies across the entire detector→injector→validator→generator pipeline; established trajectory segmentation by object interaction (InteractionSegmenter) as the core fix direction, with each segment having a clearly defined current target object to entirely bypass phase detection defects. Plan file created and updated, providing full context for Steps 1–7 implementation.</li>
+<li>✅ <strong>Comprehensive Code Review of 13 Error Skills and Root Cause Investigation of Training Data Generation</strong> — Used 3 parallel agents to perform a complete code review of can_inject/inject/validate across all error skills, uncovering 5 categories of implementation bugs; aggregated 42 parallel log files to count failure causes (gripper not closed: 1,698 times; insufficient displacement: 1,390 times; etc.); used bash to analyze the phase distribution in the opportunity map, discovering that all 372 threading opportunities were labeled as pre_reach with pick_place entirely missing reach/grasp phases — confirming phase detection failure as the core root cause.</li>
+<li>✅ <strong>Systematic Error Skill Parameter Fixes (Fix A–G + Fix 5–6)</strong> — Applied 24 parameter changes across 7 error skill types (offset lower bounds, step counts, velocity directions, validation thresholds); fixed <code>get_target_object()</code> to prioritize searching within graspable objects (Fix 5); restricted InteractionSegmenter to the graspable candidate set (Fix 6); all 139 unit tests pass.</li>
+<li>✅ <strong>Trajectory Segmentation + Contract Alignment Implementation (Steps 1–7 + 6 Missed Fixes)</strong> — Added InteractionSegment dataclass and InteractionSegmenter; updated CleanTrajectory to support segment serialization; updated OpportunityScanner to retrieve target_object/phase/other_objects from segments; fixed objects[0] semantics across 13 skills (e01–e13); fixed e02 gripper direction and e11 freeze_steps hardcoding; added target_pos to trajectory_context; fixed e12/e10 config key drift; fixed context_replay.py to use error_spec.target; fixed EnvWrapper._sim_body_name2id substring fallback; all 139 unit tests pass.</li>
+<li>🔄 <strong>three_piece_assembly Scan Regression Root Cause Analysis (23→4 subtypes)</strong> — By analyzing NPZ files (missing interaction_segments_json), scan logs (879/887 frames labeled pre_reach), and the collect script (never calls segment_interactions()), identified 4 root causes: collect script not integrated with the segmenter, replay_and_label_phases() not passing target_object (causing immovable base fixture to be used for phase detection), scanner fallback overwriting bad labels, and missing defensive logic. Fix plan drafted; code implementation pending.</li>
+<li>✅ <strong>gadget: Fixed npx Subprocess Permanent Hang Bug</strong> — npx calls in <code>fetch_codex_usage_full()</code> and <code>fetch_ccusage_full()</code> lacked <code>--yes</code>, causing them to wait indefinitely for install confirmation in <code>capture_output=True</code> mode; adding <code>--yes</code> to all 3 npx calls resolved the issue and restored the daily report generation pipeline.</li>
+<li>✅ <strong>gadget: ECC Full Upgrade to opus + max thinking</strong> — Thoroughly reviewed ECC components (5 core agents, 4 skills, hooks system); used sed to batch-upgrade 27 agents from sonnet/haiku to opus (doc-updater kept at sonnet); changed settings.json effortLevel to max (a new feature the user proactively informed me of).</li>
+<li>✅ <strong>Large-Scale Parallel Training Scene Generation (Multiple Slurm Jobs)</strong> — Three rounds of scene generation: Round 1 (after Fix A–G): 96 workers, 1,209 scenes (158/160 subtype success); Round 2 (after Fix 5–6): 32 workers, 1,159 scenes (107/160 achieving 10/10); Round 3 (after Steps 1–7): 96 workers on node an53, 1,222 scenes in 32 min 49 sec (130/160 subtypes satisfied).</li>
+<li>✅ <strong>Full 6-Task collect + scan Validation and Opportunity Map Rescan</strong> — Re-ran collect+scan for all 6 tasks multiple times; final scan results: threading 3→25 (+22), pick_place 21→23 (+2), three_piece_assembly 23→4 (−19), total 130→135 (+5); validated the significant effect of the target_pos fix on threading while discovering the unexpected three_piece_assembly regression.</li>
+<li>✅ <strong>gadget: Added Codex Usage Aggregation Support to monthly_summary.py</strong> — Added functions including <code>aggregate_token_usage</code> and <code>combine_usage_summaries</code>; independently tracks codex_token_usage in monthly summaries and generates combined_token_usage_summary; README documentation updated accordingly.</li>
 </ul>
-<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
 <ul>
-<li>✅ <strong>gadget: git 同步与 rclone 数据配置</strong> — 修复 DCC 和 TzJsDesktop 的 git 合并冲突（git reset &ndash;hard origin/main 对齐远端）；创建 ~/.config/gadget/sync.json，修复 sync.py 中 Windows 反斜杠 bug（Path.as_posix()），成功从 Google Drive 拉取全部个人数据。</li>
-<li>✅ <strong>CLAUDE.md / AGENTS.md 审查与更新（ErrorRecoveryBenchmark）</strong> — 执行 /init 对现有 CLAUDE.md 进行审查，补充缺失的 Makefile 目标（v5-training、v5-mass-gen 等）、训练脚本、6 个未文档化的 pipeline 脚本；通过 Codex 生成 358 词的 AGENTS.md 贡献者指南，覆盖项目结构、构建测试命令、代码风格和 PR 规范。</li>
+<li>✅ <strong>gadget: Git Sync and rclone Data Configuration</strong> — Fixed git merge conflicts on DCC and TzJsDesktop (<code>git reset --hard origin/main</code> to align with remote); created <code>~/.config/gadget/sync.json</code>; fixed the Windows backslash bug in sync.py (<code>Path.as_posix()</code>); successfully pulled all personal data from Google Drive.</li>
+<li>✅ <strong>CLAUDE.md / AGENTS.md Review and Update (ErrorRecoveryBenchmark)</strong> — Ran <code>/init</code> to review and update CLAUDE.md, adding missing Makefile targets (v5-training, v5-mass-gen, etc.), training scripts, and 6 undocumented pipeline scripts; generated a 358-word AGENTS.md contributor guide via Codex covering project structure, build/test commands, code style, and PR standards.</li>
 </ul>
-<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
-<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
-<h4 id="1-threadingpick_place-等多物体任务中-phase-detection-系统性失效threading-全部帧标记为-pre_reachpick_place-缺失-reachgrasp-阶段导致-1213-个-skill-无法找到-opportunity">1. threading/pick_place 等多物体任务中 phase detection 系统性失效：threading 全部帧标记为 pre_reach，pick_place 缺失 reach/grasp 阶段，导致 12/13 个 skill 无法找到 opportunity<a hidden class="anchor" aria-hidden="true" href="#1-threadingpick_place-等多物体任务中-phase-detection-系统性失效threading-全部帧标记为-pre_reachpick_place-缺失-reachgrasp-阶段导致-1213-个-skill-无法找到-opportunity">#</a></h4>
-<p><strong>解决方案:</strong> 根因：phase detection 依赖单个物体与 EEF 的距离，在特殊几何（针形 needle）或多物体场景下根本站不住脚。根本修复：新增 InteractionSegmenter，按物体交互（EEF 接近度 + 夹爪状态 + 共运动检测）分段轨迹，每段有明确 target_object 和 phase，彻底绕过 phase detection。</p>
-<p><strong>关键洞察:</strong> phase detection 的单物体假设是架构层面的设计缺陷，无法通过调参修复；轨迹分段是更根本的解决方案，不修补而是绕过缺陷抽象。</p>
-<h4 id="2-v5-pipeline-整链路-target_object-歧义opportunityscannerskillinjectvalidatecontextreplayengine-均默认-objects0在多物体场景中系统性选错操作目标trajectory_context-缺少-target_pos-导致-drop-类-skill-过滤条件形同虚设">2. v5 pipeline 整链路 target_object 歧义：OpportunityScanner/skill.inject()/validate()/ContextReplayEngine 均默认 objects[0]，在多物体场景中系统性选错操作目标；trajectory_context 缺少 target_pos 导致 drop 类 skill 过滤条件形同虚设<a hidden class="anchor" aria-hidden="true" href="#2-v5-pipeline-整链路-target_object-歧义opportunityscannerskillinjectvalidatecontextreplayengine-均默认-objects0在多物体场景中系统性选错操作目标trajectory_context-缺少-target_pos-导致-drop-类-skill-过滤条件形同虚设">#</a></h4>
-<p><strong>解决方案:</strong> Step 1-7 全链路透传 target_object 和 target_pos；修复 13 个 skill 的 objects[0] 语义；在 trajectory_context 构建后写入 target_pos；context_replay.py 使用 error_spec.target。</p>
-<p><strong>关键洞察:</strong> 多物体任务中 objects[0] 是字典插入序第一个物体，语义完全错误但不报错，导致所有基于物体状态的判断（displacement/gripper/pose）系统性误判。</p>
-<h4 id="3-error-skill-注入参数与验证阈值系统性不匹配导致-41-个-subtype-生成-0-个场景位移不足夹爪夹空物体不脱手碰撞力不足等-5-类根因">3. Error skill 注入参数与验证阈值系统性不匹配，导致 41+ 个 subtype 生成 0 个场景（位移不足、夹爪夹空、物体不脱手、碰撞力不足等 5 类根因）<a hidden class="anchor" aria-hidden="true" href="#3-error-skill-注入参数与验证阈值系统性不匹配导致-41-个-subtype-生成-0-个场景位移不足夹爪夹空物体不脱手碰撞力不足等-5-类根因">#</a></h4>
-<p><strong>解决方案:</strong> 归纳 5 大根因并针对性修改 7 个文件 24 处参数（降低验证阈值、增加步数、调整速度方向）；drop 类 skill 施加微弱初速度（Z=-0.15m/s）辅助脱手。</p>
-<p><strong>关键洞察:</strong> 注入参数下限必须与验证阈值配套：降低注入下限时必须同步降低验证阈值；drop 类不能只依赖重力，需主动初速度克服摩擦。</p>
-<h4 id="4-collect-脚本从未调用-segment_interactionsnpz-缺少分段数据three_piece_assembly-中-interactionsegmenter-和-get_target_object-误将-base-fixture-选为-target导致-scan-从-23-退化至-4-subtypes">4. collect 脚本从未调用 segment_interactions()，NPZ 缺少分段数据；three_piece_assembly 中 InteractionSegmenter 和 get_target_object() 误将 base fixture 选为 target，导致 scan 从 23 退化至 4 subtypes<a hidden class="anchor" aria-hidden="true" href="#4-collect-脚本从未调用-segment_interactionsnpz-缺少分段数据three_piece_assembly-中-interactionsegmenter-和-get_target_object-误将-base-fixture-选为-target导致-scan-从-23-退化至-4-subtypes">#</a></h4>
-<p><strong>解决方案:</strong> Fix 5-6 将 target 搜索限定在 graspable 物体（有 grasp_geoms 配置）；collect 脚本需补调 segment_interactions()；replay_and_label_phases() 需传入 target_object；scanner 需修复标签覆盖时序。（fixture 部分已修，collect 集成待实施）</p>
-<p><strong>关键洞察:</strong> 实现了分段器但未接入数据收集管道，contract 对齐必须追踪存储层持久化——单元测试通过不代表 E2E 正常。</p>
-<h4 id="5-python-summarizedaily_summarypy-永久卡在-ccusagecodex-步骤无输出无报错">5. python summarize/daily_summary.py 永久卡在 @ccusage/codex 步骤，无输出无报错<a hidden class="anchor" aria-hidden="true" href="#5-python-summarizedaily_summarypy-永久卡在-ccusagecodex-步骤无输出无报错">#</a></h4>
-<p><strong>解决方案:</strong> subprocess.run(capture_output=True) 将 stdin 重定向到 DEVNULL，npx 首次安装确认提示无限等待；在所有 3 处 npx 调用添加 &ndash;yes 参数跳过交互确认。</p>
-<p><strong>关键洞察:</strong> capture_output=True 模式下调用任何可能有交互提示的 CLI 工具，必须显式传入 &ndash;yes/-y 等参数，否则会无限挂起而非超时。</p>
-<h4 id="6-hpc-多重障碍共享登录节点-32-workers-同时-fork--import-重量级库导致-io-竞争崩溃ai-分区强制要求-gpua8001-即使任务是纯-cpusbatch-wrap-使用-binsh-不支持-sourceconda-命令mujoco_glosmesa-在部分节点无法初始化">6. HPC 多重障碍：共享登录节点 32+ workers 同时 fork + import 重量级库导致 IO 竞争崩溃；ai 分区强制要求 gpu:a800:1 即使任务是纯 CPU；sbatch &ndash;wrap 使用 /bin/sh 不支持 source/conda 命令；MUJOCO_GL=osmesa 在部分节点无法初始化<a hidden class="anchor" aria-hidden="true" href="#6-hpc-多重障碍共享登录节点-32-workers-同时-fork--import-重量级库导致-io-竞争崩溃ai-分区强制要求-gpua8001-即使任务是纯-cpusbatch-wrap-使用-binsh-不支持-sourceconda-命令mujoco_glosmesa-在部分节点无法初始化">#</a></h4>
-<p><strong>解决方案:</strong> 提交 Slurm 独占节点作业（96 core）；接受 1 GPU 但以 MUJOCO_GL=disabled 运行（物理仿真无需 GL）；sbatch 命令包裹在 bash -c 中，conda init 改用 . 代替 source。</p>
-<p><strong>关键洞察:</strong> MuJoCo 物理仿真（enable_camera=False）是纯 CPU 任务；sbatch &ndash;wrap 默认使用 /bin/sh 而非用户登录 shell；workers 数应精确匹配申请的 &ndash;cpus-per-task。</p>
-<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
-<h4 id="7-e02-drop_in_transit-settle-阶段-action-1-10-注释写-open-gripper-但实际是关闭夹爪导致已掉落物体被重新抓住drop-失败e11-validate-阈值-min_progress--30-硬编码而-inject-从-config-读取-freeze_steps判定标准不一致">7. e02 drop_in_transit settle 阶段 action[-1]=-1.0 注释写 &lsquo;Open gripper&rsquo; 但实际是关闭夹爪，导致已掉落物体被重新抓住，drop 失败；e11 validate() 阈值 min_progress * 30 硬编码而 inject() 从 config 读取 freeze_steps，判定标准不一致<a hidden class="anchor" aria-hidden="true" href="#7-e02-drop_in_transit-settle-阶段-action-1-10-注释写-open-gripper-但实际是关闭夹爪导致已掉落物体被重新抓住drop-失败e11-validate-阈值-min_progress--30-硬编码而-inject-从-config-读取-freeze_steps判定标准不一致">#</a></h4>
-<p><strong>解决方案:</strong> e02 改为 action[-1]=1.0（robosuite OSC 1.0=打开）；e11 添加 freeze_steps = self.config.get(&lsquo;freeze_steps&rsquo;, 30) 统一来源。</p>
-<p><strong>关键洞察:</strong> robosuite 夹爪 action 符号与直觉和注释相反（-1=关，1=开），日志中表现为 drop 指标为 0，容易被误判为物理执行失败而非控制命令错误。</p>
-<h4 id="8-yaml-config-key-与-python-代码读取-key-不匹配lateral_offset-vs-lateral_offset_rangerotation_offset-vs-rotation_rangereverse_steps-vs-regression_range相关-skill-始终使用硬编码默认值">8. YAML config key 与 Python 代码读取 key 不匹配（lateral_offset vs lateral_offset_range、rotation_offset vs rotation_range、reverse_steps vs regression_range），相关 skill 始终使用硬编码默认值<a hidden class="anchor" aria-hidden="true" href="#8-yaml-config-key-与-python-代码读取-key-不匹配lateral_offset-vs-lateral_offset_rangerotation_offset-vs-rotation_rangereverse_steps-vs-regression_range相关-skill-始终使用硬编码默认值">#</a></h4>
-<p><strong>解决方案:</strong> 添加双 key fallback（先找新名再找旧名），reverse_steps 处理从固定值改为范围采样。</p>
-<p><strong>关键洞察:</strong> config key 演化未同步更新代码，getdefault 机制掩盖了错误——配置被忽略但程序不报错，是高隐蔽性 bug。</p>
-<h4 id="9-git-pull-触发大量合并冲突13-个文件ai-默认走保留双方修改流程导致大量弯路syncpy-在-windows-上生成反斜杠的-rclone-远端路径导致同步失败">9. git pull 触发大量合并冲突（13 个文件），AI 默认走「保留双方修改」流程导致大量弯路；sync.py 在 Windows 上生成反斜杠的 rclone 远端路径导致同步失败<a hidden class="anchor" aria-hidden="true" href="#9-git-pull-触发大量合并冲突13-个文件ai-默认走保留双方修改流程导致大量弯路syncpy-在-windows-上生成反斜杠的-rclone-远端路径导致同步失败">#</a></h4>
-<p><strong>解决方案:</strong> 用户指出应以远端为准；执行 git reset &ndash;hard origin/main 直接对齐；将 str(Path(remote_rel).parent) 改为 Path(remote_rel).parent.as_posix()。</p>
-<p><strong>关键洞察:</strong> 冲突解决策略取决于业务意图，AI 应在操作前先询问而非默认走复杂合并路径；Windows pathlib.Path 传给外部命令时必须显式调用 as_posix()。</p>
-<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
-<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
-<h4 id="问题性质判断系统性-contract-不一致-vs-孤立点-bug">问题性质判断：系统性 Contract 不一致 vs 孤立点 bug<a hidden class="anchor" aria-hidden="true" href="#问题性质判断系统性-contract-不一致-vs-孤立点-bug">#</a></h4>
+<h2 id="problems-and-solutions">Problems and Solutions<a hidden class="anchor" aria-hidden="true" href="#problems-and-solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-systematic-phase-detection-failure-across-multi-object-tasks-threadingpick_place-etc-all-threading-frames-labeled-pre_reach-pick_place-missing-reachgrasp-phases-causing-1213-skills-to-find-no-opportunities">1. Systematic phase detection failure across multi-object tasks (threading/pick_place, etc.): all threading frames labeled pre_reach, pick_place missing reach/grasp phases, causing 12/13 skills to find no opportunities<a hidden class="anchor" aria-hidden="true" href="#1-systematic-phase-detection-failure-across-multi-object-tasks-threadingpick_place-etc-all-threading-frames-labeled-pre_reach-pick_place-missing-reachgrasp-phases-causing-1213-skills-to-find-no-opportunities">#</a></h4>
+<p><strong>Solution:</strong> Root cause: phase detection relies on the distance between a single object and the EEF, which fundamentally fails with unusual geometry (needle shape) or multi-object scenarios. Core fix: added InteractionSegmenter to segment trajectories by object interaction (EEF proximity + gripper state + co-motion detection), giving each segment a clearly defined target_object and phase, entirely bypassing phase detection.</p>
+<p><strong>Key Insight:</strong> The single-object assumption in phase detection is an architectural design flaw that cannot be fixed by tuning parameters; trajectory segmentation is a more fundamental solution that circumvents the flawed abstraction rather than patching it.</p>
+<h4 id="2-pipeline-wide-target_object-ambiguity-in-v5-opportunityscannerskillinjectvalidatecontextreplayengine-all-default-to-objects0-systematically-selecting-the-wrong-operation-target-in-multi-object-scenarios-missing-target_pos-in-trajectory_context-renders-drop-type-skill-filtering-conditions-ineffective">2. Pipeline-wide target_object ambiguity in v5: OpportunityScanner/skill.inject()/validate()/ContextReplayEngine all default to objects[0], systematically selecting the wrong operation target in multi-object scenarios; missing target_pos in trajectory_context renders drop-type skill filtering conditions ineffective<a hidden class="anchor" aria-hidden="true" href="#2-pipeline-wide-target_object-ambiguity-in-v5-opportunityscannerskillinjectvalidatecontextreplayengine-all-default-to-objects0-systematically-selecting-the-wrong-operation-target-in-multi-object-scenarios-missing-target_pos-in-trajectory_context-renders-drop-type-skill-filtering-conditions-ineffective">#</a></h4>
+<p><strong>Solution:</strong> Steps 1–7 propagate target_object and target_pos through the entire pipeline; fixed objects[0] semantics in 13 skills; wrote target_pos to trajectory_context after construction; context_replay.py uses error_spec.target.</p>
+<p><strong>Key Insight:</strong> In multi-object tasks, objects[0] is the first object by dictionary insertion order — semantically incorrect but raises no errors — causing all object-state-based judgments (displacement/gripper/pose) to be systematically wrong.</p>
+<h4 id="3-systematic-mismatch-between-error-skill-injection-parameters-and-validation-thresholds-causing-41-subtypes-to-generate-0-scenes-5-root-causes-insufficient-displacement-empty-gripper-object-wont-release-insufficient-collision-force-etc">3. Systematic mismatch between error skill injection parameters and validation thresholds, causing 41+ subtypes to generate 0 scenes (5 root causes: insufficient displacement, empty gripper, object won&rsquo;t release, insufficient collision force, etc.)<a hidden class="anchor" aria-hidden="true" href="#3-systematic-mismatch-between-error-skill-injection-parameters-and-validation-thresholds-causing-41-subtypes-to-generate-0-scenes-5-root-causes-insufficient-displacement-empty-gripper-object-wont-release-insufficient-collision-force-etc">#</a></h4>
+<p><strong>Solution:</strong> Categorized 5 root causes and made targeted fixes across 7 files with 24 parameter changes (lowered validation thresholds, increased step counts, adjusted velocity directions); drop-type skills now apply a slight initial velocity (Z=−0.15 m/s) to assist object release.</p>
+<p><strong>Key Insight:</strong> Injection parameter lower bounds must be calibrated against validation thresholds: when lowering the injection lower bound, the validation threshold must be lowered simultaneously; drop-type errors cannot rely solely on gravity and need an active initial velocity to overcome friction.</p>
+<h4 id="4-the-collect-script-never-calls-segment_interactions-so-npz-files-lack-segmentation-data-in-three_piece_assembly-interactionsegmenter-and-get_target_object-incorrectly-select-the-base-fixture-as-the-target-causing-scan-results-to-regress-from-23-to-4-subtypes">4. The collect script never calls segment_interactions(), so NPZ files lack segmentation data; in three_piece_assembly, InteractionSegmenter and get_target_object() incorrectly select the base fixture as the target, causing scan results to regress from 23 to 4 subtypes<a hidden class="anchor" aria-hidden="true" href="#4-the-collect-script-never-calls-segment_interactions-so-npz-files-lack-segmentation-data-in-three_piece_assembly-interactionsegmenter-and-get_target_object-incorrectly-select-the-base-fixture-as-the-target-causing-scan-results-to-regress-from-23-to-4-subtypes">#</a></h4>
+<p><strong>Solution:</strong> Fix 5–6 restricts target search to graspable objects (those with grasp_geoms configured); collect script needs to call segment_interactions(); replay_and_label_phases() needs to pass target_object; scanner needs to fix label override timing. (Fixture part fixed; collect integration pending.)</p>
+<p><strong>Key Insight:</strong> The segmenter was implemented but never integrated into the data collection pipeline; contract alignment must track storage-layer persistence — passing unit tests does not mean E2E correctness.</p>
+<h4 id="5-python-summarizedaily_summarypy-permanently-hangs-at-the-ccusagecodex-step-with-no-output-and-no-errors">5. <code>python summarize/daily_summary.py</code> permanently hangs at the @ccusage/codex step with no output and no errors<a hidden class="anchor" aria-hidden="true" href="#5-python-summarizedaily_summarypy-permanently-hangs-at-the-ccusagecodex-step-with-no-output-and-no-errors">#</a></h4>
+<p><strong>Solution:</strong> <code>subprocess.run(capture_output=True)</code> redirects stdin to DEVNULL; npx&rsquo;s first-run install confirmation prompt waits indefinitely; adding <code>--yes</code> to all 3 npx calls skips the interactive confirmation.</p>
+<p><strong>Key Insight:</strong> When calling any CLI tool that may have interactive prompts in <code>capture_output=True</code> mode, <code>--yes</code>/<code>-y</code> or equivalent flags must be explicitly passed; otherwise the process hangs indefinitely rather than timing out.</p>
+<h4 id="6-multiple-hpc-obstacles-32-workers-simultaneously-forking-and-importing-heavy-libraries-on-a-shared-login-node-caused-io-contention-crashes-the-ai-partition-forces-gpua8001-even-for-purely-cpu-tasks-sbatch-wrap-uses-binsh-which-doesnt-support-sourceconda-mujoco_glosmesa-fails-to-initialize-on-some-nodes">6. Multiple HPC obstacles: 32+ workers simultaneously forking and importing heavy libraries on a shared login node caused IO contention crashes; the ai partition forces gpu:a800:1 even for purely CPU tasks; sbatch &ndash;wrap uses /bin/sh which doesn&rsquo;t support source/conda; MUJOCO_GL=osmesa fails to initialize on some nodes<a hidden class="anchor" aria-hidden="true" href="#6-multiple-hpc-obstacles-32-workers-simultaneously-forking-and-importing-heavy-libraries-on-a-shared-login-node-caused-io-contention-crashes-the-ai-partition-forces-gpua8001-even-for-purely-cpu-tasks-sbatch-wrap-uses-binsh-which-doesnt-support-sourceconda-mujoco_glosmesa-fails-to-initialize-on-some-nodes">#</a></h4>
+<p><strong>Solution:</strong> Submitted a Slurm exclusive-node job (96 cores); accepted 1 GPU but ran with MUJOCO_GL=disabled (physics simulation needs no GL); wrapped sbatch commands in <code>bash -c</code>, replaced <code>source</code> with <code>.</code> for conda init.</p>
+<p><strong>Key Insight:</strong> MuJoCo physics simulation (enable_camera=False) is a purely CPU task; sbatch &ndash;wrap defaults to /bin/sh, not the user&rsquo;s login shell; worker count should exactly match the requested &ndash;cpus-per-task.</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="7-in-e02-drop_in_transit-the-settle-phase-has-action-1-10-commented-open-gripper-but-actually-closes-the-gripper-causing-an-already-dropped-object-to-be-re-grasped-and-the-drop-to-fail-in-e11-validate-threshold-uses-min_progress--30-hardcoded-while-inject-reads-freeze_steps-from-config-making-the-evaluation-criteria-inconsistent">7. In e02 drop_in_transit, the settle phase has action[-1]=-1.0 commented &lsquo;Open gripper&rsquo; but actually closes the gripper, causing an already-dropped object to be re-grasped and the drop to fail; in e11, validate() threshold uses min_progress * 30 hardcoded while inject() reads freeze_steps from config, making the evaluation criteria inconsistent<a hidden class="anchor" aria-hidden="true" href="#7-in-e02-drop_in_transit-the-settle-phase-has-action-1-10-commented-open-gripper-but-actually-closes-the-gripper-causing-an-already-dropped-object-to-be-re-grasped-and-the-drop-to-fail-in-e11-validate-threshold-uses-min_progress--30-hardcoded-while-inject-reads-freeze_steps-from-config-making-the-evaluation-criteria-inconsistent">#</a></h4>
+<p><strong>Solution:</strong> Changed e02 to action[-1]=1.0 (in robosuite OSC, 1.0 = open); added <code>freeze_steps = self.config.get('freeze_steps', 30)</code> in e11 to unify the source.</p>
+<p><strong>Key Insight:</strong> robosuite gripper action sign is counter-intuitive and opposite to comments (−1=close, 1=open); in logs this appears as drop metrics of 0, easily misinterpreted as a physical execution failure rather than a control command error.</p>
+<h4 id="8-yaml-config-keys-dont-match-the-keys-read-in-python-code-lateral_offset-vs-lateral_offset_range-rotation_offset-vs-rotation_range-reverse_steps-vs-regression_range-causing-affected-skills-to-always-use-hardcoded-defaults">8. YAML config keys don&rsquo;t match the keys read in Python code (lateral_offset vs. lateral_offset_range; rotation_offset vs. rotation_range; reverse_steps vs. regression_range), causing affected skills to always use hardcoded defaults<a hidden class="anchor" aria-hidden="true" href="#8-yaml-config-keys-dont-match-the-keys-read-in-python-code-lateral_offset-vs-lateral_offset_range-rotation_offset-vs-rotation_range-reverse_steps-vs-regression_range-causing-affected-skills-to-always-use-hardcoded-defaults">#</a></h4>
+<p><strong>Solution:</strong> Added dual-key fallback (check new name first, then old name); reverse_steps handling changed from a fixed value to range sampling.</p>
+<p><strong>Key Insight:</strong> Config key evolution was not synchronized with the code; the <code>getdefault</code> mechanism masked the error — the config was silently ignored with no crash, making this a highly insidious bug.</p>
+<h4 id="9-git-pull-triggered-merge-conflicts-in-13-files-ai-defaulted-to-the-preserve-both-sides-flow-causing-many-wasted-steps-syncpy-on-windows-generated-backslash-based-rclone-remote-paths-causing-sync-failures">9. <code>git pull</code> triggered merge conflicts in 13 files; AI defaulted to the &ldquo;preserve both sides&rdquo; flow, causing many wasted steps; sync.py on Windows generated backslash-based rclone remote paths, causing sync failures<a hidden class="anchor" aria-hidden="true" href="#9-git-pull-triggered-merge-conflicts-in-13-files-ai-defaulted-to-the-preserve-both-sides-flow-causing-many-wasted-steps-syncpy-on-windows-generated-backslash-based-rclone-remote-paths-causing-sync-failures">#</a></h4>
+<p><strong>Solution:</strong> User indicated remote should take precedence; executed <code>git reset --hard origin/main</code> to align directly; changed <code>str(Path(remote_rel).parent)</code> to <code>Path(remote_rel).parent.as_posix()</code>.</p>
+<p><strong>Key Insight:</strong> Conflict resolution strategy depends on business intent; AI should ask before acting rather than defaulting to a complex merge path; Windows pathlib.Path must explicitly call <code>.as_posix()</code> when passing paths to external commands.</p>
+<h2 id="human-thinking-vs-ai-thinking">Human Thinking vs. AI Thinking<a hidden class="anchor" aria-hidden="true" href="#human-thinking-vs-ai-thinking">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="problem-classification-systemic-contract-inconsistency-vs-isolated-point-bugs">Problem Classification: Systemic Contract Inconsistency vs. Isolated Point Bugs<a hidden class="anchor" aria-hidden="true" href="#problem-classification-systemic-contract-inconsistency-vs-isolated-point-bugs">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>角色</th>
-          <th>思路</th>
+          <th>Role</th>
+          <th>Approach</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td>人类</td>
-          <td>明确指出生成失败不是单一 skill 调阈值的问题，而是 detector→injector→validator→generator 整条链路 contract 不一致，分为三个层次：detector 被错过、validator 永远不过、generator 遇到连续失败提前停。</td>
+          <td>Human</td>
+          <td>Explicitly identified that generation failures were not a matter of tuning thresholds in individual skills, but rather contract inconsistencies across the entire detector→injector→validator→generator pipeline, breaking it down into three levels: detectors being missed, validators never passing, and generators stopping early after consecutive failures.</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>发现了多个孤立代码 bug 和 phase detection 失效现象，倾向于逐个修复，缺乏对整条链路的系统性视角。</td>
+          <td>Found multiple isolated code bugs and phase detection failure symptoms; tended toward fixing them one by one, lacking a systemic view of the full pipeline.</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> 人类从架构视角定义了问题本质，直接改变了整个修复方案的方向；AI 更擅长在局部范围内快速定位具体 bug，但缺乏跨模块数据流的整体视角。</p>
-<h4 id="核心修复方向轨迹分段绕过-phase-detectionvs-修补-phase-detection">核心修复方向：轨迹分段（绕过 phase detection）vs 修补 phase detection<a hidden class="anchor" aria-hidden="true" href="#核心修复方向轨迹分段绕过-phase-detectionvs-修补-phase-detection">#</a></h4>
+<p><strong>Analysis:</strong> The human defined the nature of the problem from an architectural perspective, directly changing the direction of the entire fix strategy; AI is better at quickly pinpointing specific bugs locally but lacks a holistic view of cross-module data flow.</p>
+<h4 id="core-fix-direction-trajectory-segmentation-bypass-phase-detection-vs-patching-phase-detection">Core Fix Direction: Trajectory Segmentation (Bypass phase detection) vs. Patching phase detection<a hidden class="anchor" aria-hidden="true" href="#core-fix-direction-trajectory-segmentation-bypass-phase-detection-vs-patching-phase-detection">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>角色</th>
-          <th>思路</th>
+          <th>Role</th>
+          <th>Approach</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td>人类</td>
-          <td>提出按物体交互分段轨迹的根本性架构方案——每段明确当前目标物体，gripper 检测通过物体与夹爪的共同位置判断，彻底绕过 phase detection 缺陷。</td>
+          <td>Human</td>
+          <td>Proposed a fundamental architectural solution — segment trajectories by object interaction, with each segment having a clearly defined current target object and gripper detection based on co-position of object and EEF — entirely bypassing the phase detection flaw.</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>仅发现了 phase detection 失效的症状，提议修复 get_task_completion_stages() 的单物体假设，停留在修补层面。</td>
+          <td>Only identified the symptoms of phase detection failure and proposed fixing the single-object assumption in <code>get_task_completion_stages()</code>, remaining at the patch level.</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> 人类直接提出了更优雅的架构解——不修补而是绕过；AI 思路停留在错误的抽象层次上打补丁，会导致大量对特殊 case 的临时处理。</p>
-<h4 id="识别局部修复的系统性遗漏6-个未覆盖问题">识别局部修复的系统性遗漏（6 个未覆盖问题）<a hidden class="anchor" aria-hidden="true" href="#识别局部修复的系统性遗漏6-个未覆盖问题">#</a></h4>
+<p><strong>Analysis:</strong> The human proposed a more elegant architectural solution — bypassing rather than patching; AI&rsquo;s thinking was stuck patching at the wrong level of abstraction, which would have led to many ad hoc workarounds for special cases.</p>
+<h4 id="identifying-systemic-gaps-in-local-fixes-6-uncovered-issues">Identifying Systemic Gaps in Local Fixes (6 Uncovered Issues)<a hidden class="anchor" aria-hidden="true" href="#identifying-systemic-gaps-in-local-fixes-6-uncovered-issues">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>角色</th>
-          <th>思路</th>
+          <th>Role</th>
+          <th>Approach</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td>人类</td>
-          <td>在 AI 完成 7 步计划后，系统性审查指出：target_pos 未传递、fallback phase 逻辑未修、config 漂移只修了一半、e05/e06/e09 仍用 objects[0]、error_spec.target 未使用、three_piece_assembly body-name 告警。</td>
+          <td>Human</td>
+          <td>After AI completed the 7-step plan, a systematic review identified: target_pos not being passed, fallback phase logic not fixed, config drift only half-fixed, e05/e06/e09 still using objects[0], error_spec.target not used, three_piece_assembly body-name warnings.</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>完成了 7 步计划，通过单元测试（139 通过）验证，但未系统验证所有 skill 和调用点，缺乏对已修改模块的整体数据流回顾。</td>
+          <td>Completed the 7-step plan and validated with unit tests (139 passing), but did not systematically verify all skills and call sites; lacked initiative in reviewing the overall data flow of modified modules.</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> 人类从数据契约角度而非单文件角度进行整体性系统审查；AI 倾向于按计划执行后认为完成，缺乏全局回顾的主动性。</p>
-<h4 id="任务物体数量等基本假设的验证">任务物体数量等基本假设的验证<a hidden class="anchor" aria-hidden="true" href="#任务物体数量等基本假设的验证">#</a></h4>
+<p><strong>Analysis:</strong> The human reviewed the entire system from a data contract perspective rather than file by file; AI tends to consider tasks complete after executing the plan, lacking the initiative for a global post-hoc review.</p>
+<h4 id="validating-basic-assumptions-about-task-object-counts">Validating Basic Assumptions About Task Object Counts<a hidden class="anchor" aria-hidden="true" href="#validating-basic-assumptions-about-task-object-counts">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>角色</th>
-          <th>思路</th>
+          <th>Role</th>
+          <th>Approach</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td>人类</td>
-          <td>快速纠正了 AI 对 pick_place（1 个 → 4 个物体）和 threading（无抓取 → 必须抓取 needle）的基本假设错误。</td>
+          <td>Human</td>
+          <td>Quickly corrected AI&rsquo;s basic assumption errors about pick_place (1 → 4 objects) and threading (no grasping → must grasp needle).</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>未优先读取任务配置 YAML 就基于代码推断任务结构，导致部分分析建立在错误前提上。</td>
+          <td>Made inferences about task structure from code without first reading the task configuration YAML, causing parts of the analysis to be built on incorrect premises.</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> 人类凭借先验知识直接识别基本假设错误；AI 应先读配置文件验证，「配置文件是地图，代码是地形，要先看地图」。</p>
-<h4 id="gpu-资源需求与-workers-数量配置">GPU 资源需求与 workers 数量配置<a hidden class="anchor" aria-hidden="true" href="#gpu-资源需求与-workers-数量配置">#</a></h4>
+<p><strong>Analysis:</strong> The human identified basic assumption errors from prior knowledge; AI should first read config files to verify assumptions before beginning analysis — &ldquo;config files are the map, code is the terrain; read the map first.&rdquo;</p>
+<h4 id="gpu-resource-requirements-and-worker-count-configuration">GPU Resource Requirements and Worker Count Configuration<a hidden class="anchor" aria-hidden="true" href="#gpu-resource-requirements-and-worker-count-configuration">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>角色</th>
-          <th>思路</th>
+          <th>Role</th>
+          <th>Approach</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td>人类</td>
-          <td>指出场景生成是纯 CPU 无需 GPU；持续纠正 AI 多申请 GPU（8→1）；明确 workers 数应精确匹配申请的 CPU 核心数（而非 AI 的保守估计 8-16）。</td>
+          <td>Human</td>
+          <td>Pointed out that scene generation is purely CPU-based with no GPU needed; repeatedly corrected AI over-requesting GPUs (8→1); clarified that worker count should exactly match the requested CPU core count (rather than AI&rsquo;s conservative estimate of 8–16).</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>默认认为 MuJoCo 仿真需要 GPU 渲染，未主动检查 enable_camera 参数；倾向于最大化资源配置，未对齐实际节点核数。</td>
+          <td>Defaulted to assuming MuJoCo simulation requires GPU rendering without first checking the enable_camera parameter; tended to maximize resource allocation without aligning to actual node core counts.</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> 人类从任务本质判断资源需求，AI 依赖表面印象且未先读代码验证假设；这类错误导致了多次无效 Slurm 作业提交。</p>
-<h4 id="ecc-模型选择策略与新版功能感知">ECC 模型选择策略与新版功能感知<a hidden class="anchor" aria-hidden="true" href="#ecc-模型选择策略与新版功能感知">#</a></h4>
+<p><strong>Analysis:</strong> The human assessed resource needs from the nature of the task; AI relied on surface-level assumptions and did not read the code to verify before acting — these errors led to multiple wasted Slurm job submissions.</p>
+<h4 id="ecc-model-selection-strategy-and-awareness-of-new-features">ECC Model Selection Strategy and Awareness of New Features<a hidden class="anchor" aria-hidden="true" href="#ecc-model-selection-strategy-and-awareness-of-new-features">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>角色</th>
-          <th>思路</th>
+          <th>Role</th>
+          <th>Approach</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td>人类</td>
-          <td>要求「所有部分使用最新的 opus 4.6 with max thinking」，并主动告知存在新版 effortLevel: max 选项。</td>
+          <td>Human</td>
+          <td>Required &ldquo;the latest opus 4.6 with max thinking for all components&rdquo; and proactively informed AI that a new effortLevel: max option existed.</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>初始推荐「核心 Opus + 其他 Sonnet」平衡成本方案；错误地告知用户 high 是 effortLevel 最高级别。</td>
+          <td>Initially recommended a balanced cost approach of &ldquo;opus for core + sonnet for others&rdquo;; incorrectly told the user that <code>high</code> was the highest effortLevel.</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> 用户优先考虑能力最大化而非成本；用户掌握了 AI 未知的新版功能，是信息不对称的典型案例，AI 应主动声明知识可能存在版本滞后。</p>
-<h4 id="npx-挂起根因诊断ai-系统性排查-vs-人类症状描述">npx 挂起根因诊断（AI 系统性排查 vs 人类症状描述）<a hidden class="anchor" aria-hidden="true" href="#npx-挂起根因诊断ai-系统性排查-vs-人类症状描述">#</a></h4>
+<p><strong>Analysis:</strong> The user prioritized maximizing capability over cost; the user knew about new features that AI was unaware of — a classic case of information asymmetry; AI should proactively declare that its knowledge of rapidly evolving tools may be outdated.</p>
+<h4 id="npx-hang-root-cause-diagnosis-ai-systematic-investigation-vs-human-symptom-description">npx Hang Root Cause Diagnosis (AI Systematic Investigation vs. Human Symptom Description)<a hidden class="anchor" aria-hidden="true" href="#npx-hang-root-cause-diagnosis-ai-systematic-investigation-vs-human-symptom-description">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>角色</th>
-          <th>思路</th>
+          <th>Role</th>
+          <th>Approach</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td>人类</td>
-          <td>提供准确症状（卡在 @ccusage/codex 步骤无输出），但不清楚具体根因。</td>
+          <td>Human</td>
+          <td>Provided accurate symptoms (hung at @ccusage/codex step with no output) but was unclear on the specific root cause.</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>系统性排除假设：检查数据量 → 实测命令 → 定位 capture_output + 缺少 &ndash;yes 的根因；整个诊断链条清晰高效。</td>
+          <td>Systematically eliminated hypotheses: checked data volume → tested command directly → pinpointed capture_output + missing &ndash;yes as root cause; the entire diagnostic chain was clear and efficient.</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> AI 的系统性诊断流程比直觉判断更高效；人类提供精准症状，AI 负责执行推断链条——这是少数 AI 表现明显优于直觉的场景。</p>
-<h4 id="subtype-数量异常警觉与精确统计">subtype 数量异常警觉与精确统计<a hidden class="anchor" aria-hidden="true" href="#subtype-数量异常警觉与精确统计">#</a></h4>
+<p><strong>Analysis:</strong> AI&rsquo;s systematic diagnostic process was more efficient than intuitive guessing; the human provided precise symptoms while AI executed the inference chain — one of the few scenarios where AI clearly outperforms intuition.</p>
+<h4 id="alertness-to-subtype-count-anomalies-and-precise-statistics">Alertness to Subtype Count Anomalies and Precise Statistics<a hidden class="anchor" aria-hidden="true" href="#alertness-to-subtype-count-anomalies-and-precise-statistics">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>角色</th>
-          <th>思路</th>
+          <th>Role</th>
+          <th>Approach</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td>人类</td>
-          <td>自行统计出 48 个失败 subtype（按 5 类根因逐一列出文件路径、行号和日志示例）；注意到 130 subtypes 不够（理论 174），主动追问并推动重新扫描。</td>
+          <td>Human</td>
+          <td>Self-counted 48 failing subtypes (listing file paths, line numbers, and log examples for each of 5 root cause categories); noticed that 130 subtypes was insufficient (theoretical 174) and proactively asked follow-up questions to drive a rescan.</td>
       </tr>
       <tr>
           <td>AI</td>
-          <td>分类框架基本正确但粒度较粗，未精确统计 48 这个数字；汇报 130 subtypes 时未预警与预期 174 的差距。</td>
+          <td>Classification framework was roughly correct but too coarse; did not accurately count the 48 number; when reporting 130 subtypes, did not proactively flag the gap against the expected 174.</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析:</strong> 人类对预期结果有先验判断，发现与实际值不符并追问；AI 只汇报观测结果，缺乏主动的合理性校验意识。</p>
-<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
-<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<p><strong>Analysis:</strong> The human had prior expectations about results and noticed when they didn&rsquo;t match actuals; AI only reported observed results without proactive sanity-checking.</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="key-limitations">Key Limitations<a hidden class="anchor" aria-hidden="true" href="#key-limitations">#</a></h3>
 <ul>
-<li>面对复杂系统问题时，倾向于定位孤立代码 bug，缺乏从数据流全链路视角（detector→injector→validator→generator）分析 contract 不一致的能力，需要人类从架构层面指引才能提升分析维度。</li>
-<li>完成局部修复计划后缺乏主动的全局数据流验证：e05/e06/e09 三个 skill、target_pos 传递缺失、collect 脚本未集成 segment_interactions() 等多个遗漏均需人类系统性审查才能发现；单元测试通过给了错误的「完成感」。</li>
-<li>未优先读取任务配置文件（task YAML）就对任务结构做出推断，导致分析建立在错误前提（pick_place 物体数量、threading 是否有抓取）上；应先读配置文件验证基本假设再开始分析。</li>
-<li>未主动检查 enable_camera 参数就假设需要 GPU；多次被纠正后仍在 Slurm 脚本中申请过多 GPU，对运行环境资源需求评估不准确且容易遗忘用户在多轮对话中设定的局部偏好。</li>
-<li>在 git 合并冲突场景中，默认执行「保留双方修改、逐文件解决冲突」的复杂流程，未先询问用户意图（丢弃本地 vs 保留本地），导致大量无效操作后被纠正。</li>
-<li>three_piece_assembly 退化（23→4 subtypes）在 AI 汇报时被呈现为「正常结果」，未主动预警并分析；分析失败时也未能主动穷举所有同类型文件（e05/e06/e09 被遗漏），需要人类显式列出才能补全。</li>
-<li>不了解 Claude Code 最新功能（effortLevel: max），错误地告知用户 high 是最高级别；对快速迭代的工具生态存在知识滞后，应主动声明可能存在新版本功能未知。</li>
+<li>When facing complex systemic problems, AI tends to locate isolated code bugs and lacks the ability to analyze contract inconsistencies across the full data flow (detector→injector→validator→generator); it requires human guidance at the architectural level to elevate its analytical perspective.</li>
+<li>After completing local fix plans, AI lacks initiative for global data flow validation: multiple gaps — including three skills (e05/e06/e09), missing target_pos propagation, and the collect script not integrating segment_interactions() — all required human systematic review to discover; passing unit tests created a false sense of completion.</li>
+<li>AI makes inferences about task structure without first reading task configuration files (task YAML), causing analyses to be built on incorrect premises (pick_place object count, whether threading involves grasping); configuration files should always be read first to validate basic assumptions before beginning analysis.</li>
+<li>AI assumed GPU was needed without first checking the enable_camera parameter; despite repeated corrections, Slurm scripts continued to request too many GPUs; AI inaccurately assesses runtime resource requirements and tends to forget user preferences set in earlier turns of a multi-round conversation.</li>
+<li>In git merge conflict scenarios, AI defaults to the complex &ldquo;preserve both sides, resolve file by file&rdquo; workflow without first asking for user intent (discard local vs. keep local), resulting in much wasted effort before being corrected.</li>
+<li>The three_piece_assembly regression (23→4 subtypes) was presented as a &ldquo;normal result&rdquo; in AI&rsquo;s report without proactive flagging or analysis; when analyzing failures, AI also failed to proactively enumerate all files of the same type (e05/e06/e09 were missed) until the human explicitly listed them.</li>
+<li>AI is unaware of the latest Claude Code features (effortLevel: max) and incorrectly told the user that <code>high</code> was the highest level; AI has a knowledge lag on rapidly evolving tool ecosystems and should proactively declare that newer features may be unknown to it.</li>
 </ul>
-<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
-<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<h2 id="todays-takeaways">Today&rsquo;s Takeaways<a hidden class="anchor" aria-hidden="true" href="#todays-takeaways">#</a></h2>
+<h3 id="core-takeaways">Core Takeaways<a hidden class="anchor" aria-hidden="true" href="#core-takeaways">#</a></h3>
 <ul>
-<li>Pipeline contract 对齐必须追踪完整数据流：不仅要修改代码处理逻辑，还必须确保数据在存储层被持久化（如 segment_interactions() 结果写入 NPZ）；否则重新加载时数据丢失，修复对后续流程无效。单元测试通过 ≠ E2E 正确。</li>
-<li>多物体机器人操作任务中，target_object 必须作为一等公民在 detector/injector/validator 三个阶段全程透传；objects[0] 是字典插入序第一个物体，在多物体场景中语义完全错误且不会报错，导致所有基于物体状态的判断系统性误判。</li>
-<li>分析复杂系统问题前，必须先读取所有相关配置文件验证基本假设（如任务有多少物体、任务类型）——「配置文件是地图，代码是地形，要先看地图」。</li>
-<li>系统性修复后必须对所有任务做 before/after 对比验证，不能仅凭单元测试通过就认为没有副作用；threading +22 和 three_piece_assembly -19 同时出现正说明了这一点。</li>
-<li>Error skill 注入参数下限必须与验证阈值配套调整：降低注入下限时必须同步降低验证阈值（min_displacement、min_rotation_deviation 等），否则注入仍然无法通过验证。Drop 类 error 不能只依赖重力，需施加微弱初始下推速度（Z=-0.15m/s）辅助脱手克服摩擦。</li>
-<li>subprocess.run(capture_output=True) 会将 stdin 重定向到 DEVNULL，调用 npx 等可能有交互提示的 CLI 工具时必须传入 &ndash;yes/-y 等参数显式跳过，否则会无限挂起而非超时。</li>
-<li>日志聚合统计（Counter）比逐条阅读更有效定位系统性 bug：1698 次 gripper not closed 直接指向 target_object 歧义，而非真正的夹爪执行问题；数据量驱动的根因分析优于主观猜测。</li>
-<li>MuJoCo 物理仿真（enable_camera=False）是纯 CPU 任务，MUJOCO_GL=disabled 可完全绕过 OpenGL；HPC 共享节点不适合大规模并行 subprocess，应通过 Slurm 独占节点，workers 数精确匹配 &ndash;cpus-per-task；Slurm sbatch &ndash;wrap 默认使用 /bin/sh，需显式包裹 bash -c。</li>
-<li>graspable 物体与 fixture 在多物体 MuJoCo 任务中必须区分；task_config 的 grasp_geoms 字段可作为过滤依据，避免 EEF 轨迹经过 fixture 上方时误判 target；other_objects 仍需保留 fixture 供碰撞判断，只在 target 搜索时过滤。</li>
-<li>robosuite OSC 控制器夹爪 action 符号与直觉和注释相反（-1.0=关闭，1.0=打开），日志中表现为 drop 相关指标为 0，容易被误判为物理执行失败而非控制命令错误。robosuite MuJoCo body 命名与 task config 存在映射不一致，需要模糊匹配 fallback。</li>
-<li>ECC v1.9.0 新增 effortLevel: max，配合全员 opus 模型将 AI 推理能力配置到最高档，是基础设施层面的一次性投资。Windows pathlib.Path 传给外部命令（rclone、git 等）时必须使用 .as_posix() 转为正斜杠。</li>
+<li>Pipeline contract alignment must track the complete data flow: it&rsquo;s not enough to fix the processing logic in code — you must also ensure data is persisted at the storage layer (e.g., segment_interactions() results written to NPZ); otherwise data is lost on reload and fixes have no effect on downstream processes. Passing unit tests ≠ E2E correctness.</li>
+<li>In multi-object robot manipulation tasks, target_object must be treated as a first-class citizen propagated through all three stages of detector/injector/validator; objects[0] is the first object by dictionary insertion order, semantically wrong in multi-object scenarios and will not raise an error, causing all object-state-based judgments to be systematically incorrect.</li>
+<li>Before analyzing a complex system problem, all relevant configuration files must be read to validate basic assumptions (e.g., how many objects a task has, what type of task it is) — &ldquo;config files are the map, code is the terrain; read the map first.&rdquo;</li>
+<li>After systematic fixes, a before/after comparison across all tasks must be performed; you cannot assume there are no side effects just because unit tests pass. The simultaneous threading +22 and three_piece_assembly −19 results prove exactly this.</li>
+<li>Error skill injection parameter lower bounds must be adjusted in tandem with validation thresholds: when lowering the injection lower bound, validation thresholds (min_displacement, min_rotation_deviation, etc.) must be lowered simultaneously; otherwise injections still fail validation. Drop-type errors cannot rely solely on gravity and need a slight initial downward velocity (Z=−0.15 m/s) to overcome friction and assist release.</li>
+<li><code>subprocess.run(capture_output=True)</code> redirects stdin to DEVNULL; when calling any CLI tool that may have interactive prompts (such as npx), <code>--yes</code>/<code>-y</code> or equivalent flags must be explicitly passed; otherwise the process hangs indefinitely rather than timing out.</li>
+<li>Log aggregation statistics (Counter) are far more effective than reading individual log lines for identifying systemic bugs: 1,698 instances of &ldquo;gripper not closed&rdquo; pointed directly to target_object ambiguity, not actual gripper execution problems; data-driven root cause analysis is superior to subjective guessing.</li>
+<li>MuJoCo physics simulation (enable_camera=False) is a purely CPU task; MUJOCO_GL=disabled completely bypasses OpenGL. HPC shared nodes are not suitable for large-scale parallel subprocesses — use exclusive Slurm nodes with worker count exactly matching &ndash;cpus-per-task; sbatch &ndash;wrap defaults to /bin/sh, so commands must be explicitly wrapped in <code>bash -c</code>.</li>
+<li>Graspable objects and fixtures must be distinguished in multi-object MuJoCo tasks; the <code>grasp_geoms</code> field in task_config serves as a filter criterion to avoid misidentifying target when the EEF trajectory passes above a fixture. other_objects should still include fixtures for collision detection — only filter them out when searching for the target.</li>
+<li>robosuite OSC controller gripper action sign is counter-intuitive and opposite to comments (−1.0=close, 1.0=open); in logs this appears as drop-related metrics of 0, easily misinterpreted as physical execution failure rather than a control command error. robosuite MuJoCo body naming has mapping inconsistencies with task configs, requiring fuzzy-match fallback.</li>
+<li>ECC v1.9.0 added effortLevel: max; combined with full opus models, this brings AI inference capability to its maximum configuration — a one-time infrastructure investment. Windows pathlib.Path must use <code>.as_posix()</code> when passing paths to external commands (rclone, git, etc.).</li>
 </ul>
-<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h2 id="session-summaries">Session Summaries<a hidden class="anchor" aria-hidden="true" href="#session-summaries">#</a></h2>
 <h3 id="errorrecoverybenchmark">ErrorRecoveryBenchmark<a hidden class="anchor" aria-hidden="true" href="#errorrecoverybenchmark">#</a></h3>
-<p><strong>✅ 代码审查与根因调查：CLAUDE.md 更新、13 个 skill 全面审查、phase detection 失效发现、系统性 contract 问题确立</strong>
+<p><strong>✅ Code Review &amp; Root Cause Investigation: CLAUDE.md update, comprehensive review of 13 skills, phase detection failure discovery, systemic contract issues established</strong>
 <em>02:19:30.892 | claude_code + codex</em>
-通过 /init 审查并更新 CLAUDE.md（补充 Makefile 目标、训练脚本、未文档化 pipeline 脚本）；通过 3 个并行 agent 对 13 个 error skill 完整代码审查，发现 5 类 bug（e02 夹爪方向反转、e7 空字典、e11 硬编码阈值、YAML key 不匹配等）；通过 bash 统计 opportunity map phase 分布，发现 threading 全部 195 帧标记为 pre_reach，确认 phase detection 失效是核心根因；人类指出系统性问题本质（整条链路 contract 不一致），确立「轨迹分段」为根本修复方向；Codex 同步生成 AGENTS.md 贡献者指南（358 词）。</p>
-<p><strong>🔄 架构修复实施：Step 1-7 轨迹分段 + Contract 对齐 + 6 遗漏修复 + 大规模场景生成 + 扫描验证与退化排查</strong>
+Reviewed and updated CLAUDE.md via /init (adding Makefile targets, training scripts, and undocumented pipeline scripts); performed a comprehensive code review of 13 error skills using 3 parallel agents, uncovering 5 bug categories (e02 gripper direction reversed, e7 empty dict, e11 hardcoded thresholds, YAML key mismatches, etc.); used bash to analyze phase distribution in the opportunity map, finding all 195 threading frames labeled as pre_reach — confirming phase detection failure as the core root cause; human identified the systemic nature of the problem (contract inconsistency across the full pipeline) and established &ldquo;trajectory segmentation&rdquo; as the fundamental fix direction; Codex concurrently generated a 358-word AGENTS.md contributor guide.</p>
+<p><strong>🔄 Architectural Fix Implementation: Steps 1–7 Trajectory Segmentation + Contract Alignment + 6 Missed Fixes + Large-Scale Scene Generation + Scan Validation and Regression Analysis</strong>
 <em>03:46:21.126 | claude_code</em>
-系统性实施 7 步计划：新增 InteractionSegment/InteractionSegmenter、修改 CleanTrajectory 分段序列化、修改 OpportunityScanner 和 ContextReplayEngine 透传 target_object、修复 7 个 skill 的 objects[0] 语义和 2 个显式 bug；人类审查后补充 6 个遗漏修复（target_pos、fallback phase、config 漂移、e05/e06/e09 语义、error_spec.target、body-name fallback）；sbatch job 50015 在 an53 节点 32 分 49 秒生成 1222 scenes；重扫结果：threading 3→25（+22），three_piece_assembly 23→4（-19）；通过 NPZ 分析和 collect 脚本审查定位退化根因（collect 未调用 segment_interactions()），修复方案制定完毕待实施。</p>
-<p><strong>✅ 参数修复与初步场景生成：Fix A-G（7 类 error skill）+ Fix 5-6（graspable 过滤）+ 并行场景生成 + 48 subtype 根因分析</strong>
+Systematically implemented the 7-step plan: added InteractionSegment/InteractionSegmenter, updated CleanTrajectory for segment serialization, updated OpportunityScanner and ContextReplayEngine to propagate target_object, fixed objects[0] semantics in 7 skills and 2 explicit bugs; human review identified 6 missed fixes (target_pos, fallback phase, config drift, e05/e06/e09 semantics, error_spec.target, body-name fallback); sbatch job 50015 generated 1,222 scenes on node an53 in 32 min 49 sec; rescan results: threading 3→25 (+22), three_piece_assembly 23→4 (−19); NPZ analysis and collect script review identified the regression root cause (collect never called segment_interactions()); fix plan drafted, awaiting implementation.</p>
+<p><strong>✅ Parameter Fixes and Initial Scene Generation: Fix A–G (7 error skill types) + Fix 5–6 (graspable filtering) + Parallel Scene Generation + 48-Subtype Root Cause Analysis</strong>
 <em>17:31:04.519 | claude_code</em>
-实施 Fix A-G：修改 7 个文件 24 处参数，96 workers Slurm 作业生成 1209 scenes（158/160 subtype 成功）；实施 Fix 5-6：限定 graspable 物体候选集修复 three_piece_assembly target 误识别，重跑全 6 任务 collect+scan 验证；32 workers 生成 1159 scenes（107/160 满 10/10）；用户提供精确 48 个失败 subtype 分类（含文件路径、行号），AI 读取 7 个 skill 源码确认 5 类系统性根因，写入修复 plan 文件。</p>
+Implemented Fix A–G: 24 parameter changes across 7 files; 96-worker Slurm job generated 1,209 scenes (158/160 subtype success); implemented Fix 5–6: restricted graspable candidate set to fix three_piece_assembly target misidentification; re-ran collect+scan validation for all 6 tasks; 32-worker job generated 1,159 scenes (107/160 achieving 10/10); user provided precise 48-subtype failure classification (with file paths and line numbers); AI read 7 skill source files and confirmed 5 systemic root causes, documenting the fix plan.</p>
 <h3 id="gadget">gadget<a hidden class="anchor" aria-hidden="true" href="#gadget">#</a></h3>
-<p><strong>✅ 基础设施修复与工具链升级：git 同步、rclone 配置、npx bug 修复、ECC 全员 opus 升级、Codex 月度聚合支持</strong>
+<p><strong>✅ Infrastructure Fixes and Toolchain Upgrade: git sync, rclone config, npx bug fix, ECC full opus upgrade, Codex monthly aggregation support</strong>
 <em>02:35:05.863 | claude_code + codex</em>
-修复 DCC 和 TzJsDesktop 的 git 合并冲突（git reset &ndash;hard origin/main 对齐远端，避免了 AI 默认走的复杂合并路径）；创建 rclone 同步配置，修复 Windows 反斜杠 bug（Path.as_posix()）后成功拉取全部个人数据；精确定位 daily_summary.py 卡在 @ccusage/codex 步骤的根因（npx 无 &ndash;yes 在 capture_output 模式下无限等待），在 3 处添加 &ndash;yes 参数修复；深入阅读 ECC 组件后通过 sed 批量将 27 个 agent 升级至 opus（doc-updater 保留 sonnet）、effortLevel 设为 max（用户主动告知新功能）；通过 Codex 新增 monthly_summary.py Codex 用量聚合函数，同步更新 README 文档；research/CLAUDE.md 补充未记录的 CLI 参数。</p>
-<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+Fixed git merge conflicts on DCC and TzJsDesktop (git reset &ndash;hard origin/main to align with remote, avoiding the complex merge path AI would have defaulted to); created rclone sync configuration, fixed the Windows backslash bug (Path.as_posix()), and successfully pulled all personal data; precisely identified the root cause of daily_summary.py hanging at the @ccusage/codex step (npx missing &ndash;yes, waiting indefinitely in capture_output mode), added &ndash;yes to 3 locations to fix; after thoroughly reviewing ECC components, batch-upgraded 27 agents to opus (doc-updater kept at sonnet) and set effortLevel to max (new feature the user proactively informed me of) using sed; added Codex usage aggregation functions to monthly_summary.py via Codex, updated README documentation; supplemented undocumented CLI parameters in research/CLAUDE.md.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
 <h3 id="claude-code">Claude Code<a hidden class="anchor" aria-hidden="true" href="#claude-code">#</a></h3>
-<h4 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h4>
+<h4 id="overview">Overview<a hidden class="anchor" aria-hidden="true" href="#overview">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>指标</th>
-          <th>数值</th>
+          <th>Metric</th>
+          <th>Value</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td>总 Token</td>
+          <td>Total Tokens</td>
           <td>39,706,094</td>
       </tr>
       <tr>
-          <td>输入 Token</td>
+          <td>Input Tokens</td>
           <td>47,162</td>
       </tr>
       <tr>
-          <td>输出 Token</td>
+          <td>Output Tokens</td>
           <td>108,045</td>
       </tr>
       <tr>
-          <td>Cache 创建</td>
+          <td>Cache Creation</td>
           <td>2,303,350</td>
       </tr>
       <tr>
-          <td>Cache 读取</td>
+          <td>Cache Read</td>
           <td>37,247,537</td>
       </tr>
       <tr>
-          <td>Cache 命中率</td>
+          <td>Cache Hit Rate</td>
           <td>94.2%</td>
       </tr>
       <tr>
-          <td>总费用 (USD)</td>
+          <td>Total Cost (USD)</td>
           <td>$26.1748</td>
       </tr>
   </tbody>
 </table>
-<h4 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h4>
+<h4 id="model-breakdown">Model Breakdown<a hidden class="anchor" aria-hidden="true" href="#model-breakdown">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>模型</th>
-          <th>输入</th>
-          <th>输出</th>
-          <th>Cache 创建</th>
-          <th>Cache 读取</th>
-          <th>费用</th>
-          <th>占比</th>
+          <th>Model</th>
+          <th>Input</th>
+          <th>Output</th>
+          <th>Cache Creation</th>
+          <th>Cache Read</th>
+          <th>Cost</th>
+          <th>Share</th>
       </tr>
   </thead>
   <tbody>
@@ -598,15 +604,15 @@
       </tr>
   </tbody>
 </table>
-<h4 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h4>
+<h4 id="usage-by-device">Usage by Device<a hidden class="anchor" aria-hidden="true" href="#usage-by-device">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>设备</th>
-          <th>总 Token</th>
-          <th>输入</th>
-          <th>输出</th>
-          <th>费用</th>
+          <th>Device</th>
+          <th>Total Tokens</th>
+          <th>Input</th>
+          <th>Output</th>
+          <th>Cost</th>
       </tr>
   </thead>
   <tbody>
@@ -627,52 +633,52 @@
   </tbody>
 </table>
 <h3 id="codex">Codex<a hidden class="anchor" aria-hidden="true" href="#codex">#</a></h3>
-<h4 id="总览-1">总览<a hidden class="anchor" aria-hidden="true" href="#总览-1">#</a></h4>
+<h4 id="overview-1">Overview<a hidden class="anchor" aria-hidden="true" href="#overview-1">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>指标</th>
-          <th>数值</th>
+          <th>Metric</th>
+          <th>Value</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td>总 Token</td>
+          <td>Total Tokens</td>
           <td>9,917,937</td>
       </tr>
       <tr>
-          <td>输入 Token</td>
+          <td>Input Tokens</td>
           <td>9,827,688</td>
       </tr>
       <tr>
-          <td>输出 Token</td>
+          <td>Output Tokens</td>
           <td>90,249</td>
       </tr>
       <tr>
-          <td>推理 Token</td>
+          <td>Reasoning Tokens</td>
           <td>43,171</td>
       </tr>
       <tr>
-          <td>Cache 读取</td>
+          <td>Cache Read</td>
           <td>8,714,880</td>
       </tr>
       <tr>
-          <td>总费用 (USD)</td>
+          <td>Total Cost (USD)</td>
           <td>$6.3145</td>
       </tr>
   </tbody>
 </table>
-<h4 id="模型明细-1">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细-1">#</a></h4>
+<h4 id="model-breakdown-1">Model Breakdown<a hidden class="anchor" aria-hidden="true" href="#model-breakdown-1">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>模型</th>
-          <th>输入</th>
-          <th>输出</th>
-          <th>推理</th>
-          <th>Cache 读取</th>
-          <th>费用</th>
-          <th>占比</th>
+          <th>Model</th>
+          <th>Input</th>
+          <th>Output</th>
+          <th>Reasoning</th>
+          <th>Cache Read</th>
+          <th>Cost</th>
+          <th>Share</th>
       </tr>
   </thead>
   <tbody>

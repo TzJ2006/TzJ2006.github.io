@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-23 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="在DCC节点系统优化MIHD空间组学融合训练（3项CPU加速&#43;架构解耦&#43;全切片基准测试&#43;Vision Refine对比实验），同时在天河集群完成MimicGen数据准备、修复M14三路评估的环境指纹崩溃及Pi0.5全量微调OOM问题，成功将Pi0.5 LoRA训练（Job 46553）推进至稳定运行。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-23/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.74275d3de94d719fb7098f21c29c7cbda35c9c6ca6621dbdcbd629ecff2aa1ac.css" integrity="sha256-dCddPelNcZ&#43;3CY8hwpx8vaNcnGymYh29y9Yp7P8qoaw=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-02-23/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-23/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-23/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-23">
+  <meta property="og:description" content="在DCC节点系统优化MIHD空间组学融合训练（3项CPU加速&#43;架构解耦&#43;全切片基准测试&#43;Vision Refine对比实验），同时在天河集群完成MimicGen数据准备、修复M14三路评估的环境指纹崩溃及Pi0.5全量微调OOM问题，成功将Pi0.5 LoRA训练（Job 46553）推进至稳定运行。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-23T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-23T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-23">
+  <meta name="twitter:description" content="在DCC节点系统优化MIHD空间组学融合训练（3项CPU加速&#43;架构解耦&#43;全切片基准测试&#43;Vision Refine对比实验），同时在天河集群完成MimicGen数据准备、修复M14三路评估的环境指纹崩溃及Pi0.5全量微调OOM问题，成功将Pi0.5 LoRA训练（Job 46553）推进至稳定运行。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "每日摘要",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-02-23",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/2026-02-23/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-23",
+  "name": "Bug Journal 2026-02-23",
+  "description": "在DCC节点系统优化MIHD空间组学融合训练（3项CPU加速+架构解耦+全切片基准测试+Vision Refine对比实验），同时在天河集群完成MimicGen数据准备、修复M14三路评估的环境指纹崩溃及Pi0.5全量微调OOM问题，成功将Pi0.5 LoRA训练（Job 46553）推进至稳定运行。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-23 今日概览 做了什么： 在DCC和天河两台集群上并行推进三个核心工作：MIHD融合训练全面优化与全切片基准测试、Error Recovery Benchmark M14三路评估启动与关键bug修复、Pi0.5 LoRA微调训练从零搭建到稳定运行。 怎么做的： DCC端通过NumPy向量化、GPU化随机数、批量Transformer forward三项手段消除CPU瓶颈并解耦编码器架构；天河端通过渐进式调试（依赖降级、修补源码、切换LoRA架构、sbatch提交）解决数据兼容性和显存OOM问题，同时通过scene级try-except修复评估进程崩溃。 有什么用： QFormer训练预计加速20-50x，STAIG全切片平均ARI=0.546，发现refine对弱/强fusion效果两极分化规律；Pi0.5 LoRA训练（Job 46553）以2.0s/step稳定运行（预计53小时完成）；M14三路评估修复后恢复全量推进，确认649场景中~519个为有效评估目标。 DCC 做了什么： 在RTX 5000 Ada GPU节点上完成MIHD融合训练全面优化：3项CPU加速实现、视觉编码器架构解耦、Vision Refine vs Baseline对比实验（8种fusion×有无refine）、STAIG全部11个DLPFC切片基准测试。 怎么做的： 使用conda General环境运行PyTorch训练；scipy cdist向量化边权重、GPU原生随机数消除跨设备传输、批量Transformer forward替代逐spot循环；清除pyc缓存解决ImportError；后台TaskOutput并行监控长耗时实验。 有什么用： 10/11 DLPFC切片STAIG fusion成功（151676已知坍塌），平均ARI=0.546；qformer+no-refine为151673最优组合（ARI=0.4832）；发现scan_cluster refine对弱fusion有益、对强fusion有害的规律。 tianhe 做了什么： 在天河集群（an46/an49/an51）完成Pi0.5 LoRA微调全流程搭建（数据转换→归一化统计→LoRA训练），以及Error Recovery Benchmark M14三路评估（CPU分析+GPU评估+环境指纹崩溃修复）。 怎么做的： 通过渐进式调试解决数据格式兼容性（datasets降级、lerobot源码修补）、显存OOM（全量→LoRA架构切换）、训练进程管理（srun→sbatch）等问题；srun –overlap并行启动评估进程；scene级try-except修复EnvironmentMismatchError。 有什么用： 获得step-1000 LoRA检查点，Job 46553稳定运行（loss=0.068，2.0s/step）；M14三路评估（m14_cpu完成、m14_pi05完成、m14_pi0运行中）修复后跨越scene 122崩溃点；确认649场景数据库中~130个natural_*场景不兼容，实际有效评估场景约519个。 在DCC节点系统优化MIHD空间组学融合训练（3项CPU加速+架构解耦+全切片基准测试+Vision Refine对比实验），同时在天河集群完成MimicGen数据准备、修复M14三路评估的环境指纹崩溃及Pi0.5全量微调OOM问题，成功将Pi0.5 LoRA训练（Job 46553）推进至稳定运行。\n今日任务 架构与策略 ✅ MIHD融合训练CPU三项加速（向量化+GPU化+批量化） — 对STAIGTrainer.py、STAIGTrainerE2E.py、QFormerFusion.py三个文件实施全面优化：用scipy cdist替代O(n²)嵌套循环（初始化阶段，~100-500x加速）、将adaptive_dropout_adj随机数生成迁移至GPU（消除每epoch GPU↔CPU同步开销约1-2s）、为QFormerFusion添加批量forward接口（forward_batched()含key_padding_mask+预构建padded tensor，预计20-50x加速）。 🔄 Pi0.5 LoRA微调训练（Job 46551→46553，运行中） — 历经全量微调OOM（pi0.5训练状态62GB超A800容量，FSDP=4无效）后，切换为gemma_2b_lora+gemma_300m_lora架构（显存降至22.5GB）。通过sbatch提交Job 46551首跑至step 3000，因stdout缓冲误判退出；加入PYTHONUNBUFFERED=1+stdbuf+ERR trap后以–resume重启为Job 46553，当前在an46（4×A800）以2.0s/step稳定运行，loss=0.068，预计约53小时完成。 🔄 M14三路评估（m14_cpu/Pi0/Pi0.5）启动与环境指纹修复 — 修复MUJOCO_EGL_DEVICE_ID不匹配后启动m14_cpu续跑；启动Pi0（an49 GPU6，port 5556）和Pi0.5（an49 GPU5，port 5557）VLA评估。三路均在scene 122/649崩溃（~130个natural_*场景xml_hash不兼容）；collector.py加入scene级EnvironmentMismatchError try-except修复后以–resume恢复，m14_cpu和m14_pi05以exit code 0完成，m14_pi0仍运行中。 ✅ evaluate_mimicgen.py与collector.py关键bug修复 — evaluate_mimicgen.py：加入env.seed()确保可复现性、状态维度8D assert验证、修复_quat2axisangle的in-place数组修改bug（改用np.clip+copy）。collector.py：collect_on_scenes()中为每个scene捕获EnvironmentMismatchError，记录警告并跳过不兼容场景，避免整个进程崩溃。 ✅ staig_fusion支持任意视觉编码器（解耦UNI硬依赖） — 重命名常量（STAIG_FUSION_VISION_ENCODER→STAIG_FUSION_DEFAULT_VISION_ENCODER）、新增STAIG_UNI_FAMILY集合（{uni,uni2}），更新extraction_planner.py/evaluation_planner.py/phase2_evaluate.py/run_benchmark.py四个文件分支逻辑，UNI系列自动使用staig_strict预处理，其他编码器使用standard。清除pyc缓存解决ImportError。 ✅ STAIG fusion全部11个DLPFC切片基准测试 — 在全部11个DLPFC切片上运行pca+uni2+staig_fusion和none+uni2+staig_fusion，修复UNI2 patch_size兼容性bug（256×256→224×224 resize）和NaN KMeans fallback。10/11切片成功，平均ARI=0.546、NMI=0.639；151676已知坍塌（ARI=0）。 ✅ M13 CPU分析三件套（基线报告+分类器可靠性+错误类型区分度） — 在m14_cpu 726 episodes上运行4_analyze_results.py、7_classifier_reliability.py（修复tabulate缺失）、8_error_type_discriminability.py（修复int(‘False’)崩溃），产出6个分析文件。Fleiss’ kappa=-0.02（poor），drop↔grasp_slip kappa=0.71（非冗余性验证失败），SR全零（CPU基线无法恢复）。 ✅ MIHD Vision Refine vs Baseline对比实验（8种fusion方法） — 在切片151673上运行concat/mean/element_wise_sum/attention/basic_contrastive/adaln_attention/llava_mlp/qformer有/无scan_cluster refine全量对比，生成三子图可视化（GT | Baseline | Refine），汇总至vision_refine_summary_151673.txt。qformer baseline ARI=0.4832为所有实验最优；refine对弱fusion有益（attention +0.086），对强fusion有害（qformer -0.054）。 实现与修复 ✅ MimicGen数据集准备（HDF5→LeRoBot转换+归一化统计） — 将9个MimicGen核心任务转换为LeRoBot格式（4500集，1,034,176帧），修复datasets 4.4.1不兼容问题（降级至3.6.0）及lerobot源码prev_delta_indices属性缺失bug。随后计算16159批次归一化统计（耗时约3.5小时），输出norm_stats.json。 ✅ 项目全景总结.md更新（场景数454→649，版本v4.12） — 全面更新场景数（454→649，9种错误类型），更新里程碑进度、小目标完成状态、版本历史（v4.11.1→v4.12），更新差距分析实际值。 问题与解决方案 关键问题 1. pi0.5全量微调训练状态（params+optimizer+EMA）需~62GB/GPU，即使FSDP=4分片权重，初始化阶段仍因replicated_sharding导致每GPU暂时持有完整模型，反复OOM 解决方案: 切换为LoRA微调（gemma_2b_lora+gemma_300m_lora），可训练参数减少90%，显存需求降至22.5GB/GPU\n关键洞察: JAX FSDP只分片参数存储，不减少前向传播激活内存；单A800 80GB无法承载pi0.5全量微调，LoRA是A800集群的唯一可行方案。看到’Can’t reduce memory use below 62.46GiB’警告时应立即切换LoRA而非继续尝试FSDP配置。\n2. 所有三路M14评估均在scene 122/649处崩溃：自然捕获场景（~130个natural_*）与当前mimicgen环境xml_hash不一致，触发EnvironmentMismatchError且无捕获，导致整个评估进程崩溃 解决方案: 在collector.py的collect_on_scenes()中为每个scene加入EnvironmentMismatchError的try-except，记录警告并跳过该scene，修复后以–resume重启三路评估\n关键洞察: 649场景数据库含两类环境：519个impulse/augmented兼容场景（xml_hash匹配）和130个natural_*自然捕获场景（在VLA环境生成，xml_hash不同）。M14实际有效评估目标为~519个场景，目标episode数需相应下调。\n3. UNI2（ViT-H/14，patch_size=14）不兼容STAIG strict模式的256×256 patch输入（256/14=18.28非整数，AssertionError） 解决方案: 在UNI2提取流程中检测到STAIG模式时，批量推理前自动将patches从256×256 resize到224×224（224可被14整除）\n关键洞察: UNI v1使用dynamic_img_size=True支持任意输入，UNI2是标准ViT-H/14；STAIG的256×256 patch为UNI v1设计，移植到新模型需适配patch_size约束。\n4. 训练日志因stdout缓冲导致进度严重失真：Pi0.5训练看起来只跑了~580步，实际已到step 3000，误判训练中止 解决方案: 在训练脚本和sbatch提交脚本中加入PYTHONUNBUFFERED=1和stdbuf -oL，保证日志实时刷新；同时加入ERR trap和后台GPU内存监控\n关键洞察: 所有长时间训练脚本应标准化加入PYTHONUNBUFFERED=1，否则stdout缓冲会导致进度监控完全失真，造成不必要的重启操作。\n5. Slurm资源管理双重问题：srun –overlap方式在已分配作业上执行命令会阻塞超时；长时间训练进程在交互会话超时后被SIGTERM/SIGKILL（exit code 137/143） 解决方案: 使用srun –jobid=XXXXX –overlap解除资源冲突，在已分配节点执行命令；长时间训练改用sbatch提交独立批处理作业，与交互会话生命周期解耦\n关键洞察: 交互式开发（srun）与长时间训练（sbatch）必须严格区分，sbatch作业有独立的资源分配和生命周期管理，是集群训练的正确方式。\n6. DLPFC切片151676的STAIG训练loss从第一epoch变为NaN，KMeans fallback因NaN崩溃 解决方案: 在KMeans fallback路径加入nan_to_num清理；训练坍塌本身是已知问题（高温度tau=30+特殊数据分布），无根本解决方案\n关键洞察: 151676是异常切片，可能需要独立调整tau/dropout rate/图构建参数进行专项调查。\n一般问题 7. 多次训练失败后zombie GPU进程（nvitop、前次训练）占用70+GB显存，导致新训练无法获取足够显存，所有OOM实为zombie进程所致而非配置问题 解决方案: 使用fuser /dev/nvidiaX和kill -9逐一清理僵尸进程，特别注意nvitop即使无活跃训练也持有CUDA上下文\n关键洞察: 启动训练前必须检查并清理所有非必要GPU进程，nvitop等监控工具是隐性显存占用的常见来源。\n8. Python .pyc缓存导致模块修改不生效：重命名常量后遗漏phase2_evaluate.py引用（ImportError）；修改config.py的batch_size/fsdp_devices后未清缓存（配置不生效） 解决方案: 修改模块常量或配置后，主动清除所有__pycache__和.pyc文件，确保Python重新编译使用最新代码\n关键洞察: Python字节码缓存在快速迭代开发中是常见陷阱；常量重命名后应先全局搜索所有引用再提交修改，避免遗漏。\n9. MUJOCO_EGL_DEVICE_ID=0与CUDA_VISIBLE_DEVICES=5不匹配，导致m14_cpu评估启动立即AssertionError崩溃 解决方案: 将MUJOCO_EGL_DEVICE_ID设为与CUDA_VISIBLE_DEVICES字符串中相同的GPU编号（均设为5）\n关键洞察: robosuite EGL绑定通过字符串包含断言实现，MUJOCO_EGL_DEVICE_ID必须是CUDA_VISIBLE_DEVICES中实际存在的GPU编号，而非重映射后的相对索引。\n10. 数据集与脚本兼容性问题集合：datasets 4.4.1与lerobot 0.1.0不兼容（column访问API变更）、scripts/8中int(‘False’)崩溃（JSONL布尔值被序列化为字符串）、tabulate未安装 解决方案: 降级datasets至3.6.0并重新转换数据集；读取success字段时加入’True’/‘False’字符串到bool转换及kruskal退化case保护；pip install tabulate\n关键洞察: 共享集群环境中Python依赖兼容性需在首次运行时逐一验证；JSONL中布尔值经json.dumps后可能变为字符串，读取时需显式转换。\n人类思路 vs AI 思路 战略层面 649场景数据库组成的架构发现 角色 思路 人类 执行计划假设649个场景均可评估，未预见场景兼容性问题 AI 三路评估全部于scene 122崩溃后，AI通过分析EnvironmentMismatchError独立识别出数据库中含两类不兼容环境（~519 impulse兼容+130 natural_*不兼容），提出scene级try-except修复方案，并意识到实际有效评估场景数应为519 差异分析: 这是当天最重要的架构发现，由AI在调试过程中独立发现。AI的问题诊断能力在此体现了实际价值，但若提前检查meta.json中的场景指纹分布，可以在启动评估前预先规避。\nCPU性能瓶颈识别与训练加速 角色 思路 人类 人类直觉提出「每epoch都做CPU密集型任务」是训练慢的根因，给出「预处理加速」大方向，并提前设计分阶段完整执行计划（含精确命令行参数） AI AI系统性读取三个核心文件，精确定位初始化O(n²)循环、每epoch GPU↔CPU传输、逐spot Python循环三个具体瓶颈，量化分析（2700 spot×200 epoch=54万次独立forward），设计含边界处理的完整实现方案，并在执行中发现多个计划未预见的运行时bug 差异分析: 人类提供战略方向和架构判断，AI负责量化分析、具体实现和调试适应；AI在FSDP显存节省效果（认为FSDP=4可降至~16GB，实际仍OOM）和新模型约束预检查（UNI2 patch_size）方面判断不够准确。\n多GPU并行训练策略与显存管理 角色 思路 人类 用户主动提出使用多张GPU并行训练，推动AI探索FSDP方案；对部分数据先开始训练持实用主义（尽早验证）态度 AI AI对JAX FSDP显存优化过于乐观，在多次OOM后才切换LoRA架构；对数据集格式完整性约束的判断正确（不能部分训练）；切换LoRA是正确解决方向，但应从JAX警告中更早识别 差异分析: 用户的并行化直觉正确，但AI对FSDP原理存在误解（只分片存储，不减少激活内存）；架构层面的解决方案（LoRA）应更早提出。\n实现层面 Plan Mode工作流与AI自主执行边界 角色 思路 人类 用户两次拒绝AI自动调用ExitPlanMode，明确要求先审阅计划再批准执行；理解plan是用户决策门 AI AI在写完plan后直接尝试调用ExitPlanMode推进执行，未等待用户确认 差异分析: AI未能正确理解Plan Mode语义——plan需要用户显式批准，而非AI自动推进的信号。这反映了AI对「计划作为用户决策检查点」这一工作流模式的理解不足。\nAI 局限性 重要局限 对JAX FSDP显存优化原理判断错误：认为FSDP=4可将每GPU显存降至约16GB（62/4），实际上FSDP只分片参数存储，初始化时仍需完整模型，前向传播激活内存也不减少。应在看到’Can’t reduce memory use below 62.46GiB’警告时立即切换LoRA，而非继续尝试多种FSDP配置。 未预先检查模型架构约束和数据兼容性：实施UNI2兼容性时未核查ViT-H/14的patch_size整除要求；评估启动前未检查meta.json场景指纹分布；均在运行时崩溃后才发现修复，造成额外调试循环。 长时间任务的进度监控判断失误：未在训练脚本中设置PYTHONUNBUFFERED=1，导致日志缓冲、进度误判（580步→实际3000步）；多次在未检查GPU显存是否真正释放的情况下重启训练，多次OOM实为zombie进程所致而非配置问题。 一般局限 代码修改后的缓存清理和引用搜索不彻底：重命名常量后未一次性搜索所有引用（遗漏scripts/phase2_evaluate.py）；修改config.py后未清除__pycache__，导致运行时ImportError或配置不生效，需要额外修复步骤。 Plan Mode工作流理解不足：多次在写完plan后直接尝试调用ExitPlanMode推进执行（两次被用户拒绝），未能理解plan是用户决策门而非AI自动推进的信号。 今日收获 核心收获 pi0.5完整训练状态（参数+AdamW+EMA）需62GB显存，单A800 80GB无法承载全量微调；JAX FSDP只分片参数存储，不影响初始化时的完整模型加载和前向激活内存。LoRA微调（gemma_2b_lora）将显存需求降至22.5GB，是A800集群唯一可行方案。 649场景数据库由两类组成：519个impulse/pose_perturb/augmented兼容场景（xml_hash匹配）和130个natural_*自然捕获场景（在启用相机的VLA环境生成，xml_hash不同）。M14评估实际有效场景数为~519，目标episode数和所有文档需相应更新。 Vision Refine对Fusion效果呈两极分化规律：scan_cluster refine（1536d→256d降维）对弱fusion有益（attention +0.086 ARI），对强fusion有害（qformer -0.054）。强fusion（QFormer）具备处理高维输入的能力，降维反而损失信息；当日最优结果为qformer+no-refine（ARI=0.4832）。 向量化与批量化加速在科学计算中效果极为显著：O(n²)嵌套循环→cdist矩阵运算约100-500x加速；Python逐spot循环→批量GPU forward预计20-50x加速。这是空间组学训练提速的核心手段，同时验证了「预处理替代每epoch计算」的通用优化策略。 Slurm集群训练工程最佳实践：长时间训练必须用sbatch（非srun，避免会话超时被SIGTERM）；所有训练脚本标准化加入PYTHONUNBUFFERED=1+stdbuf -oL；启动训练前用fuser /dev/nvidiaX清理zombie GPU进程（nvitop等监控工具也持有CUDA上下文）；MUJOCO_EGL_DEVICE_ID必须与CUDA_VISIBLE_DEVICES字符串中的GPU编号完全一致。 STAIG fusion是端到端refine+fuse一体化方案（GCN编码空间关系），在输入端叠加scan_cluster refine会导致功能重叠和信息冗余，两者不应叠加使用。DLPFC切片151676存在稳定训练坍塌问题（NaN from epoch 1），需独立调整tau/dropout rate/图构建参数。 M13初步分析结论：Random+BC-RNN两个CPU基线在所有场景SR=0，Fleiss’ kappa=-0.02（poor），区分度不显著——因为基线策略根本无法成功恢复，缺乏SR变异性。有意义的统计结果需要VLA（Pi0/Pi0.5）数据。 会话摘要 MIHD ✅ MIHD融合训练全面优化：CPU三项加速+架构解耦+Vision Refine对比+STAIG全切片基准 00:02:10.477 | claude_code 在DCC的RTX 5000 Ada节点上完成六项工作：①对STAIGTrainer/STAIGTrainerE2E/QFormerFusion实施cdist向量化（100-500x）、GPU化dropout随机数、批量forward（预计20-50x）三项CPU加速；②移除staig_fusion对UNI的硬依赖，新增STAIG_UNI_FAMILY集合支持任意视觉编码器，清除pyc缓存解决ImportError；③在切片151673上完成8种fusion方法有/无scan_cluster refine全量对比实验并生成三子图可视化，发现qformer baseline ARI=0.4832为最优，refine对弱fusion有益（attention +0.086）对强fusion有害（qformer -0.054）；④修复UNI2 patch_size兼容性bug（256→224 resize）和NaN KMeans fallback；⑤完成全部11个DLPFC切片STAIG fusion基准测试，10/11成功，平均ARI=0.546（151676已知坍塌）。\nError Recovery Benchmark • Pi0.5 LoRA训练全流程搭建+M14三路评估启动与关键bug修复+M13 CPU分析 00:00:18.651 | claude_code 在天河集群完成两条主线工作。【训练线】将9个MimicGen任务转换为LeRoBot格式（4500集，100万帧），修复datasets版本兼容性（降级至3.6.0）和lerobot源码bug；归一化统计耗时3.5小时；全量微调反复OOM（pi0.5训练状态62GB超A800容量，JAX FSDP无效）后，切换为LoRA架构通过sbatch提交Job 46551，首跑至step 3000后因stdout缓冲误判退出；加入PYTHONUNBUFFERED=1重启为Job 46553（an46，2.0s/step，loss=0.068，预计53小时）。【评估线】修复tabulate缺失/int(‘False’)类型转换/kruskal退化等bug，完成M13 CPU分析三件套（kappa=-0.02，SR全零，需VLA数据才有统计意义）；修复MUJOCO_EGL_DEVICE_ID不匹配后启动m14_cpu/Pi0/Pi0.5三路评估，均在scene 122因EnvironmentMismatchError崩溃（发现649场景库含130个不兼容natural_*场景）；在collector.py加入scene级try-except修复后以–resume恢复，m14_cpu和m14_pi05完成，m14_pi0运行中。同步更新项目全景总结.md（场景数454→649，v4.12）。\nToken 用量 总览 指标 数值 总 Token 17,246,252 输入 Token 32,552 输出 Token 1,598 Cache 创建 2,043,944 Cache 读取 15,168,158 Cache 命中率 88.1% 总费用 (USD) $8.8234 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 249 443 670,414 3,372,934 $5.8889 66.7% claude-haiku-4-5-20251001 32,303 1,155 1,373,530 11,795,224 $2.9345 33.3% 各设备用量 设备 总 Token 输入 输出 费用 DCC 2,621,468 8,010 256 $1.2491 tianhe 14,624,784 24,542 1,342 $7.5743 ",
+  "wordCount" : "438",
+  "inLanguage": "zh",
+  "datePublished": "2026-02-23T00:00:00-05:00",
+  "dateModified": "2026-02-23T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/daily/2026-02-23/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                    <ul class="lang-switch"><li>|</li>
+                        <li>
+                            <a href="https://tzj2006.github.io/" title="English"
+                                aria-label="English">English</a>
+                        </li>
+                    </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/zh/">主页</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/daily/">每日摘要</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-23
+    </h1>
+    <div class="post-meta"><span title='2026-02-23 00:00:00 -0500 EST'>2026年2月23日</span>&nbsp;·&nbsp;<span>3 分钟</span>&nbsp;|&nbsp;<span>语言:</span>
+<ul class="i18n_list">
+    <li>
+        <a href="https://tzj2006.github.io/bugjournal/daily/2026-02-23/">English</a>
+    </li>
+</ul>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-23">日报 — 2026-02-23<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-23">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 在DCC和天河两台集群上并行推进三个核心工作：MIHD融合训练全面优化与全切片基准测试、Error Recovery Benchmark M14三路评估启动与关键bug修复、Pi0.5 LoRA微调训练从零搭建到稳定运行。</li>
+<li><strong>怎么做的：</strong> DCC端通过NumPy向量化、GPU化随机数、批量Transformer forward三项手段消除CPU瓶颈并解耦编码器架构；天河端通过渐进式调试（依赖降级、修补源码、切换LoRA架构、sbatch提交）解决数据兼容性和显存OOM问题，同时通过scene级try-except修复评估进程崩溃。</li>
+<li><strong>有什么用：</strong> QFormer训练预计加速20-50x，STAIG全切片平均ARI=0.546，发现refine对弱/强fusion效果两极分化规律；Pi0.5 LoRA训练（Job 46553）以2.0s/step稳定运行（预计53小时完成）；M14三路评估修复后恢复全量推进，确认649场景中~519个为有效评估目标。</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 在RTX 5000 Ada GPU节点上完成MIHD融合训练全面优化：3项CPU加速实现、视觉编码器架构解耦、Vision Refine vs Baseline对比实验（8种fusion×有无refine）、STAIG全部11个DLPFC切片基准测试。</li>
+<li><strong>怎么做的：</strong> 使用conda General环境运行PyTorch训练；scipy cdist向量化边权重、GPU原生随机数消除跨设备传输、批量Transformer forward替代逐spot循环；清除pyc缓存解决ImportError；后台TaskOutput并行监控长耗时实验。</li>
+<li><strong>有什么用：</strong> 10/11 DLPFC切片STAIG fusion成功（151676已知坍塌），平均ARI=0.546；qformer+no-refine为151673最优组合（ARI=0.4832）；发现scan_cluster refine对弱fusion有益、对强fusion有害的规律。</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 在天河集群（an46/an49/an51）完成Pi0.5 LoRA微调全流程搭建（数据转换→归一化统计→LoRA训练），以及Error Recovery Benchmark M14三路评估（CPU分析+GPU评估+环境指纹崩溃修复）。</li>
+<li><strong>怎么做的：</strong> 通过渐进式调试解决数据格式兼容性（datasets降级、lerobot源码修补）、显存OOM（全量→LoRA架构切换）、训练进程管理（srun→sbatch）等问题；srun &ndash;overlap并行启动评估进程；scene级try-except修复EnvironmentMismatchError。</li>
+<li><strong>有什么用：</strong> 获得step-1000 LoRA检查点，Job 46553稳定运行（loss=0.068，2.0s/step）；M14三路评估（m14_cpu完成、m14_pi05完成、m14_pi0运行中）修复后跨越scene 122崩溃点；确认649场景数据库中~130个natural_*场景不兼容，实际有效评估场景约519个。</li>
+</ul>
+<blockquote>
+<p>在DCC节点系统优化MIHD空间组学融合训练（3项CPU加速+架构解耦+全切片基准测试+Vision Refine对比实验），同时在天河集群完成MimicGen数据准备、修复M14三路评估的环境指纹崩溃及Pi0.5全量微调OOM问题，成功将Pi0.5 LoRA训练（Job 46553）推进至稳定运行。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>MIHD融合训练CPU三项加速（向量化+GPU化+批量化）</strong> — 对STAIGTrainer.py、STAIGTrainerE2E.py、QFormerFusion.py三个文件实施全面优化：用scipy cdist替代O(n²)嵌套循环（初始化阶段，~100-500x加速）、将adaptive_dropout_adj随机数生成迁移至GPU（消除每epoch GPU↔CPU同步开销约1-2s）、为QFormerFusion添加批量forward接口（forward_batched()含key_padding_mask+预构建padded tensor，预计20-50x加速）。</li>
+<li>🔄 <strong>Pi0.5 LoRA微调训练（Job 46551→46553，运行中）</strong> — 历经全量微调OOM（pi0.5训练状态<del>62GB超A800容量，FSDP=4无效）后，切换为gemma_2b_lora+gemma_300m_lora架构（显存降至</del>22.5GB）。通过sbatch提交Job 46551首跑至step 3000，因stdout缓冲误判退出；加入PYTHONUNBUFFERED=1+stdbuf+ERR trap后以&ndash;resume重启为Job 46553，当前在an46（4×A800）以2.0s/step稳定运行，loss=0.068，预计约53小时完成。</li>
+<li>🔄 <strong>M14三路评估（m14_cpu/Pi0/Pi0.5）启动与环境指纹修复</strong> — 修复MUJOCO_EGL_DEVICE_ID不匹配后启动m14_cpu续跑；启动Pi0（an49 GPU6，port 5556）和Pi0.5（an49 GPU5，port 5557）VLA评估。三路均在scene 122/649崩溃（~130个natural_*场景xml_hash不兼容）；collector.py加入scene级EnvironmentMismatchError try-except修复后以&ndash;resume恢复，m14_cpu和m14_pi05以exit code 0完成，m14_pi0仍运行中。</li>
+<li>✅ <strong>evaluate_mimicgen.py与collector.py关键bug修复</strong> — evaluate_mimicgen.py：加入env.seed()确保可复现性、状态维度8D assert验证、修复_quat2axisangle的in-place数组修改bug（改用np.clip+copy）。collector.py：collect_on_scenes()中为每个scene捕获EnvironmentMismatchError，记录警告并跳过不兼容场景，避免整个进程崩溃。</li>
+<li>✅ <strong>staig_fusion支持任意视觉编码器（解耦UNI硬依赖）</strong> — 重命名常量（STAIG_FUSION_VISION_ENCODER→STAIG_FUSION_DEFAULT_VISION_ENCODER）、新增STAIG_UNI_FAMILY集合（{uni,uni2}），更新extraction_planner.py/evaluation_planner.py/phase2_evaluate.py/run_benchmark.py四个文件分支逻辑，UNI系列自动使用staig_strict预处理，其他编码器使用standard。清除pyc缓存解决ImportError。</li>
+<li>✅ <strong>STAIG fusion全部11个DLPFC切片基准测试</strong> — 在全部11个DLPFC切片上运行pca+uni2+staig_fusion和none+uni2+staig_fusion，修复UNI2 patch_size兼容性bug（256×256→224×224 resize）和NaN KMeans fallback。10/11切片成功，平均ARI=0.546、NMI=0.639；151676已知坍塌（ARI=0）。</li>
+<li>✅ <strong>M13 CPU分析三件套（基线报告+分类器可靠性+错误类型区分度）</strong> — 在m14_cpu 726 episodes上运行4_analyze_results.py、7_classifier_reliability.py（修复tabulate缺失）、8_error_type_discriminability.py（修复int(&lsquo;False&rsquo;)崩溃），产出6个分析文件。Fleiss&rsquo; kappa=-0.02（poor），drop↔grasp_slip kappa=0.71（非冗余性验证失败），SR全零（CPU基线无法恢复）。</li>
+<li>✅ <strong>MIHD Vision Refine vs Baseline对比实验（8种fusion方法）</strong> — 在切片151673上运行concat/mean/element_wise_sum/attention/basic_contrastive/adaln_attention/llava_mlp/qformer有/无scan_cluster refine全量对比，生成三子图可视化（GT | Baseline | Refine），汇总至vision_refine_summary_151673.txt。qformer baseline ARI=0.4832为所有实验最优；refine对弱fusion有益（attention +0.086），对强fusion有害（qformer -0.054）。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>MimicGen数据集准备（HDF5→LeRoBot转换+归一化统计）</strong> — 将9个MimicGen核心任务转换为LeRoBot格式（4500集，1,034,176帧），修复datasets 4.4.1不兼容问题（降级至3.6.0）及lerobot源码prev_delta_indices属性缺失bug。随后计算16159批次归一化统计（耗时约3.5小时），输出norm_stats.json。</li>
+<li>✅ <strong>项目全景总结.md更新（场景数454→649，版本v4.12）</strong> — 全面更新场景数（454→649，9种错误类型），更新里程碑进度、小目标完成状态、版本历史（v4.11.1→v4.12），更新差距分析实际值。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-pi05全量微调训练状态paramsoptimizerema需62gbgpu即使fsdp4分片权重初始化阶段仍因replicated_sharding导致每gpu暂时持有完整模型反复oom">1. pi0.5全量微调训练状态（params+optimizer+EMA）需~62GB/GPU，即使FSDP=4分片权重，初始化阶段仍因replicated_sharding导致每GPU暂时持有完整模型，反复OOM<a hidden class="anchor" aria-hidden="true" href="#1-pi05全量微调训练状态paramsoptimizerema需62gbgpu即使fsdp4分片权重初始化阶段仍因replicated_sharding导致每gpu暂时持有完整模型反复oom">#</a></h4>
+<p><strong>解决方案:</strong> 切换为LoRA微调（gemma_2b_lora+gemma_300m_lora），可训练参数减少<del>90%，显存需求降至</del>22.5GB/GPU</p>
+<p><strong>关键洞察:</strong> JAX FSDP只分片参数存储，不减少前向传播激活内存；单A800 80GB无法承载pi0.5全量微调，LoRA是A800集群的唯一可行方案。看到&rsquo;Can&rsquo;t reduce memory use below 62.46GiB&rsquo;警告时应立即切换LoRA而非继续尝试FSDP配置。</p>
+<h4 id="2-所有三路m14评估均在scene-122649处崩溃自然捕获场景130个natural_与当前mimicgen环境xml_hash不一致触发environmentmismatcherror且无捕获导致整个评估进程崩溃">2. 所有三路M14评估均在scene 122/649处崩溃：自然捕获场景（~130个natural_*）与当前mimicgen环境xml_hash不一致，触发EnvironmentMismatchError且无捕获，导致整个评估进程崩溃<a hidden class="anchor" aria-hidden="true" href="#2-所有三路m14评估均在scene-122649处崩溃自然捕获场景130个natural_与当前mimicgen环境xml_hash不一致触发environmentmismatcherror且无捕获导致整个评估进程崩溃">#</a></h4>
+<p><strong>解决方案:</strong> 在collector.py的collect_on_scenes()中为每个scene加入EnvironmentMismatchError的try-except，记录警告并跳过该scene，修复后以&ndash;resume重启三路评估</p>
+<p><strong>关键洞察:</strong> 649场景数据库含两类环境：<del>519个impulse/augmented兼容场景（xml_hash匹配）和</del>130个natural_*自然捕获场景（在VLA环境生成，xml_hash不同）。M14实际有效评估目标为~519个场景，目标episode数需相应下调。</p>
+<h4 id="3-uni2vit-h14patch_size14不兼容staig-strict模式的256256-patch输入256141828非整数assertionerror">3. UNI2（ViT-H/14，patch_size=14）不兼容STAIG strict模式的256×256 patch输入（256/14=18.28非整数，AssertionError）<a hidden class="anchor" aria-hidden="true" href="#3-uni2vit-h14patch_size14不兼容staig-strict模式的256256-patch输入256141828非整数assertionerror">#</a></h4>
+<p><strong>解决方案:</strong> 在UNI2提取流程中检测到STAIG模式时，批量推理前自动将patches从256×256 resize到224×224（224可被14整除）</p>
+<p><strong>关键洞察:</strong> UNI v1使用dynamic_img_size=True支持任意输入，UNI2是标准ViT-H/14；STAIG的256×256 patch为UNI v1设计，移植到新模型需适配patch_size约束。</p>
+<h4 id="4-训练日志因stdout缓冲导致进度严重失真pi05训练看起来只跑了580步实际已到step-3000误判训练中止">4. 训练日志因stdout缓冲导致进度严重失真：Pi0.5训练看起来只跑了~580步，实际已到step 3000，误判训练中止<a hidden class="anchor" aria-hidden="true" href="#4-训练日志因stdout缓冲导致进度严重失真pi05训练看起来只跑了580步实际已到step-3000误判训练中止">#</a></h4>
+<p><strong>解决方案:</strong> 在训练脚本和sbatch提交脚本中加入PYTHONUNBUFFERED=1和stdbuf -oL，保证日志实时刷新；同时加入ERR trap和后台GPU内存监控</p>
+<p><strong>关键洞察:</strong> 所有长时间训练脚本应标准化加入PYTHONUNBUFFERED=1，否则stdout缓冲会导致进度监控完全失真，造成不必要的重启操作。</p>
+<h4 id="5-slurm资源管理双重问题srun-overlap方式在已分配作业上执行命令会阻塞超时长时间训练进程在交互会话超时后被sigtermsigkillexit-code-137143">5. Slurm资源管理双重问题：srun &ndash;overlap方式在已分配作业上执行命令会阻塞超时；长时间训练进程在交互会话超时后被SIGTERM/SIGKILL（exit code 137/143）<a hidden class="anchor" aria-hidden="true" href="#5-slurm资源管理双重问题srun-overlap方式在已分配作业上执行命令会阻塞超时长时间训练进程在交互会话超时后被sigtermsigkillexit-code-137143">#</a></h4>
+<p><strong>解决方案:</strong> 使用srun &ndash;jobid=XXXXX &ndash;overlap解除资源冲突，在已分配节点执行命令；长时间训练改用sbatch提交独立批处理作业，与交互会话生命周期解耦</p>
+<p><strong>关键洞察:</strong> 交互式开发（srun）与长时间训练（sbatch）必须严格区分，sbatch作业有独立的资源分配和生命周期管理，是集群训练的正确方式。</p>
+<h4 id="6-dlpfc切片151676的staig训练loss从第一epoch变为nankmeans-fallback因nan崩溃">6. DLPFC切片151676的STAIG训练loss从第一epoch变为NaN，KMeans fallback因NaN崩溃<a hidden class="anchor" aria-hidden="true" href="#6-dlpfc切片151676的staig训练loss从第一epoch变为nankmeans-fallback因nan崩溃">#</a></h4>
+<p><strong>解决方案:</strong> 在KMeans fallback路径加入nan_to_num清理；训练坍塌本身是已知问题（高温度tau=30+特殊数据分布），无根本解决方案</p>
+<p><strong>关键洞察:</strong> 151676是异常切片，可能需要独立调整tau/dropout rate/图构建参数进行专项调查。</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="7-多次训练失败后zombie-gpu进程nvitop前次训练占用70gb显存导致新训练无法获取足够显存所有oom实为zombie进程所致而非配置问题">7. 多次训练失败后zombie GPU进程（nvitop、前次训练）占用70+GB显存，导致新训练无法获取足够显存，所有OOM实为zombie进程所致而非配置问题<a hidden class="anchor" aria-hidden="true" href="#7-多次训练失败后zombie-gpu进程nvitop前次训练占用70gb显存导致新训练无法获取足够显存所有oom实为zombie进程所致而非配置问题">#</a></h4>
+<p><strong>解决方案:</strong> 使用fuser /dev/nvidiaX和kill -9逐一清理僵尸进程，特别注意nvitop即使无活跃训练也持有CUDA上下文</p>
+<p><strong>关键洞察:</strong> 启动训练前必须检查并清理所有非必要GPU进程，nvitop等监控工具是隐性显存占用的常见来源。</p>
+<h4 id="8-python-pyc缓存导致模块修改不生效重命名常量后遗漏phase2_evaluatepy引用importerror修改configpy的batch_sizefsdp_devices后未清缓存配置不生效">8. Python .pyc缓存导致模块修改不生效：重命名常量后遗漏phase2_evaluate.py引用（ImportError）；修改config.py的batch_size/fsdp_devices后未清缓存（配置不生效）<a hidden class="anchor" aria-hidden="true" href="#8-python-pyc缓存导致模块修改不生效重命名常量后遗漏phase2_evaluatepy引用importerror修改configpy的batch_sizefsdp_devices后未清缓存配置不生效">#</a></h4>
+<p><strong>解决方案:</strong> 修改模块常量或配置后，主动清除所有__pycache__和.pyc文件，确保Python重新编译使用最新代码</p>
+<p><strong>关键洞察:</strong> Python字节码缓存在快速迭代开发中是常见陷阱；常量重命名后应先全局搜索所有引用再提交修改，避免遗漏。</p>
+<h4 id="9-mujoco_egl_device_id0与cuda_visible_devices5不匹配导致m14_cpu评估启动立即assertionerror崩溃">9. MUJOCO_EGL_DEVICE_ID=0与CUDA_VISIBLE_DEVICES=5不匹配，导致m14_cpu评估启动立即AssertionError崩溃<a hidden class="anchor" aria-hidden="true" href="#9-mujoco_egl_device_id0与cuda_visible_devices5不匹配导致m14_cpu评估启动立即assertionerror崩溃">#</a></h4>
+<p><strong>解决方案:</strong> 将MUJOCO_EGL_DEVICE_ID设为与CUDA_VISIBLE_DEVICES字符串中相同的GPU编号（均设为5）</p>
+<p><strong>关键洞察:</strong> robosuite EGL绑定通过字符串包含断言实现，MUJOCO_EGL_DEVICE_ID必须是CUDA_VISIBLE_DEVICES中实际存在的GPU编号，而非重映射后的相对索引。</p>
+<h4 id="10-数据集与脚本兼容性问题集合datasets-441与lerobot-010不兼容column访问api变更scripts8中intfalse崩溃jsonl布尔值被序列化为字符串tabulate未安装">10. 数据集与脚本兼容性问题集合：datasets 4.4.1与lerobot 0.1.0不兼容（column访问API变更）、scripts/8中int(&lsquo;False&rsquo;)崩溃（JSONL布尔值被序列化为字符串）、tabulate未安装<a hidden class="anchor" aria-hidden="true" href="#10-数据集与脚本兼容性问题集合datasets-441与lerobot-010不兼容column访问api变更scripts8中intfalse崩溃jsonl布尔值被序列化为字符串tabulate未安装">#</a></h4>
+<p><strong>解决方案:</strong> 降级datasets至3.6.0并重新转换数据集；读取success字段时加入&rsquo;True&rsquo;/&lsquo;False&rsquo;字符串到bool转换及kruskal退化case保护；pip install tabulate</p>
+<p><strong>关键洞察:</strong> 共享集群环境中Python依赖兼容性需在首次运行时逐一验证；JSONL中布尔值经json.dumps后可能变为字符串，读取时需显式转换。</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="649场景数据库组成的架构发现">649场景数据库组成的架构发现<a hidden class="anchor" aria-hidden="true" href="#649场景数据库组成的架构发现">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>执行计划假设649个场景均可评估，未预见场景兼容性问题</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>三路评估全部于scene 122崩溃后，AI通过分析EnvironmentMismatchError独立识别出数据库中含两类不兼容环境（~519 impulse兼容+<del>130 natural_*不兼容），提出scene级try-except修复方案，并意识到实际有效评估场景数应为</del>519</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 这是当天最重要的架构发现，由AI在调试过程中独立发现。AI的问题诊断能力在此体现了实际价值，但若提前检查meta.json中的场景指纹分布，可以在启动评估前预先规避。</p>
+<h4 id="cpu性能瓶颈识别与训练加速">CPU性能瓶颈识别与训练加速<a hidden class="anchor" aria-hidden="true" href="#cpu性能瓶颈识别与训练加速">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类直觉提出「每epoch都做CPU密集型任务」是训练慢的根因，给出「预处理加速」大方向，并提前设计分阶段完整执行计划（含精确命令行参数）</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI系统性读取三个核心文件，精确定位初始化O(n²)循环、每epoch GPU↔CPU传输、逐spot Python循环三个具体瓶颈，量化分析（2700 spot×200 epoch=54万次独立forward），设计含边界处理的完整实现方案，并在执行中发现多个计划未预见的运行时bug</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类提供战略方向和架构判断，AI负责量化分析、具体实现和调试适应；AI在FSDP显存节省效果（认为FSDP=4可降至~16GB，实际仍OOM）和新模型约束预检查（UNI2 patch_size）方面判断不够准确。</p>
+<h4 id="多gpu并行训练策略与显存管理">多GPU并行训练策略与显存管理<a hidden class="anchor" aria-hidden="true" href="#多gpu并行训练策略与显存管理">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户主动提出使用多张GPU并行训练，推动AI探索FSDP方案；对部分数据先开始训练持实用主义（尽早验证）态度</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI对JAX FSDP显存优化过于乐观，在多次OOM后才切换LoRA架构；对数据集格式完整性约束的判断正确（不能部分训练）；切换LoRA是正确解决方向，但应从JAX警告中更早识别</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户的并行化直觉正确，但AI对FSDP原理存在误解（只分片存储，不减少激活内存）；架构层面的解决方案（LoRA）应更早提出。</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="plan-mode工作流与ai自主执行边界">Plan Mode工作流与AI自主执行边界<a hidden class="anchor" aria-hidden="true" href="#plan-mode工作流与ai自主执行边界">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户两次拒绝AI自动调用ExitPlanMode，明确要求先审阅计划再批准执行；理解plan是用户决策门</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI在写完plan后直接尝试调用ExitPlanMode推进执行，未等待用户确认</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI未能正确理解Plan Mode语义——plan需要用户显式批准，而非AI自动推进的信号。这反映了AI对「计划作为用户决策检查点」这一工作流模式的理解不足。</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>对JAX FSDP显存优化原理判断错误：认为FSDP=4可将每GPU显存降至约16GB（62/4），实际上FSDP只分片参数存储，初始化时仍需完整模型，前向传播激活内存也不减少。应在看到&rsquo;Can&rsquo;t reduce memory use below 62.46GiB&rsquo;警告时立即切换LoRA，而非继续尝试多种FSDP配置。</li>
+<li>未预先检查模型架构约束和数据兼容性：实施UNI2兼容性时未核查ViT-H/14的patch_size整除要求；评估启动前未检查meta.json场景指纹分布；均在运行时崩溃后才发现修复，造成额外调试循环。</li>
+<li>长时间任务的进度监控判断失误：未在训练脚本中设置PYTHONUNBUFFERED=1，导致日志缓冲、进度误判（580步→实际3000步）；多次在未检查GPU显存是否真正释放的情况下重启训练，多次OOM实为zombie进程所致而非配置问题。</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>代码修改后的缓存清理和引用搜索不彻底：重命名常量后未一次性搜索所有引用（遗漏scripts/phase2_evaluate.py）；修改config.py后未清除__pycache__，导致运行时ImportError或配置不生效，需要额外修复步骤。</li>
+<li>Plan Mode工作流理解不足：多次在写完plan后直接尝试调用ExitPlanMode推进执行（两次被用户拒绝），未能理解plan是用户决策门而非AI自动推进的信号。</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>pi0.5完整训练状态（参数+AdamW+EMA）需<del>62GB显存，单A800 80GB无法承载全量微调；JAX FSDP只分片参数存储，不影响初始化时的完整模型加载和前向激活内存。LoRA微调（gemma_2b_lora）将显存需求降至</del>22.5GB，是A800集群唯一可行方案。</li>
+<li>649场景数据库由两类组成：<del>519个impulse/pose_perturb/augmented兼容场景（xml_hash匹配）和</del>130个natural_*自然捕获场景（在启用相机的VLA环境生成，xml_hash不同）。M14评估实际有效场景数为~519，目标episode数和所有文档需相应更新。</li>
+<li>Vision Refine对Fusion效果呈两极分化规律：scan_cluster refine（1536d→256d降维）对弱fusion有益（attention +0.086 ARI），对强fusion有害（qformer -0.054）。强fusion（QFormer）具备处理高维输入的能力，降维反而损失信息；当日最优结果为qformer+no-refine（ARI=0.4832）。</li>
+<li>向量化与批量化加速在科学计算中效果极为显著：O(n²)嵌套循环→cdist矩阵运算约100-500x加速；Python逐spot循环→批量GPU forward预计20-50x加速。这是空间组学训练提速的核心手段，同时验证了「预处理替代每epoch计算」的通用优化策略。</li>
+<li>Slurm集群训练工程最佳实践：长时间训练必须用sbatch（非srun，避免会话超时被SIGTERM）；所有训练脚本标准化加入PYTHONUNBUFFERED=1+stdbuf -oL；启动训练前用fuser /dev/nvidiaX清理zombie GPU进程（nvitop等监控工具也持有CUDA上下文）；MUJOCO_EGL_DEVICE_ID必须与CUDA_VISIBLE_DEVICES字符串中的GPU编号完全一致。</li>
+<li>STAIG fusion是端到端refine+fuse一体化方案（GCN编码空间关系），在输入端叠加scan_cluster refine会导致功能重叠和信息冗余，两者不应叠加使用。DLPFC切片151676存在稳定训练坍塌问题（NaN from epoch 1），需独立调整tau/dropout rate/图构建参数。</li>
+<li>M13初步分析结论：Random+BC-RNN两个CPU基线在所有场景SR=0，Fleiss&rsquo; kappa=-0.02（poor），区分度不显著——因为基线策略根本无法成功恢复，缺乏SR变异性。有意义的统计结果需要VLA（Pi0/Pi0.5）数据。</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>✅ MIHD融合训练全面优化：CPU三项加速+架构解耦+Vision Refine对比+STAIG全切片基准</strong>
+<em>00:02:10.477 | claude_code</em>
+在DCC的RTX 5000 Ada节点上完成六项工作：①对STAIGTrainer/STAIGTrainerE2E/QFormerFusion实施cdist向量化（100-500x）、GPU化dropout随机数、批量forward（预计20-50x）三项CPU加速；②移除staig_fusion对UNI的硬依赖，新增STAIG_UNI_FAMILY集合支持任意视觉编码器，清除pyc缓存解决ImportError；③在切片151673上完成8种fusion方法有/无scan_cluster refine全量对比实验并生成三子图可视化，发现qformer baseline ARI=0.4832为最优，refine对弱fusion有益（attention +0.086）对强fusion有害（qformer -0.054）；④修复UNI2 patch_size兼容性bug（256→224 resize）和NaN KMeans fallback；⑤完成全部11个DLPFC切片STAIG fusion基准测试，10/11成功，平均ARI=0.546（151676已知坍塌）。</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>• Pi0.5 LoRA训练全流程搭建+M14三路评估启动与关键bug修复+M13 CPU分析</strong>
+<em>00:00:18.651 | claude_code</em>
+在天河集群完成两条主线工作。【训练线】将9个MimicGen任务转换为LeRoBot格式（4500集，100万帧），修复datasets版本兼容性（降级至3.6.0）和lerobot源码bug；归一化统计耗时3.5小时；全量微调反复OOM（pi0.5训练状态<del>62GB超A800容量，JAX FSDP无效）后，切换为LoRA架构通过sbatch提交Job 46551，首跑至step 3000后因stdout缓冲误判退出；加入PYTHONUNBUFFERED=1重启为Job 46553（an46，2.0s/step，loss=0.068，预计53小时）。【评估线】修复tabulate缺失/int(&lsquo;False&rsquo;)类型转换/kruskal退化等bug，完成M13 CPU分析三件套（kappa=-0.02，SR全零，需VLA数据才有统计意义）；修复MUJOCO_EGL_DEVICE_ID不匹配后启动m14_cpu/Pi0/Pi0.5三路评估，均在scene 122因EnvironmentMismatchError崩溃（发现649场景库含</del>130个不兼容natural_*场景）；在collector.py加入scene级try-except修复后以&ndash;resume恢复，m14_cpu和m14_pi05完成，m14_pi0运行中。同步更新项目全景总结.md（场景数454→649，v4.12）。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>17,246,252</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>32,552</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>1,598</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>2,043,944</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>15,168,158</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>88.1%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$8.8234</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>249</td>
+          <td>443</td>
+          <td>670,414</td>
+          <td>3,372,934</td>
+          <td>$5.8889</td>
+          <td>66.7%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>32,303</td>
+          <td>1,155</td>
+          <td>1,373,530</td>
+          <td>11,795,224</td>
+          <td>$2.9345</td>
+          <td>33.3%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>2,621,468</td>
+          <td>8,010</td>
+          <td>256</td>
+          <td>$1.2491</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>14,624,784</td>
+          <td>24,542</td>
+          <td>1,342</td>
+          <td>$7.5743</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

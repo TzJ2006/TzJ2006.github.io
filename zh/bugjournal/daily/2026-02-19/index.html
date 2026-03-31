@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-19 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="在 MIHD 项目中，系统完成了 H&amp;E Image-Only 聚类方法文献调研（确立 ARI 0.11–0.16 基线及 Foundation Model 失效五大根因）、四份核心技术文档建立，并实现并验证了三种自监督聚类增强方案（STEGO/BYOL&#43;GAT/SCAN），SCAN 将 image-only ARI 从 0.251 提升至 0.303（&#43;20.6%）。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-19/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.74275d3de94d719fb7098f21c29c7cbda35c9c6ca6621dbdcbd629ecff2aa1ac.css" integrity="sha256-dCddPelNcZ&#43;3CY8hwpx8vaNcnGymYh29y9Yp7P8qoaw=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-02-19/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-19/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-19/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-19">
+  <meta property="og:description" content="在 MIHD 项目中，系统完成了 H&amp;E Image-Only 聚类方法文献调研（确立 ARI 0.11–0.16 基线及 Foundation Model 失效五大根因）、四份核心技术文档建立，并实现并验证了三种自监督聚类增强方案（STEGO/BYOL&#43;GAT/SCAN），SCAN 将 image-only ARI 从 0.251 提升至 0.303（&#43;20.6%）。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-19T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-19T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-19">
+  <meta name="twitter:description" content="在 MIHD 项目中，系统完成了 H&amp;E Image-Only 聚类方法文献调研（确立 ARI 0.11–0.16 基线及 Foundation Model 失效五大根因）、四份核心技术文档建立，并实现并验证了三种自监督聚类增强方案（STEGO/BYOL&#43;GAT/SCAN），SCAN 将 image-only ARI 从 0.251 提升至 0.303（&#43;20.6%）。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "每日摘要",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-02-19",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/2026-02-19/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-19",
+  "name": "Bug Journal 2026-02-19",
+  "description": "在 MIHD 项目中，系统完成了 H\u0026amp;E Image-Only 聚类方法文献调研（确立 ARI 0.11–0.16 基线及 Foundation Model 失效五大根因）、四份核心技术文档建立，并实现并验证了三种自监督聚类增强方案（STEGO/BYOL+GAT/SCAN），SCAN 将 image-only ARI 从 0.251 提升至 0.303（+20.6%）。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-19 今日概览 做了什么： 系统开展了 MIHD 项目三大工作：技术文档体系建立（RM-IDEAL 双语说明、视觉编码器指南、病理 PFM 文献综述、UNI/UNI2 评测分析），H\u0026E Image-Only 聚类方法深度调研（含量化基线、Foundation Model 失效根因分析及 ENHANCEMENT_PLAN_CN.md 大目标 7 更新），以及三种 image-only 自监督聚类增强方案（STEGO/BYOL+GAT/SCAN）的完整实现与对比验证。 怎么做的： 通过大量学术文献网络检索（spEMO、HEST-1k、STAIG 等）与代码库深度探索，新建五个模型文件及修改基础设施文件，在 GPU 上完成多方法对比实验，同时利用缓存 .npz 文件批量重新生成 UNI2 可视化，并将所有调研结论整理写入 ENHANCEMENT_PLAN_CN.md。 有什么用： SCAN 方法将 image-only ARI 从基线 0.251 提升至 0.303（+20.6%），其嵌入与基因特征融合可进一步提升 +0.065 ARI；系统调研填补了文献中几乎无 vision-only 空间域识别评测的空白，为项目建立了可参考的文献对标基准与完整的多阶段增强路线图。 在 MIHD 项目中，系统完成了 H\u0026E Image-Only 聚类方法文献调研（确立 ARI 0.11–0.16 基线及 Foundation Model 失效五大根因）、四份核心技术文档建立，并实现并验证了三种自监督聚类增强方案（STEGO/BYOL+GAT/SCAN），SCAN 将 image-only ARI 从 0.251 提升至 0.303（+20.6%）。\n今日任务 架构与策略 ✅ MIHD 技术文档体系建立 — 创建四份核心技术文档：RM-IDEAL 双语结构文档（WWL 图核、Wasserstein 最优传输、与 ARI/NMI 的互补关系）、视觉编码器使用指南（12 章节端到端流水线，含 UNI2/UNI/HIPT/ResNet50 详细对比）、病理 PFM 文献综述（spEMO/HEST-1k/STAIG 等方法的 patch 提取策略与 encoder 选型）、UNI/UNI2 原论文评测分析（34 个临床任务 + 8 个 benchmark 综合文档）。 ✅ H\u0026E Image-Only 聚类方法系统调研 — 搜集 MILWRM、F-SEG、Deep Contrastive Clustering 等方法全貌，专项从消融实验中核实 image-only 的 DLPFC ARI 数值（SpaConTDS=0.16、stLearn=0.11，为目前唯二可查数据），深度调研 BYOL/STEGO/SCAN 在病理学中的应用（尤其 STAIG 用 BYOL 训练图像 encoder 的先例），调研 FGVC/医学影像/遥感/材料科学跨领域类比方案，梳理 CV 社区四级 domain gap 解决框架。 ✅ Foundation Model 在空间域识别失效根因分析 — 从训练数据 domain 不匹配（以癌症组织为主）、预训练任务 mismatch（patch 分类/重建 vs 层间梯度识别）、脑组织层间形态差异极微小、特征冗余、缺乏空间上下文五个维度系统分析失效机制，结合 UNI2 棕色重复 patch 现象提供具体案例支撑。 ✅ Image-Only 聚类增强方案实现（STEGO/BYOL+GAT/SCAN） — 完成五阶段实施：修改基础设施（run_benchmark.py、config.yaml 等 5 个文件）→ 新建 STEGOHead/BYOLAdapter/SpatialGATRefiner/SCANHead 四个模型文件（全部通过 AST 语法验证）→ 新建 eval_image_only.py 在 151673 section 对比测试 → 更新 models/init.py 懒加载和配置集成。SCAN 以 ARI=0.303 最优（baseline 0.251，+20.6%）。 🔄 SCAN 嵌入与多模态 Fusion 联合评估 — 编写 eval_scan_fusion.py，将 SCAN 优化后的 256 维视觉嵌入与 PCA 基因特征做所有 fusion 方法对比；mean fusion ARI +0.065，llava_mlp fusion +0.018，证明互补性。coords 维度 bug 已部分修复，脚本调试中。 🔄 ENHANCEMENT_PLAN_CN.md 大目标 7 更新及 Image Encoder 增强方案规划 — 将全天调研成果（文献综述、根因分析、六类方案、BYOL 详解、五阶段实施路线、风险与验证计划）写入 ENHANCEMENT_PLAN_CN.md（~400 行扩展至 907 行）；并行通过三个 agent 分析 ImageEncoder.py/spatial_utils.py/datasets.py 架构并生成实施计划，后续实施尚未开始。 实现与修复 ✅ UNI2 可视化添加 H\u0026E 面板并批量更新 — 修改 scripts/run_benchmark.py 可视化函数为 1×3 布局（H\u0026E + GT + 预测），修复 151510 缺少 tissue_lowres_image.png 的问题（创建 hires→lowres symlink），利用缓存 .npz 文件批量重新生成全部 11 个 section 可视化，无需重新推理。 问题与解决方案 关键问题 1. STEGO 训练 loss 全程为 NaN，模型无法收敛 解决方案: 两步修复：① 对输入 image_emb 做 L2 归一化防止幅度过大；② 将 InfoNCE 改为数值稳定版本（先减去行最大值再做 logsumexp），temperature 提高至 0.1\n关键洞察: 3639×3639 dense 相似度矩阵除以 temperature=0.07 后指数运算在 float32 精度下溢出；log-sum-exp 是彻底解决方案，大规模对比损失计算必须使用此形式\n2. MILWRM 被错误归类为 Image-Only 方法，且 AI 初次汇总时将多模态方法混入 image-only 结果，导致第一版调研结论需大幅修订 解决方案: 通过 WebFetch 阅读 PMC 全文确认 MILWRM 实际基于基因表达，将其从 image-only 列表移除；结合用户两次明确的边界约束，重新聚焦于纯图像场景并专门从消融实验中挖掘 image-only 数据点\n关键洞察: 文献摘要描述常具误导性，需阅读全文方法部分确认输入模态；大多数多模态方法的消融实验从不测 image-only，需专门从 SpaConTDS 等少数文章中定向检索\n一般问题 3. 付费学术期刊（Nature Medicine、Elsevier 等）返回 303/403，及论文图表中嵌入数值无法通过网页文本提取 解决方案: 转而使用 PMC 全文镜像、arXiv HTML 版本、HuggingFace 模型卡及 GitHub README 作为替代来源；图表嵌入数值无法获取时，改用文字定性结论并明确标注数据来源和置信度\n关键洞察: PMC 和 arXiv HTML 是访问付费期刊的有效路径；关键模型性能数值通常已在 GitHub README 中完整列出，应优先检索；无法获取精确数值时，定性结论加来源标注优于推测\n4. eval_scan_fusion.py 中空间坐标维度异常（变成 (1,2)），多个 fusion 方法（basic_contrastive/qformer/staig_fusion）报错 解决方案: 放弃调用 load_spatial_coordinates()（barcode 匹配失败），改为直接从 adata.obsm[‘spatial’] 读取坐标；同时修复 load_dlpfc_data 返回值解包错误（函数返回单值而非元组）\n关键洞察: 依赖 barcode 精确匹配的工具函数跨数据源时容易失败；直接访问 AnnData 原生字段更可靠，调用项目内部函数前应实时核验函数签名\n5. AI 在文档任务中反复触发 ExitPlanMode（被拒绝两次），以及默认使用 CPU 进行模型验证，导致不必要的交互摩擦和效率损失 解决方案: 用户明确指示后，纯文档写入任务直接调用 Write 工具；所有模型验证改在 GPU 上运行，三个方法并行后台执行大幅缩短总耗时\n关键洞察: 在 HPC 环境中 GPU 是默认计算设备，CPU 测试会掩盖真实性能问题；纯文档任务不需要「计划→退出计划」流程\n6. 重新生成可视化时需避免重跑 UNI2 推理（耗时数小时），以及 151510 缺少 tissue_lowres_image.png 解决方案: 发现 .npz 缓存文件中已保存 pred_labels 和 gt_labels，直接加载后调用修改后的可视化函数，11/11 section 全部成功；151510 通过创建 hires→lowres symlink 修复\n关键洞察: MIHD 的缓存设计（embedding+labels 一起保存）使可视化更新与推理完全解耦；sc.read_visium 默认寻找 lowres 图，hires 用软链接替代是最小改动方案\n人类思路 vs AI 思路 战略层面 监督分类与无监督聚类的本质等价性 角色 思路 人类 用户直觉上指出「UNI 的 CRC-100K 9类分类不就是 clustering 吗？」，从任务本质打破了论文的分类框架，主动建立了 UNI 评测与 MIHD 空间域识别之间的类比关系。 AI AI 按照论文分类框架（ROI 分类/聚类/分割/检索）进行详细描述，未主动发现两者的本质联系；被提示后解释了监督（linear probe）与无监督（KMeans）的关键区别，并指出这是一个文献空白。 差异分析: 人类从任务本质出发突破了论文框架；AI 停留在文献描述体系内。这一洞察完全由人类主动提出，是本次最重要的认知差异，揭示了 UNI 高准确率不能直接推断无监督聚类效果。\n从消融研究定向获取 Image-Only 量化数据 角色 思路 人类 用户主动提问「这些文章的 ablation study 里有 image-only 的部分吗？」——这一策略直接找到了 SpaConTDS ARI=0.16 等为数不多的精确数字。 AI AI 起初搜索专门做 image-only 的独立论文，方向正确但遗漏了多模态方法消融实验中的 image-only baseline 这一重要来源。 差异分析: 人类对论文结构（消融实验往往包含模态对比）有更强的直觉，能精准定向；AI 的检索策略偏宏观，需用户引导才能聚焦到最有效的信息来源。\nSCAN 嵌入与全 Fusion 联合评估的系统化实验设计 角色 思路 人类 在三方法对比完成后，用户主动提出将 SCAN 优化嵌入与所有 fusion 方法（含 staig_fusion）联合评估，设计了「先独立评估视觉嵌入质量，再探索与基因特征互补性」的系统化消融实验。 AI AI 在完成三方法对比后准备收尾，未主动提出扩展实验；实验设计的前瞻性不及用户。 差异分析: 用户具有清晰的实验设计思维，能主动识别独立性评估与融合互补性验证的两阶段逻辑；AI 倾向于完成当前目标后停止，缺乏主动延伸的研究视野。\n研究边界精确界定与可视化需求主导 角色 思路 人类 用户两次明确打断 AI（「我只要 image-only 的方法/部分」），同时主动提出在可视化中添加 H\u0026E 原图作为形态学参照，以便直观解释棕色重复 patch 的生物学含义。 AI AI 初次汇总时习惯性提供多模态全景视图；在可视化实现中只输出 GT+预测双面板，未主动建议添加原始图像。 差异分析: 人类研究者对研究边界和分析目标有明确先验认知；AI 倾向于提供更完整背景而忽视约束，关键细节需求（形态对比）由人类主导提出。\nBYOL 与 STAIG 关联的领域知识触发 角色 思路 人类 用户主动提出「我记得有个方法使用了 BYOL」，将 AI 引向了 STAIG 使用 BYOL 在目标数据集上做无监督域适配这一关键先例。 AI 在梳理六种无监督方案时，AI 未主动关联 BYOL 与 STAIG 的已知联系，将 BYOL 列为通用选项之一，未凸显其在 ST 领域的已有实践。 差异分析: 用户的领域先验知识触发了更精准的信息检索；AI 的知识库中存在此关联但未被主动激活，需要外部线索触发。\nAI 局限性 重要局限 文献归类与知识关联的准确性不足：将 MILWRM 错误归类为 image-only 方法（实际基于基因表达），需要 WebFetch 全文阅读才自我纠正；描述 UNI 评测任务时未主动建立与 MIHD 空间域识别的类比关系；整理无监督方案时未主动激活 BYOL→STAIG 的已知联系。三者均需用户干预才能触发或纠正。 技术实现的预见性不足：STEGO 数值稳定性问题（3639×3639 dense 矩阵的 float32 精度边界）未在初始设计阶段预见；eval_scan_fusion.py 多次出现 API 使用错误（函数签名/返回值解包），倾向于依赖记忆而非实时读取源码核验。 任务约束感知不足与流程误判：初次汇总忽视用户核心约束（image-only），导致第一版需大幅修订；在文档任务中反复触发 ExitPlanMode（被拒绝两次）；默认使用 CPU 进行 HPC 环境的模型验证。均造成额外交互摩擦。 一般局限 无法访问付费期刊全文，以及无法提取论文中嵌入图片/图表的具体数值（F-SEG F1 曲线、MILWRM DLPFC ARI 散点图等），导致部分定量数据缺失，只能依赖定性结论或间接来源。 今日收获 核心收获 纯 Image-Only 在 DLPFC 精细分层任务上 ARI 仅 0.11–0.16（多模态可达 0.45–0.64），这是脑组织层间形态学差异极小与 foundation model 训练 domain 不匹配的综合结果，而非 encoder 质量问题；多模态方法的消融实验几乎从不单独测试 image-only（基因表达被视为核心），这本身是一个值得关注的 research gap。 Foundation Model 在空间域识别上失效的五大根因：① 训练以癌症组织为主（domain gap）；② 预训练任务（patch 分类/重建）与层间梯度识别不匹配；③ 脑皮层层间形态差异极微小；④ 图像特征与基因表达高度冗余；⑤ 单 patch 独立编码缺乏空间位置上下文。UNI2 棕色重复 patch 现象是根因①③的直接体现。 SCAN 在 image-only 空间转录组场景中 ARI 最优（0.303 vs baseline 0.251，+20.6%），其核心优势是离线特征 k-NN 挖掘解耦了嵌入学习与聚类，避免了 STEGO 的数值不稳定性；其 256 维优化嵌入与基因特征融合具有真实互补性（mean fusion +0.065，llava_mlp +0.018 ARI）。 STAIG 使用 BYOL 在目标数据集 H\u0026E patch 上做无监督域适配（训练后丢弃 projector/predictor，保留 encoder 特征）是将无监督域适配引入空间转录组的直接先例；BYOL 无需负样本的设计对小 batch ST 场景（每 section 数千 patch）天然友好，且对 H\u0026E 染色变异鲁棒。 大规模 dense 相似度矩阵（n\u003e3000）计算 InfoNCE 对比损失时，必须使用数值稳定的 log-sum-exp（减去行最大值），否则在 float32 精度下 temperature=0.07 的指数运算会溢出导致 NaN；这是 HPC 大规模对比学习实现的关键工程约束。 CV 社区处理「domain gap + 细粒度任务 + 无标注」的四级共识框架：Level 1 直接用预训练特征聚类 → Level 2 STEGO/SCAN 特征精炼 → Level 3 域内 SSL 重新预训练（BYOL/MAE）→ Level 4 专属 foundation model；应按计算资源约束选择合适级别。GPFM/CHIEF 是空间域识别 ARI 最优 PFM；UNI2 是 spot 检索最优；224×224 是行业标准 patch 尺寸。 UNI 原论文 34 个监督评测任务（linear probe）与 MIHD 无监督聚类（KMeans）在任务本质上相同，但评估方式不同，UNI 的高准确率不能直接推断无监督聚类效果；HEST-1k 证明 PFM 大小与空间基因表达预测性能呈对数关系（R=0.81），病理专用 PFM 比 ResNet50 高约 8.2%（Pearson r）。 spEMO 文献综述发现：GPFM/CHIEF 在空间域识别聚类 ARI 最优；UNI2 在 spot 检索排名相关性最优；224×224 是行业主流 patch 尺寸，与 MIHD 一致。这为 MIHD 的 encoder 选型提供了有据可查的文献支撑。 会话摘要 ✅ 技术文档体系建立与 UNI2 可视化扩展（RM-IDEAL / 视觉编码器指南 / 文献综述 / UNI2 评测分析） 2026-02-19 | claude_code 上午会话聚焦于 MIHD 技术文档建设：创建 RM-IDEAL 双语结构文档、12 章节视觉编码器使用指南（含 UNI2/UNI/HIPT/ResNet50 对比）、病理 PFM 文献综述（spEMO/HEST-1k/STAIG 等），及 UNI/UNI2 原论文评测任务综合分析（34 任务 + 8 个 benchmark）。期间通过大量联网文献检索核实各方法性能数据，并在用户发现棕色重复 patch 异常后，将 UNI2 聚类可视化从双面板扩展为含 H\u0026E 原图的三面板布局，利用缓存 .npz 批量重新生成全部 11 个 section 可视化（修复 151510 symlink 问题后全部成功）。\n✅ H\u0026E Image-Only 聚类方法深度调研与 ENHANCEMENT_PLAN_CN.md 大目标 7 更新 2026-02-19 | claude_code 下午前段系统调研纯图像空间域聚类方法：多轮联网检索核实 image-only DLPFC ARI 量化基线（SpaConTDS=0.16、stLearn=0.11），用户两次纠正边界约束后精准聚焦于 image-only 场景。从五个维度分析 foundation model 失效根因，调研 FGVC/医学影像/遥感等跨领域类比方案，在用户提示下深度剖析 BYOL 在 STAIG 中的域适配应用（无负样本设计对 ST 小 batch 的天然优势）。将全部调研成果（约 500 行）写入 ENHANCEMENT_PLAN_CN.md 大目标 7，文件从约 400 行扩展至 907 行。\n🔄 Image-Only 聚类增强三方案实现（STEGO/BYOL+GAT/SCAN）及 SCAN Fusion 联合评估 2026-02-19 | claude_code 下午后段完成五阶段实施：修改基础设施文件 → 新建四个模型文件（STEGOHead/BYOLAdapter/SpatialGATRefiner/SCANHead）→ 在 GPU 上于 151673 section 对比四种方法（SCAN ARI=0.303 最优，修复 STEGO NaN loss 后全部方法正常运行）→ 完成集成配置。随后开始编写 eval_scan_fusion.py 进行 SCAN 嵌入与多模态 fusion 联合评估（mean fusion +0.065 ARI，验证互补性），修复 coords 维度 bug；同时通过三个并行 agent 分析 image encoder 增强架构并生成实施计划，待后续开始实施。\nToken 用量 总览 指标 数值 总 Token 3,152,997 输入 Token 10,779 输出 Token 9,386 Cache 创建 399,815 Cache 读取 2,733,017 Cache 命中率 87.2% 总费用 (USD) $2.1354 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 17 9,258 105,702 914,790 $1.3496 63.2% claude-haiku-4-5-20251001 10,752 99 228,410 1,515,992 $0.4484 21.0% claude-sonnet-4-6 10 29 65,703 302,235 $0.3375 15.8% ",
+  "wordCount" : "886",
+  "inLanguage": "zh",
+  "datePublished": "2026-02-19T00:00:00-05:00",
+  "dateModified": "2026-02-19T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/daily/2026-02-19/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                    <ul class="lang-switch"><li>|</li>
+                        <li>
+                            <a href="https://tzj2006.github.io/" title="English"
+                                aria-label="English">English</a>
+                        </li>
+                    </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/zh/">主页</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/daily/">每日摘要</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-19
+    </h1>
+    <div class="post-meta"><span title='2026-02-19 00:00:00 -0500 EST'>2026年2月19日</span>&nbsp;·&nbsp;<span>5 分钟</span>&nbsp;|&nbsp;<span>语言:</span>
+<ul class="i18n_list">
+    <li>
+        <a href="https://tzj2006.github.io/bugjournal/daily/2026-02-19/">English</a>
+    </li>
+</ul>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-19">日报 — 2026-02-19<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-19">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 系统开展了 MIHD 项目三大工作：技术文档体系建立（RM-IDEAL 双语说明、视觉编码器指南、病理 PFM 文献综述、UNI/UNI2 评测分析），H&amp;E Image-Only 聚类方法深度调研（含量化基线、Foundation Model 失效根因分析及 ENHANCEMENT_PLAN_CN.md 大目标 7 更新），以及三种 image-only 自监督聚类增强方案（STEGO/BYOL+GAT/SCAN）的完整实现与对比验证。</li>
+<li><strong>怎么做的：</strong> 通过大量学术文献网络检索（spEMO、HEST-1k、STAIG 等）与代码库深度探索，新建五个模型文件及修改基础设施文件，在 GPU 上完成多方法对比实验，同时利用缓存 .npz 文件批量重新生成 UNI2 可视化，并将所有调研结论整理写入 ENHANCEMENT_PLAN_CN.md。</li>
+<li><strong>有什么用：</strong> SCAN 方法将 image-only ARI 从基线 0.251 提升至 0.303（+20.6%），其嵌入与基因特征融合可进一步提升 +0.065 ARI；系统调研填补了文献中几乎无 vision-only 空间域识别评测的空白，为项目建立了可参考的文献对标基准与完整的多阶段增强路线图。</li>
+</ul>
+<blockquote>
+<p>在 MIHD 项目中，系统完成了 H&amp;E Image-Only 聚类方法文献调研（确立 ARI 0.11–0.16 基线及 Foundation Model 失效五大根因）、四份核心技术文档建立，并实现并验证了三种自监督聚类增强方案（STEGO/BYOL+GAT/SCAN），SCAN 将 image-only ARI 从 0.251 提升至 0.303（+20.6%）。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>MIHD 技术文档体系建立</strong> — 创建四份核心技术文档：RM-IDEAL 双语结构文档（WWL 图核、Wasserstein 最优传输、与 ARI/NMI 的互补关系）、视觉编码器使用指南（12 章节端到端流水线，含 UNI2/UNI/HIPT/ResNet50 详细对比）、病理 PFM 文献综述（spEMO/HEST-1k/STAIG 等方法的 patch 提取策略与 encoder 选型）、UNI/UNI2 原论文评测分析（34 个临床任务 + 8 个 benchmark 综合文档）。</li>
+<li>✅ <strong>H&amp;E Image-Only 聚类方法系统调研</strong> — 搜集 MILWRM、F-SEG、Deep Contrastive Clustering 等方法全貌，专项从消融实验中核实 image-only 的 DLPFC ARI 数值（SpaConTDS=0.16、stLearn=0.11，为目前唯二可查数据），深度调研 BYOL/STEGO/SCAN 在病理学中的应用（尤其 STAIG 用 BYOL 训练图像 encoder 的先例），调研 FGVC/医学影像/遥感/材料科学跨领域类比方案，梳理 CV 社区四级 domain gap 解决框架。</li>
+<li>✅ <strong>Foundation Model 在空间域识别失效根因分析</strong> — 从训练数据 domain 不匹配（以癌症组织为主）、预训练任务 mismatch（patch 分类/重建 vs 层间梯度识别）、脑组织层间形态差异极微小、特征冗余、缺乏空间上下文五个维度系统分析失效机制，结合 UNI2 棕色重复 patch 现象提供具体案例支撑。</li>
+<li>✅ <strong>Image-Only 聚类增强方案实现（STEGO/BYOL+GAT/SCAN）</strong> — 完成五阶段实施：修改基础设施（run_benchmark.py、config.yaml 等 5 个文件）→ 新建 STEGOHead/BYOLAdapter/SpatialGATRefiner/SCANHead 四个模型文件（全部通过 AST 语法验证）→ 新建 eval_image_only.py 在 151673 section 对比测试 → 更新 models/<strong>init</strong>.py 懒加载和配置集成。SCAN 以 ARI=0.303 最优（baseline 0.251，+20.6%）。</li>
+<li>🔄 <strong>SCAN 嵌入与多模态 Fusion 联合评估</strong> — 编写 eval_scan_fusion.py，将 SCAN 优化后的 256 维视觉嵌入与 PCA 基因特征做所有 fusion 方法对比；mean fusion ARI +0.065，llava_mlp fusion +0.018，证明互补性。coords 维度 bug 已部分修复，脚本调试中。</li>
+<li>🔄 <strong>ENHANCEMENT_PLAN_CN.md 大目标 7 更新及 Image Encoder 增强方案规划</strong> — 将全天调研成果（文献综述、根因分析、六类方案、BYOL 详解、五阶段实施路线、风险与验证计划）写入 ENHANCEMENT_PLAN_CN.md（~400 行扩展至 907 行）；并行通过三个 agent 分析 ImageEncoder.py/spatial_utils.py/datasets.py 架构并生成实施计划，后续实施尚未开始。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>UNI2 可视化添加 H&amp;E 面板并批量更新</strong> — 修改 scripts/run_benchmark.py 可视化函数为 1×3 布局（H&amp;E + GT + 预测），修复 151510 缺少 tissue_lowres_image.png 的问题（创建 hires→lowres symlink），利用缓存 .npz 文件批量重新生成全部 11 个 section 可视化，无需重新推理。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-stego-训练-loss-全程为-nan模型无法收敛">1. STEGO 训练 loss 全程为 NaN，模型无法收敛<a hidden class="anchor" aria-hidden="true" href="#1-stego-训练-loss-全程为-nan模型无法收敛">#</a></h4>
+<p><strong>解决方案:</strong> 两步修复：① 对输入 image_emb 做 L2 归一化防止幅度过大；② 将 InfoNCE 改为数值稳定版本（先减去行最大值再做 logsumexp），temperature 提高至 0.1</p>
+<p><strong>关键洞察:</strong> 3639×3639 dense 相似度矩阵除以 temperature=0.07 后指数运算在 float32 精度下溢出；log-sum-exp 是彻底解决方案，大规模对比损失计算必须使用此形式</p>
+<h4 id="2-milwrm-被错误归类为-image-only-方法且-ai-初次汇总时将多模态方法混入-image-only-结果导致第一版调研结论需大幅修订">2. MILWRM 被错误归类为 Image-Only 方法，且 AI 初次汇总时将多模态方法混入 image-only 结果，导致第一版调研结论需大幅修订<a hidden class="anchor" aria-hidden="true" href="#2-milwrm-被错误归类为-image-only-方法且-ai-初次汇总时将多模态方法混入-image-only-结果导致第一版调研结论需大幅修订">#</a></h4>
+<p><strong>解决方案:</strong> 通过 WebFetch 阅读 PMC 全文确认 MILWRM 实际基于基因表达，将其从 image-only 列表移除；结合用户两次明确的边界约束，重新聚焦于纯图像场景并专门从消融实验中挖掘 image-only 数据点</p>
+<p><strong>关键洞察:</strong> 文献摘要描述常具误导性，需阅读全文方法部分确认输入模态；大多数多模态方法的消融实验从不测 image-only，需专门从 SpaConTDS 等少数文章中定向检索</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="3-付费学术期刊nature-medicineelsevier-等返回-303403及论文图表中嵌入数值无法通过网页文本提取">3. 付费学术期刊（Nature Medicine、Elsevier 等）返回 303/403，及论文图表中嵌入数值无法通过网页文本提取<a hidden class="anchor" aria-hidden="true" href="#3-付费学术期刊nature-medicineelsevier-等返回-303403及论文图表中嵌入数值无法通过网页文本提取">#</a></h4>
+<p><strong>解决方案:</strong> 转而使用 PMC 全文镜像、arXiv HTML 版本、HuggingFace 模型卡及 GitHub README 作为替代来源；图表嵌入数值无法获取时，改用文字定性结论并明确标注数据来源和置信度</p>
+<p><strong>关键洞察:</strong> PMC 和 arXiv HTML 是访问付费期刊的有效路径；关键模型性能数值通常已在 GitHub README 中完整列出，应优先检索；无法获取精确数值时，定性结论加来源标注优于推测</p>
+<h4 id="4-eval_scan_fusionpy-中空间坐标维度异常变成-12多个-fusion-方法basic_contrastiveqformerstaig_fusion报错">4. eval_scan_fusion.py 中空间坐标维度异常（变成 (1,2)），多个 fusion 方法（basic_contrastive/qformer/staig_fusion）报错<a hidden class="anchor" aria-hidden="true" href="#4-eval_scan_fusionpy-中空间坐标维度异常变成-12多个-fusion-方法basic_contrastiveqformerstaig_fusion报错">#</a></h4>
+<p><strong>解决方案:</strong> 放弃调用 load_spatial_coordinates()（barcode 匹配失败），改为直接从 adata.obsm[&lsquo;spatial&rsquo;] 读取坐标；同时修复 load_dlpfc_data 返回值解包错误（函数返回单值而非元组）</p>
+<p><strong>关键洞察:</strong> 依赖 barcode 精确匹配的工具函数跨数据源时容易失败；直接访问 AnnData 原生字段更可靠，调用项目内部函数前应实时核验函数签名</p>
+<h4 id="5-ai-在文档任务中反复触发-exitplanmode被拒绝两次以及默认使用-cpu-进行模型验证导致不必要的交互摩擦和效率损失">5. AI 在文档任务中反复触发 ExitPlanMode（被拒绝两次），以及默认使用 CPU 进行模型验证，导致不必要的交互摩擦和效率损失<a hidden class="anchor" aria-hidden="true" href="#5-ai-在文档任务中反复触发-exitplanmode被拒绝两次以及默认使用-cpu-进行模型验证导致不必要的交互摩擦和效率损失">#</a></h4>
+<p><strong>解决方案:</strong> 用户明确指示后，纯文档写入任务直接调用 Write 工具；所有模型验证改在 GPU 上运行，三个方法并行后台执行大幅缩短总耗时</p>
+<p><strong>关键洞察:</strong> 在 HPC 环境中 GPU 是默认计算设备，CPU 测试会掩盖真实性能问题；纯文档任务不需要「计划→退出计划」流程</p>
+<h4 id="6-重新生成可视化时需避免重跑-uni2-推理耗时数小时以及-151510-缺少-tissue_lowres_imagepng">6. 重新生成可视化时需避免重跑 UNI2 推理（耗时数小时），以及 151510 缺少 tissue_lowres_image.png<a hidden class="anchor" aria-hidden="true" href="#6-重新生成可视化时需避免重跑-uni2-推理耗时数小时以及-151510-缺少-tissue_lowres_imagepng">#</a></h4>
+<p><strong>解决方案:</strong> 发现 .npz 缓存文件中已保存 pred_labels 和 gt_labels，直接加载后调用修改后的可视化函数，11/11 section 全部成功；151510 通过创建 hires→lowres symlink 修复</p>
+<p><strong>关键洞察:</strong> MIHD 的缓存设计（embedding+labels 一起保存）使可视化更新与推理完全解耦；sc.read_visium 默认寻找 lowres 图，hires 用软链接替代是最小改动方案</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="监督分类与无监督聚类的本质等价性">监督分类与无监督聚类的本质等价性<a hidden class="anchor" aria-hidden="true" href="#监督分类与无监督聚类的本质等价性">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户直觉上指出「UNI 的 CRC-100K 9类分类不就是 clustering 吗？」，从任务本质打破了论文的分类框架，主动建立了 UNI 评测与 MIHD 空间域识别之间的类比关系。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 按照论文分类框架（ROI 分类/聚类/分割/检索）进行详细描述，未主动发现两者的本质联系；被提示后解释了监督（linear probe）与无监督（KMeans）的关键区别，并指出这是一个文献空白。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类从任务本质出发突破了论文框架；AI 停留在文献描述体系内。这一洞察完全由人类主动提出，是本次最重要的认知差异，揭示了 UNI 高准确率不能直接推断无监督聚类效果。</p>
+<h4 id="从消融研究定向获取-image-only-量化数据">从消融研究定向获取 Image-Only 量化数据<a hidden class="anchor" aria-hidden="true" href="#从消融研究定向获取-image-only-量化数据">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户主动提问「这些文章的 ablation study 里有 image-only 的部分吗？」——这一策略直接找到了 SpaConTDS ARI=0.16 等为数不多的精确数字。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 起初搜索专门做 image-only 的独立论文，方向正确但遗漏了多模态方法消融实验中的 image-only baseline 这一重要来源。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类对论文结构（消融实验往往包含模态对比）有更强的直觉，能精准定向；AI 的检索策略偏宏观，需用户引导才能聚焦到最有效的信息来源。</p>
+<h4 id="scan-嵌入与全-fusion-联合评估的系统化实验设计">SCAN 嵌入与全 Fusion 联合评估的系统化实验设计<a hidden class="anchor" aria-hidden="true" href="#scan-嵌入与全-fusion-联合评估的系统化实验设计">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>在三方法对比完成后，用户主动提出将 SCAN 优化嵌入与所有 fusion 方法（含 staig_fusion）联合评估，设计了「先独立评估视觉嵌入质量，再探索与基因特征互补性」的系统化消融实验。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 在完成三方法对比后准备收尾，未主动提出扩展实验；实验设计的前瞻性不及用户。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户具有清晰的实验设计思维，能主动识别独立性评估与融合互补性验证的两阶段逻辑；AI 倾向于完成当前目标后停止，缺乏主动延伸的研究视野。</p>
+<h4 id="研究边界精确界定与可视化需求主导">研究边界精确界定与可视化需求主导<a hidden class="anchor" aria-hidden="true" href="#研究边界精确界定与可视化需求主导">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户两次明确打断 AI（「我只要 image-only 的方法/部分」），同时主动提出在可视化中添加 H&amp;E 原图作为形态学参照，以便直观解释棕色重复 patch 的生物学含义。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 初次汇总时习惯性提供多模态全景视图；在可视化实现中只输出 GT+预测双面板，未主动建议添加原始图像。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类研究者对研究边界和分析目标有明确先验认知；AI 倾向于提供更完整背景而忽视约束，关键细节需求（形态对比）由人类主导提出。</p>
+<h4 id="byol-与-staig-关联的领域知识触发">BYOL 与 STAIG 关联的领域知识触发<a hidden class="anchor" aria-hidden="true" href="#byol-与-staig-关联的领域知识触发">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户主动提出「我记得有个方法使用了 BYOL」，将 AI 引向了 STAIG 使用 BYOL 在目标数据集上做无监督域适配这一关键先例。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>在梳理六种无监督方案时，AI 未主动关联 BYOL 与 STAIG 的已知联系，将 BYOL 列为通用选项之一，未凸显其在 ST 领域的已有实践。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户的领域先验知识触发了更精准的信息检索；AI 的知识库中存在此关联但未被主动激活，需要外部线索触发。</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>文献归类与知识关联的准确性不足：将 MILWRM 错误归类为 image-only 方法（实际基于基因表达），需要 WebFetch 全文阅读才自我纠正；描述 UNI 评测任务时未主动建立与 MIHD 空间域识别的类比关系；整理无监督方案时未主动激活 BYOL→STAIG 的已知联系。三者均需用户干预才能触发或纠正。</li>
+<li>技术实现的预见性不足：STEGO 数值稳定性问题（3639×3639 dense 矩阵的 float32 精度边界）未在初始设计阶段预见；eval_scan_fusion.py 多次出现 API 使用错误（函数签名/返回值解包），倾向于依赖记忆而非实时读取源码核验。</li>
+<li>任务约束感知不足与流程误判：初次汇总忽视用户核心约束（image-only），导致第一版需大幅修订；在文档任务中反复触发 ExitPlanMode（被拒绝两次）；默认使用 CPU 进行 HPC 环境的模型验证。均造成额外交互摩擦。</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>无法访问付费期刊全文，以及无法提取论文中嵌入图片/图表的具体数值（F-SEG F1 曲线、MILWRM DLPFC ARI 散点图等），导致部分定量数据缺失，只能依赖定性结论或间接来源。</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>纯 Image-Only 在 DLPFC 精细分层任务上 ARI 仅 0.11–0.16（多模态可达 0.45–0.64），这是脑组织层间形态学差异极小与 foundation model 训练 domain 不匹配的综合结果，而非 encoder 质量问题；多模态方法的消融实验几乎从不单独测试 image-only（基因表达被视为核心），这本身是一个值得关注的 research gap。</li>
+<li>Foundation Model 在空间域识别上失效的五大根因：① 训练以癌症组织为主（domain gap）；② 预训练任务（patch 分类/重建）与层间梯度识别不匹配；③ 脑皮层层间形态差异极微小；④ 图像特征与基因表达高度冗余；⑤ 单 patch 独立编码缺乏空间位置上下文。UNI2 棕色重复 patch 现象是根因①③的直接体现。</li>
+<li>SCAN 在 image-only 空间转录组场景中 ARI 最优（0.303 vs baseline 0.251，+20.6%），其核心优势是离线特征 k-NN 挖掘解耦了嵌入学习与聚类，避免了 STEGO 的数值不稳定性；其 256 维优化嵌入与基因特征融合具有真实互补性（mean fusion +0.065，llava_mlp +0.018 ARI）。</li>
+<li>STAIG 使用 BYOL 在目标数据集 H&amp;E patch 上做无监督域适配（训练后丢弃 projector/predictor，保留 encoder 特征）是将无监督域适配引入空间转录组的直接先例；BYOL 无需负样本的设计对小 batch ST 场景（每 section 数千 patch）天然友好，且对 H&amp;E 染色变异鲁棒。</li>
+<li>大规模 dense 相似度矩阵（n&gt;3000）计算 InfoNCE 对比损失时，必须使用数值稳定的 log-sum-exp（减去行最大值），否则在 float32 精度下 temperature=0.07 的指数运算会溢出导致 NaN；这是 HPC 大规模对比学习实现的关键工程约束。</li>
+<li>CV 社区处理「domain gap + 细粒度任务 + 无标注」的四级共识框架：Level 1 直接用预训练特征聚类 → Level 2 STEGO/SCAN 特征精炼 → Level 3 域内 SSL 重新预训练（BYOL/MAE）→ Level 4 专属 foundation model；应按计算资源约束选择合适级别。GPFM/CHIEF 是空间域识别 ARI 最优 PFM；UNI2 是 spot 检索最优；224×224 是行业标准 patch 尺寸。</li>
+<li>UNI 原论文 34 个监督评测任务（linear probe）与 MIHD 无监督聚类（KMeans）在任务本质上相同，但评估方式不同，UNI 的高准确率不能直接推断无监督聚类效果；HEST-1k 证明 PFM 大小与空间基因表达预测性能呈对数关系（R=0.81），病理专用 PFM 比 ResNet50 高约 8.2%（Pearson r）。</li>
+<li>spEMO 文献综述发现：GPFM/CHIEF 在空间域识别聚类 ARI 最优；UNI2 在 spot 检索排名相关性最优；224×224 是行业主流 patch 尺寸，与 MIHD 一致。这为 MIHD 的 encoder 选型提供了有据可查的文献支撑。</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<p><strong>✅ 技术文档体系建立与 UNI2 可视化扩展（RM-IDEAL / 视觉编码器指南 / 文献综述 / UNI2 评测分析）</strong>
+<em>2026-02-19 | claude_code</em>
+上午会话聚焦于 MIHD 技术文档建设：创建 RM-IDEAL 双语结构文档、12 章节视觉编码器使用指南（含 UNI2/UNI/HIPT/ResNet50 对比）、病理 PFM 文献综述（spEMO/HEST-1k/STAIG 等），及 UNI/UNI2 原论文评测任务综合分析（34 任务 + 8 个 benchmark）。期间通过大量联网文献检索核实各方法性能数据，并在用户发现棕色重复 patch 异常后，将 UNI2 聚类可视化从双面板扩展为含 H&amp;E 原图的三面板布局，利用缓存 .npz 批量重新生成全部 11 个 section 可视化（修复 151510 symlink 问题后全部成功）。</p>
+<p><strong>✅ H&amp;E Image-Only 聚类方法深度调研与 ENHANCEMENT_PLAN_CN.md 大目标 7 更新</strong>
+<em>2026-02-19 | claude_code</em>
+下午前段系统调研纯图像空间域聚类方法：多轮联网检索核实 image-only DLPFC ARI 量化基线（SpaConTDS=0.16、stLearn=0.11），用户两次纠正边界约束后精准聚焦于 image-only 场景。从五个维度分析 foundation model 失效根因，调研 FGVC/医学影像/遥感等跨领域类比方案，在用户提示下深度剖析 BYOL 在 STAIG 中的域适配应用（无负样本设计对 ST 小 batch 的天然优势）。将全部调研成果（约 500 行）写入 ENHANCEMENT_PLAN_CN.md 大目标 7，文件从约 400 行扩展至 907 行。</p>
+<p><strong>🔄 Image-Only 聚类增强三方案实现（STEGO/BYOL+GAT/SCAN）及 SCAN Fusion 联合评估</strong>
+<em>2026-02-19 | claude_code</em>
+下午后段完成五阶段实施：修改基础设施文件 → 新建四个模型文件（STEGOHead/BYOLAdapter/SpatialGATRefiner/SCANHead）→ 在 GPU 上于 151673 section 对比四种方法（SCAN ARI=0.303 最优，修复 STEGO NaN loss 后全部方法正常运行）→ 完成集成配置。随后开始编写 eval_scan_fusion.py 进行 SCAN 嵌入与多模态 fusion 联合评估（mean fusion +0.065 ARI，验证互补性），修复 coords 维度 bug；同时通过三个并行 agent 分析 image encoder 增强架构并生成实施计划，待后续开始实施。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>3,152,997</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>10,779</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>9,386</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>399,815</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>2,733,017</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>87.2%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$2.1354</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>17</td>
+          <td>9,258</td>
+          <td>105,702</td>
+          <td>914,790</td>
+          <td>$1.3496</td>
+          <td>63.2%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>10,752</td>
+          <td>99</td>
+          <td>228,410</td>
+          <td>1,515,992</td>
+          <td>$0.4484</td>
+          <td>21.0%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>10</td>
+          <td>29</td>
+          <td>65,703</td>
+          <td>302,235</td>
+          <td>$0.3375</td>
+          <td>15.8%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
