@@ -10,7 +10,7 @@
 <meta name="description" content="Posts - TzJ&#39;s Net">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/zh/posts/">
-<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.c3b562a4103ddad215966d26b061d89cb16e1dade8748d9f57c4abc19a840c1a.css" integrity="sha256-w7VipBA92tIVlm0msGHYnLFuHa3odI2fV8SrwZqEDBo=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://tzj2006.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
@@ -72,7 +72,18 @@
         document.querySelector("html").dataset.theme = 'light';
     }
 
-</script><meta property="og:url" content="https://tzj2006.github.io/zh/posts/">
+</script>
+<script>
+(function() {
+    var stored = localStorage.getItem("pref-lang");
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/zh/posts/">
   <meta property="og:site_name" content="TzJ&#39;s Net">
   <meta property="og:title" content="Posts">
   <meta property="og:locale" content="zh_cn">
@@ -122,13 +133,11 @@
                         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
-                </button>
-                    <ul class="lang-switch"><li>|</li>
-                        <li>
-                            <a href="https://tzj2006.github.io/posts/" title="English"
-                                aria-label="English">English</a>
-                        </li>
-                    </ul>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="zh"
+                        data-translation-url="https://tzj2006.github.io/posts/">EN
+                    </button>
             </div>
         </div>
         <ul id="menu">
@@ -217,6 +226,20 @@
         <path d="M12 6H0l6-6z" />
     </svg>
 </a>
+<script>
+document.getElementById("lang-toggle").addEventListener("click", function() {
+    var current = this.getAttribute("data-current-lang");
+    var url = this.getAttribute("data-translation-url");
+    var newLang = (current === "en") ? "zh" : "en";
+    localStorage.setItem("pref-lang", newLang);
+    if (url) {
+        window.location.href = url;
+    } else {
+        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+    }
+});
+</script>
+
 
 <script>
     let menu = document.getElementById('menu');

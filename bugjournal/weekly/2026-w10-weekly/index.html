@@ -10,7 +10,7 @@
 <meta name="description" content="本周跨DCC、天河超算、TzJsDesktop三台设备，并行推进空间转录组研究、机器人操作训练/评估、AI个人助理、论文管理工具四条主线。MIHD项目完成scGPT&#43;UNI2全套融合实验（QFormer avg ARI=0.370，&#43;117% vs scGPT-only）并确立zero-shot跨样本评估框架；Pi0.5 LoRA精调以整体58.9%成功率全面超越BC-RNN（0%），定量验证VLA模型优势；CalendarPro完成从被动响应到主动决策的架构跃升（321个测试全绿），同时暴露并修复BackgroundCoordinator从未启动等关键集成缺陷；gadget Research Scout从零构建到生产就绪，单日内实现两阶段LLM论文评估管线并首次产出3条研究方向建议；error_recovery_benchmark完成65个symlink全量清理和错误场景MP4可视化基础设施建设。本周最重要的工程经验是：测试通过≠系统可用（集成层必须单独验证），以及设计Agentic系统前应主动研究成熟同类项目的架构模式。">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/weekly/2026-w10-weekly/">
-<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.c3b562a4103ddad215966d26b061d89cb16e1dade8748d9f57c4abc19a840c1a.css" integrity="sha256-w7VipBA92tIVlm0msGHYnLFuHa3odI2fV8SrwZqEDBo=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://tzj2006.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
@@ -70,7 +70,18 @@
         document.querySelector("html").dataset.theme = 'light';
     }
 
-</script><meta property="og:url" content="https://tzj2006.github.io/bugjournal/weekly/2026-w10-weekly/">
+</script>
+<script>
+(function() {
+    var stored = localStorage.getItem("pref-lang");
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/weekly/2026-w10-weekly/">
   <meta property="og:site_name" content="TzJ&#39;s Net">
   <meta property="og:title" content="Weekly Summary 2026-W10">
   <meta property="og:description" content="本周跨DCC、天河超算、TzJsDesktop三台设备，并行推进空间转录组研究、机器人操作训练/评估、AI个人助理、论文管理工具四条主线。MIHD项目完成scGPT&#43;UNI2全套融合实验（QFormer avg ARI=0.370，&#43;117% vs scGPT-only）并确立zero-shot跨样本评估框架；Pi0.5 LoRA精调以整体58.9%成功率全面超越BC-RNN（0%），定量验证VLA模型优势；CalendarPro完成从被动响应到主动决策的架构跃升（321个测试全绿），同时暴露并修复BackgroundCoordinator从未启动等关键集成缺陷；gadget Research Scout从零构建到生产就绪，单日内实现两阶段LLM论文评估管线并首次产出3条研究方向建议；error_recovery_benchmark完成65个symlink全量清理和错误场景MP4可视化基础设施建设。本周最重要的工程经验是：测试通过≠系统可用（集成层必须单独验证），以及设计Agentic系统前应主动研究成熟同类项目的架构模式。">
@@ -166,13 +177,11 @@
                         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
-                </button>
-                    <ul class="lang-switch"><li>|</li>
-                        <li>
-                            <a href="https://tzj2006.github.io/zh/" title="中文"
-                                aria-label="中文">中文</a>
-                        </li>
-                    </ul>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="">中文
+                    </button>
             </div>
         </div>
         <ul id="menu">
@@ -669,6 +678,20 @@
         <path d="M12 6H0l6-6z" />
     </svg>
 </a>
+<script>
+document.getElementById("lang-toggle").addEventListener("click", function() {
+    var current = this.getAttribute("data-current-lang");
+    var url = this.getAttribute("data-translation-url");
+    var newLang = (current === "en") ? "zh" : "en";
+    localStorage.setItem("pref-lang", newLang);
+    if (url) {
+        window.location.href = url;
+    } else {
+        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+    }
+});
+</script>
+
 
 <script>
     let menu = document.getElementById('menu');
