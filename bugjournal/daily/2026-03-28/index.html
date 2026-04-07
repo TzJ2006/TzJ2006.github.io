@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-28 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="全天跨 tianhe 与 TzJsDesktop 两台设备、四个项目并行推进：tianhe 完成 error_recovery_benchmark 的 Context Replay 概念重构与代码修复，并修复 LIBERO/BOSS 评估环境资产缺失与零样本设计分析；TzJsDesktop 完成 cchypothesis skill 的智能双轨插桩架构整合，以及 TokenMonitor 应用的 Dashboard 抖动、Rust 编译错误、前端导入失效、窗口锚定四项递进式 Bug 修复。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-28/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.c3b562a4103ddad215966d26b061d89cb16e1dade8748d9f57c4abc19a840c1a.css" integrity="sha256-w7VipBA92tIVlm0msGHYnLFuHa3odI2fV8SrwZqEDBo=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-28/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-28/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-28">
+  <meta property="og:description" content="全天跨 tianhe 与 TzJsDesktop 两台设备、四个项目并行推进：tianhe 完成 error_recovery_benchmark 的 Context Replay 概念重构与代码修复，并修复 LIBERO/BOSS 评估环境资产缺失与零样本设计分析；TzJsDesktop 完成 cchypothesis skill 的智能双轨插桩架构整合，以及 TokenMonitor 应用的 Dashboard 抖动、Rust 编译错误、前端导入失效、窗口锚定四项递进式 Bug 修复。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-28T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-28T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-28">
+  <meta name="twitter:description" content="全天跨 tianhe 与 TzJsDesktop 两台设备、四个项目并行推进：tianhe 完成 error_recovery_benchmark 的 Context Replay 概念重构与代码修复，并修复 LIBERO/BOSS 评估环境资产缺失与零样本设计分析；TzJsDesktop 完成 cchypothesis skill 的智能双轨插桩架构整合，以及 TokenMonitor 应用的 Dashboard 抖动、Rust 编译错误、前端导入失效、窗口锚定四项递进式 Bug 修复。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Daily Summaries",
+      "item": "https://tzj2006.github.io/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-03-28",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-03-28/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-28",
+  "name": "Bug Journal 2026-03-28",
+  "description": "全天跨 tianhe 与 TzJsDesktop 两台设备、四个项目并行推进：tianhe 完成 error_recovery_benchmark 的 Context Replay 概念重构与代码修复，并修复 LIBERO/BOSS 评估环境资产缺失与零样本设计分析；TzJsDesktop 完成 cchypothesis skill 的智能双轨插桩架构整合，以及 TokenMonitor 应用的 Dashboard 抖动、Rust 编译错误、前端导入失效、窗口锚定四项递进式 Bug 修复。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-28 今日概览 做了什么： 跨两台设备在四个项目上完成多项系统性修复与功能整合：Error Recovery Benchmark 的 Context Replay 机制概念层（VLA 叙事清理）与代码层（policy_adapter 时序 + render_window 重命名）双重重构；LIBERO/BOSS 评估环境修复与零样本设计意图分析；cchypothesis skill 的智能双轨插桩架构整合（经 critic agent 11 个对抗问题验证）；TokenMonitor Tauri 应用四项递进式 Bug 修复（Dashboard 1-2Hz 抖动、Rust 42 个编译错误、前端 4 个失效 import、窗口 resize 底边颠倒）。 怎么做的： tianhe 侧通过 ccplan 规划 → Explore subagent 探索 → 批量 grep/Edit 修改 → pytest 验证循环完成 context_replay.py 重构与文档22处清理；再通过 diff 比对资产目录、溯源 form_boss_44_dataset.py 白名单机制确认 benchmark 设计意图。TzJsDesktop 侧通过 ccplan 对抗性规划完成 skill 文档重构；TokenMonitor 侧按根因层次逐步修复，配合 cargo/vitest/svelte-check 全链路验证。 有什么用： 消除 error_recovery_benchmark 中根本性概念错误（VLA context window 误解），代码逻辑与文档达成一致；BOSS 评估管线可正常加载全部任务并正确理解零样本任务的0%预期行为；cchypothesis 获得运行时插桩验证能力；TokenMonitor 从多处 UX 缺陷恢复至 222 Rust + 191 前端测试全部通过、svelte-check 0 错误的稳定可发布状态。 tianhe 做了什么： 完成两个项目：(1) error_recovery_benchmark Context Replay 全面重构——纠正 VLA context window 错误叙事、修复 policy_adapter 时序、删除 observations 死代码、重命名 render_window，并同步7个文件约22处文档；(2) 修复 BOSS benchmark 5个缺失物体资产，并分析确认7个 LIVING_ROOM 零样本任务成功率为0是 benchmark 有意设计的泛化测试。 怎么做的： 使用 ccplan skill 结构化规划，配合 Explore subagent 探索代码库；通过 grep 批量定位并 Edit 工具精确修改，pytest 验证每轮改动（139个单元测试）；LIBERO 侧通过 diff 比对资产目录、查看 form_boss_44_dataset.py 白名单机制确认设计意图。 有什么用： context_replay.py 代码逻辑正确性提升（删死代码、修时序、统一命名），7个文件完成一致性同步更新；BOSS 评估脚本可加载全部44个任务环境；明确7个零样本任务的0%成功率是预期行为而非模型问题。 TzJsDesktop 做了什么： 完成两个项目：(1) cchypothesis skill 重构为智能双轨架构（Phase 3 并行静态 + 串行插桩 + Git Safety Checkpoint + Phase 4 人工确认），经 critic agent 11个对抗问题验证，涉及4个文件 +395/-70行；(2) TokenMonitor 四项递进式 Bug 修复：Dashboard 1-2Hz 抖动（四层正反馈打断）、Rust commands 模块重构遗留42个编译错误、前端4个失效 import 路径、窗口 resize 底边不固定（Win32 API 替换 + 删除动态锚点检测 + IPC 原子命令）。 怎么做的： cchypothesis 侧通过 ccplan 选择方案 C 并批量修改4个技术文档，先发自检后由 critic agent 验证；TokenMonitor 侧按根因层次逐步修复：RESIZE_SETTLE_DELAY + shallowPayloadEqual + 节流阀打断抖动循环，重写 commands.rs 薄模块根解决 Rust 模块歧义，更新 import 路径修复 Vite 解析，删除动态锚点检测改为固定底部锚定并通过后端 IPC 原子处理 resize。 有什么用： cchypothesis 获得运行时插桩验证能力且架构通过严格对抗审查；TokenMonitor 完成从多处 UX 缺陷到全测试通过（222 Rust + 191 前端，svelte-check 0 错误）的完整修复，窗口定位行为符合系统托盘弹窗预期。 全天跨 tianhe 与 TzJsDesktop 两台设备、四个项目并行推进：tianhe 完成 error_recovery_benchmark 的 Context Replay 概念重构与代码修复，并修复 LIBERO/BOSS 评估环境资产缺失与零样本设计分析；TzJsDesktop 完成 cchypothesis skill 的智能双轨插桩架构整合，以及 TokenMonitor 应用的 Dashboard 抖动、Rust 编译错误、前端导入失效、窗口锚定四项递进式 Bug 修复。\n今日任务 架构与策略 ✅ Context Replay 代码逻辑修复（删死代码 + 修正 policy_adapter 时序 + 重命名 render_window） — 删除 observations 死代码列表（收集但从未消费），将 policy_adapter 喂入从 replay 循环内（干净帧阶段）移至 Step F（post-injection 环境稳定后），将 context_window 全局重命名为 render_window（含 ErrorScene 数据结构向后兼容 fallback），更新3个 pipeline 脚本和测试文件，139个单元测试通过。 ✅ 整合插桩调试模式到 cchypothesis skill（智能双轨架构） — 通过 ccplan 选择方案 C，重构 Phase 3 为：Git Safety Checkpoint + 调查分流（static/needs-instrumentation）+ 并行静态分析 + 串行插桩探测（[DEBUG Hx] 标签日志 + 每轮 git restore 清理）+ 汇总；Phase 4 新增 Human Confirmation；新增 Instrumentation Protocol section；解决 critic agent 返回的11个对抗问题；涉及 SKILL.md/cchypothesis.md/diagnostic-schema.md/skills/CLAUDE.md 共4个文件 +395/-70 行。 ✅ TokenMonitor Dashboard 1-2Hz 垂直抖动修复 — 四层并发修复打断 ResizeObserver↔setSize 正反馈循环：①RESIZE_SETTLE_DELAY_MS 16→100ms；②shallowPayloadEqual 跳过无意义 store 更新；③resize 节流阀（500ms 内最多3次）；④parser.rs 中 is_active 加2分钟宽限期消除30分钟边界振荡；191个 vitest 测试通过。 🔄 Context Replay 残留检查与 set_sim_state_flat 替代方案规划 — 通过 ccplan 检查代码库中 ContextReplayEngine 残留，发现完整存在（393行）且被3个 pipeline 脚本使用；规划了使用 set_sim_state_flat 直跳注入帧替代逐帧回放的方案，用户在 ExitPlanMode 时中断，未执行代码变更。 ✅ 修复 BOSS benchmark 环境缺失资产并分析零样本任务设计意图 — 评估脚本报 KeyError: ‘potato’，diff 比对发现5个物体资产（corn/egg/lemon/onion/potato）在标准 LIBERO 仓库缺失；复制资产并在 hope_objects.py 注册4个新类后，查看 form_boss_44_dataset.py 确认：boss_44 的 allowed_files 白名单仅含46个 KITCHEN_SCENE 文件，7个 LIVING_ROOM 任务是有意排除的零样本泛化测试。 ✅ TokenMonitor Rust commands 模块重构遗留42个编译错误修复 — 将2222行旧 commands.rs 重写为约80行薄模块根（声明6个子模块、保留 AppState 和共享 helper），消除旧文件与新 commands/ 目录并存导致的 Rust 模块路径歧义；同时修复4个预存 clippy 警告；cargo check/test（222通过）/clippy/fmt 全部通过。 ✅ TokenMonitor 窗口定位与 resize 底边锚定修复 — 修复两个叠加 bug：①用 Win32 API（FindWindowW/FindWindowExW 找 TrayNotifyWnd）替换定位不准的 tauri_plugin_positioner，实现初始弹窗精确定位至系统托盘上方；②删除 VerticalAnchor 枚举和 detect_vertical_anchor 动态检测函数，aligned_window_origin 始终用 work.bottom - height 计算 Y 坐标；③前端 setSize() 改为调用后端 set_window_size_and_align IPC 原子命令同时更新尺寸与位置；全部测试通过。 实现与修复 ✅ TokenMonitor 前端4个失效 import 路径修复 — 更新 App.svelte 和 usage.ts 中 rateLimitMonitor/traySync/windowAppearance 的 import 路径至新位置，向 uiStability.ts 添加 resizeDebug stub，补全 emptyPayload/makePayload 缺失的 usage_source/usage_warning 字段；191个 vitest 测试通过，svelte-check 229个文件0错误。 ✅ 全代码库 VLA 叙事清理与文档更新（OVERVIEW.md + 22处代码库替换） — 修正 OVERVIEW.md 五项（Context Window 描述移除 VLA 时序叙事、Trajectory Collector 改为 MimicGen Generator 10→1000条、Recovery Behavior Groups 说明、13种 Error Skill 详细参考表格、统计数据）；批量替换 context_replay.py/framework/init.py/CLAUDE.md/benchmark_v5.yaml/项目全景总结.md 等7个文件约22处错误表述为确定性回放叙事，grep 验证0残留，139个单元测试通过。 问题与解决方案 关键问题 1. Context Replay 的 policy_adapter 在 replay 循环内（干净轨迹帧阶段）就开始喂入，策略看到的是注入前的干净状态而非错误后的稳定状态，与实际部署场景不符。 解决方案: 将 policy_adapter.predict() 调用移至 Step F（collect_rollout_stats 完成、环境稳定后），确保策略接收的是错误注入且环境稳定后的 post-error observation。\n关键洞察: policy_adapter 的喂入时机必须与实际部署场景一致——策略只能看到错误发生后且环境稳定后的状态，在 replay 阶段喂干净帧毫无意义。\n2. context_window 参数名同时承担两种语义（VLA 观察窗口大小 vs 渲染展示起始帧偏移），文档存在\"VLA 需要时序上下文窗口\"的错误叙事，与实际 VLA open-loop 推理机制根本不符。 解决方案: 将参数重命名为 render_window，明确其唯一用途为控制渲染范围；批量替换代码库7个文件约22处错误叙事为\"MuJoCo 确定性仿真状态回放\"正确描述，grep 验证0残留。\n关键洞察: VLA 是 open-loop 推理，每步独立接受单帧输入，不维护 recurrent state，根本不需要\"时序上下文窗口\"；命名是最廉价的文档，错误叙事比代码 bug 危害更深，必须系统性清理。\n3. TokenMonitor Dashboard 整页以 1-2Hz 频率持续垂直抖动，三层正反馈循环叠加：数据刷新→重渲染→窗口 Resize→再触发数据刷新，同时30分钟边界处 is_active 状态振荡。 解决方案: 四层并发修复：①RESIZE_SETTLE_DELAY_MS 16→100ms 增大稳定窗口；②shallowPayloadEqual 跳过无意义 store 更新；③resize 节流阀限制级联（500ms/3次）；④is_active 判断加2分钟宽限期消除时间边界振荡。\n关键洞察: 多层正反馈循环叠加的抖动 bug 必须同时打断所有环节，任何单一修复都只能削弱而无法彻底消除。\n4. BOSS 评估脚本运行时报 KeyError: ‘potato’ 无法加载任务环境；boss_44 评估结果中7个 LIVING_ROOM 任务成功率全为0，怀疑是模型泛化能力或训练数据问题。 解决方案: 从 BOSS 仓库复制5个缺失物体资产（corn/egg/lemon/onion/potato）至 LIBERO 对应目录并注册新类；查看 form_boss_44_dataset.py 确认 allowed_files 白名单仅含 KITCHEN_SCENE 文件——7个 LIVING_ROOM 任务是有意排除的零样本泛化测试，0%成功率是 benchmark 的预期设计行为。\n关键洞察: BOSS 是 LIBERO 的扩展 benchmark，引入了标准仓库缺失的新物体；其核心测试理念（Out-of-Suppositional-Set）是评估模型在完全未见过场景上的零样本泛化能力，不能将0%误判为模型失败。\n5. cchypothesis 现有 Phase 3 纯 READ-ONLY 并行架构无法验证运行时假设（时序竞态、数据流状态、动态行为），存在调试能力盲区。 解决方案: 设计智能双轨架构：静态假设走并行 READ-ONLY 子代理；inconclusive 的静态调查结果升级到串行插桩探测（[DEBUG Hx] 标签日志 + 每轮 git restore 清理）；Git Safety Checkpoint 作为 Phase 3 入口保护用户工作现场。\n关键洞察: 插桩调试应是静态分析无法确定时的升级手段而非替代路径，才能在保留并行速度优势的同时获得运行时探测能力。\n6. Rust 项目出现42个编译错误（unresolved import crate::change_stats/crate::integrations 等），旧 commands.rs（2222行）与新 commands/ 子目录并存导致模块路径歧义。 解决方案: 将旧 commands.rs 重写为约80行薄模块根，正确声明 commands/ 子目录下的6个子模块，删除所有已移至子模块的重复函数和失效 import；同时修复4个预存 clippy 警告。\n关键洞察: Rust 模块系统中 commands.rs 与 commands/mod.rs 作为模块根是互斥的；两者并存时旧文件阻止新子模块被识别，增量重构必须最后一步才能替换/删除旧入口。\n7. TokenMonitor 弹窗出现在屏幕中间偏左而非系统托盘区域；resize 时底边移动而非顶边固定（顶底颠倒），detect_vertical_anchor 动态检测在初始化时序和竞态条件下极易误判。 解决方案: ①用 Win32 API（Shell_TrayWnd → TrayNotifyWnd）获取精确托盘坐标替换 tauri_plugin_positioner；②删除 detect_vertical_anchor 动态检测，aligned_window_origin 始终用 work.bottom - height 计算 Y 坐标；③前端 setSize() 改为调用后端 set_window_size_and_align IPC 原子命令同时更新尺寸与位置。\n关键洞察: tauri_plugin_positioner 的 Windows 支持不可靠；系统托盘弹窗始终底部锚定，无需动态检测；Tauri setSize() 是纯尺寸 API，resize 需通过后端 IPC 原子处理位置。\n一般问题 8. observations 列表在 replay 循环中收集最后50帧的 obs，但后续代码从未消费该列表，是死代码，浪费内存且与渲染目的混淆。 解决方案: 直接删除 observations 列表及相关的 context_start 初始化代码，渲染通过 render_fn 回调独立完成，不受影响。\n关键洞察: render_fn 回调与 observations 收集是两套并行机制，后者是增量开发残留的死代码，删除不影响任何功能。\n9. Vite 无法解析前端4个 import 路径（rateLimitMonitor.js/traySync.js/windowAppearance.js/resizeDebug.js），为增量重构删除旧文件后未同步更新引用所致。 解决方案: 将 import 路径更新为新位置，向 uiStability.ts 添加 resizeDebug stub 函数作为替代导出，补全 emptyPayload/makePayload 缺失字段。\n关键洞察: 增量重构删除旧文件后必须同步更新所有 import 引用，否则会留下 Vite 解析错误。\n人类思路 vs AI 思路 战略层面 VLA 领域知识：context window 概念与项目架构直接掌握 角色 思路 人类 用户明确指出 VLA 没有 context window 概念（open-loop 推理，每步独立，不维护 recurrent state），注入时不需要为 VLA 回放50帧；同时直接指出 Section 3.2 的 Trajectory Collector 实为 MimicGen Generator（10→1000条 demo）。 AI AI 未主动质疑代码注释中的 VLA-aware 设计假设，接受了旧叙事；在项目架构理解上需要通过代码路径倒推，理解滞后于用户的直接知识。 差异分析: 用户具备对 VLA 推理机制的领域先验知识和对项目整体设计意图的直接掌握；AI 倾向于信任已有代码中的设计注释，在架构层面理解不如用户准确，需要用户主动纠正才能启动系统性清理。\npolicy_adapter 正确喂入时机的物理直觉 角色 思路 人类 用户明确指出 policy_adapter 应在\"错误注入完成且环境稳定后的帧\"才开始喂入，这是对 sim-to-real 对齐的精确要求，基于物理仿真直觉立刻判断出正确时机。 AI AI 发现 policy_adapter 在 replay 循环内被调用，但倾向于通过选项枚举让用户确认，而非直接基于仿真语义判断正确时机。 差异分析: 用户从物理直觉出发立刻判断正确时机；AI 需要通过备选方案确认，反映其对仿真语义理解不够深入。\nRust 模块重构根因的独立识别 角色 思路 人类 用户只提供编译错误信息，没有说明重构背景或模块并存问题。 AI AI 主动通过 Explore agent 深度分析新旧模块结构，独立识别出 commands.rs 作为模块根阻止了 commands/ 被识别的根本原因，制定完整重写方案。 差异分析: AI 正确独立识别了 Rust 模块系统特有的并存歧义陷阱，展现了超出用户提示的主动分析能力；这是语言机制层面的问题，不依赖领域知识。\nBOSS 零样本任务成因假设方向 角色 思路 人类 人类主动提出核心假设：7个任务0%成功率可能是训练集未覆盖导致，而非模型泛化能力差的问题。 AI AI 列出训练集文件、对比评估任务、查看数据集构建脚本验证假设，并进一步发现这是 benchmark 有意设计的零样本泛化测试。 差异分析: 人类提出了正确的问题方向（数据覆盖假设），AI 负责执行验证并补充了机制层面的解释（allowed_files 白名单设计）；人类直觉正确，AI 提供了证据链。\ncchypothesis 整合方案的选择决策 角色 思路 人类 人类选择了架构重构最彻底的方案 C（智能双轨），全选四种整合模式，批准包含11个风险修复的完整实现计划，决策比 AI 预期更激进。 AI AI 设计了三个递进复杂度方案并推荐方案 C，先行进行对抗性分析并在 critic agent 反馈前基于自身分析修复了大部分已知风险。 差异分析: 人类的决策比 AI 预期更激进；AI 的先发修复模式体现主动性，但导致 critic agent 的发现成为事后确认而非事前预防。\nTokenMonitor 用户视觉感知识别独立 Bug 与修复复杂度判断 角色 思路 人类 用户通过视觉感知立刻识别出多个独立问题：截图直接显示弹窗位置错误；第一次修复后立即指出还有独立的\"底边不动顶边动\"逻辑缺失（用？？？？？暗示修复应该简单）；Dashboard 抖动提前收集了社区解决方案文档。 AI AI 每次只针对当前报告的 bug 进行修复，第一次未预见 resize 是独立的第二个 bug；分析窗口锚定时先调用 Explore + Plan agent 大量分析，实际修复只需删除约30行代码。 差异分析: 用户的用户视角使其能直接感知功能性缺陷并判断修复复杂度；AI 倾向于系统性分析每个 bug，对简单问题可能过度分析；用户提前收集解决方案将高成本搜集步骤分离出来。\nAI 局限性 重要局限 对物理仿真语义理解不足：在 policy_adapter 喂入时机错误上，AI 倾向于提问\"选哪个方案\"而非直接基于仿真语义判断正确时机；在 VLA open-loop 推理机制上，未能主动质疑代码注释中的错误假设，需要用户明确纠正后才启动系统性清理。 代码数据流分析存在盲区：observations 列表死代码（收集但从未消费）需要用户引导才发现；首次修复 TokenMonitor 窗口初始定位时未预见 resize 是独立的第二个 bug，需用户视觉反馈后才意识到 setSize() 不带位置更新的 Tauri API 行为。 执行节奏与并行处理判断问题：ccplan 规划完成后试图直接推进改动而未等用户确认，导致用户中断；critic agent 因实现完成后才返回结果（约390行改动已提交），对抗验证成为事后确认而非事前预防；对简单问题（删除30行代码的窗口锚定修复）过度调用 Explore + Plan agent 进行大量分析。 一般局限 跨会话缺乏全局视图：多个会话中反复扫描同一类问题（VLA 上下文叙事），每次从零开始，效率较低。 环境依赖与工具使用局限：无法在主环境验证 LIBERO OBJECTS_DICT 注册（需 robosuite）；Windows Git Bash 下 process substitution diff 命令批量失败需串行重试；不支持读取二进制文件（.mp4 等）。 今日收获 核心收获 VLA（Vision-Language-Action）模型是 open-loop 推理：每步接受单帧观察输出动作，不维护 recurrent hidden state，因此根本不需要\"提前回放N帧建立上下文窗口\"——这个假设是对 VLA 工作机制的根本性误解。 MuJoCo 仿真状态是确定性的但非快照可复现的：必须从初始状态逐帧执行动作才能得到正确的中间物理状态；直接 set_sim_state_flat 跳到目标帧是潜在替代方案（需评估物理一致性）。 UI 抖动类 bug 往往是多层正反馈循环叠加的结果，单层修复只能削弱不能消除；需要同时打断所有环节（测量延迟、相等性检查、节流阀、数据边界宽限期）。 插桩调试的正确架构模式：以静态并行分析为主路径，以插桩探测为 inconclusive 结果的升级路径，每个假设独立完成 instrument→run→analyze→cleanup 循环，Git Safety Checkpoint 在入口保护用户工作现场；多阶段调试中优先用 git restore . 而非 git stash 避免堆叠冲突。 命名是设计意图最廉价的表达（context_window → render_window）；错误的文档叙事比代码 bug 危害更深——不影响当前运行结果，但在项目交接、论文写作和代码审查时造成系统性误解，必须主动识别并系统性清理。 BOSS benchmark 设计机制：boss_44 训练集通过 allowed_files 白名单有意覆盖37个 KITCHEN 任务但排除7个 LIVING_ROOM 任务用于零样本泛化评估；BOSS 扩展了标准 LIBERO 的物体资产（corn/egg/lemon/onion/potato），使用前需从 BOSS 仓库单独获取。 系统托盘弹窗定位应始终底部锚定（work.bottom - height），无需动态检测（动态检测在初始化时序和竞态条件下极易误判）；tauri_plugin_positioner 的 Windows 支持不可靠，需用 Win32 API（FindWindowW/FindWindowExW）直接获取精确坐标；Tauri setSize() 是纯尺寸 API，resize 需通过后端 IPC 原子处理尺寸和位置。 Rust 增量模块重构的安全顺序：先创建新文件结构并让旧入口文件 re-export，验证编译通过后最后一步才替换/删除旧入口；commands.rs 与 commands/mod.rs 并存会导致模块路径歧义，旧文件阻止新子模块被识别。 shallowPayloadEqual 模式（缓存命中时引用相等检查 + 后台刷新时字段浅比较）是避免 Svelte store 不必要重渲染的有效手段，特别适合高频数据轮询场景。 会话摘要 Error Recovery Benchmark 🔄 Context Replay 全面重构：VLA 概念纠正 + 叙事清理 + 代码逻辑修复 04:10:46.496 | claude_code 用户发现 context_replay.py 中存在\"VLA 需要时序上下文窗口\"的根本性错误叙事，通过四个会话系统性完成全面重构：①规划使用 set_sim_state_flat 替代逐帧回放（用户中断未执行）；②修正 OVERVIEW.md 五项内容（Context Window 描述、MimicGen Generator 10→1000条、Error Skill 13种详细表格等）并修复周边配置文件7处；③批量替换代码库7个文件约22处 VLA 叙事为确定性回放描述，grep 验证0残留；④修复代码逻辑三项缺陷：删除 observations 死代码、将 policy_adapter 喂入移至 post-injection 稳定后（Step F）、将 context_window 全局重命名为 render_window（含 ErrorScene 向后兼容 fallback）。全程 139 个单元测试通过。\nOpenPI-LIBERO ✅ 修复 BOSS benchmark 缺失物体资产并确认零样本任务设计意图 11:06:05.882 | claude_code 运行 BOSS 评估脚本时遇到 KeyError: ‘potato’，通过 diff 比对发现5个物体资产（corn/egg/lemon/onion/potato）在标准 LIBERO 仓库缺失；复制资产并注册4个新类后，进一步分析7个 LIVING_ROOM 任务成功率全为0的原因：查看 form_boss_44_dataset.py 确认 allowed_files 白名单有意排除 LIVING_ROOM 场景，这是 BOSS benchmark 的核心设计——评估模型在完全未见过场景上的零样本泛化能力，0%是预期行为。\ngadget-skills ✅ 将插桩调试模式整合进 cchypothesis skill（智能双轨架构） 04:19:54.398 | claude_code 先 web 搜索确认市面无同类产品，cchypothesis 的并行 subagent + 批量假设设计具有独特性。通过 ccplan 完整规划，用户全选四种模式并选择方案 C（智能双轨），AI 重构 Phase 3（Git Safety Checkpoint + 调查分流 + 并行静态 + 串行插桩 [DEBUG Hx] 标签 + 每轮 git restore）、扩展 Phase 4（人工确认）、新增 Instrumentation Protocol section，并在 critic agent 11个对抗问题反馈后完成修复，涉及4个文件共 +395/-70 行变更。\nTokenMonitor ✅ TokenMonitor 四项递进式 Bug 修复（抖动、Rust 编译、前端导入、窗口锚定） 04:02:33.844 | claude_code 全天完成四项递进式修复：①Dashboard 1-2Hz 抖动——用户提供社区解决方案文档，AI 识别三层正反馈循环，实施 RESIZE_SETTLE_DELAY 增大 + shallowPayloadEqual 浅比较 + resize 节流阀 + is_active 2分钟宽限期四层修复；②Rust commands 模块重构遗留42个编译错误——重写2222行旧 commands.rs 为80行薄模块根，解决 commands.rs 与 commands/ 目录并存的模块路径歧义；③前端4个失效 import 路径——更新路径至新位置并添加 resizeDebug stub，svelte-check 229个文件0错误；④窗口初始定位与 resize 底边锚定——用 Win32 API 替换 tauri_plugin_positioner，删除动态锚点检测改为 work.bottom - height 固定底部锚定，前端 setSize 改为 IPC 原子命令。最终 222 个 Rust + 191 个前端测试全部通过。\nToken 用量 总览 指标 数值 总 Token 69,731,622 输入 Token 127,251 输出 Token 183,224 Cache 创建 3,409,971 Cache 读取 66,011,176 Cache 命中率 95.1% 总费用 (USD) $46.3856 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 52,717 95,468 2,067,580 55,051,251 $43.0983 92.9% claude-haiku-4-5-20251001 74,534 87,756 1,342,391 10,959,925 $3.2873 7.1% 各设备用量 设备 总 Token 输入 输出 费用 tianhe 14,020,085 40,870 46,529 $9.1710 TzJsDesktop 55,711,537 86,381 136,695 $37.2146 ",
+  "wordCount" : "1232",
+  "inLanguage": "en",
+  "datePublished": "2026-03-28T00:00:00-05:00",
+  "dateModified": "2026-03-28T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-03-28/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                    <ul class="lang-switch"><li>|</li>
+                        <li>
+                            <a href="https://tzj2006.github.io/zh/" title="中文"
+                                aria-label="中文">中文</a>
+                        </li>
+                    </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/daily/">Daily Summaries</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-28
+    </h1>
+    <div class="post-meta"><span title='2026-03-28 00:00:00 -0500 -0500'>March 28, 2026</span>&nbsp;·&nbsp;<span>6 min</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-28">日报 — 2026-03-28<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-28">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 跨两台设备在四个项目上完成多项系统性修复与功能整合：Error Recovery Benchmark 的 Context Replay 机制概念层（VLA 叙事清理）与代码层（policy_adapter 时序 + render_window 重命名）双重重构；LIBERO/BOSS 评估环境修复与零样本设计意图分析；cchypothesis skill 的智能双轨插桩架构整合（经 critic agent 11 个对抗问题验证）；TokenMonitor Tauri 应用四项递进式 Bug 修复（Dashboard 1-2Hz 抖动、Rust 42 个编译错误、前端 4 个失效 import、窗口 resize 底边颠倒）。</li>
+<li><strong>怎么做的：</strong> tianhe 侧通过 ccplan 规划 → Explore subagent 探索 → 批量 grep/Edit 修改 → pytest 验证循环完成 context_replay.py 重构与文档22处清理；再通过 diff 比对资产目录、溯源 form_boss_44_dataset.py 白名单机制确认 benchmark 设计意图。TzJsDesktop 侧通过 ccplan 对抗性规划完成 skill 文档重构；TokenMonitor 侧按根因层次逐步修复，配合 cargo/vitest/svelte-check 全链路验证。</li>
+<li><strong>有什么用：</strong> 消除 error_recovery_benchmark 中根本性概念错误（VLA context window 误解），代码逻辑与文档达成一致；BOSS 评估管线可正常加载全部任务并正确理解零样本任务的0%预期行为；cchypothesis 获得运行时插桩验证能力；TokenMonitor 从多处 UX 缺陷恢复至 222 Rust + 191 前端测试全部通过、svelte-check 0 错误的稳定可发布状态。</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成两个项目：(1) error_recovery_benchmark Context Replay 全面重构——纠正 VLA context window 错误叙事、修复 policy_adapter 时序、删除 observations 死代码、重命名 render_window，并同步7个文件约22处文档；(2) 修复 BOSS benchmark 5个缺失物体资产，并分析确认7个 LIVING_ROOM 零样本任务成功率为0是 benchmark 有意设计的泛化测试。</li>
+<li><strong>怎么做的：</strong> 使用 ccplan skill 结构化规划，配合 Explore subagent 探索代码库；通过 grep 批量定位并 Edit 工具精确修改，pytest 验证每轮改动（139个单元测试）；LIBERO 侧通过 diff 比对资产目录、查看 form_boss_44_dataset.py 白名单机制确认设计意图。</li>
+<li><strong>有什么用：</strong> context_replay.py 代码逻辑正确性提升（删死代码、修时序、统一命名），7个文件完成一致性同步更新；BOSS 评估脚本可加载全部44个任务环境；明确7个零样本任务的0%成功率是预期行为而非模型问题。</li>
+</ul>
+<h3 id="tzjsdesktop">TzJsDesktop<a hidden class="anchor" aria-hidden="true" href="#tzjsdesktop">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成两个项目：(1) cchypothesis skill 重构为智能双轨架构（Phase 3 并行静态 + 串行插桩 + Git Safety Checkpoint + Phase 4 人工确认），经 critic agent 11个对抗问题验证，涉及4个文件 +395/-70行；(2) TokenMonitor 四项递进式 Bug 修复：Dashboard 1-2Hz 抖动（四层正反馈打断）、Rust commands 模块重构遗留42个编译错误、前端4个失效 import 路径、窗口 resize 底边不固定（Win32 API 替换 + 删除动态锚点检测 + IPC 原子命令）。</li>
+<li><strong>怎么做的：</strong> cchypothesis 侧通过 ccplan 选择方案 C 并批量修改4个技术文档，先发自检后由 critic agent 验证；TokenMonitor 侧按根因层次逐步修复：RESIZE_SETTLE_DELAY + shallowPayloadEqual + 节流阀打断抖动循环，重写 commands.rs 薄模块根解决 Rust 模块歧义，更新 import 路径修复 Vite 解析，删除动态锚点检测改为固定底部锚定并通过后端 IPC 原子处理 resize。</li>
+<li><strong>有什么用：</strong> cchypothesis 获得运行时插桩验证能力且架构通过严格对抗审查；TokenMonitor 完成从多处 UX 缺陷到全测试通过（222 Rust + 191 前端，svelte-check 0 错误）的完整修复，窗口定位行为符合系统托盘弹窗预期。</li>
+</ul>
+<blockquote>
+<p>全天跨 tianhe 与 TzJsDesktop 两台设备、四个项目并行推进：tianhe 完成 error_recovery_benchmark 的 Context Replay 概念重构与代码修复，并修复 LIBERO/BOSS 评估环境资产缺失与零样本设计分析；TzJsDesktop 完成 cchypothesis skill 的智能双轨插桩架构整合，以及 TokenMonitor 应用的 Dashboard 抖动、Rust 编译错误、前端导入失效、窗口锚定四项递进式 Bug 修复。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>Context Replay 代码逻辑修复（删死代码 + 修正 policy_adapter 时序 + 重命名 render_window）</strong> — 删除 observations 死代码列表（收集但从未消费），将 policy_adapter 喂入从 replay 循环内（干净帧阶段）移至 Step F（post-injection 环境稳定后），将 context_window 全局重命名为 render_window（含 ErrorScene 数据结构向后兼容 fallback），更新3个 pipeline 脚本和测试文件，139个单元测试通过。</li>
+<li>✅ <strong>整合插桩调试模式到 cchypothesis skill（智能双轨架构）</strong> — 通过 ccplan 选择方案 C，重构 Phase 3 为：Git Safety Checkpoint + 调查分流（static/needs-instrumentation）+ 并行静态分析 + 串行插桩探测（[DEBUG Hx] 标签日志 + 每轮 git restore 清理）+ 汇总；Phase 4 新增 Human Confirmation；新增 Instrumentation Protocol section；解决 critic agent 返回的11个对抗问题；涉及 SKILL.md/cchypothesis.md/diagnostic-schema.md/skills/CLAUDE.md 共4个文件 +395/-70 行。</li>
+<li>✅ <strong>TokenMonitor Dashboard 1-2Hz 垂直抖动修复</strong> — 四层并发修复打断 ResizeObserver↔setSize 正反馈循环：①RESIZE_SETTLE_DELAY_MS 16→100ms；②shallowPayloadEqual 跳过无意义 store 更新；③resize 节流阀（500ms 内最多3次）；④parser.rs 中 is_active 加2分钟宽限期消除30分钟边界振荡；191个 vitest 测试通过。</li>
+<li>🔄 <strong>Context Replay 残留检查与 set_sim_state_flat 替代方案规划</strong> — 通过 ccplan 检查代码库中 ContextReplayEngine 残留，发现完整存在（393行）且被3个 pipeline 脚本使用；规划了使用 set_sim_state_flat 直跳注入帧替代逐帧回放的方案，用户在 ExitPlanMode 时中断，未执行代码变更。</li>
+<li>✅ <strong>修复 BOSS benchmark 环境缺失资产并分析零样本任务设计意图</strong> — 评估脚本报 KeyError: &lsquo;potato&rsquo;，diff 比对发现5个物体资产（corn/egg/lemon/onion/potato）在标准 LIBERO 仓库缺失；复制资产并在 hope_objects.py 注册4个新类后，查看 form_boss_44_dataset.py 确认：boss_44 的 allowed_files 白名单仅含46个 KITCHEN_SCENE 文件，7个 LIVING_ROOM 任务是有意排除的零样本泛化测试。</li>
+<li>✅ <strong>TokenMonitor Rust commands 模块重构遗留42个编译错误修复</strong> — 将2222行旧 commands.rs 重写为约80行薄模块根（声明6个子模块、保留 AppState 和共享 helper），消除旧文件与新 commands/ 目录并存导致的 Rust 模块路径歧义；同时修复4个预存 clippy 警告；cargo check/test（222通过）/clippy/fmt 全部通过。</li>
+<li>✅ <strong>TokenMonitor 窗口定位与 resize 底边锚定修复</strong> — 修复两个叠加 bug：①用 Win32 API（FindWindowW/FindWindowExW 找 TrayNotifyWnd）替换定位不准的 tauri_plugin_positioner，实现初始弹窗精确定位至系统托盘上方；②删除 VerticalAnchor 枚举和 detect_vertical_anchor 动态检测函数，aligned_window_origin 始终用 work.bottom - height 计算 Y 坐标；③前端 setSize() 改为调用后端 set_window_size_and_align IPC 原子命令同时更新尺寸与位置；全部测试通过。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>TokenMonitor 前端4个失效 import 路径修复</strong> — 更新 App.svelte 和 usage.ts 中 rateLimitMonitor/traySync/windowAppearance 的 import 路径至新位置，向 uiStability.ts 添加 resizeDebug stub，补全 emptyPayload/makePayload 缺失的 usage_source/usage_warning 字段；191个 vitest 测试通过，svelte-check 229个文件0错误。</li>
+<li>✅ <strong>全代码库 VLA 叙事清理与文档更新（OVERVIEW.md + 22处代码库替换）</strong> — 修正 OVERVIEW.md 五项（Context Window 描述移除 VLA 时序叙事、Trajectory Collector 改为 MimicGen Generator 10→1000条、Recovery Behavior Groups 说明、13种 Error Skill 详细参考表格、统计数据）；批量替换 context_replay.py/framework/<strong>init</strong>.py/CLAUDE.md/benchmark_v5.yaml/项目全景总结.md 等7个文件约22处错误表述为确定性回放叙事，grep 验证0残留，139个单元测试通过。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-context-replay-的-policy_adapter-在-replay-循环内干净轨迹帧阶段就开始喂入策略看到的是注入前的干净状态而非错误后的稳定状态与实际部署场景不符">1. Context Replay 的 policy_adapter 在 replay 循环内（干净轨迹帧阶段）就开始喂入，策略看到的是注入前的干净状态而非错误后的稳定状态，与实际部署场景不符。<a hidden class="anchor" aria-hidden="true" href="#1-context-replay-的-policy_adapter-在-replay-循环内干净轨迹帧阶段就开始喂入策略看到的是注入前的干净状态而非错误后的稳定状态与实际部署场景不符">#</a></h4>
+<p><strong>解决方案:</strong> 将 policy_adapter.predict() 调用移至 Step F（collect_rollout_stats 完成、环境稳定后），确保策略接收的是错误注入且环境稳定后的 post-error observation。</p>
+<p><strong>关键洞察:</strong> policy_adapter 的喂入时机必须与实际部署场景一致——策略只能看到错误发生后且环境稳定后的状态，在 replay 阶段喂干净帧毫无意义。</p>
+<h4 id="2-context_window-参数名同时承担两种语义vla-观察窗口大小-vs-渲染展示起始帧偏移文档存在vla-需要时序上下文窗口的错误叙事与实际-vla-open-loop-推理机制根本不符">2. context_window 参数名同时承担两种语义（VLA 观察窗口大小 vs 渲染展示起始帧偏移），文档存在&quot;VLA 需要时序上下文窗口&quot;的错误叙事，与实际 VLA open-loop 推理机制根本不符。<a hidden class="anchor" aria-hidden="true" href="#2-context_window-参数名同时承担两种语义vla-观察窗口大小-vs-渲染展示起始帧偏移文档存在vla-需要时序上下文窗口的错误叙事与实际-vla-open-loop-推理机制根本不符">#</a></h4>
+<p><strong>解决方案:</strong> 将参数重命名为 render_window，明确其唯一用途为控制渲染范围；批量替换代码库7个文件约22处错误叙事为&quot;MuJoCo 确定性仿真状态回放&quot;正确描述，grep 验证0残留。</p>
+<p><strong>关键洞察:</strong> VLA 是 open-loop 推理，每步独立接受单帧输入，不维护 recurrent state，根本不需要&quot;时序上下文窗口&quot;；命名是最廉价的文档，错误叙事比代码 bug 危害更深，必须系统性清理。</p>
+<h4 id="3-tokenmonitor-dashboard-整页以-1-2hz-频率持续垂直抖动三层正反馈循环叠加数据刷新重渲染窗口-resize再触发数据刷新同时30分钟边界处-is_active-状态振荡">3. TokenMonitor Dashboard 整页以 1-2Hz 频率持续垂直抖动，三层正反馈循环叠加：数据刷新→重渲染→窗口 Resize→再触发数据刷新，同时30分钟边界处 is_active 状态振荡。<a hidden class="anchor" aria-hidden="true" href="#3-tokenmonitor-dashboard-整页以-1-2hz-频率持续垂直抖动三层正反馈循环叠加数据刷新重渲染窗口-resize再触发数据刷新同时30分钟边界处-is_active-状态振荡">#</a></h4>
+<p><strong>解决方案:</strong> 四层并发修复：①RESIZE_SETTLE_DELAY_MS 16→100ms 增大稳定窗口；②shallowPayloadEqual 跳过无意义 store 更新；③resize 节流阀限制级联（500ms/3次）；④is_active 判断加2分钟宽限期消除时间边界振荡。</p>
+<p><strong>关键洞察:</strong> 多层正反馈循环叠加的抖动 bug 必须同时打断所有环节，任何单一修复都只能削弱而无法彻底消除。</p>
+<h4 id="4-boss-评估脚本运行时报-keyerror-potato-无法加载任务环境boss_44-评估结果中7个-living_room-任务成功率全为0怀疑是模型泛化能力或训练数据问题">4. BOSS 评估脚本运行时报 KeyError: &lsquo;potato&rsquo; 无法加载任务环境；boss_44 评估结果中7个 LIVING_ROOM 任务成功率全为0，怀疑是模型泛化能力或训练数据问题。<a hidden class="anchor" aria-hidden="true" href="#4-boss-评估脚本运行时报-keyerror-potato-无法加载任务环境boss_44-评估结果中7个-living_room-任务成功率全为0怀疑是模型泛化能力或训练数据问题">#</a></h4>
+<p><strong>解决方案:</strong> 从 BOSS 仓库复制5个缺失物体资产（corn/egg/lemon/onion/potato）至 LIBERO 对应目录并注册新类；查看 form_boss_44_dataset.py 确认 allowed_files 白名单仅含 KITCHEN_SCENE 文件——7个 LIVING_ROOM 任务是有意排除的零样本泛化测试，0%成功率是 benchmark 的预期设计行为。</p>
+<p><strong>关键洞察:</strong> BOSS 是 LIBERO 的扩展 benchmark，引入了标准仓库缺失的新物体；其核心测试理念（Out-of-Suppositional-Set）是评估模型在完全未见过场景上的零样本泛化能力，不能将0%误判为模型失败。</p>
+<h4 id="5-cchypothesis-现有-phase-3-纯-read-only-并行架构无法验证运行时假设时序竞态数据流状态动态行为存在调试能力盲区">5. cchypothesis 现有 Phase 3 纯 READ-ONLY 并行架构无法验证运行时假设（时序竞态、数据流状态、动态行为），存在调试能力盲区。<a hidden class="anchor" aria-hidden="true" href="#5-cchypothesis-现有-phase-3-纯-read-only-并行架构无法验证运行时假设时序竞态数据流状态动态行为存在调试能力盲区">#</a></h4>
+<p><strong>解决方案:</strong> 设计智能双轨架构：静态假设走并行 READ-ONLY 子代理；inconclusive 的静态调查结果升级到串行插桩探测（[DEBUG Hx] 标签日志 + 每轮 git restore 清理）；Git Safety Checkpoint 作为 Phase 3 入口保护用户工作现场。</p>
+<p><strong>关键洞察:</strong> 插桩调试应是静态分析无法确定时的升级手段而非替代路径，才能在保留并行速度优势的同时获得运行时探测能力。</p>
+<h4 id="6-rust-项目出现42个编译错误unresolved-import-cratechange_statscrateintegrations-等旧-commandsrs2222行与新-commands-子目录并存导致模块路径歧义">6. Rust 项目出现42个编译错误（unresolved import crate::change_stats/crate::integrations 等），旧 commands.rs（2222行）与新 commands/ 子目录并存导致模块路径歧义。<a hidden class="anchor" aria-hidden="true" href="#6-rust-项目出现42个编译错误unresolved-import-cratechange_statscrateintegrations-等旧-commandsrs2222行与新-commands-子目录并存导致模块路径歧义">#</a></h4>
+<p><strong>解决方案:</strong> 将旧 commands.rs 重写为约80行薄模块根，正确声明 commands/ 子目录下的6个子模块，删除所有已移至子模块的重复函数和失效 import；同时修复4个预存 clippy 警告。</p>
+<p><strong>关键洞察:</strong> Rust 模块系统中 commands.rs 与 commands/mod.rs 作为模块根是互斥的；两者并存时旧文件阻止新子模块被识别，增量重构必须最后一步才能替换/删除旧入口。</p>
+<h4 id="7-tokenmonitor-弹窗出现在屏幕中间偏左而非系统托盘区域resize-时底边移动而非顶边固定顶底颠倒detect_vertical_anchor-动态检测在初始化时序和竞态条件下极易误判">7. TokenMonitor 弹窗出现在屏幕中间偏左而非系统托盘区域；resize 时底边移动而非顶边固定（顶底颠倒），detect_vertical_anchor 动态检测在初始化时序和竞态条件下极易误判。<a hidden class="anchor" aria-hidden="true" href="#7-tokenmonitor-弹窗出现在屏幕中间偏左而非系统托盘区域resize-时底边移动而非顶边固定顶底颠倒detect_vertical_anchor-动态检测在初始化时序和竞态条件下极易误判">#</a></h4>
+<p><strong>解决方案:</strong> ①用 Win32 API（Shell_TrayWnd → TrayNotifyWnd）获取精确托盘坐标替换 tauri_plugin_positioner；②删除 detect_vertical_anchor 动态检测，aligned_window_origin 始终用 work.bottom - height 计算 Y 坐标；③前端 setSize() 改为调用后端 set_window_size_and_align IPC 原子命令同时更新尺寸与位置。</p>
+<p><strong>关键洞察:</strong> tauri_plugin_positioner 的 Windows 支持不可靠；系统托盘弹窗始终底部锚定，无需动态检测；Tauri setSize() 是纯尺寸 API，resize 需通过后端 IPC 原子处理位置。</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="8-observations-列表在-replay-循环中收集最后50帧的-obs但后续代码从未消费该列表是死代码浪费内存且与渲染目的混淆">8. observations 列表在 replay 循环中收集最后50帧的 obs，但后续代码从未消费该列表，是死代码，浪费内存且与渲染目的混淆。<a hidden class="anchor" aria-hidden="true" href="#8-observations-列表在-replay-循环中收集最后50帧的-obs但后续代码从未消费该列表是死代码浪费内存且与渲染目的混淆">#</a></h4>
+<p><strong>解决方案:</strong> 直接删除 observations 列表及相关的 context_start 初始化代码，渲染通过 render_fn 回调独立完成，不受影响。</p>
+<p><strong>关键洞察:</strong> render_fn 回调与 observations 收集是两套并行机制，后者是增量开发残留的死代码，删除不影响任何功能。</p>
+<h4 id="9-vite-无法解析前端4个-import-路径ratelimitmonitorjstraysyncjswindowappearancejsresizedebugjs为增量重构删除旧文件后未同步更新引用所致">9. Vite 无法解析前端4个 import 路径（rateLimitMonitor.js/traySync.js/windowAppearance.js/resizeDebug.js），为增量重构删除旧文件后未同步更新引用所致。<a hidden class="anchor" aria-hidden="true" href="#9-vite-无法解析前端4个-import-路径ratelimitmonitorjstraysyncjswindowappearancejsresizedebugjs为增量重构删除旧文件后未同步更新引用所致">#</a></h4>
+<p><strong>解决方案:</strong> 将 import 路径更新为新位置，向 uiStability.ts 添加 resizeDebug stub 函数作为替代导出，补全 emptyPayload/makePayload 缺失字段。</p>
+<p><strong>关键洞察:</strong> 增量重构删除旧文件后必须同步更新所有 import 引用，否则会留下 Vite 解析错误。</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="vla-领域知识context-window-概念与项目架构直接掌握">VLA 领域知识：context window 概念与项目架构直接掌握<a hidden class="anchor" aria-hidden="true" href="#vla-领域知识context-window-概念与项目架构直接掌握">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户明确指出 VLA 没有 context window 概念（open-loop 推理，每步独立，不维护 recurrent state），注入时不需要为 VLA 回放50帧；同时直接指出 Section 3.2 的 Trajectory Collector 实为 MimicGen Generator（10→1000条 demo）。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 未主动质疑代码注释中的 VLA-aware 设计假设，接受了旧叙事；在项目架构理解上需要通过代码路径倒推，理解滞后于用户的直接知识。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户具备对 VLA 推理机制的领域先验知识和对项目整体设计意图的直接掌握；AI 倾向于信任已有代码中的设计注释，在架构层面理解不如用户准确，需要用户主动纠正才能启动系统性清理。</p>
+<h4 id="policy_adapter-正确喂入时机的物理直觉">policy_adapter 正确喂入时机的物理直觉<a hidden class="anchor" aria-hidden="true" href="#policy_adapter-正确喂入时机的物理直觉">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户明确指出 policy_adapter 应在&quot;错误注入完成且环境稳定后的帧&quot;才开始喂入，这是对 sim-to-real 对齐的精确要求，基于物理仿真直觉立刻判断出正确时机。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 发现 policy_adapter 在 replay 循环内被调用，但倾向于通过选项枚举让用户确认，而非直接基于仿真语义判断正确时机。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户从物理直觉出发立刻判断正确时机；AI 需要通过备选方案确认，反映其对仿真语义理解不够深入。</p>
+<h4 id="rust-模块重构根因的独立识别">Rust 模块重构根因的独立识别<a hidden class="anchor" aria-hidden="true" href="#rust-模块重构根因的独立识别">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户只提供编译错误信息，没有说明重构背景或模块并存问题。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 主动通过 Explore agent 深度分析新旧模块结构，独立识别出 commands.rs 作为模块根阻止了 commands/ 被识别的根本原因，制定完整重写方案。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI 正确独立识别了 Rust 模块系统特有的并存歧义陷阱，展现了超出用户提示的主动分析能力；这是语言机制层面的问题，不依赖领域知识。</p>
+<h4 id="boss-零样本任务成因假设方向">BOSS 零样本任务成因假设方向<a hidden class="anchor" aria-hidden="true" href="#boss-零样本任务成因假设方向">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类主动提出核心假设：7个任务0%成功率可能是训练集未覆盖导致，而非模型泛化能力差的问题。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 列出训练集文件、对比评估任务、查看数据集构建脚本验证假设，并进一步发现这是 benchmark 有意设计的零样本泛化测试。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类提出了正确的问题方向（数据覆盖假设），AI 负责执行验证并补充了机制层面的解释（allowed_files 白名单设计）；人类直觉正确，AI 提供了证据链。</p>
+<h4 id="cchypothesis-整合方案的选择决策">cchypothesis 整合方案的选择决策<a hidden class="anchor" aria-hidden="true" href="#cchypothesis-整合方案的选择决策">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类选择了架构重构最彻底的方案 C（智能双轨），全选四种整合模式，批准包含11个风险修复的完整实现计划，决策比 AI 预期更激进。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 设计了三个递进复杂度方案并推荐方案 C，先行进行对抗性分析并在 critic agent 反馈前基于自身分析修复了大部分已知风险。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类的决策比 AI 预期更激进；AI 的先发修复模式体现主动性，但导致 critic agent 的发现成为事后确认而非事前预防。</p>
+<h4 id="tokenmonitor-用户视觉感知识别独立-bug-与修复复杂度判断">TokenMonitor 用户视觉感知识别独立 Bug 与修复复杂度判断<a hidden class="anchor" aria-hidden="true" href="#tokenmonitor-用户视觉感知识别独立-bug-与修复复杂度判断">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户通过视觉感知立刻识别出多个独立问题：截图直接显示弹窗位置错误；第一次修复后立即指出还有独立的&quot;底边不动顶边动&quot;逻辑缺失（用？？？？？暗示修复应该简单）；Dashboard 抖动提前收集了社区解决方案文档。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 每次只针对当前报告的 bug 进行修复，第一次未预见 resize 是独立的第二个 bug；分析窗口锚定时先调用 Explore + Plan agent 大量分析，实际修复只需删除约30行代码。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户的用户视角使其能直接感知功能性缺陷并判断修复复杂度；AI 倾向于系统性分析每个 bug，对简单问题可能过度分析；用户提前收集解决方案将高成本搜集步骤分离出来。</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>对物理仿真语义理解不足：在 policy_adapter 喂入时机错误上，AI 倾向于提问&quot;选哪个方案&quot;而非直接基于仿真语义判断正确时机；在 VLA open-loop 推理机制上，未能主动质疑代码注释中的错误假设，需要用户明确纠正后才启动系统性清理。</li>
+<li>代码数据流分析存在盲区：observations 列表死代码（收集但从未消费）需要用户引导才发现；首次修复 TokenMonitor 窗口初始定位时未预见 resize 是独立的第二个 bug，需用户视觉反馈后才意识到 setSize() 不带位置更新的 Tauri API 行为。</li>
+<li>执行节奏与并行处理判断问题：ccplan 规划完成后试图直接推进改动而未等用户确认，导致用户中断；critic agent 因实现完成后才返回结果（约390行改动已提交），对抗验证成为事后确认而非事前预防；对简单问题（删除30行代码的窗口锚定修复）过度调用 Explore + Plan agent 进行大量分析。</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>跨会话缺乏全局视图：多个会话中反复扫描同一类问题（VLA 上下文叙事），每次从零开始，效率较低。</li>
+<li>环境依赖与工具使用局限：无法在主环境验证 LIBERO OBJECTS_DICT 注册（需 robosuite）；Windows Git Bash 下 process substitution diff 命令批量失败需串行重试；不支持读取二进制文件（.mp4 等）。</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>VLA（Vision-Language-Action）模型是 open-loop 推理：每步接受单帧观察输出动作，不维护 recurrent hidden state，因此根本不需要&quot;提前回放N帧建立上下文窗口&quot;——这个假设是对 VLA 工作机制的根本性误解。</li>
+<li>MuJoCo 仿真状态是确定性的但非快照可复现的：必须从初始状态逐帧执行动作才能得到正确的中间物理状态；直接 set_sim_state_flat 跳到目标帧是潜在替代方案（需评估物理一致性）。</li>
+<li>UI 抖动类 bug 往往是多层正反馈循环叠加的结果，单层修复只能削弱不能消除；需要同时打断所有环节（测量延迟、相等性检查、节流阀、数据边界宽限期）。</li>
+<li>插桩调试的正确架构模式：以静态并行分析为主路径，以插桩探测为 inconclusive 结果的升级路径，每个假设独立完成 instrument→run→analyze→cleanup 循环，Git Safety Checkpoint 在入口保护用户工作现场；多阶段调试中优先用 git restore . 而非 git stash 避免堆叠冲突。</li>
+<li>命名是设计意图最廉价的表达（context_window → render_window）；错误的文档叙事比代码 bug 危害更深——不影响当前运行结果，但在项目交接、论文写作和代码审查时造成系统性误解，必须主动识别并系统性清理。</li>
+<li>BOSS benchmark 设计机制：boss_44 训练集通过 allowed_files 白名单有意覆盖37个 KITCHEN 任务但排除7个 LIVING_ROOM 任务用于零样本泛化评估；BOSS 扩展了标准 LIBERO 的物体资产（corn/egg/lemon/onion/potato），使用前需从 BOSS 仓库单独获取。</li>
+<li>系统托盘弹窗定位应始终底部锚定（work.bottom - height），无需动态检测（动态检测在初始化时序和竞态条件下极易误判）；tauri_plugin_positioner 的 Windows 支持不可靠，需用 Win32 API（FindWindowW/FindWindowExW）直接获取精确坐标；Tauri setSize() 是纯尺寸 API，resize 需通过后端 IPC 原子处理尺寸和位置。</li>
+<li>Rust 增量模块重构的安全顺序：先创建新文件结构并让旧入口文件 re-export，验证编译通过后最后一步才替换/删除旧入口；commands.rs 与 commands/mod.rs 并存会导致模块路径歧义，旧文件阻止新子模块被识别。</li>
+<li>shallowPayloadEqual 模式（缓存命中时引用相等检查 + 后台刷新时字段浅比较）是避免 Svelte store 不必要重渲染的有效手段，特别适合高频数据轮询场景。</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 Context Replay 全面重构：VLA 概念纠正 + 叙事清理 + 代码逻辑修复</strong>
+<em>04:10:46.496 | claude_code</em>
+用户发现 context_replay.py 中存在&quot;VLA 需要时序上下文窗口&quot;的根本性错误叙事，通过四个会话系统性完成全面重构：①规划使用 set_sim_state_flat 替代逐帧回放（用户中断未执行）；②修正 OVERVIEW.md 五项内容（Context Window 描述、MimicGen Generator 10→1000条、Error Skill 13种详细表格等）并修复周边配置文件7处；③批量替换代码库7个文件约22处 VLA 叙事为确定性回放描述，grep 验证0残留；④修复代码逻辑三项缺陷：删除 observations 死代码、将 policy_adapter 喂入移至 post-injection 稳定后（Step F）、将 context_window 全局重命名为 render_window（含 ErrorScene 向后兼容 fallback）。全程 139 个单元测试通过。</p>
+<h3 id="openpi-libero">OpenPI-LIBERO<a hidden class="anchor" aria-hidden="true" href="#openpi-libero">#</a></h3>
+<p><strong>✅ 修复 BOSS benchmark 缺失物体资产并确认零样本任务设计意图</strong>
+<em>11:06:05.882 | claude_code</em>
+运行 BOSS 评估脚本时遇到 KeyError: &lsquo;potato&rsquo;，通过 diff 比对发现5个物体资产（corn/egg/lemon/onion/potato）在标准 LIBERO 仓库缺失；复制资产并注册4个新类后，进一步分析7个 LIVING_ROOM 任务成功率全为0的原因：查看 form_boss_44_dataset.py 确认 allowed_files 白名单有意排除 LIVING_ROOM 场景，这是 BOSS benchmark 的核心设计——评估模型在完全未见过场景上的零样本泛化能力，0%是预期行为。</p>
+<h3 id="gadget-skills">gadget-skills<a hidden class="anchor" aria-hidden="true" href="#gadget-skills">#</a></h3>
+<p><strong>✅ 将插桩调试模式整合进 cchypothesis skill（智能双轨架构）</strong>
+<em>04:19:54.398 | claude_code</em>
+先 web 搜索确认市面无同类产品，cchypothesis 的并行 subagent + 批量假设设计具有独特性。通过 ccplan 完整规划，用户全选四种模式并选择方案 C（智能双轨），AI 重构 Phase 3（Git Safety Checkpoint + 调查分流 + 并行静态 + 串行插桩 [DEBUG Hx] 标签 + 每轮 git restore）、扩展 Phase 4（人工确认）、新增 Instrumentation Protocol section，并在 critic agent 11个对抗问题反馈后完成修复，涉及4个文件共 +395/-70 行变更。</p>
+<h3 id="tokenmonitor">TokenMonitor<a hidden class="anchor" aria-hidden="true" href="#tokenmonitor">#</a></h3>
+<p><strong>✅ TokenMonitor 四项递进式 Bug 修复（抖动、Rust 编译、前端导入、窗口锚定）</strong>
+<em>04:02:33.844 | claude_code</em>
+全天完成四项递进式修复：①Dashboard 1-2Hz 抖动——用户提供社区解决方案文档，AI 识别三层正反馈循环，实施 RESIZE_SETTLE_DELAY 增大 + shallowPayloadEqual 浅比较 + resize 节流阀 + is_active 2分钟宽限期四层修复；②Rust commands 模块重构遗留42个编译错误——重写2222行旧 commands.rs 为80行薄模块根，解决 commands.rs 与 commands/ 目录并存的模块路径歧义；③前端4个失效 import 路径——更新路径至新位置并添加 resizeDebug stub，svelte-check 229个文件0错误；④窗口初始定位与 resize 底边锚定——用 Win32 API 替换 tauri_plugin_positioner，删除动态锚点检测改为 work.bottom - height 固定底部锚定，前端 setSize 改为 IPC 原子命令。最终 222 个 Rust + 191 个前端测试全部通过。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>69,731,622</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>127,251</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>183,224</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>3,409,971</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>66,011,176</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>95.1%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$46.3856</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>52,717</td>
+          <td>95,468</td>
+          <td>2,067,580</td>
+          <td>55,051,251</td>
+          <td>$43.0983</td>
+          <td>92.9%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>74,534</td>
+          <td>87,756</td>
+          <td>1,342,391</td>
+          <td>10,959,925</td>
+          <td>$3.2873</td>
+          <td>7.1%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>tianhe</td>
+          <td>14,020,085</td>
+          <td>40,870</td>
+          <td>46,529</td>
+          <td>$9.1710</td>
+      </tr>
+      <tr>
+          <td>TzJsDesktop</td>
+          <td>55,711,537</td>
+          <td>86,381</td>
+          <td>136,695</td>
+          <td>$37.2146</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

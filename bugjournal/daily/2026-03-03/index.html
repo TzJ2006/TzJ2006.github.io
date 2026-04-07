@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-03 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="在 DCC 上完成跨 Section RM-IDEAL benchmark 实现与方法文档，在天河超算集群上完成 Pi0.5 LoRA（58.9% vs BC-RNN 0%）全量评估、核查训练权重来源（确认均使用 pi05_base）并恢复 9 任务续训。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-03/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.c3b562a4103ddad215966d26b061d89cb16e1dade8748d9f57c4abc19a840c1a.css" integrity="sha256-w7VipBA92tIVlm0msGHYnLFuHa3odI2fV8SrwZqEDBo=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-03/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-03/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-03">
+  <meta property="og:description" content="在 DCC 上完成跨 Section RM-IDEAL benchmark 实现与方法文档，在天河超算集群上完成 Pi0.5 LoRA（58.9% vs BC-RNN 0%）全量评估、核查训练权重来源（确认均使用 pi05_base）并恢复 9 任务续训。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-03T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-03T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-03">
+  <meta name="twitter:description" content="在 DCC 上完成跨 Section RM-IDEAL benchmark 实现与方法文档，在天河超算集群上完成 Pi0.5 LoRA（58.9% vs BC-RNN 0%）全量评估、核查训练权重来源（确认均使用 pi05_base）并恢复 9 任务续训。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Daily Summaries",
+      "item": "https://tzj2006.github.io/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-03-03",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-03-03/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-03",
+  "name": "Bug Journal 2026-03-03",
+  "description": "在 DCC 上完成跨 Section RM-IDEAL benchmark 实现与方法文档，在天河超算集群上完成 Pi0.5 LoRA（58.9% vs BC-RNN 0%）全量评估、核查训练权重来源（确认均使用 pi05_base）并恢复 9 任务续训。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-03 今日概览 做了什么： 在 DCC 和天河两台设备上分别推进空间转录组跨样本评估（RM-IDEAL benchmark）和机器人策略评估（Pi0.5 LoRA / BC-RNN baseline）两条独立工作线，并完成训练权重来源核查与续训恢复。 怎么做的： DCC 侧通过深度代码阅读、bug 修复与实验验证完成 781 行 benchmark 脚本和 459 行方法文档；天河侧综合运用 Slurm 作业调度、SSH 远程直连计算节点、BatchedVLAServer 并行评估，完成 9 任务批量评估、NODE_FAIL 事故调查、训练配置核查和 9 任务续训恢复。 有什么用： RM-IDEAL 首次在跨 section 场景验证（Layer_3 Spearman r≈0.44），形成可复用评估框架；Pi0.5 LoRA 以 58.9% 成功率全面优于 BC-RNN（0%），Stack 类任务近乎完美；确认训练权重来源正确并恢复续训，消除了实验可复现性风险。 DCC 做了什么： 在 MIHD 项目中实现跨 Section RM-IDEAL benchmark 脚本，并撰写跨样本 Patch Query 方法文档。 怎么做的： 深入阅读 rm_ideal.py、spatial_utils.py、Fusion.py 等模块，编写 benchmark_rm_ideal.py（781 行），修复 STAIG 零嵌入 bug 和 CUDA 兼容问题后成功运行，并创建空间热力图可视化；创建 docs/CROSS_SAMPLE_QUERY.md（459 行）。 有什么用： Layer_3 双向评估结果（r=0.44/0.45）证明 STAIG fusion 嵌入捕获了跨 section 空间 niche 结构；方法文档为后续 pipeline 集成提供参考。 tianhe 做了什么： 在天河跳板机和 an46/an49/an53 计算节点上完成 Pi0.5 LoRA 批量评估、BC-RNN baseline 成功率测试、训练权重来源核查、NODE_FAIL 事故调查和 9 任务续训恢复。 怎么做的： 通过 SSH + Slurm 进行跨节点操作，使用 BatchedVLAServer 并行评估（44 分钟完成 9 任务）；通过 sacct step 时间戳追溯崩溃责任；搜索 openpi config.py weight_loader 字段和训练日志核查权重来源；SSH 直连 an49 以 nohup 后台方式恢复续训。 有什么用： 获得完整模型性能对比（Pi0.5 58.9% vs BC-RNN 0%），确认 Stack 类任务显著优势；排除 AI 操作导致 NODE_FAIL 的误判；确认两侧训练均基于 pi05_base，从已有 checkpoint（最高 18000 step）无损恢复续训。 在 DCC 上完成跨 Section RM-IDEAL benchmark 实现与方法文档，在天河超算集群上完成 Pi0.5 LoRA（58.9% vs BC-RNN 0%）全量评估、核查训练权重来源（确认均使用 pi05_base）并恢复 9 任务续训。\n今日任务 架构与策略 ✅ 跨 Section RM-IDEAL benchmark 实现与验证（MIHD） — 新建 scripts/benchmark_rm_ideal.py（781 行），支持双向跨 section 评估（151673↔151676）、自动检测零嵌入并重算 STAIG fusion、RM-IDEAL 分数缓存、Spearman/Precision@K/Same-label rate 三组指标输出，最终获得 Layer_3 双向 r=0.44/0.45。 ✅ Pi0.5 LoRA 精调批量评估（an46，9 任务） — 在 an46 通过 Slurm job 47209 运行 9 个 MimicGen 任务批量评估（各 20 rollout），使用 BatchedVLAServer 并行执行，总耗时约 44 分钟；整体成功率 58.9%（Stack_D0 100%、Stack_D1 95%、StackThree 80-90%、Coffee_D0 45%、Threading/TPA 30-45%）。 ✅ Pi0.5 LoRA base model 核查与 an49 续训恢复 — 用户怀疑训练使用 pi05_libero 而非 pi05_base；AI 通过 config.py weight_loader 字段和训练日志中的 Restoring checkpoint 路径，确认 tangzijia/zhaoganlong 两侧均正确使用 pi05_base。停止误启动的 fresh-start 进程后，通过 SSH 后台启动 9 任务续训（从已有 checkpoint 最高 18000 step 恢复）。 ✅ BC-RNN baseline 全量评估（5 任务 ×50 rollout） — 创建 5 任务 checkpoint symlink，修复 policy_adapter.py numpy.float64 类型 bug，添加 –task 参数支持后完成全量评估；所有任务成功率均为 0%，确认 Coffee_D0 在 600 epoch 训练中 SR 始终为 0 是训练本身失败，而非评估 bug。 ✅ Cross-Sample Patch Query 方法文档（MIHD） — 新建 docs/CROSS_SAMPLE_QUERY.md（459 行），覆盖空间图构建、k-hop 子图提取、WWL 图核、Wasserstein 距离、跨 section 流程、嵌入相似度对比、评估指标、实验结果等章节。 ✅ an53 节点 NODE_FAIL 事故调查 — 通过 sacct step 时间戳确认：AI 操作在 05:07 前全部 COMPLETED，an53 在 08:30 发生 NODE_FAIL（8 GPU 满载导致系统 OOM/GPU 驱动崩溃），09:41 重启完成；AI 操作与崩溃无因果关系。 实现与修复 ✅ 双 GPU 评估脚本创建与启动（an53） — 基于 run_pi05_eval_v5_single_gpu.sh 改造双 GPU 版本：GPU0 运行 VLA server，GPU1 运行 MuJoCo rollout，修复 MUJOCO_EGL_DEVICE_ID remapping 和 SSH 绝对路径问题后成功在 an53 启动（PID 492473）。 ❌ 演示视频渲染 — 等待评估结果确认哪些任务 SR 足够高再渲染 BC-RNN 和 Pi0.5 各任务的成功/失败视频。 ✅ 项目文档更新（CLAUDE.md + AGENTS.md） — 更新 CLAUDE.md 补充约 35 个 Makefile targets、并行 VLA 评估架构说明和编码规范；生成 390 词 AGENTS.md 贡献者指南，涵盖项目结构、构建/测试命令、代码风格和提交约定。 问题与解决方案 关键问题 1. Pi0.5 LoRA 训练配置名含 ‘pi05_libero’，用户怀疑初始化权重来自 libero checkpoint 而非 pi05_base 解决方案: 通过三层证据确认无误：① openpi config.py weight_loader 明确指向 pi05_base/params；② 训练日志 ‘Restoring checkpoint from …/pi05_base’；③ zhaoganlong 侧配置同样加载 pi05_base\n关键洞察: openpi TrainConfig 的配置名称（如 pi05_libero）描述数据加载配置，weight_loader 字段才是模型初始化来源的唯一依据，两者可以不同名\n2. BC-RNN 在全部 5 个 MimicGen 任务上成功率均为 0%，且 Coffee_D0 在整个 600 epoch 训练中 SR 始终为 0 解决方案: 暂未完全解决；通过查看训练日志确认是训练本身失败而非评估 bug，后续需诊断 checkpoint 质量和数据集路径是否正确\n关键洞察: 通过历史训练日志可区分’评估 bug’和’训练本就失败’，避免花时间调试其实不存在的评估问题；BC-RNN 在 error recovery 框架下彻底失败，说明传统序列建模策略泛化能力不足\n3. an53 节点 08:30 发生 NODE_FAIL，用户怀疑 AI 操作（srun）导致崩溃 解决方案: 通过 sacct step 级时间戳系统性排除：AI 操作在 05:07 前全部 COMPLETED，srun 因节点忙碌始终未执行；NODE_FAIL 最可能原因是 8 GPU 满载导致系统 OOM/GPU 驱动崩溃\n关键洞察: Slurm NODE_FAIL 不等于人为操作失误；sacct step 时间戳是追溯操作时间线和判断因果关系的有效工具\n4. STAIG fusion 在 151676 上嵌入全为零（训练坍塌），导致跨 section 评估 Spearman r 为 NaN 解决方案: 在 load_fused_embeddings() 中添加零嵌入检测（norm \u003c 1e-6），自动触发 –recompute_fusion 重新训练 STAIG（RTX 2080 Ti，300 epochs，约 50s）\n关键洞察: STAIG 在某些 section 上存在训练坍塌风险，Phase 2 缓存的嵌入不可无条件信任，需运行时校验\n5. AI 在用户未确认续训意图时预先启动了 fresh-start 训练进程（benchmark_retrain_20260303_134427） 解决方案: 用户及时叫停，AI 杀死错误进程并重新创建 resume 脚本（–no-overwrite –resume），通过 SSH 后台重新启动\n关键洞察: 在执行资源密集型操作（GPU 训练）前，必须与用户确认 resume/fresh-start 意图，不能依赖前置推断自动决策\n一般问题 6. P100 GPU（sm_60）与新版 PyTorch 不兼容；SSH 远程执行常见问题（相对路径、uid 映射、$变量展开、多行 Python 转义） 解决方案: 切换到 RTX 2080 Ti（sm_75）节点；SSH 命令内显式 cd 使用绝对路径；显式指定 -l 用户名；nohup 脚本使用单引号；多行 Python 改写为临时脚本文件\n关键洞察: SSH 远程执行有固定的问题模式与解法规范；CUDA_VISIBLE_DEVICES remapping 会影响 MuJoCo EGL 设备编号（物理 GPU 1 在 CUDA_VISIBLE_DEVICES=1 下 EGL device id 应设为 0）\n人类思路 vs AI 思路 战略层面 实验设计与关键决策（评估框架、base model 选择、resume vs fresh-start） 角色 思路 人类 人类主导所有核心实验决策：提出 RM-IDEAL + 嵌入余弦相似度的跨样本评估框架；主动发现 pi05_libero vs pi05_base 的潜在风险；选择’先用当前 checkpoint 立即评估’节省等待时间；在 AI 误启动 fresh-start 时及时叫停并要求 resume AI AI 负责将设计落地为代码，并通过多层证据链（config.py + 训练日志 + 对比组）系统性核查实验配置的正确性 差异分析: 人类凭领域先验知识和直觉发现关键风险，AI 提供系统性验证但初次判断有时需多轮修正；人类的务实性决策（立即评估、不覆盖 checkpoint）为实验节省了大量算力与等待时间\n问题诊断（STAIG 零嵌入、NODE_FAIL 责任判断、BC-RNN 训练失败识别） 角色 思路 人类 人类依赖时间相关性和直觉做初步判断（如怀疑 srun 导致 NODE_FAIL），有时误判 AI AI 通过主动调试（检查 embedding norm）、sacct 结构化证据链分析、查阅历史训练日志（确认 coffee SR 始终 0），提供了比直觉更可靠的根因判断 差异分析: AI 在诊断已发生问题方面具有优势（系统性查证、历史日志分析），但对潜在实验设计风险的主动审查不如领域专家\n集群操作方式选择（sbatch vs SSH 直连） 角色 思路 人类 用户明确要求不用 sbatch，改用 SSH 直连 an49 后台执行，基于对集群实际架构（路径完全一致、可直连计算节点）的准确理解 AI AI 默认倾向于 sbatch 作为 HPC 标准调度方式，创建了 .sbatch 脚本后被打断；改用 SSH 后能有效执行 差异分析: 典型的’通用 HPC 知识 vs 具体集群环境知识’差异；用户的具体知识更适用于该集群，AI 的通用最佳实践在此场景下反而低效\nAI 局限性 重要局限 缺乏对实验设计合理性的主动审查：未主动检查 Pi0.5 LoRA 精调的 base model 配置是否符合预期，需要用户提出后才发现 libero vs base 的潜在问题 在资源密集型操作（GPU 训练）前缺乏必要的事前确认：在用户未明确说明 resume/fresh-start 之前预先启动了 fresh-start 训练脚本；多次尝试 ExitPlanMode 也显示对何时需用户确认的判断不够准确 分析过程中存在中间误判，需多轮验证才得出正确结论：核查 base model 时经历了多轮冗余验证；可视化脚本调试经历 5 次失败；auth token 过期导致多个子 agent 失败 一般局限 SSH 远程执行的技术局限：多行 Python heredoc 转义、nohup 变量展开失败（$ts 未展开）、进程管理（pkill 不可靠需指定 PID）等问题反复出现；CUDA 兼容性（sm_60 vs sm_70+）未能提前警告 今日收获 核心收获 Pi0.5 LoRA 精调在 Stack 类任务上可达 95-100% 成功率，整体 58.9%；BC-RNN 全量失败（0%）；这一对比揭示了 VLA 模型相对于传统序列建模策略在机器人操作任务上的显著优势，任务复杂度（多步骤、精细操作）是成功率的主要决定因素 openpi TrainConfig 中配置名称（如 ‘pi05_libero’）描述数据加载配置，weight_loader 字段才是模型参数初始化来源的唯一依据，两者可以不同名，不能仅凭配置名判断初始化权重 STAIG fusion 训练存在坍塌风险（embeddings all-zero），跨样本评估中必须对嵌入 norm 做运行时校验，不能依赖 Phase 2 缓存；RM-IDEAL 与 STAIG 嵌入在 Layer_3 上 Spearman r≈0.44，两者捕获的空间信息有中等重叠但不等价（RM-IDEAL 更精确，嵌入相似度更弥散） GPU 训练等资源密集型操作必须在启动前与研究人员确认 resume/fresh-start 意图，尤其是在前置判断被推翻后，操作意图可能随之改变 BatchedVLAServer 并行评估（4 workers × 5 trials）仅需 44 分钟完成 9 任务，相比串行评估大幅提速，对实验迭代速度有实质性提升 实践收获 部分 HPC 集群中 SSH 可直连计算节点且路径与登录节点完全一致，SSH + nohup 是比 sbatch 更轻量灵活的启动方式；Slurm sacct step 级时间戳可精确追溯操作时间线，是判断操作因果关系的有效工具；集群 pam_slurm_adopt 机制会拒绝没有 active job 的 SSH 连接 会话摘要 MIHD ✅ 跨 Section RM-IDEAL benchmark 实现与方法文档撰写 19:08:35.365 | claude_code 规划并实现了 benchmark_rm_ideal.py（781 行）：通过并行 agent 探索代码库形成方案，修复 STAIG 151676 零嵌入 bug（自动重算）和 P100 CUDA 兼容问题（用户换 RTX 2080 Ti），最终获得 Layer_3 双向评估结果（r=0.44/0.45）并生成空间热力图可视化；随后创建 docs/CROSS_SAMPLE_QUERY.md（459 行），完整描述 WWL 图核 + Wasserstein 距离的跨样本评估方法链及实验结果。\nErrorRecoveryBenchmark ✅ Pi0.5 批量评估、BC-RNN baseline、训练权重核查与续训恢复 00:01:02.845 | claude_code 在 an46（job 47209）完成 9 任务 Pi0.5 LoRA 批量评估（整体 58.9%，Stack 类最佳）；BC-RNN 全量 5 任务均为 0%，确认 Coffee_D0 训练全程 SR=0 为训练失败。用户发现配置名含 ‘pi05_libero’ 怀疑 base model 错误，AI 通过 config.py weight_loader 字段和训练日志确认两侧（tangzijia/zhaoganlong）均正确使用 pi05_base，停止误启动的 fresh-start 进程后通过 SSH 在 an49 后台恢复 9 任务续训（最高 18000 step）。期间完成 an53 NODE_FAIL 事故调查（通过 sacct 确认与 AI 操作无关）、双 GPU 评估脚本创建与启动（an53，PID 492473）、CLAUDE.md 和 AGENTS.md 文档更新，以及 yhbatch 命令研究（确认为 sbatch wrapper）。\nToken 用量 Claude Code 总览 指标 数值 总 Token 53,713,082 输入 Token 61,555 输出 Token 115,623 Cache 创建 2,521,983 Cache 读取 51,013,921 Cache 命中率 95.3% 总费用 (USD) $36.5587 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 28,207 77,648 1,707,041 43,660,481 $34.5815 94.6% claude-haiku-4-5-20251001 33,348 37,975 814,942 7,353,440 $1.9772 5.4% 各设备用量 设备 总 Token 输入 输出 费用 DCC 14,115,560 23,166 36,251 $11.7005 tianhe 39,597,522 38,389 79,372 $24.8582 Codex 总览 指标 数值 总 Token 12,713,756 输入 Token 12,648,899 输出 Token 64,857 推理 Token 30,268 Cache 读取 12,095,872 总费用 (USD) $3.9926 模型明细 模型 输入 输出 推理 Cache 读取 费用 占比 gpt-5.3-codex 12,648,899 64,857 30,268 12,095,872 $3.9926 100.0% ",
+  "wordCount" : "951",
+  "inLanguage": "en",
+  "datePublished": "2026-03-03T00:00:00-05:00",
+  "dateModified": "2026-03-03T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-03-03/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                    <ul class="lang-switch"><li>|</li>
+                        <li>
+                            <a href="https://tzj2006.github.io/zh/" title="中文"
+                                aria-label="中文">中文</a>
+                        </li>
+                    </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/daily/">Daily Summaries</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-03
+    </h1>
+    <div class="post-meta"><span title='2026-03-03 00:00:00 -0500 EST'>March 3, 2026</span>&nbsp;·&nbsp;<span>5 min</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-03">日报 — 2026-03-03<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-03">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 在 DCC 和天河两台设备上分别推进空间转录组跨样本评估（RM-IDEAL benchmark）和机器人策略评估（Pi0.5 LoRA / BC-RNN baseline）两条独立工作线，并完成训练权重来源核查与续训恢复。</li>
+<li><strong>怎么做的：</strong> DCC 侧通过深度代码阅读、bug 修复与实验验证完成 781 行 benchmark 脚本和 459 行方法文档；天河侧综合运用 Slurm 作业调度、SSH 远程直连计算节点、BatchedVLAServer 并行评估，完成 9 任务批量评估、NODE_FAIL 事故调查、训练配置核查和 9 任务续训恢复。</li>
+<li><strong>有什么用：</strong> RM-IDEAL 首次在跨 section 场景验证（Layer_3 Spearman r≈0.44），形成可复用评估框架；Pi0.5 LoRA 以 58.9% 成功率全面优于 BC-RNN（0%），Stack 类任务近乎完美；确认训练权重来源正确并恢复续训，消除了实验可复现性风险。</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 在 MIHD 项目中实现跨 Section RM-IDEAL benchmark 脚本，并撰写跨样本 Patch Query 方法文档。</li>
+<li><strong>怎么做的：</strong> 深入阅读 rm_ideal.py、spatial_utils.py、Fusion.py 等模块，编写 benchmark_rm_ideal.py（781 行），修复 STAIG 零嵌入 bug 和 CUDA 兼容问题后成功运行，并创建空间热力图可视化；创建 docs/CROSS_SAMPLE_QUERY.md（459 行）。</li>
+<li><strong>有什么用：</strong> Layer_3 双向评估结果（r=0.44/0.45）证明 STAIG fusion 嵌入捕获了跨 section 空间 niche 结构；方法文档为后续 pipeline 集成提供参考。</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 在天河跳板机和 an46/an49/an53 计算节点上完成 Pi0.5 LoRA 批量评估、BC-RNN baseline 成功率测试、训练权重来源核查、NODE_FAIL 事故调查和 9 任务续训恢复。</li>
+<li><strong>怎么做的：</strong> 通过 SSH + Slurm 进行跨节点操作，使用 BatchedVLAServer 并行评估（44 分钟完成 9 任务）；通过 sacct step 时间戳追溯崩溃责任；搜索 openpi config.py weight_loader 字段和训练日志核查权重来源；SSH 直连 an49 以 nohup 后台方式恢复续训。</li>
+<li><strong>有什么用：</strong> 获得完整模型性能对比（Pi0.5 58.9% vs BC-RNN 0%），确认 Stack 类任务显著优势；排除 AI 操作导致 NODE_FAIL 的误判；确认两侧训练均基于 pi05_base，从已有 checkpoint（最高 18000 step）无损恢复续训。</li>
+</ul>
+<blockquote>
+<p>在 DCC 上完成跨 Section RM-IDEAL benchmark 实现与方法文档，在天河超算集群上完成 Pi0.5 LoRA（58.9% vs BC-RNN 0%）全量评估、核查训练权重来源（确认均使用 pi05_base）并恢复 9 任务续训。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>跨 Section RM-IDEAL benchmark 实现与验证（MIHD）</strong> — 新建 scripts/benchmark_rm_ideal.py（781 行），支持双向跨 section 评估（151673↔151676）、自动检测零嵌入并重算 STAIG fusion、RM-IDEAL 分数缓存、Spearman/Precision@K/Same-label rate 三组指标输出，最终获得 Layer_3 双向 r=0.44/0.45。</li>
+<li>✅ <strong>Pi0.5 LoRA 精调批量评估（an46，9 任务）</strong> — 在 an46 通过 Slurm job 47209 运行 9 个 MimicGen 任务批量评估（各 20 rollout），使用 BatchedVLAServer 并行执行，总耗时约 44 分钟；整体成功率 58.9%（Stack_D0 100%、Stack_D1 95%、StackThree 80-90%、Coffee_D0 45%、Threading/TPA 30-45%）。</li>
+<li>✅ <strong>Pi0.5 LoRA base model 核查与 an49 续训恢复</strong> — 用户怀疑训练使用 pi05_libero 而非 pi05_base；AI 通过 config.py weight_loader 字段和训练日志中的 Restoring checkpoint 路径，确认 tangzijia/zhaoganlong 两侧均正确使用 pi05_base。停止误启动的 fresh-start 进程后，通过 SSH 后台启动 9 任务续训（从已有 checkpoint 最高 18000 step 恢复）。</li>
+<li>✅ <strong>BC-RNN baseline 全量评估（5 任务 ×50 rollout）</strong> — 创建 5 任务 checkpoint symlink，修复 policy_adapter.py numpy.float64 类型 bug，添加 &ndash;task 参数支持后完成全量评估；所有任务成功率均为 0%，确认 Coffee_D0 在 600 epoch 训练中 SR 始终为 0 是训练本身失败，而非评估 bug。</li>
+<li>✅ <strong>Cross-Sample Patch Query 方法文档（MIHD）</strong> — 新建 docs/CROSS_SAMPLE_QUERY.md（459 行），覆盖空间图构建、k-hop 子图提取、WWL 图核、Wasserstein 距离、跨 section 流程、嵌入相似度对比、评估指标、实验结果等章节。</li>
+<li>✅ <strong>an53 节点 NODE_FAIL 事故调查</strong> — 通过 sacct step 时间戳确认：AI 操作在 05:07 前全部 COMPLETED，an53 在 08:30 发生 NODE_FAIL（8 GPU 满载导致系统 OOM/GPU 驱动崩溃），09:41 重启完成；AI 操作与崩溃无因果关系。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>双 GPU 评估脚本创建与启动（an53）</strong> — 基于 run_pi05_eval_v5_single_gpu.sh 改造双 GPU 版本：GPU0 运行 VLA server，GPU1 运行 MuJoCo rollout，修复 MUJOCO_EGL_DEVICE_ID remapping 和 SSH 绝对路径问题后成功在 an53 启动（PID 492473）。</li>
+<li>❌ <strong>演示视频渲染</strong> — 等待评估结果确认哪些任务 SR 足够高再渲染 BC-RNN 和 Pi0.5 各任务的成功/失败视频。</li>
+<li>✅ <strong>项目文档更新（CLAUDE.md + AGENTS.md）</strong> — 更新 CLAUDE.md 补充约 35 个 Makefile targets、并行 VLA 评估架构说明和编码规范；生成 390 词 AGENTS.md 贡献者指南，涵盖项目结构、构建/测试命令、代码风格和提交约定。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-pi05-lora-训练配置名含-pi05_libero用户怀疑初始化权重来自-libero-checkpoint-而非-pi05_base">1. Pi0.5 LoRA 训练配置名含 &lsquo;pi05_libero&rsquo;，用户怀疑初始化权重来自 libero checkpoint 而非 pi05_base<a hidden class="anchor" aria-hidden="true" href="#1-pi05-lora-训练配置名含-pi05_libero用户怀疑初始化权重来自-libero-checkpoint-而非-pi05_base">#</a></h4>
+<p><strong>解决方案:</strong> 通过三层证据确认无误：① openpi config.py weight_loader 明确指向 pi05_base/params；② 训练日志 &lsquo;Restoring checkpoint from &hellip;/pi05_base&rsquo;；③ zhaoganlong 侧配置同样加载 pi05_base</p>
+<p><strong>关键洞察:</strong> openpi TrainConfig 的配置名称（如 pi05_libero）描述数据加载配置，weight_loader 字段才是模型初始化来源的唯一依据，两者可以不同名</p>
+<h4 id="2-bc-rnn-在全部-5-个-mimicgen-任务上成功率均为-0且-coffee_d0-在整个-600-epoch-训练中-sr-始终为-0">2. BC-RNN 在全部 5 个 MimicGen 任务上成功率均为 0%，且 Coffee_D0 在整个 600 epoch 训练中 SR 始终为 0<a hidden class="anchor" aria-hidden="true" href="#2-bc-rnn-在全部-5-个-mimicgen-任务上成功率均为-0且-coffee_d0-在整个-600-epoch-训练中-sr-始终为-0">#</a></h4>
+<p><strong>解决方案:</strong> 暂未完全解决；通过查看训练日志确认是训练本身失败而非评估 bug，后续需诊断 checkpoint 质量和数据集路径是否正确</p>
+<p><strong>关键洞察:</strong> 通过历史训练日志可区分&rsquo;评估 bug&rsquo;和&rsquo;训练本就失败&rsquo;，避免花时间调试其实不存在的评估问题；BC-RNN 在 error recovery 框架下彻底失败，说明传统序列建模策略泛化能力不足</p>
+<h4 id="3-an53-节点-0830-发生-node_fail用户怀疑-ai-操作srun导致崩溃">3. an53 节点 08:30 发生 NODE_FAIL，用户怀疑 AI 操作（srun）导致崩溃<a hidden class="anchor" aria-hidden="true" href="#3-an53-节点-0830-发生-node_fail用户怀疑-ai-操作srun导致崩溃">#</a></h4>
+<p><strong>解决方案:</strong> 通过 sacct step 级时间戳系统性排除：AI 操作在 05:07 前全部 COMPLETED，srun 因节点忙碌始终未执行；NODE_FAIL 最可能原因是 8 GPU 满载导致系统 OOM/GPU 驱动崩溃</p>
+<p><strong>关键洞察:</strong> Slurm NODE_FAIL 不等于人为操作失误；sacct step 时间戳是追溯操作时间线和判断因果关系的有效工具</p>
+<h4 id="4-staig-fusion-在-151676-上嵌入全为零训练坍塌导致跨-section-评估-spearman-r-为-nan">4. STAIG fusion 在 151676 上嵌入全为零（训练坍塌），导致跨 section 评估 Spearman r 为 NaN<a hidden class="anchor" aria-hidden="true" href="#4-staig-fusion-在-151676-上嵌入全为零训练坍塌导致跨-section-评估-spearman-r-为-nan">#</a></h4>
+<p><strong>解决方案:</strong> 在 load_fused_embeddings() 中添加零嵌入检测（norm &lt; 1e-6），自动触发 &ndash;recompute_fusion 重新训练 STAIG（RTX 2080 Ti，300 epochs，约 50s）</p>
+<p><strong>关键洞察:</strong> STAIG 在某些 section 上存在训练坍塌风险，Phase 2 缓存的嵌入不可无条件信任，需运行时校验</p>
+<h4 id="5-ai-在用户未确认续训意图时预先启动了-fresh-start-训练进程benchmark_retrain_20260303_134427">5. AI 在用户未确认续训意图时预先启动了 fresh-start 训练进程（benchmark_retrain_20260303_134427）<a hidden class="anchor" aria-hidden="true" href="#5-ai-在用户未确认续训意图时预先启动了-fresh-start-训练进程benchmark_retrain_20260303_134427">#</a></h4>
+<p><strong>解决方案:</strong> 用户及时叫停，AI 杀死错误进程并重新创建 resume 脚本（&ndash;no-overwrite &ndash;resume），通过 SSH 后台重新启动</p>
+<p><strong>关键洞察:</strong> 在执行资源密集型操作（GPU 训练）前，必须与用户确认 resume/fresh-start 意图，不能依赖前置推断自动决策</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="6-p100-gpusm_60与新版-pytorch-不兼容ssh-远程执行常见问题相对路径uid-映射变量展开多行-python-转义">6. P100 GPU（sm_60）与新版 PyTorch 不兼容；SSH 远程执行常见问题（相对路径、uid 映射、$变量展开、多行 Python 转义）<a hidden class="anchor" aria-hidden="true" href="#6-p100-gpusm_60与新版-pytorch-不兼容ssh-远程执行常见问题相对路径uid-映射变量展开多行-python-转义">#</a></h4>
+<p><strong>解决方案:</strong> 切换到 RTX 2080 Ti（sm_75）节点；SSH 命令内显式 cd 使用绝对路径；显式指定 -l 用户名；nohup 脚本使用单引号；多行 Python 改写为临时脚本文件</p>
+<p><strong>关键洞察:</strong> SSH 远程执行有固定的问题模式与解法规范；CUDA_VISIBLE_DEVICES remapping 会影响 MuJoCo EGL 设备编号（物理 GPU 1 在 CUDA_VISIBLE_DEVICES=1 下 EGL device id 应设为 0）</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="实验设计与关键决策评估框架base-model-选择resume-vs-fresh-start">实验设计与关键决策（评估框架、base model 选择、resume vs fresh-start）<a hidden class="anchor" aria-hidden="true" href="#实验设计与关键决策评估框架base-model-选择resume-vs-fresh-start">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类主导所有核心实验决策：提出 RM-IDEAL + 嵌入余弦相似度的跨样本评估框架；主动发现 pi05_libero vs pi05_base 的潜在风险；选择&rsquo;先用当前 checkpoint 立即评估&rsquo;节省等待时间；在 AI 误启动 fresh-start 时及时叫停并要求 resume</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 负责将设计落地为代码，并通过多层证据链（config.py + 训练日志 + 对比组）系统性核查实验配置的正确性</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类凭领域先验知识和直觉发现关键风险，AI 提供系统性验证但初次判断有时需多轮修正；人类的务实性决策（立即评估、不覆盖 checkpoint）为实验节省了大量算力与等待时间</p>
+<h4 id="问题诊断staig-零嵌入node_fail-责任判断bc-rnn-训练失败识别">问题诊断（STAIG 零嵌入、NODE_FAIL 责任判断、BC-RNN 训练失败识别）<a hidden class="anchor" aria-hidden="true" href="#问题诊断staig-零嵌入node_fail-责任判断bc-rnn-训练失败识别">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类依赖时间相关性和直觉做初步判断（如怀疑 srun 导致 NODE_FAIL），有时误判</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 通过主动调试（检查 embedding norm）、sacct 结构化证据链分析、查阅历史训练日志（确认 coffee SR 始终 0），提供了比直觉更可靠的根因判断</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI 在诊断已发生问题方面具有优势（系统性查证、历史日志分析），但对潜在实验设计风险的主动审查不如领域专家</p>
+<h4 id="集群操作方式选择sbatch-vs-ssh-直连">集群操作方式选择（sbatch vs SSH 直连）<a hidden class="anchor" aria-hidden="true" href="#集群操作方式选择sbatch-vs-ssh-直连">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户明确要求不用 sbatch，改用 SSH 直连 an49 后台执行，基于对集群实际架构（路径完全一致、可直连计算节点）的准确理解</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 默认倾向于 sbatch 作为 HPC 标准调度方式，创建了 .sbatch 脚本后被打断；改用 SSH 后能有效执行</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 典型的&rsquo;通用 HPC 知识 vs 具体集群环境知识&rsquo;差异；用户的具体知识更适用于该集群，AI 的通用最佳实践在此场景下反而低效</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>缺乏对实验设计合理性的主动审查：未主动检查 Pi0.5 LoRA 精调的 base model 配置是否符合预期，需要用户提出后才发现 libero vs base 的潜在问题</li>
+<li>在资源密集型操作（GPU 训练）前缺乏必要的事前确认：在用户未明确说明 resume/fresh-start 之前预先启动了 fresh-start 训练脚本；多次尝试 ExitPlanMode 也显示对何时需用户确认的判断不够准确</li>
+<li>分析过程中存在中间误判，需多轮验证才得出正确结论：核查 base model 时经历了多轮冗余验证；可视化脚本调试经历 5 次失败；auth token 过期导致多个子 agent 失败</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>SSH 远程执行的技术局限：多行 Python heredoc 转义、nohup 变量展开失败（$ts 未展开）、进程管理（pkill 不可靠需指定 PID）等问题反复出现；CUDA 兼容性（sm_60 vs sm_70+）未能提前警告</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>Pi0.5 LoRA 精调在 Stack 类任务上可达 95-100% 成功率，整体 58.9%；BC-RNN 全量失败（0%）；这一对比揭示了 VLA 模型相对于传统序列建模策略在机器人操作任务上的显著优势，任务复杂度（多步骤、精细操作）是成功率的主要决定因素</li>
+<li>openpi TrainConfig 中配置名称（如 &lsquo;pi05_libero&rsquo;）描述数据加载配置，weight_loader 字段才是模型参数初始化来源的唯一依据，两者可以不同名，不能仅凭配置名判断初始化权重</li>
+<li>STAIG fusion 训练存在坍塌风险（embeddings all-zero），跨样本评估中必须对嵌入 norm 做运行时校验，不能依赖 Phase 2 缓存；RM-IDEAL 与 STAIG 嵌入在 Layer_3 上 Spearman r≈0.44，两者捕获的空间信息有中等重叠但不等价（RM-IDEAL 更精确，嵌入相似度更弥散）</li>
+<li>GPU 训练等资源密集型操作必须在启动前与研究人员确认 resume/fresh-start 意图，尤其是在前置判断被推翻后，操作意图可能随之改变</li>
+<li>BatchedVLAServer 并行评估（4 workers × 5 trials）仅需 44 分钟完成 9 任务，相比串行评估大幅提速，对实验迭代速度有实质性提升</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>部分 HPC 集群中 SSH 可直连计算节点且路径与登录节点完全一致，SSH + nohup 是比 sbatch 更轻量灵活的启动方式；Slurm sacct step 级时间戳可精确追溯操作时间线，是判断操作因果关系的有效工具；集群 pam_slurm_adopt 机制会拒绝没有 active job 的 SSH 连接</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>✅ 跨 Section RM-IDEAL benchmark 实现与方法文档撰写</strong>
+<em>19:08:35.365 | claude_code</em>
+规划并实现了 benchmark_rm_ideal.py（781 行）：通过并行 agent 探索代码库形成方案，修复 STAIG 151676 零嵌入 bug（自动重算）和 P100 CUDA 兼容问题（用户换 RTX 2080 Ti），最终获得 Layer_3 双向评估结果（r=0.44/0.45）并生成空间热力图可视化；随后创建 docs/CROSS_SAMPLE_QUERY.md（459 行），完整描述 WWL 图核 + Wasserstein 距离的跨样本评估方法链及实验结果。</p>
+<h3 id="errorrecoverybenchmark">ErrorRecoveryBenchmark<a hidden class="anchor" aria-hidden="true" href="#errorrecoverybenchmark">#</a></h3>
+<p><strong>✅ Pi0.5 批量评估、BC-RNN baseline、训练权重核查与续训恢复</strong>
+<em>00:01:02.845 | claude_code</em>
+在 an46（job 47209）完成 9 任务 Pi0.5 LoRA 批量评估（整体 58.9%，Stack 类最佳）；BC-RNN 全量 5 任务均为 0%，确认 Coffee_D0 训练全程 SR=0 为训练失败。用户发现配置名含 &lsquo;pi05_libero&rsquo; 怀疑 base model 错误，AI 通过 config.py weight_loader 字段和训练日志确认两侧（tangzijia/zhaoganlong）均正确使用 pi05_base，停止误启动的 fresh-start 进程后通过 SSH 在 an49 后台恢复 9 任务续训（最高 18000 step）。期间完成 an53 NODE_FAIL 事故调查（通过 sacct 确认与 AI 操作无关）、双 GPU 评估脚本创建与启动（an53，PID 492473）、CLAUDE.md 和 AGENTS.md 文档更新，以及 yhbatch 命令研究（确认为 sbatch wrapper）。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="claude-code">Claude Code<a hidden class="anchor" aria-hidden="true" href="#claude-code">#</a></h3>
+<h4 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>53,713,082</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>61,555</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>115,623</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>2,521,983</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>51,013,921</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>95.3%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$36.5587</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>28,207</td>
+          <td>77,648</td>
+          <td>1,707,041</td>
+          <td>43,660,481</td>
+          <td>$34.5815</td>
+          <td>94.6%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>33,348</td>
+          <td>37,975</td>
+          <td>814,942</td>
+          <td>7,353,440</td>
+          <td>$1.9772</td>
+          <td>5.4%</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>14,115,560</td>
+          <td>23,166</td>
+          <td>36,251</td>
+          <td>$11.7005</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>39,597,522</td>
+          <td>38,389</td>
+          <td>79,372</td>
+          <td>$24.8582</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="codex">Codex<a hidden class="anchor" aria-hidden="true" href="#codex">#</a></h3>
+<h4 id="总览-1">总览<a hidden class="anchor" aria-hidden="true" href="#总览-1">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>12,713,756</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>12,648,899</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>64,857</td>
+      </tr>
+      <tr>
+          <td>推理 Token</td>
+          <td>30,268</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>12,095,872</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$3.9926</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="模型明细-1">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细-1">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>推理</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>gpt-5.3-codex</td>
+          <td>12,648,899</td>
+          <td>64,857</td>
+          <td>30,268</td>
+          <td>12,095,872</td>
+          <td>$3.9926</td>
+          <td>100.0%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

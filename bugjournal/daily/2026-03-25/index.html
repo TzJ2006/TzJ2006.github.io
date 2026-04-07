@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-25 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="tianhe 服务器多用户完成 VLA/机器人研究全链路技术栈搭建（Git迁移、训练脚本、数据管道修复、OpenPI评测客户端），TzJsDesktop 完成 research_scout.py 模块化重构、TokenMonitor 跨平台适配与首个 Windows .exe 构建、optimize skill 四语言扩展，以及 Claude Code 工具链精细化配置">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-25/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.c3b562a4103ddad215966d26b061d89cb16e1dade8748d9f57c4abc19a840c1a.css" integrity="sha256-w7VipBA92tIVlm0msGHYnLFuHa3odI2fV8SrwZqEDBo=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-25/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-25/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-25">
+  <meta property="og:description" content="tianhe 服务器多用户完成 VLA/机器人研究全链路技术栈搭建（Git迁移、训练脚本、数据管道修复、OpenPI评测客户端），TzJsDesktop 完成 research_scout.py 模块化重构、TokenMonitor 跨平台适配与首个 Windows .exe 构建、optimize skill 四语言扩展，以及 Claude Code 工具链精细化配置">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-25T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-25T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-25">
+  <meta name="twitter:description" content="tianhe 服务器多用户完成 VLA/机器人研究全链路技术栈搭建（Git迁移、训练脚本、数据管道修复、OpenPI评测客户端），TzJsDesktop 完成 research_scout.py 模块化重构、TokenMonitor 跨平台适配与首个 Windows .exe 构建、optimize skill 四语言扩展，以及 Claude Code 工具链精细化配置">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Daily Summaries",
+      "item": "https://tzj2006.github.io/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-03-25",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-03-25/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-25",
+  "name": "Bug Journal 2026-03-25",
+  "description": "tianhe 服务器多用户完成 VLA/机器人研究全链路技术栈搭建（Git迁移、训练脚本、数据管道修复、OpenPI评测客户端），TzJsDesktop 完成 research_scout.py 模块化重构、TokenMonitor 跨平台适配与首个 Windows .exe 构建、optimize skill 四语言扩展，以及 Claude Code 工具链精细化配置",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-25 今日概览 做了什么： 双设备协同推进六个方向：tianhe 服务器聚焦 VLA 机器人研究全链路（BOSS 项目 Git 迁移→训练脚本→LeRobot 数据管道修复→OpenPI 评测客户端改造），TzJsDesktop 完成 research_scout.py 7 模块拆包重构、TokenMonitor Phase E 跨平台适配与 Windows .exe 构建及 3 个 Windows Bug 修复、optimize skill 四语言扩展 怎么做的： ccplan skill 驱动假设验证→方案发散→Critic 对抗→ECL 持久化的结构化流程贯穿大型任务；6 路并行 Explore agent 加速代码分析；#[cfg] 条件编译处理平台差异；NSIS 工具链打包 Windows 安装程序；三并行 Agent 代码审查覆盖复用/质量/效率三维度 有什么用： BOSS 项目训练-评测完整链路打通，research_scout.py 从 2934 行巨石解耦为可维护子包，TokenMonitor 生成首个可分发 Windows .exe（NSIS 3.2MB），三工具均实现跨平台或多语言能力提升，ECL 文档完整记录架构决策链保障跨 session 可继续 TzJsDesktop 做了什么： 完成 research_scout.py 7 模块子包重构、TokenMonitor Phase E 跨平台迁移（Rust 后端完成，前端 glass 清理待办）与 Windows .exe 构建、3 个 Windows 运行时 Bug 修复、约 1300 行 dead 代码清理、optimize skill 四语言 hub+spoke 扩展、ccusage 前置依赖安装工具制作、全局 skill 库重组 怎么做的： ccplan 进行结构化规划，Critic agent 做对抗性审查，三并行 Agent 代码审查，安装 Rust+MSVC Build Tools 通过 cmd.exe 构建 Windows 目标，NSIS makensis 编译安装包，Shell 脚本自动化 skill 目录操作 有什么用： 全部编译验证通过（clippy zero warning，Rust 191 测试 + 前端 175 测试全绿），生成可分发 TokenMonitor_0.5.0_x64-setup.exe 和 TokenMonitor-PrereqSetup.exe（72KB）；ECL 文档保障后续 session 可继续执行 tianhe 做了什么： 为 error_recovery_benchmark 生成 OVERVIEW.md，协助 chenjunye 完成 BOSS 项目 Git 迁移、openvla-oft 训练代码深度对比与训练脚本创建、LeRobot 数据管道修复及 OpenPI 评测客户端改造，与 chenlu 讨论 CrossFormer 到电池 foundation model 的跨域迁移，协助 mozihao 定位 RoboTwin 渲染分辨率 怎么做的： 6 路并行 Explore agent 深度提取项目架构，逐函数对比 openvla/openvla-oft finetune.py，修复 LeRobot→RLDS 数据转换脚本字段过滤逻辑，参照 OpenPI 客户端样例改造评测代码 有什么用： error_recovery_benchmark 技术文档完整生成，BOSS 项目可复现 Git 工作流建立，openvla-oft 完整训练-评测链路搭建完成，LeRobot→RLDS 数据转换修复 tianhe 服务器多用户完成 VLA/机器人研究全链路技术栈搭建（Git迁移、训练脚本、数据管道修复、OpenPI评测客户端），TzJsDesktop 完成 research_scout.py 模块化重构、TokenMonitor 跨平台适配与首个 Windows .exe 构建、optimize skill 四语言扩展，以及 Claude Code 工具链精细化配置\n今日任务 架构与策略 🔄 TokenMonitor Phase E 跨平台迁移与 Windows 构建 — 从 Cargo.toml 完全移除 4 个 objc2 crate 和 macos-private-api 特性，删除约 250 行 glass/transparent Rust 代码，更新 CI 为三平台矩阵构建（macOS+Windows+Ubuntu），安装 Rust+MSVC Build Tools 构建 Windows .exe（NSIS 3.2MB、MSI 4.6MB、裸 exe 14MB）。Rust 后端完成；前端 glass 清理（E-3+E-9）尚待完成 ✅ TokenMonitor 代码清理与 Windows 运行时 Bug 修复 — 三并行 Agent 审查识别并修复：4 个 dead MCP 模块（~1300 行）移除 mod 声明、set_dock_icon_visible 功能回退用 #[cfg] 恢复、Phase A 注释清理；3 个 Windows Bug 修复（TrayBottomCenter 窗口对齐、CREATE_NO_WINDOW 防终端弹出、进度条 Windows 1.5x 宽度缩放）；bootstrap.ts 串行 IPC 改 Promise.allSettled() 并发；sort+reverse 改 sort_unstable_by ✅ research_scout.py 模块化重构 — 将 2934 行单文件巨石拆分为 scout/ 子包（config/prompts/project/search/evaluate/report/cli 共 7 模块），research_scout.py 降为约 80 行薄 shim 保证 mcp_server.py 零改动，同步添加 SSRF 防护和配置值外部化，通过全部 6 项验证 ✅ openvla-oft 训练代码深度对比与脚本创建 — 深度对比 openvla vs openvla-oft finetune.py：动作表示（离散 token vs L1 回归/Diffusion）、架构差异（FiLM、Proprio、Action Chunking）、训练配置差异（LR 调度、断点续训）、数据接口（OFT 额外支持腕部相机和本体感知）。创建 run_openvla_oft.sh（torchrun、L1 回归、双图输入、本体感知、150K 步） ✅ BOSS OpenPI 评测客户端改造 — 将 eval_skills_unaffected_by_oss.py 改造为 WebsocketClientPolicy 客户端，保留 BOSS benchmark 加载和 init_states 复现逻辑，适配 openpi 图像预处理（180°翻转+resize+pad）、状态向量组装（ee_pos+axisangle+gripper）和 action chunking（每 replan_steps 步重新查询） ✅ optimize skill 四语言扩展（hub+spoke） — 将 Python-only optimize skill 扩展支持 Python/Swift/Rust/TypeScript，hub+spoke 架构（SKILL.md 133 行 + 4 个语言 spoke 各 56-57 行，总计 359 行），每语言每维度 ≥7 项检查，配合单语言聚焦指令防止 prompt 稀释 ✅ lerobot2rlds.py 数据接口修复 — 修复 observation.state 过滤器遗漏 joint_state 字段，将包含匹配改为 startswith+排除组合，添加 dones 字段跳过逻辑，修复 v[’names’] KeyError，确保 LeRobot→RLDS 正确包含 state/joint_state/双路图像 ✅ error_recovery_benchmark OVERVIEW.md 生成 — 通过 6 路并行 Explore agent 分析框架核心模块（core.py/recovery_types/error_skills/Phoenix 等），生成约 450 行六段式技术概述文档，包含实际输出统计（pick_place 4995 场景，代码库 9011 行，数据 211MB） ✅ CrossFormer 到电池 foundation model 跨域迁移分析 — 从 CrossFormer 的分段建模/双注意力/Router 路由/多尺度预测提取电池建模 motivation，提出充放电周期=分段单元、多传感器=维度注意力、大规模电池组=路由需求、细中粗三粒度=多尺度预测四个映射方向及周期感知注意力等潜在创新点。讨论停留在概念层，未产出代码 ✅ Claude Code skill 库重组与工具链配置 — 安装 awesome-claude-skills 31 个，将 11 个 coding/documentation/research 相关 skill 移入 gadget 项目级，删除 36 个无关 ECC skill（物流/能源/投资/社交等），重写 tutorial.md；同步更新 summarize tutorial 为 python -m summarize 格式并新增周报章节 实现与修复 ✅ ccusage 前置依赖安装工具制作 — 用 NSIS 编译 TokenMonitor-PrereqSetup.exe（72KB），自动安装 Node.js 和 @ccusage/mcp；同步创建 macOS/Linux shell 脚本版本 ✅ BOSS 项目 Git 迁移与仓库整理 — 将 BOSS 项目从 YY-GX/BOSS 迁移到 Junye-Chen/boss，配置项目级 git user，解决全局代理不可达问题（切换至 localhost:9977），删除 openvla-oft/.git 嵌套仓库转为普通目录，成功 push 84 文件 问题与解决方案 关键问题 1. research_scout.py 拆包后 mcp_server.py 直接 import 15 个函数面临断裂风险（CRITICAL 级） 解决方案: research_scout.py 降为约 80 行薄 shim，通过 re-export 保证 mcp_server.py 零改动，无需修改任何调用方\n关键洞察: Critic agent 发现的 MCP import 断裂是模块化重构中最高风险点；shim re-export 是唯一无侵入迁移路径\n2. 代码审查发现 ~1300 行 dead MCP 模块声明在 lib.rs 中但从未被外部调用，浪费编译时间且制造混乱 解决方案: 移除 lib.rs 中的 4 个 mod 声明和相关 Phase A 注释，文件本身保留供未来接入\n关键洞察: 三并行 Agent 代码审查能检测到「自洽但孤立」的模块群——内部有依赖链但不被任何外部模块引用，单线性审查难以发现\n3. 跨平台迁移时 macOS 专属 API（Keychain、/bin/zsh 路径、set_dock_icon_visible）在 Windows/Linux 编译阻断 解决方案: 用 #[cfg(target_os)] 条件编译分离平台代码；macOS Keychain 在其他平台返回 Err 而非 panic 实现优雅降级；set_dock_icon_visible 用 cfg 恢复 macOS 实现，非 macOS 保留 noop\n关键洞察: 跨平台迁移时「删除 macOS 代码」与「将 macOS 代码改为 noop」是两种操作，必须逐函数决策；macOS-only API 可让其在其他平台返回 Err 优雅降级，无需完全删除功能\n4. Windows 托盘应用三个运行时问题：窗口未贴底对齐任务栏、CLI 探测弹出终端窗口、进度条显示过短 解决方案: 改用 TrayBottomCenter 替代 TrayCenter；所有 Command 调用添加 .creation_flags(0x0800_0000)；#[cfg] 为 Windows/Linux 定义 1.5 倍进度条宽度\n关键洞察: tauri_plugin_positioner 已内置 TrayBottomCenter；tokio::process::Command 在 Windows 原生暴露 creation_flags()，无需额外 trait import（与 std::process::Command 不同）\n5. lerobot2rlds.py 中 ‘observation.state’ 包含匹配遗漏 joint_state 字段，导致 RLDS 数据缺失关节状态 解决方案: 改为 startswith(‘observation.’) + 排除 image/dones 的精确组合，同时处理 v[’names’] KeyError\n关键洞察: 字符串包含匹配容易产生意外（‘observation.state’ 是 ‘observation.joint_state’ 的子串），应用 startswith+排除组合更精确\n6. optimize skill 单文件方案预估 500-700 行，Critic 发现多语言内容会稀释 Claude 处理单语言时的注意力 解决方案: 改为 hub+spoke 架构：hub 放通用框架（133 行），4 个语言 spoke 各 ≤80 行，配合单语言聚焦指令\n关键洞察: 多语言 prompt 设计中，物理文件隔离（spoke 文件）比 section 分隔更能防止 prompt 稀释\n7. resizeDebug 工具被认为可简单归档，但实际深度嵌入 8 个文件 100+ 处调用 解决方案: grep 全量扫描后调整方案：移至 lib/debug/ 子目录而非完全归档，避免大规模调用清除\n关键洞察: 归档前必须 grep 评估实际调用深度，文件数量少不代表影响范围小；ccplan Review Gate 要求此评估步骤\n8. 全局 skill 库 50+ 无关 skill 每次会话加载约 15000-20000 token 的索引 解决方案: 按项目粒度拆分：Python/research/coding 相关移入 gadget 项目级，删除 36 个无关 skill\n关键洞察: Claude Code 每次会话加载全部 skill 索引，应按就近原则管理，全局只留真正通用的 skill\n一般问题 9. datasets 3.6.0 加载 LeRobot Parquet 文件报 ValueError: Feature type ‘List’ not found 解决方案: datasets 新版已移除 List 类型改为 Sequence；引导使用已有 fix_parquet_metadata.py 以位置参数方式批量替换元数据\n关键洞察: LeRobot 数据集与 datasets 库版本强耦合，跨版本升级时需检查 Parquet 元数据特征类型定义\n10. Git Bash 环境中 /usr/bin/link 覆盖 MSVC link.exe，导致 Rust MSVC 目标链接失败 解决方案: 安装 Visual Studio 2022 Build Tools，通过 cmd.exe 激活 MSVC 环境后再执行 cargo build\n关键洞察: Git Bash 路径优先级会遮蔽 Windows 原生链接器，Rust MSVC 目标必须用 cmd.exe 绕过 Git Bash 环境\n人类思路 vs AI 思路 战略层面 运行时 Bug 感知（用户）vs 静态代码分析（AI）的互补性 角色 思路 人类 用户从真实 Windows 实机使用中感知到 3 个具体 Bug（窗口位置错、终端弹出、进度条过短），描述精准到现象层面 AI AI 在 /simplify 审查中从代码层面发现 dead 模块、功能回退、冗余 IPC 调用等问题，属于静态分析而非运行时感知 差异分析: 两种视角互补不可替代：用户提供运行时 Bug 报告，AI 提供代码结构质量发现；跨平台场景下用户实机体验是 AI 静态分析无法覆盖的\n产品化分发思维：用户超越 AI 的「功能完成」视角 角色 思路 人类 用户直接提出创建独立 .exe/.dmg 安装包来自动处理依赖安装，不依赖用户手动执行命令 AI AI 最初停留在「列出用户需手动执行的命令」层次，将安装责任转移给用户 差异分析: 用户比 AI 更早考虑到打包分发的产品化体验，AI 只关注功能实现而忽略了分发便利性\nAI 主动识别技术风险（prompt 稀释、MCP 断裂、归档危险） 角色 思路 人类 用户偏好单文件方案，直觉认为 resizeDebug 可简单归档，未预先评估技术边界 AI AI 通过 Critic agent 发现 prompt 稀释风险；通过 grep 扫描发现 resizeDebug 100+ 处调用；识别 MCP import 断裂为 CRITICAL 级 差异分析: 对抗性评审机制使 AI 能在执行前主动识别破坏性风险，防止用户直觉判断导致的意外回退；这次 AI 比用户更早识别到技术风险\n跨域研究创意来自用户，AI 负责系统化 角色 思路 人类 用户主动提供 CrossFormer 论文核心，提出迁移到电池建模领域的构想，具有明确的研究方向感 AI AI 在用户框架基础上系统化拓展 4 个映射方向，提出周期感知注意力等具体创新点 差异分析: 跨域灵感来自用户的领域知识和直觉，AI 无法独立产生跨领域研究创意，只能在给定框架内结构化和具体化\nAI 基于过时文档给出错误的项目状态评估 角色 思路 人类 用户直接询问 Windows/Linux 适配方案，预判存在可行路径 AI AI 未先查阅 ECL 文档即声称「TokenMonitor macOS-only，无法直接运行」，而实际跨平台工作已部分完成（phase-9-A+E） 差异分析: 用户对项目现状的直觉判断比 AI 的即兴检索更准确；AI 在给出项目状态评估前应先读取最新的 ECL/规划文档\nAI 局限性 重要局限 未查阅现有规划文档（ECL/CLAUDE.md）便给出过时的项目状态评估：将 TokenMonitor 声称为「macOS-only」，忽略了 ECL 中已记录的跨平台进度（phase-9-implementation-A+E），导致用户需要纠正 跨平台代码变更无法在目标平台（Windows）本地运行 cargo build/check 进行实机编译验证，需依赖用户离线确认，增加了跨平台迁移的验证摩擦 Phase E 实施时未主动追踪前端 glass 清理（E-3+E-9）的完成状态，多次会话后该任务仍处于待办，需用户追问才意识到遗漏 一般局限 对 tokio::process::Command 与 std::process::Command 的 API 差异掌握不精确：先添加不必要的 CommandExt trait import，compiler 报 unused import 后才纠正 Commit 默认行为不符合用户偏好（自动添加 Co-Authored-By 行；SSH key 引用错误指向旧密钥），需用户发现后明确指令才纠正 今日收获 核心收获 ECL（Evolving Constraint Language）文档能跨 session 保存完整架构决策上下文（假设验证历史、方案选择原因、Critic 反馈、依赖 DAG），让后续 agent 无需重新分析即可继续执行，是大型多 session 重构的关键持久化机制 Critic agent 和并行多角度 Agent 审查（复用/质量/效率）是防止破坏性变更的有效机制：能系统性发现人类遗漏的关键依赖链（MCP import 断裂、prompt 稀释、resizeDebug 100+ 调用深度），对抗性评审应在每次架构决策中强制执行 OpenVLA-OFT vs OpenVLA 核心差异：OFT 使用独立 Action Head（L1/Diffusion）输出连续动作而非离散 token，额外支持 FiLM 语言条件、本体感知、Action Chunking 和多图输入；数据格式两者均为 RLDS，但 OFT 的 RLDSBatchTransform 额外处理腕部相机和本体感知字段 Hub+spoke 架构适用于多语言 prompt skill 设计：hub 维护通用框架和哲学，spoke 聚焦语言特有检查项（≤80 行），配合「单语言聚焦指令」防止 Claude 处理单语言时注意力稀释；物理文件隔离比 section 分隔更有效 跨平台迁移时「删除 macOS 代码」与「将 macOS 代码改为 noop」是两种操作，必须逐函数决策；macOS-only API 可让其在其他平台返回 Err 实现优雅降级，无需完全删除功能 CrossFormer 的核心思想（时间分段/时间×维度双注意力/Router 路由/多尺度预测）可映射到电池 foundation model：充放电周期=分段单元、多传感器=维度注意力、大规模电池组=路由需求、细中粗三粒度=多尺度预测 Rust 跨平台条件编译 #[cfg(target_os)] 是处理平台特有 API 的干净方案；tokio::process::Command 在 Windows 原生支持 creation_flags()，无需额外 trait import（与 std::process::Command 不同） Claude Code skill 分层管理规则：~/.claude/skills/ 全局加载，项目级 .claude/skills/ 仅该项目加载；skill 索引条目越多上下文 token 消耗越大，应按就近原则管理，非相关 skill 应移入项目级或删除 ccplan Review Gate 在文件重组类任务中价值显著：归档/删除决策前必须 grep 评估实际调用深度，「文件数量少」不等于「影响范围小」，避免将高频调用工具错误归档 实践收获 RLDS 数据格式用 is_first/is_last/is_terminal 表达 episode 边界，不应包含显式 dones 字段；LeRobot→RLDS 转换时需跳过 dones 字段，由 episode 边界自动推导 会话摘要 TokenMonitor 🔄 Phase E 跨平台迁移、Windows .exe 构建、代码清理与 Windows Bug 修复 00:48:26.474 | claude_code 全天四个主要 TokenMonitor 会话：(1) Phase E 移除 4 个 objc2 crate 和 ~250 行 glass 代码，CI 改三平台矩阵，安装 MSVC Build Tools 通过 cmd.exe 成功构建 Windows .exe（NSIS 3.2MB）；(2) 用户主动提出打包依赖安装工具，用 NSIS 制作 72KB TokenMonitor-PrereqSetup.exe；(3) /simplify 三并行 Agent 审查发现 ~1300 行 dead MCP 模块、set_dock_icon_visible 回退等问题全部修复，191+175 测试全绿；(4) 修复 3 个 Windows 运行时 Bug（TrayBottomCenter/CREATE_NO_WINDOW/进度条 1.5x）、/optimize 并发 IPC 优化、/ccplan 制定文件重组规划（ECL 文档已创建，实施待启动）。前端 glass 清理（E-3+E-9）尚未完成。\ngadget Research ✅ research_scout.py 2934 行巨石模块化重构为 scout/ 子包（7 模块） 00:55:52.333 | claude_code 通过 /ccplan 完成假设验证和方案发散，选定按职责拆 scout/ 子包方案。Critic agent 发现 mcp_server.py 直接 import 15 个函数的 CRITICAL 断裂风险，设计 shim re-export 缓解。并行创建 7 个模块（config/prompts/project/search/evaluate/report/cli），通过全部 6 项验证（imports、backward compat、SSRF 防护等）。ECL 文档记录完整决策链。\nchenlu 研究讨论 🔍 CrossFormer 核心思想迁移到电池 foundation model 的 motivation 分析 06:52:35.576 | claude_code 用户 chenlu 介绍 CrossFormer 论文核心（时间分段、时间×维度双注意力、Router 路由、多尺度预测），AI 系统化提出 4 个电池建模映射方向，提出周期感知注意力和跨电池路由等潜在创新点。讨论停留在概念层面，未产出代码。\nBOSS (chenjunye) ✅ Git 迁移、训练代码分析与脚本创建、数据管道调试、OpenPI 评测客户端改造 06:09:02.365 | claude_code 四个 BOSS 相关会话：(1) Git 迁移到 Junye-Chen/boss，解决代理不可达问题，清理 openvla-oft 嵌套 .git，推送 84 文件；(2) 深度对比 openvla vs openvla-oft finetune.py，创建 run_openvla_oft.sh 训练脚本（torchrun、L1 回归、双图、本体感知）；(3) 调试 uv PATH 问题和 datasets 3.6.0 List 类型兼容，引导使用 fix_parquet_metadata.py；(4) 将评测代码改造为 WebsocketClientPolicy 客户端，保留 BOSS benchmark 逻辑，适配 openpi 图像预处理和 action chunking。\nerror-recovery-benchmark ✅ 为机器人错误恢复基准框架生成论文风格技术概述 OVERVIEW.md 01:02:00.964 | claude_code 使用 /summarize 技能，通过 6 路并行 Explore agent 深度分析框架核心模块（ErrorSpec/EnvWrapper/13 个 ErrorSkill/5 种 RBG 恢复策略/Context Replay/Phoenix 等）。生成约 450 行六段式 OVERVIEW.md，包含实际输出统计（pick_place 4995 场景，代码库 9011 行，数据 211MB）。\ngadget Skills \u0026 工具链配置 ✅ optimize skill 四语言扩展、全局 skill 库重组、summarize tutorial 更新 01:44:07.472 | claude_code 三个配置类会话：(1) optimize skill 通过 /ccplan 扩展为 hub+spoke 四语言架构（359 行），Critic 发现单文件 prompt 稀释风险后调整方案；(2) 安装 awesome-claude-skills 31 个，将 11 个移入 gadget 项目级，删除 36 个无关 ECC skill，重写 tutorial.md；(3) 更新 summarize tutorial.md 为 python -m summarize 格式，新增周报章节。天津服务器同步安装 ccplan/summarize/optimize 三个自定义 skill。\nRoboTwin (mozihao) ✅ 查找 RoboTwin 渲染分辨率定义位置 09:14:39.642 | claude_code AI 搜索返回：主配置 task_config/_camera_config.yml 定义 4 种相机类型（D435:320×240、Large_D435:640×480 等），Observer 和 World 相机分辨率硬编码于 envs/camera/camera.py。\nsysu_gbli2xy_1 (codex) ✅ 为仓库自动生成 AGENTS.md 贡献者指南 07:11:13.564 | codex Codex 按标准模板生成 AGENTS.md，涵盖项目结构、构建/测试命令、编码规范、Commit/PR 规范，200-400 字精简专业文档。\nToken 用量 总览 指标 数值 总 Token 86,445,836 输入 Token 142,111 输出 Token 258,888 Cache 创建 4,801,696 Cache 读取 81,243,141 Cache 命中率 94.4% 总费用 (USD) $66.6156 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 66,524 171,951 3,681,693 72,383,409 $63.8337 95.8% claude-haiku-4-5-20251001 66,878 86,086 1,120,003 8,845,758 $2.7819 4.2% glm-4.7 8,709 851 0 13,974 $0.0000 0.0% 各设备用量 设备 总 Token 输入 输出 费用 DCC 16,815,490 33,377 75,742 $15.1681 tianhe 7,516,495 44,898 46,264 $5.0812 TzJsDesktop 62,113,851 63,836 136,882 $46.3662 ",
+  "wordCount" : "1395",
+  "inLanguage": "en",
+  "datePublished": "2026-03-25T00:00:00-05:00",
+  "dateModified": "2026-03-25T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-03-25/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                    <ul class="lang-switch"><li>|</li>
+                        <li>
+                            <a href="https://tzj2006.github.io/zh/" title="中文"
+                                aria-label="中文">中文</a>
+                        </li>
+                    </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/daily/">Daily Summaries</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-25
+    </h1>
+    <div class="post-meta"><span title='2026-03-25 00:00:00 -0500 -0500'>March 25, 2026</span>&nbsp;·&nbsp;<span>7 min</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-25">日报 — 2026-03-25<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-25">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 双设备协同推进六个方向：tianhe 服务器聚焦 VLA 机器人研究全链路（BOSS 项目 Git 迁移→训练脚本→LeRobot 数据管道修复→OpenPI 评测客户端改造），TzJsDesktop 完成 research_scout.py 7 模块拆包重构、TokenMonitor Phase E 跨平台适配与 Windows .exe 构建及 3 个 Windows Bug 修复、optimize skill 四语言扩展</li>
+<li><strong>怎么做的：</strong> ccplan skill 驱动假设验证→方案发散→Critic 对抗→ECL 持久化的结构化流程贯穿大型任务；6 路并行 Explore agent 加速代码分析；#[cfg] 条件编译处理平台差异；NSIS 工具链打包 Windows 安装程序；三并行 Agent 代码审查覆盖复用/质量/效率三维度</li>
+<li><strong>有什么用：</strong> BOSS 项目训练-评测完整链路打通，research_scout.py 从 2934 行巨石解耦为可维护子包，TokenMonitor 生成首个可分发 Windows .exe（NSIS 3.2MB），三工具均实现跨平台或多语言能力提升，ECL 文档完整记录架构决策链保障跨 session 可继续</li>
+</ul>
+<h3 id="tzjsdesktop">TzJsDesktop<a hidden class="anchor" aria-hidden="true" href="#tzjsdesktop">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 完成 research_scout.py 7 模块子包重构、TokenMonitor Phase E 跨平台迁移（Rust 后端完成，前端 glass 清理待办）与 Windows .exe 构建、3 个 Windows 运行时 Bug 修复、约 1300 行 dead 代码清理、optimize skill 四语言 hub+spoke 扩展、ccusage 前置依赖安装工具制作、全局 skill 库重组</li>
+<li><strong>怎么做的：</strong> ccplan 进行结构化规划，Critic agent 做对抗性审查，三并行 Agent 代码审查，安装 Rust+MSVC Build Tools 通过 cmd.exe 构建 Windows 目标，NSIS makensis 编译安装包，Shell 脚本自动化 skill 目录操作</li>
+<li><strong>有什么用：</strong> 全部编译验证通过（clippy zero warning，Rust 191 测试 + 前端 175 测试全绿），生成可分发 TokenMonitor_0.5.0_x64-setup.exe 和 TokenMonitor-PrereqSetup.exe（72KB）；ECL 文档保障后续 session 可继续执行</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 为 error_recovery_benchmark 生成 OVERVIEW.md，协助 chenjunye 完成 BOSS 项目 Git 迁移、openvla-oft 训练代码深度对比与训练脚本创建、LeRobot 数据管道修复及 OpenPI 评测客户端改造，与 chenlu 讨论 CrossFormer 到电池 foundation model 的跨域迁移，协助 mozihao 定位 RoboTwin 渲染分辨率</li>
+<li><strong>怎么做的：</strong> 6 路并行 Explore agent 深度提取项目架构，逐函数对比 openvla/openvla-oft finetune.py，修复 LeRobot→RLDS 数据转换脚本字段过滤逻辑，参照 OpenPI 客户端样例改造评测代码</li>
+<li><strong>有什么用：</strong> error_recovery_benchmark 技术文档完整生成，BOSS 项目可复现 Git 工作流建立，openvla-oft 完整训练-评测链路搭建完成，LeRobot→RLDS 数据转换修复</li>
+</ul>
+<blockquote>
+<p>tianhe 服务器多用户完成 VLA/机器人研究全链路技术栈搭建（Git迁移、训练脚本、数据管道修复、OpenPI评测客户端），TzJsDesktop 完成 research_scout.py 模块化重构、TokenMonitor 跨平台适配与首个 Windows .exe 构建、optimize skill 四语言扩展，以及 Claude Code 工具链精细化配置</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>🔄 <strong>TokenMonitor Phase E 跨平台迁移与 Windows 构建</strong> — 从 Cargo.toml 完全移除 4 个 objc2 crate 和 macos-private-api 特性，删除约 250 行 glass/transparent Rust 代码，更新 CI 为三平台矩阵构建（macOS+Windows+Ubuntu），安装 Rust+MSVC Build Tools 构建 Windows .exe（NSIS 3.2MB、MSI 4.6MB、裸 exe 14MB）。Rust 后端完成；前端 glass 清理（E-3+E-9）尚待完成</li>
+<li>✅ <strong>TokenMonitor 代码清理与 Windows 运行时 Bug 修复</strong> — 三并行 Agent 审查识别并修复：4 个 dead MCP 模块（~1300 行）移除 mod 声明、set_dock_icon_visible 功能回退用 #[cfg] 恢复、Phase A 注释清理；3 个 Windows Bug 修复（TrayBottomCenter 窗口对齐、CREATE_NO_WINDOW 防终端弹出、进度条 Windows 1.5x 宽度缩放）；bootstrap.ts 串行 IPC 改 Promise.allSettled() 并发；sort+reverse 改 sort_unstable_by</li>
+<li>✅ <strong>research_scout.py 模块化重构</strong> — 将 2934 行单文件巨石拆分为 scout/ 子包（config/prompts/project/search/evaluate/report/cli 共 7 模块），research_scout.py 降为约 80 行薄 shim 保证 mcp_server.py 零改动，同步添加 SSRF 防护和配置值外部化，通过全部 6 项验证</li>
+<li>✅ <strong>openvla-oft 训练代码深度对比与脚本创建</strong> — 深度对比 openvla vs openvla-oft finetune.py：动作表示（离散 token vs L1 回归/Diffusion）、架构差异（FiLM、Proprio、Action Chunking）、训练配置差异（LR 调度、断点续训）、数据接口（OFT 额外支持腕部相机和本体感知）。创建 run_openvla_oft.sh（torchrun、L1 回归、双图输入、本体感知、150K 步）</li>
+<li>✅ <strong>BOSS OpenPI 评测客户端改造</strong> — 将 eval_skills_unaffected_by_oss.py 改造为 WebsocketClientPolicy 客户端，保留 BOSS benchmark 加载和 init_states 复现逻辑，适配 openpi 图像预处理（180°翻转+resize+pad）、状态向量组装（ee_pos+axisangle+gripper）和 action chunking（每 replan_steps 步重新查询）</li>
+<li>✅ <strong>optimize skill 四语言扩展（hub+spoke）</strong> — 将 Python-only optimize skill 扩展支持 Python/Swift/Rust/TypeScript，hub+spoke 架构（SKILL.md 133 行 + 4 个语言 spoke 各 56-57 行，总计 359 行），每语言每维度 ≥7 项检查，配合单语言聚焦指令防止 prompt 稀释</li>
+<li>✅ <strong>lerobot2rlds.py 数据接口修复</strong> — 修复 observation.state 过滤器遗漏 joint_state 字段，将包含匹配改为 startswith+排除组合，添加 dones 字段跳过逻辑，修复 v[&rsquo;names&rsquo;] KeyError，确保 LeRobot→RLDS 正确包含 state/joint_state/双路图像</li>
+<li>✅ <strong>error_recovery_benchmark OVERVIEW.md 生成</strong> — 通过 6 路并行 Explore agent 分析框架核心模块（core.py/recovery_types/error_skills/Phoenix 等），生成约 450 行六段式技术概述文档，包含实际输出统计（pick_place 4995 场景，代码库 9011 行，数据 211MB）</li>
+<li>✅ <strong>CrossFormer 到电池 foundation model 跨域迁移分析</strong> — 从 CrossFormer 的分段建模/双注意力/Router 路由/多尺度预测提取电池建模 motivation，提出充放电周期=分段单元、多传感器=维度注意力、大规模电池组=路由需求、细中粗三粒度=多尺度预测四个映射方向及周期感知注意力等潜在创新点。讨论停留在概念层，未产出代码</li>
+<li>✅ <strong>Claude Code skill 库重组与工具链配置</strong> — 安装 awesome-claude-skills 31 个，将 11 个 coding/documentation/research 相关 skill 移入 gadget 项目级，删除 36 个无关 ECC skill（物流/能源/投资/社交等），重写 tutorial.md；同步更新 summarize tutorial 为 python -m summarize 格式并新增周报章节</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>ccusage 前置依赖安装工具制作</strong> — 用 NSIS 编译 TokenMonitor-PrereqSetup.exe（72KB），自动安装 Node.js 和 @ccusage/mcp；同步创建 macOS/Linux shell 脚本版本</li>
+<li>✅ <strong>BOSS 项目 Git 迁移与仓库整理</strong> — 将 BOSS 项目从 YY-GX/BOSS 迁移到 Junye-Chen/boss，配置项目级 git user，解决全局代理不可达问题（切换至 localhost:9977），删除 openvla-oft/.git 嵌套仓库转为普通目录，成功 push 84 文件</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-research_scoutpy-拆包后-mcp_serverpy-直接-import-15-个函数面临断裂风险critical-级">1. research_scout.py 拆包后 mcp_server.py 直接 import 15 个函数面临断裂风险（CRITICAL 级）<a hidden class="anchor" aria-hidden="true" href="#1-research_scoutpy-拆包后-mcp_serverpy-直接-import-15-个函数面临断裂风险critical-级">#</a></h4>
+<p><strong>解决方案:</strong> research_scout.py 降为约 80 行薄 shim，通过 re-export 保证 mcp_server.py 零改动，无需修改任何调用方</p>
+<p><strong>关键洞察:</strong> Critic agent 发现的 MCP import 断裂是模块化重构中最高风险点；shim re-export 是唯一无侵入迁移路径</p>
+<h4 id="2-代码审查发现-1300-行-dead-mcp-模块声明在-librs-中但从未被外部调用浪费编译时间且制造混乱">2. 代码审查发现 ~1300 行 dead MCP 模块声明在 lib.rs 中但从未被外部调用，浪费编译时间且制造混乱<a hidden class="anchor" aria-hidden="true" href="#2-代码审查发现-1300-行-dead-mcp-模块声明在-librs-中但从未被外部调用浪费编译时间且制造混乱">#</a></h4>
+<p><strong>解决方案:</strong> 移除 lib.rs 中的 4 个 mod 声明和相关 Phase A 注释，文件本身保留供未来接入</p>
+<p><strong>关键洞察:</strong> 三并行 Agent 代码审查能检测到「自洽但孤立」的模块群——内部有依赖链但不被任何外部模块引用，单线性审查难以发现</p>
+<h4 id="3-跨平台迁移时-macos-专属-apikeychainbinzsh-路径set_dock_icon_visible在-windowslinux-编译阻断">3. 跨平台迁移时 macOS 专属 API（Keychain、/bin/zsh 路径、set_dock_icon_visible）在 Windows/Linux 编译阻断<a hidden class="anchor" aria-hidden="true" href="#3-跨平台迁移时-macos-专属-apikeychainbinzsh-路径set_dock_icon_visible在-windowslinux-编译阻断">#</a></h4>
+<p><strong>解决方案:</strong> 用 #[cfg(target_os)] 条件编译分离平台代码；macOS Keychain 在其他平台返回 Err 而非 panic 实现优雅降级；set_dock_icon_visible 用 cfg 恢复 macOS 实现，非 macOS 保留 noop</p>
+<p><strong>关键洞察:</strong> 跨平台迁移时「删除 macOS 代码」与「将 macOS 代码改为 noop」是两种操作，必须逐函数决策；macOS-only API 可让其在其他平台返回 Err 优雅降级，无需完全删除功能</p>
+<h4 id="4-windows-托盘应用三个运行时问题窗口未贴底对齐任务栏cli-探测弹出终端窗口进度条显示过短">4. Windows 托盘应用三个运行时问题：窗口未贴底对齐任务栏、CLI 探测弹出终端窗口、进度条显示过短<a hidden class="anchor" aria-hidden="true" href="#4-windows-托盘应用三个运行时问题窗口未贴底对齐任务栏cli-探测弹出终端窗口进度条显示过短">#</a></h4>
+<p><strong>解决方案:</strong> 改用 TrayBottomCenter 替代 TrayCenter；所有 Command 调用添加 .creation_flags(0x0800_0000)；#[cfg] 为 Windows/Linux 定义 1.5 倍进度条宽度</p>
+<p><strong>关键洞察:</strong> tauri_plugin_positioner 已内置 TrayBottomCenter；tokio::process::Command 在 Windows 原生暴露 creation_flags()，无需额外 trait import（与 std::process::Command 不同）</p>
+<h4 id="5-lerobot2rldspy-中-observationstate-包含匹配遗漏-joint_state-字段导致-rlds-数据缺失关节状态">5. lerobot2rlds.py 中 &lsquo;observation.state&rsquo; 包含匹配遗漏 joint_state 字段，导致 RLDS 数据缺失关节状态<a hidden class="anchor" aria-hidden="true" href="#5-lerobot2rldspy-中-observationstate-包含匹配遗漏-joint_state-字段导致-rlds-数据缺失关节状态">#</a></h4>
+<p><strong>解决方案:</strong> 改为 startswith(&lsquo;observation.&rsquo;) + 排除 image/dones 的精确组合，同时处理 v[&rsquo;names&rsquo;] KeyError</p>
+<p><strong>关键洞察:</strong> 字符串包含匹配容易产生意外（&lsquo;observation.state&rsquo; 是 &lsquo;observation.joint_state&rsquo; 的子串），应用 startswith+排除组合更精确</p>
+<h4 id="6-optimize-skill-单文件方案预估-500-700-行critic-发现多语言内容会稀释-claude-处理单语言时的注意力">6. optimize skill 单文件方案预估 500-700 行，Critic 发现多语言内容会稀释 Claude 处理单语言时的注意力<a hidden class="anchor" aria-hidden="true" href="#6-optimize-skill-单文件方案预估-500-700-行critic-发现多语言内容会稀释-claude-处理单语言时的注意力">#</a></h4>
+<p><strong>解决方案:</strong> 改为 hub+spoke 架构：hub 放通用框架（133 行），4 个语言 spoke 各 ≤80 行，配合单语言聚焦指令</p>
+<p><strong>关键洞察:</strong> 多语言 prompt 设计中，物理文件隔离（spoke 文件）比 section 分隔更能防止 prompt 稀释</p>
+<h4 id="7-resizedebug-工具被认为可简单归档但实际深度嵌入-8-个文件-100-处调用">7. resizeDebug 工具被认为可简单归档，但实际深度嵌入 8 个文件 100+ 处调用<a hidden class="anchor" aria-hidden="true" href="#7-resizedebug-工具被认为可简单归档但实际深度嵌入-8-个文件-100-处调用">#</a></h4>
+<p><strong>解决方案:</strong> grep 全量扫描后调整方案：移至 lib/debug/ 子目录而非完全归档，避免大规模调用清除</p>
+<p><strong>关键洞察:</strong> 归档前必须 grep 评估实际调用深度，文件数量少不代表影响范围小；ccplan Review Gate 要求此评估步骤</p>
+<h4 id="8-全局-skill-库-50-无关-skill-每次会话加载约-15000-20000-token-的索引">8. 全局 skill 库 50+ 无关 skill 每次会话加载约 15000-20000 token 的索引<a hidden class="anchor" aria-hidden="true" href="#8-全局-skill-库-50-无关-skill-每次会话加载约-15000-20000-token-的索引">#</a></h4>
+<p><strong>解决方案:</strong> 按项目粒度拆分：Python/research/coding 相关移入 gadget 项目级，删除 36 个无关 skill</p>
+<p><strong>关键洞察:</strong> Claude Code 每次会话加载全部 skill 索引，应按就近原则管理，全局只留真正通用的 skill</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="9-datasets-360-加载-lerobot-parquet-文件报-valueerror-feature-type-list-not-found">9. datasets 3.6.0 加载 LeRobot Parquet 文件报 ValueError: Feature type &lsquo;List&rsquo; not found<a hidden class="anchor" aria-hidden="true" href="#9-datasets-360-加载-lerobot-parquet-文件报-valueerror-feature-type-list-not-found">#</a></h4>
+<p><strong>解决方案:</strong> datasets 新版已移除 List 类型改为 Sequence；引导使用已有 fix_parquet_metadata.py 以位置参数方式批量替换元数据</p>
+<p><strong>关键洞察:</strong> LeRobot 数据集与 datasets 库版本强耦合，跨版本升级时需检查 Parquet 元数据特征类型定义</p>
+<h4 id="10-git-bash-环境中-usrbinlink-覆盖-msvc-linkexe导致-rust-msvc-目标链接失败">10. Git Bash 环境中 /usr/bin/link 覆盖 MSVC link.exe，导致 Rust MSVC 目标链接失败<a hidden class="anchor" aria-hidden="true" href="#10-git-bash-环境中-usrbinlink-覆盖-msvc-linkexe导致-rust-msvc-目标链接失败">#</a></h4>
+<p><strong>解决方案:</strong> 安装 Visual Studio 2022 Build Tools，通过 cmd.exe 激活 MSVC 环境后再执行 cargo build</p>
+<p><strong>关键洞察:</strong> Git Bash 路径优先级会遮蔽 Windows 原生链接器，Rust MSVC 目标必须用 cmd.exe 绕过 Git Bash 环境</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="运行时-bug-感知用户vs-静态代码分析ai的互补性">运行时 Bug 感知（用户）vs 静态代码分析（AI）的互补性<a hidden class="anchor" aria-hidden="true" href="#运行时-bug-感知用户vs-静态代码分析ai的互补性">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户从真实 Windows 实机使用中感知到 3 个具体 Bug（窗口位置错、终端弹出、进度条过短），描述精准到现象层面</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 在 /simplify 审查中从代码层面发现 dead 模块、功能回退、冗余 IPC 调用等问题，属于静态分析而非运行时感知</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 两种视角互补不可替代：用户提供运行时 Bug 报告，AI 提供代码结构质量发现；跨平台场景下用户实机体验是 AI 静态分析无法覆盖的</p>
+<h4 id="产品化分发思维用户超越-ai-的功能完成视角">产品化分发思维：用户超越 AI 的「功能完成」视角<a hidden class="anchor" aria-hidden="true" href="#产品化分发思维用户超越-ai-的功能完成视角">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户直接提出创建独立 .exe/.dmg 安装包来自动处理依赖安装，不依赖用户手动执行命令</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 最初停留在「列出用户需手动执行的命令」层次，将安装责任转移给用户</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户比 AI 更早考虑到打包分发的产品化体验，AI 只关注功能实现而忽略了分发便利性</p>
+<h4 id="ai-主动识别技术风险prompt-稀释mcp-断裂归档危险">AI 主动识别技术风险（prompt 稀释、MCP 断裂、归档危险）<a hidden class="anchor" aria-hidden="true" href="#ai-主动识别技术风险prompt-稀释mcp-断裂归档危险">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户偏好单文件方案，直觉认为 resizeDebug 可简单归档，未预先评估技术边界</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 通过 Critic agent 发现 prompt 稀释风险；通过 grep 扫描发现 resizeDebug 100+ 处调用；识别 MCP import 断裂为 CRITICAL 级</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 对抗性评审机制使 AI 能在执行前主动识别破坏性风险，防止用户直觉判断导致的意外回退；这次 AI 比用户更早识别到技术风险</p>
+<h4 id="跨域研究创意来自用户ai-负责系统化">跨域研究创意来自用户，AI 负责系统化<a hidden class="anchor" aria-hidden="true" href="#跨域研究创意来自用户ai-负责系统化">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户主动提供 CrossFormer 论文核心，提出迁移到电池建模领域的构想，具有明确的研究方向感</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 在用户框架基础上系统化拓展 4 个映射方向，提出周期感知注意力等具体创新点</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 跨域灵感来自用户的领域知识和直觉，AI 无法独立产生跨领域研究创意，只能在给定框架内结构化和具体化</p>
+<h4 id="ai-基于过时文档给出错误的项目状态评估">AI 基于过时文档给出错误的项目状态评估<a hidden class="anchor" aria-hidden="true" href="#ai-基于过时文档给出错误的项目状态评估">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户直接询问 Windows/Linux 适配方案，预判存在可行路径</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 未先查阅 ECL 文档即声称「TokenMonitor macOS-only，无法直接运行」，而实际跨平台工作已部分完成（phase-9-A+E）</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户对项目现状的直觉判断比 AI 的即兴检索更准确；AI 在给出项目状态评估前应先读取最新的 ECL/规划文档</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>未查阅现有规划文档（ECL/CLAUDE.md）便给出过时的项目状态评估：将 TokenMonitor 声称为「macOS-only」，忽略了 ECL 中已记录的跨平台进度（phase-9-implementation-A+E），导致用户需要纠正</li>
+<li>跨平台代码变更无法在目标平台（Windows）本地运行 cargo build/check 进行实机编译验证，需依赖用户离线确认，增加了跨平台迁移的验证摩擦</li>
+<li>Phase E 实施时未主动追踪前端 glass 清理（E-3+E-9）的完成状态，多次会话后该任务仍处于待办，需用户追问才意识到遗漏</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>对 tokio::process::Command 与 std::process::Command 的 API 差异掌握不精确：先添加不必要的 CommandExt trait import，compiler 报 unused import 后才纠正</li>
+<li>Commit 默认行为不符合用户偏好（自动添加 Co-Authored-By 行；SSH key 引用错误指向旧密钥），需用户发现后明确指令才纠正</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>ECL（Evolving Constraint Language）文档能跨 session 保存完整架构决策上下文（假设验证历史、方案选择原因、Critic 反馈、依赖 DAG），让后续 agent 无需重新分析即可继续执行，是大型多 session 重构的关键持久化机制</li>
+<li>Critic agent 和并行多角度 Agent 审查（复用/质量/效率）是防止破坏性变更的有效机制：能系统性发现人类遗漏的关键依赖链（MCP import 断裂、prompt 稀释、resizeDebug 100+ 调用深度），对抗性评审应在每次架构决策中强制执行</li>
+<li>OpenVLA-OFT vs OpenVLA 核心差异：OFT 使用独立 Action Head（L1/Diffusion）输出连续动作而非离散 token，额外支持 FiLM 语言条件、本体感知、Action Chunking 和多图输入；数据格式两者均为 RLDS，但 OFT 的 RLDSBatchTransform 额外处理腕部相机和本体感知字段</li>
+<li>Hub+spoke 架构适用于多语言 prompt skill 设计：hub 维护通用框架和哲学，spoke 聚焦语言特有检查项（≤80 行），配合「单语言聚焦指令」防止 Claude 处理单语言时注意力稀释；物理文件隔离比 section 分隔更有效</li>
+<li>跨平台迁移时「删除 macOS 代码」与「将 macOS 代码改为 noop」是两种操作，必须逐函数决策；macOS-only API 可让其在其他平台返回 Err 实现优雅降级，无需完全删除功能</li>
+<li>CrossFormer 的核心思想（时间分段/时间×维度双注意力/Router 路由/多尺度预测）可映射到电池 foundation model：充放电周期=分段单元、多传感器=维度注意力、大规模电池组=路由需求、细中粗三粒度=多尺度预测</li>
+<li>Rust 跨平台条件编译 #[cfg(target_os)] 是处理平台特有 API 的干净方案；tokio::process::Command 在 Windows 原生支持 creation_flags()，无需额外 trait import（与 std::process::Command 不同）</li>
+<li>Claude Code skill 分层管理规则：~/.claude/skills/ 全局加载，项目级 .claude/skills/ 仅该项目加载；skill 索引条目越多上下文 token 消耗越大，应按就近原则管理，非相关 skill 应移入项目级或删除</li>
+<li>ccplan Review Gate 在文件重组类任务中价值显著：归档/删除决策前必须 grep 评估实际调用深度，「文件数量少」不等于「影响范围小」，避免将高频调用工具错误归档</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>RLDS 数据格式用 is_first/is_last/is_terminal 表达 episode 边界，不应包含显式 dones 字段；LeRobot→RLDS 转换时需跳过 dones 字段，由 episode 边界自动推导</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="tokenmonitor">TokenMonitor<a hidden class="anchor" aria-hidden="true" href="#tokenmonitor">#</a></h3>
+<p><strong>🔄 Phase E 跨平台迁移、Windows .exe 构建、代码清理与 Windows Bug 修复</strong>
+<em>00:48:26.474 | claude_code</em>
+全天四个主要 TokenMonitor 会话：(1) Phase E 移除 4 个 objc2 crate 和 ~250 行 glass 代码，CI 改三平台矩阵，安装 MSVC Build Tools 通过 cmd.exe 成功构建 Windows .exe（NSIS 3.2MB）；(2) 用户主动提出打包依赖安装工具，用 NSIS 制作 72KB TokenMonitor-PrereqSetup.exe；(3) /simplify 三并行 Agent 审查发现 ~1300 行 dead MCP 模块、set_dock_icon_visible 回退等问题全部修复，191+175 测试全绿；(4) 修复 3 个 Windows 运行时 Bug（TrayBottomCenter/CREATE_NO_WINDOW/进度条 1.5x）、/optimize 并发 IPC 优化、/ccplan 制定文件重组规划（ECL 文档已创建，实施待启动）。前端 glass 清理（E-3+E-9）尚未完成。</p>
+<h3 id="gadget-research">gadget Research<a hidden class="anchor" aria-hidden="true" href="#gadget-research">#</a></h3>
+<p><strong>✅ research_scout.py 2934 行巨石模块化重构为 scout/ 子包（7 模块）</strong>
+<em>00:55:52.333 | claude_code</em>
+通过 /ccplan 完成假设验证和方案发散，选定按职责拆 scout/ 子包方案。Critic agent 发现 mcp_server.py 直接 import 15 个函数的 CRITICAL 断裂风险，设计 shim re-export 缓解。并行创建 7 个模块（config/prompts/project/search/evaluate/report/cli），通过全部 6 项验证（imports、backward compat、SSRF 防护等）。ECL 文档记录完整决策链。</p>
+<h3 id="chenlu-研究讨论">chenlu 研究讨论<a hidden class="anchor" aria-hidden="true" href="#chenlu-研究讨论">#</a></h3>
+<p><strong>🔍 CrossFormer 核心思想迁移到电池 foundation model 的 motivation 分析</strong>
+<em>06:52:35.576 | claude_code</em>
+用户 chenlu 介绍 CrossFormer 论文核心（时间分段、时间×维度双注意力、Router 路由、多尺度预测），AI 系统化提出 4 个电池建模映射方向，提出周期感知注意力和跨电池路由等潜在创新点。讨论停留在概念层面，未产出代码。</p>
+<h3 id="boss-chenjunye">BOSS (chenjunye)<a hidden class="anchor" aria-hidden="true" href="#boss-chenjunye">#</a></h3>
+<p><strong>✅ Git 迁移、训练代码分析与脚本创建、数据管道调试、OpenPI 评测客户端改造</strong>
+<em>06:09:02.365 | claude_code</em>
+四个 BOSS 相关会话：(1) Git 迁移到 Junye-Chen/boss，解决代理不可达问题，清理 openvla-oft 嵌套 .git，推送 84 文件；(2) 深度对比 openvla vs openvla-oft finetune.py，创建 run_openvla_oft.sh 训练脚本（torchrun、L1 回归、双图、本体感知）；(3) 调试 uv PATH 问题和 datasets 3.6.0 List 类型兼容，引导使用 fix_parquet_metadata.py；(4) 将评测代码改造为 WebsocketClientPolicy 客户端，保留 BOSS benchmark 逻辑，适配 openpi 图像预处理和 action chunking。</p>
+<h3 id="error-recovery-benchmark">error-recovery-benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>✅ 为机器人错误恢复基准框架生成论文风格技术概述 OVERVIEW.md</strong>
+<em>01:02:00.964 | claude_code</em>
+使用 /summarize 技能，通过 6 路并行 Explore agent 深度分析框架核心模块（ErrorSpec/EnvWrapper/13 个 ErrorSkill/5 种 RBG 恢复策略/Context Replay/Phoenix 等）。生成约 450 行六段式 OVERVIEW.md，包含实际输出统计（pick_place 4995 场景，代码库 9011 行，数据 211MB）。</p>
+<h3 id="gadget-skills--工具链配置">gadget Skills &amp; 工具链配置<a hidden class="anchor" aria-hidden="true" href="#gadget-skills--工具链配置">#</a></h3>
+<p><strong>✅ optimize skill 四语言扩展、全局 skill 库重组、summarize tutorial 更新</strong>
+<em>01:44:07.472 | claude_code</em>
+三个配置类会话：(1) optimize skill 通过 /ccplan 扩展为 hub+spoke 四语言架构（359 行），Critic 发现单文件 prompt 稀释风险后调整方案；(2) 安装 awesome-claude-skills 31 个，将 11 个移入 gadget 项目级，删除 36 个无关 ECC skill，重写 tutorial.md；(3) 更新 summarize tutorial.md 为 python -m summarize 格式，新增周报章节。天津服务器同步安装 ccplan/summarize/optimize 三个自定义 skill。</p>
+<h3 id="robotwin-mozihao">RoboTwin (mozihao)<a hidden class="anchor" aria-hidden="true" href="#robotwin-mozihao">#</a></h3>
+<p><strong>✅ 查找 RoboTwin 渲染分辨率定义位置</strong>
+<em>09:14:39.642 | claude_code</em>
+AI 搜索返回：主配置 task_config/_camera_config.yml 定义 4 种相机类型（D435:320×240、Large_D435:640×480 等），Observer 和 World 相机分辨率硬编码于 envs/camera/camera.py。</p>
+<h3 id="sysu_gbli2xy_1-codex">sysu_gbli2xy_1 (codex)<a hidden class="anchor" aria-hidden="true" href="#sysu_gbli2xy_1-codex">#</a></h3>
+<p><strong>✅ 为仓库自动生成 AGENTS.md 贡献者指南</strong>
+<em>07:11:13.564 | codex</em>
+Codex 按标准模板生成 AGENTS.md，涵盖项目结构、构建/测试命令、编码规范、Commit/PR 规范，200-400 字精简专业文档。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>86,445,836</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>142,111</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>258,888</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>4,801,696</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>81,243,141</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>94.4%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$66.6156</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>66,524</td>
+          <td>171,951</td>
+          <td>3,681,693</td>
+          <td>72,383,409</td>
+          <td>$63.8337</td>
+          <td>95.8%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>66,878</td>
+          <td>86,086</td>
+          <td>1,120,003</td>
+          <td>8,845,758</td>
+          <td>$2.7819</td>
+          <td>4.2%</td>
+      </tr>
+      <tr>
+          <td>glm-4.7</td>
+          <td>8,709</td>
+          <td>851</td>
+          <td>0</td>
+          <td>13,974</td>
+          <td>$0.0000</td>
+          <td>0.0%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>16,815,490</td>
+          <td>33,377</td>
+          <td>75,742</td>
+          <td>$15.1681</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>7,516,495</td>
+          <td>44,898</td>
+          <td>46,264</td>
+          <td>$5.0812</td>
+      </tr>
+      <tr>
+          <td>TzJsDesktop</td>
+          <td>62,113,851</td>
+          <td>63,836</td>
+          <td>136,882</td>
+          <td>$46.3662</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

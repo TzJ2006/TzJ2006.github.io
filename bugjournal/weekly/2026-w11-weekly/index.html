@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Weekly Summary 2026-W11 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal, Weekly Summary">
+<meta name="description" content="本周在DCC、tianhe、TzJsDesktop三台设备上并行推进六条主线：①MIHD空间转录组学发现跨样本embedding方法论根本缺陷（per-section独立处理导致特征空间不可比）并启动修复；②ErrorRecoveryBenchmark从Bug修复到13技能/29子类型全面规模化，攻克Drop技能物体不掉落难题，暴露在线配额架构局限后确立离线注入新方向；③VLA-RoboTwin/pi05从环境搭建、训练性能优化（JAX版本对齐&#43;33%提速）到新数据变量收集、辅助任务实验全链路贯通；④gadget工具链完成MCP Server&#43;common/共享包&#43;统一输出目录的架构升级，research profiler突破学者主页优先学生发现；⑤CalendarPro完成7阶段全面优化，230测试全通过，token消耗降低40-60%；⑥gadget研究工具链整合引用图分析并完成7位具身AI学者深度画像。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/weekly/2026-w11-weekly/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.c3b562a4103ddad215966d26b061d89cb16e1dade8748d9f57c4abc19a840c1a.css" integrity="sha256-w7VipBA92tIVlm0msGHYnLFuHa3odI2fV8SrwZqEDBo=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/weekly/2026-w11-weekly/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://tzj2006.github.io/bugjournal/weekly/2026-w11-weekly/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Weekly Summary 2026-W11">
+  <meta property="og:description" content="本周在DCC、tianhe、TzJsDesktop三台设备上并行推进六条主线：①MIHD空间转录组学发现跨样本embedding方法论根本缺陷（per-section独立处理导致特征空间不可比）并启动修复；②ErrorRecoveryBenchmark从Bug修复到13技能/29子类型全面规模化，攻克Drop技能物体不掉落难题，暴露在线配额架构局限后确立离线注入新方向；③VLA-RoboTwin/pi05从环境搭建、训练性能优化（JAX版本对齐&#43;33%提速）到新数据变量收集、辅助任务实验全链路贯通；④gadget工具链完成MCP Server&#43;common/共享包&#43;统一输出目录的架构升级，research profiler突破学者主页优先学生发现；⑤CalendarPro完成7阶段全面优化，230测试全通过，token消耗降低40-60%；⑥gadget研究工具链整合引用图分析并完成7位具身AI学者深度画像。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-15T23:59:00-05:00">
+    <meta property="article:modified_time" content="2026-03-15T23:59:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Weekly Summary 2026-W11">
+  <meta name="twitter:description" content="本周在DCC、tianhe、TzJsDesktop三台设备上并行推进六条主线：①MIHD空间转录组学发现跨样本embedding方法论根本缺陷（per-section独立处理导致特征空间不可比）并启动修复；②ErrorRecoveryBenchmark从Bug修复到13技能/29子类型全面规模化，攻克Drop技能物体不掉落难题，暴露在线配额架构局限后确立离线注入新方向；③VLA-RoboTwin/pi05从环境搭建、训练性能优化（JAX版本对齐&#43;33%提速）到新数据变量收集、辅助任务实验全链路贯通；④gadget工具链完成MCP Server&#43;common/共享包&#43;统一输出目录的架构升级，research profiler突破学者主页优先学生发现；⑤CalendarPro完成7阶段全面优化，230测试全通过，token消耗降低40-60%；⑥gadget研究工具链整合引用图分析并完成7位具身AI学者深度画像。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Weekly Summaries",
+      "item": "https://tzj2006.github.io/bugjournal/weekly/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Weekly Summary 2026-W11",
+      "item": "https://tzj2006.github.io/bugjournal/weekly/2026-w11-weekly/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Weekly Summary 2026-W11",
+  "name": "Weekly Summary 2026-W11",
+  "description": "本周在DCC、tianhe、TzJsDesktop三台设备上并行推进六条主线：①MIHD空间转录组学发现跨样本embedding方法论根本缺陷（per-section独立处理导致特征空间不可比）并启动修复；②ErrorRecoveryBenchmark从Bug修复到13技能/29子类型全面规模化，攻克Drop技能物体不掉落难题，暴露在线配额架构局限后确立离线注入新方向；③VLA-RoboTwin/pi05从环境搭建、训练性能优化（JAX版本对齐+33%提速）到新数据变量收集、辅助任务实验全链路贯通；④gadget工具链完成MCP Server+common/共享包+统一输出目录的架构升级，research profiler突破学者主页优先学生发现；⑤CalendarPro完成7阶段全面优化，230测试全通过，token消耗降低40-60%；⑥gadget研究工具链整合引用图分析并完成7位具身AI学者深度画像。",
+  "keywords": [
+    "Bug Journal", "Weekly Summary"
+  ],
+  "articleBody": "周报 — 2026-W11 (2026-03-09 ~ 2026-03-15) 本周在DCC、tianhe、TzJsDesktop三台设备上并行推进六条主线：①MIHD空间转录组学发现跨样本embedding方法论根本缺陷（per-section独立处理导致特征空间不可比）并启动修复；②ErrorRecoveryBenchmark从Bug修复到13技能/29子类型全面规模化，攻克Drop技能物体不掉落难题，暴露在线配额架构局限后确立离线注入新方向；③VLA-RoboTwin/pi05从环境搭建、训练性能优化（JAX版本对齐+33%提速）到新数据变量收集、辅助任务实验全链路贯通；④gadget工具链完成MCP Server+common/共享包+统一输出目录的架构升级，research profiler突破学者主页优先学生发现；⑤CalendarPro完成7阶段全面优化，230测试全通过，token消耗降低40-60%；⑥gadget研究工具链整合引用图分析并完成7位具身AI学者深度画像。\n本周概览 指标 数值 日期范围 2026-03-09 ~ 2026-03-15 活跃天数 6 / 7 总对话数 29 涉及项目 19 完成任务 36 进行中任务 10 总 Token 309,110,118 总费用 $227.47 日均费用 $32.50 项目进展 VLA-RoboTwin/pi05 (6 天活跃) — 🔄 active 完成项:\nRoboTwin 50条episode成功转换LeRobot格式（11459帧） 诊断pi05 vs openpi训练时长33%差异，升级JAX 0.5.0→0.5.3等6个关键依赖，训练预期从20h压缩至15h 完成eval.sh运行环境全链路修复：torchvision升级0.22.1+设置conda CUDA_HOME从源码重编译curobo解决ABI不兼容 为Place Dual Shoes实现5个新数据变量（manip_progress_time/distance_left/right、target_endpose、target_joint），采用move()后回溯patch pickle的后处理架构解决未来状态依赖 跨6个文件设计实现四组操作进度预测辅助实验（last_token vs special_token × time vs distance），添加stop_gradient隔离策略和ProgressConfig配置开关 修复CheckpointWeightLoader missing_regex可配置化、pi0.py LeRobot shape squeeze问题，训练step 100 action_loss/aux_loss曲线正常下降 阻塞项:\n⚠️ 四组辅助实验因LeRobot数据集未包含新字段而阻塞，需重新转换数据集 ⚠️ eval.sh默认checkpoint_id=5000路径不存在，需修正为可用值（15000/25000/29999） ErrorRecoveryBenchmark (4 天活跃) — 🔄 active 完成项:\n修复monitor.update()返回值丢弃和taxonomy标签映射两个关键Bug，重标注1029条历史场景 攻克Drop技能物体不掉落问题：调用mujoco.mj_step()运行15个物理步绕过OSC控制器干扰 修复5个系统性失败技能（drop三技能+grasp_misalignment+trajectory_regression+wrong_object），105单元测试全通过 E2 Drop按恢复策略语义拆分为3个独立技能（drop_in_transit/drop_at_wrong_place/drop_with_interaction），基准扩展至13技能/29子类型 修复Stack体名解析静默失败Bug，为11个demo技能生成MP4演示视频，完成v4代码归档 完成v5.1架构规划（InjectionEngine重构+速度限制+人类示例采集pipeline），确定4月1日前开始recovery训练里程碑 v5全量运行生成231个场景和MP4；首轮D0生成207个场景 阻塞项:\n⚠️ D0场景生成距目标600条仍有缺口，5个已修复根因需重新验证 ⚠️ 咖啡机部件散架（lid悬浮、base偏离）kinematic tree结构问题诊断未完成 ⚠️ v5.1离线注入架构实施工作尚未开始 MIHD（空间转录组学） (3 天活跃) — 🔄 active 完成项:\n完成151673↔151508跨样本RM-IDEAL benchmark，Layer_1/5正相关（r≤0.66），Layer_3负相关揭示融合嵌入层特异性 实现CrossModalEnhancer模块（空间邻居构建KV序列+对称InfoNCE），CPU端三模式测试通过 绕过RTX 2080 Ti cuBLAS大张量Bug（先投影到hidden_dim再聚合邻居+mini-batch对比损失） scGPT文献综述证实zero-shot不如PCA/scVI，为gene encoder选择提供战略性证据 完成MIHD输出目录大重构（14+文件路径引用全部更新） 发现跨样本embedding方法论根本缺陷并启动raw_shared共享HVG交集（1137基因）基线修复 阻塞项:\n⚠️ 151676 STAIG embedding全零（模型坍塌），GPU重训因PyTorch 2.9.0+PyG CUDA冲突失败，跨切片可视化阻塞 ⚠️ raw_shared embedding诊断仍在运行中，CrossModalEnhancer完整GPU pipeline评估未完成 gadget工具链 (2 天活跃) — 🔄 active 完成项:\n用FastMCP+capture_stdout+asyncio.to_thread封装9个MCP工具，重构为内容返回模式（save参数控制写入） 增强research_scout日志系统（RotatingFileHandler双输出），零新依赖接入bioRxiv/PubMed多源 新建6个common/模块消除约500行重复代码，paths.py统一6个路径常量，.gitignore精简为单行outputs/ 实现Homepage-Based学生发现（4阶段策略：主页优先+co-authorship补充），7位具身AI学者完成深度画像 整合research_scout.py为统一CLI入口（profile/citations子命令），集成Semantic Scholar引用图API，新增Hugo research栏目 阻塞项:\n⚠️ 7位学者画像Hugo部署尚未完成 ⚠️ LLM生成中文长格式JSON引号污染问题未根治 CalendarPro (2 天活跃) — ✅ completed 完成项:\n实现gadget集成层（ResearchScoutTool+DailySummaryTool+conda run跨环境），每日8AM/11PM自动触发，13单元测试通过 完成7阶段全面优化（置信度阈值、混合路由、Prompt精简+中文token修正、指数退避、可配置调度权重、自动阈值调优、ThoughtStore缓存） 修复4个真实误分类场景，Prompt token消耗减少40-60%，230测试全通过 UniVLA/CALVIN评测 (2 天活跃) — 🔄 active 完成项:\n完成CALVIN依赖链分析（4处问题定位），发现评估为纯在线仿真，提取eval-only文件（1.3GB→600KB） 添加–single_gpu模式绕过torchrun/DDP，修复多处硬编码路径，安装braceexpand依赖 阻塞项:\n⚠️ 评测脚本完整流程未验证，仍在迭代调试阶段 关键任务 ✅ CalendarPro 7阶段全面优化 (2026-03-15) — 实施语义路由置信度阈值、混合路由（Dense 70%+Keyword 30%）、Prompt精简（530行→base+11个fragment）+中文token修正（×1.5/字）、指数退避重试、可配置调度权重、自动阈值调优闭环、ThoughtStore内存缓存，修复4个真实误分类场景，token消耗降低40-60%，230测试全通过 ✅ gadget research工具链CLI整合+引用图+7位学者深度画像 (2026-03-15) — 以research_scout.py为统一CLI整合paper scout和researcher profiler，新增Semantic Scholar引用图API（三阶段报告自动对top-5论文运行引用分析），完成Mingyu Ding/Ruoshi Liu/Xiaolong Wang/Shuran Song/Yunzhu Li/Yuke Zhu/Chelsea Finn 7位学者深度画像，识别完整导师关系网络 🔄 ErrorRecoveryBenchmark v5全面修复与13技能/29子类型规模化 (2026-03-15) — 修复5个系统性失败技能，E2拆分为3个语义独立技能，完成v4归档，v5全量运行生成231个场景，首轮D0生成207个场景（目标600），完成v5.1架构规划（InjectionEngine+速度限制+人类示例采集，4月1日前开始recovery训练） ✅ gadget common/共享包提取+outputs/统一目录重构 (2026-03-15) — 新建6个common/模块（io/cache/json_utils/llm/hugo），消除约500行重复LLM调用和JSON解析代码，paths.py统一6个路径常量，.gitignore精简为单行outputs/，更新4个CLAUDE.md ✅ gadget MCP Server设计实现与工具内容返回重构 (2026-03-09) — 用FastMCP+capture_stdout+asyncio.to_thread封装9个MCP工具，从’写文件返回路径’重构为’返回完整内容+save参数可选写入’，确定pip install -e.+console entry point分发方案，全部工具验证通过 🔄 MIHD跨样本embedding方法论诊断与修复 (2026-03-15) — 发现per-section独立HVG选择+独立PCA拟合的双重不可比性，否定’PCA优于STAIG=输入特征弱’的误判，启动共享HVG交集（1137基因）的raw_shared基线方案，发现STAIG在Layer_1/5（SL@50=0.94-1.0）vs中间层全失败的层特异性现象 ✅ pi05训练性能优化：JAX版本对齐+依赖冲突修复 (2026-03-11) — 通过并行子代理对比pyproject.toml/uv.lock/wandb日志定位JAX版本差异（0.5.0 vs 0.5.3）为训练慢33%主因，对齐6个关键依赖，用uv override-dependencies解决lerobot torch\u003c2.7冲突，成功完成uv lock（305个包） 🔄 pi05四组操作进度预测辅助实验设计与实现 (2026-03-14) — 在JAX/Flax NNX框架下跨6个文件实现manip_progress辅助预测头（last_token vs special_token × time vs distance），添加stop_gradient隔离策略和ProgressConfig配置开关，修复CheckpointWeightLoader和LeRobot shape问题，训练step 100 loss曲线正常下降 ✅ ErrorRecoveryBenchmark v5.1架构规划 (2026-03-15) — 将ContextReplayEngine重构为InjectionEngine（直接恢复注入帧sim state，绕过无context window的VLA假设），添加运动速度限制，设计键盘遥操作人类示例采集pipeline，数据源限定为MimicGen demo，明确Mar 16-31分阶段实施计划 ✅ RoboTwin新数据变量后处理收集架构实现 (2026-03-13) — 采用move()完成后回溯patch pickle的后处理方案实现5个新变量，解决target_endpose/target_joint对未来状态的依赖问题，修复manip_progress_distance负值（np.clip到[0,1]），pkl2hdf5.py通用递归设计无需修改 🔄 VLA eval.sh运行环境全链路修复 (2026-03-12) — 升级torchvision 0.22.1+cu126修复nms算子不匹配，设置CUDA_HOME指向conda targets目录从源码重编译curobo解决ABI不兼容，剩余checkpoint_id=5000路径不存在问题待修正 ✅ gadget Homepage-Based学生发现策略实现 (2026-03-15) — 实现homepage_discovery.py模块（~200行），4阶段发现策略（主页优先+co-authorship补充），多策略URL发现（S2 homepage字段+LLM建议+–homepage参数），HTMLParser文本提取，2MB限制+7天缓存TTL，解决S2共作者分析对顶级大佬完全失效的根本问题 问题与解决方案 1. Drop技能：OSC控制器在env.step()中主动维持EEF位置（impedance control），夹爪打开后物体被手指托住无法自由落体 [ErrorRecoveryBenchmark] (2026-03-15) 解决方案: 绕过控制器直接设置MuJoCo qpos/qvel后，调用mujoco.mj_step()运行15个物理步完成初始分离，再进入标准控制循环\n2. MIHD跨样本embedding比较无效：per-section独立HVG选择+独立PCA拟合导致特征空间不可比，‘PCA优于STAIG’结论为方法论错误 [MIHD] (2026-03-15) 解决方案: 改用共享HVG交集（1137基因）+统一处理的raw_shared方案作为正确基线，直接从原始HDF5加载而非依赖per-section缓存（存在var_names整数化bug）\n3. Stack体名解析静默失败：stack.yaml用cubeA/cubeB，MuJoCo实际名为cubeA_main，_sim_body_name2id返回-1，Python负索引导致任务阶段检测全部误判为pre_reach [ErrorRecoveryBenchmark] (2026-03-15) 解决方案: 修复体名字段，在_sim_body_name2id中添加_main/_body0后缀回退逻辑，查找失败输出WARNING而非静默返回-1\n4. pi05训练比openpi慢33%（20h vs 15h），直觉指向硬件差异，根因不明 [VLA-RoboTwin/pi05] (2026-03-11) 解决方案: 通过并行子代理对比软件层面（pyproject.toml/uv.lock/wandb日志），定位JAX版本差异（0.5.0 vs 0.5.3）为主因，XLA编译器优化积累；用uv override-dependencies解决lerobot torch版本上界约束冲突\n5. curobo预编译.so与torch 2.7.1 ABI不兼容（undefined symbol），JIT重编译因conda CUDA头文件路径非标准而失败 [VLA-RoboTwin] (2026-03-12) 解决方案: 设置CUDA_HOME=conda环境根目录，CPATH指向targets/x86_64-linux/include/，pip install -e.从源码重编译\n6. 在线配额生成严重不均衡：premature_release自然捕获7233条，7种类型完全为0，策略行为分布不均无法控制 [ErrorRecoveryBenchmark] (2026-03-09) 解决方案: 确立离线注入架构：先完整rollout收集轨迹，离线检测可注入点建索引，再按配额选择性注入；已满类型跳过\n7. CalendarPro意图误分类：无置信度阈值（0.52也当有效分类）、时间表达式被关键词路由误判、短确认词无上下文理解、中文token估算偏差3倍 [CalendarPro] (2026-03-15) 解决方案: 添加per-route置信度阈值（0.40-0.60），引入关键词评分器与embedding 70/30混合路由，系统prompt拆分为base+11个fragment按需注入，中文token改为×1.5估算\n8. S2共作者分析对顶级大佬（Levine/Abbeel/Finn等）完全失效（depth-2全空），Xiaolong Wang/Shuran Song存在严重同名歧义 [gadget] (2026-03-15) 解决方案: 重构为homepage-first策略：优先从教授个人主页抓取学生列表，co-authorship仅作补充；多策略URL发现；同名歧义标注WARNING建议使用S2 authorId精确查询\n9. VLA context replay架构假设错误：设计了完整N-1帧回放机制，但大多数VLA没有context window，该开销为无用设计 [ErrorRecoveryBenchmark] (2026-03-15) 解决方案: 将ContextReplayEngine重构为InjectionEngine，直接恢复注入帧sim state；数据源限定为可控性更高的MimicGen demo数据\n10. RTX 2080 Ti + PyTorch 2.9.0对N\u003e3500高维张量触发cuBLAS CUBLAS_STATUS_EXECUTION_FAILED [MIHD] (2026-03-09) 解决方案: 先用Linear投影到hidden_dim(128)再索引邻居（避免高维大张量进入cuBLAS），InfoNCE改为mini-batch对比损失（batch_size=512）\n11. MCP Server工具写文件返回路径，AI无法直接消费内容 [gadget] (2026-03-09) 解决方案: 重构工具绕过cmd_*包装器直接调用底层函数返回完整内容（markdown/JSON），通过save参数控制文件写入\n12. pi0.py对LeRobot内部行为假设错误：推断shape=(1,)特征保持(b,1)形状并修改代码，实际LeRobot DataLoader会squeeze为(b,)导致训练时shape不匹配 [VLA-RoboTwin/pi05] (2026-03-15) 解决方案: 通过实际运行训练并观察日志（‘aux_targets[…]: (32,)@float32’）确认真实shape，还原原始[:, None]和jnp.stack操作\n学习收获 架构 (architecture) 跨样本embedding比较的必要前提是特征空间共享：per-section独立HVG选择+独立PCA拟合=双重不可比性。有效基线必须使用共享HVG交集+联合处理，或固定预训练权重的foundation model MuJoCo中直接状态操作与反馈控制器（OSC）存在根本冲突：sim.forward()仅更新运动学，mujoco.mj_step()才推进动力学并绕过控制器。仿真注入设计必须明确选择一条路径 Error类型语义拆分应基于’恢复策略是否相同’而非’注入机制是否相同’：drop_in_transit/drop_at_wrong_place/drop_with_interaction的检测条件和恢复逻辑截然不同，即使注入动作相同也必须分开建模 语义路由器架构缺陷：embedding最近邻总产生结果，无法表达’不确定’。置信度阈值+备选LLM+关键词评分器混合是最实用修复模式，可推广至所有基于向量检索的分类系统（RAG路由、工具选择等） MCP工具应以AI消费为首要目标：返回完整内容，文件写入为可选副作用。通用benchmark不应假设模型有context window，InjectionEngine直接恢复sim state比context replay更通用 对顶级学者（500+篇论文），S2共作者频率分析无法识别学生——first-author信号被大量合作者稀释。教授主页显式列出学生，可靠性高一个数量级。引用图（前向+后向）是研究工具链核心特性，‘相关性’与’引用数/流行程度’应解耦处理 离线注入架构比在线配额系统更适合构建均衡错误场景数据集：将’探索可注入性’与’执行注入’解耦，可精确控制每种错误类型数量；在线自然捕获受策略行为分布影响极大，无法控制类型均衡 调试 (debugging) JAX小版本升级（0.5.0→0.5.3）可带来约33%训练提速，XLA编译器优化积累效应不可忽视。uv override-dependencies可强制忽略transitive dependency版本约束，是解决第三方库版本冲突的有效工具 conda环境中编译CUDA扩展：CUDA_HOME=conda环境根目录，CPATH=envs//targets/x86_64-linux/include/（非/usr/local/cuda/include/）；torch大版本升级后所有依赖torch C++ ABI的.so文件都需重编 对第三方框架内部行为假设必须通过实际运行验证：LeRobot对shape=(1,)单标量特征在DataLoader时会自动squeeze为(batch_size,)，代码推断不可靠。训练配置实际生效值需从wandb日志验证，代码默认值可能被CLI参数覆盖 K8s容器内GPU监控：扫描/proc//fd/下/dev/nvidia*设备链接+优先读取CUDA_VISIBLE_DEVICES，可绕过PID命名空间隔离；打开全部GPU设备但不占显存的进程通常是监控工具，可据此过滤 静默失败是最危险的bug模式：body_xpos[-1]负索引在两个cube始终返回同一位置；缓存var_names整数化导致基因名交集为0。任何解析失败都应立即WARNING而非返回哨兵值，缓存数据使用前应做健全性检查 领域知识 (domain) scGPT独立benchmark（Genome Biology 2025）证实zero-shot不如PCA/scVI；scGPT-spatial只与弱baseline比较（ARI≈0.30-0.40），SOTA（GraphST，ARI≈0.55-0.63）未纳入，无独立第三方验证。评估新方法必须验证其baseline是否为当前SOTA CALVIN评估是纯在线仿真，完全不读episode数据，只需validation/.hydra/merged_config.yaml，1.3GB数据集可压缩为600KB eval-only版本 具身AI学者导师谱系：Mingyu Ding←Jitendra Malik，Ruoshi Liu←Carl Vondrick，Xiaolong Wang←Abhinav Gupta，Shuran Song←Thomas Funkhouser，Yunzhu Li←Antonio Torralba，Yuke Zhu←Li Fei-Fei——呈现顶级感知/机器人导师群体向具身AI的系统性学生输出 流匹配正成为VLA主流动作解码架构。Pi0时间约定：t=1纯噪声→t=0目标动作。Pi0.5用adaRMS注入时间条件优于简单拼接。VLA辅助任务中stop_gradient隔离主任务梯度是安全起点 工具 (tools) Prompt工程按需注入策略：系统prompt拆分为base（~50行）+intent-specific fragment（按分类动态注入），可减少40-60% token消耗。中文字符token密度约为英文字符6倍（1.5 token/字 vs 0.25 token/字符），不修正会系统性低估context长度 多工具共存项目的输出目录应按’文件类型优先’组织（outputs/reports/summarize/ 而非 summarize/reports/），可将.gitignore精简为单行outputs/；Python re-export shim模式（仅包含from x import y; all=[…]）是向后兼容的优雅迁移方式 PubMed esearch→efetch两步E-utilities API可免费索引Nature/Cell/Science等订阅期刊元数据；bioRxiv API同样开放，均无需新依赖（urllib.request）；小批量验证pipeline可行性优于直接冲满量 AI 使用备注 有效模式:\n✓ 并行子代理加速多维度代码分析：依赖版本差异诊断、代码库探索中同时启动3+子代理覆盖不同文件集，显著压缩分析时间 ✓ 目标驱动委托+迭代调试循环：用户给出清晰终止条件（‘修复到没报错’），AI独立迭代运行→报错→最小修改，内建纠错机制 ✓ 深度代码库探索识别架构级挑战：CrossModalEnhancer中主动识别单spot KV退化问题（每spot只有一个向量），提出空间邻居构建KV序列方案 ✓ sys.path hack → common/包的渐进式重构：re-export shim模式保持向后兼容同时消除重复代码 ✓ 小批量验证pipeline可行性（207个场景暴露5个系统性缺陷）优于直接冲满量，端到端集成测试比单元测试更能发现pipeline级隐式依赖 局限性:\n✗ 实验结论反思能力不足：从数值结果直接归因，未主动质疑实验设计有效性前提（MIHD embedding方法论缺陷需用户外部触发才修正） ✗ 静默失败模式未被主动发现：Stack体名解析返回-1+Python负索引、缓存var_names整数化，均因缺乏健全性检查而需用户发现 ✗ 过度工程化与架构假设错误：VLA context replay基于’所有VLA需要context window’的错误假设；对LeRobot shape行为做错误推断并修改代码，均需用户纠正或运行验证 ✗ 方法论适用边界主动质疑能力不足：S2学生发现失效时继续调试代码逻辑，未主动质疑方法论本身边界，需用户点拨才转向主页方案 ✗ Semantic Scholar同名歧义处理能力弱：对常见中文英译名缺乏主动entity disambiguation，LLM分析也无法自动识别歧义研究者 ✗ API使用前未验证签名：FastMCP version参数、conda –no-banner均在运行失败后才发现不兼容 下周展望 下周（2026-W12）重点：①ErrorRecoveryBenchmark v5.1实施——完成5个已修复技能的D0场景重新生成（目标600+条），推进InjectionEngine重构、运动速度限制、键盘遥操作人类示例采集pipeline，里程碑：4月1日前开始recovery策略训练；②VLA-RoboTwin/pi05——重新转换LeRobot数据集（含manip_progress等5个新字段），启动四组辅助实验训练并对比分析，修正eval.sh checkpoint_id后进行正式策略评估；③MIHD——完成raw_shared基线诊断并得出方法论修复结论，解决151676 GPU重训问题（固定PyTorch版本），评估CrossModalEnhancer完整GPU pipeline效果；④gadget/research——将7位学者画像部署至Hugo research栏目，在prompt中明确要求英文引号根治LLM生成中文JSON污染问题；⑤UniVLA——完成CALVIN评测完整流程验证（–single_gpu模式）。\nToken 用量统计 每日费用趋势 日期 Token (百万) 费用 ($) 2026-03-09 46.9 32.17 2026-03-11 30.5 20.75 2026-03-12 2.0 2.22 2026-03-13 3.0 2.23 2026-03-14 19.0 13.13 2026-03-15 135.3 100.70 unknown 72.5 56.27 峰值日: 2026-03-15 — $100.70 / 135.3M tokens\nClaude Code 指标 数值 总 Token 309,110,118 输入 Token 315,228 输出 Token 1,023,671 Cache 创建 22,299,827 Cache 读取 285,471,392 总费用 $227.47 模型使用分布 模型 费用 ($) 输入 Token 输出 Token claude-opus-4-6 203.57 170,917 554,482 claude-haiku-4-5-20251001 19.77 144,115 468,454 claude-sonnet-4-6 4.12 196 735 ",
+  "wordCount" : "577",
+  "inLanguage": "en",
+  "datePublished": "2026-03-15T23:59:00-05:00",
+  "dateModified": "2026-03-15T23:59:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/weekly/2026-w11-weekly/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                    <ul class="lang-switch"><li>|</li>
+                        <li>
+                            <a href="https://tzj2006.github.io/zh/" title="中文"
+                                aria-label="中文">中文</a>
+                        </li>
+                    </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span>bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/weekly/">Weekly Summaries</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Weekly Summary 2026-W11
+    </h1>
+    <div class="post-meta"><span title='2026-03-15 23:59:00 -0500 -0500'>March 15, 2026</span>&nbsp;·&nbsp;<span>3 min</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="周报--2026-w11-2026-03-09--2026-03-15">周报 — 2026-W11 (2026-03-09 ~ 2026-03-15)<a hidden class="anchor" aria-hidden="true" href="#周报--2026-w11-2026-03-09--2026-03-15">#</a></h1>
+<blockquote>
+<p>本周在DCC、tianhe、TzJsDesktop三台设备上并行推进六条主线：①MIHD空间转录组学发现跨样本embedding方法论根本缺陷（per-section独立处理导致特征空间不可比）并启动修复；②ErrorRecoveryBenchmark从Bug修复到13技能/29子类型全面规模化，攻克Drop技能物体不掉落难题，暴露在线配额架构局限后确立离线注入新方向；③VLA-RoboTwin/pi05从环境搭建、训练性能优化（JAX版本对齐+33%提速）到新数据变量收集、辅助任务实验全链路贯通；④gadget工具链完成MCP Server+common/共享包+统一输出目录的架构升级，research profiler突破学者主页优先学生发现；⑤CalendarPro完成7阶段全面优化，230测试全通过，token消耗降低40-60%；⑥gadget研究工具链整合引用图分析并完成7位具身AI学者深度画像。</p>
+</blockquote>
+<h2 id="本周概览">本周概览<a hidden class="anchor" aria-hidden="true" href="#本周概览">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>日期范围</td>
+          <td>2026-03-09 ~ 2026-03-15</td>
+      </tr>
+      <tr>
+          <td>活跃天数</td>
+          <td>6 / 7</td>
+      </tr>
+      <tr>
+          <td>总对话数</td>
+          <td>29</td>
+      </tr>
+      <tr>
+          <td>涉及项目</td>
+          <td>19</td>
+      </tr>
+      <tr>
+          <td>完成任务</td>
+          <td>36</td>
+      </tr>
+      <tr>
+          <td>进行中任务</td>
+          <td>10</td>
+      </tr>
+      <tr>
+          <td>总 Token</td>
+          <td>309,110,118</td>
+      </tr>
+      <tr>
+          <td>总费用</td>
+          <td>$227.47</td>
+      </tr>
+      <tr>
+          <td>日均费用</td>
+          <td>$32.50</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="项目进展">项目进展<a hidden class="anchor" aria-hidden="true" href="#项目进展">#</a></h2>
+<h3 id="vla-robotwinpi05-6-天活跃---active">VLA-RoboTwin/pi05 (6 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#vla-robotwinpi05-6-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>RoboTwin 50条episode成功转换LeRobot格式（11459帧）</li>
+<li>诊断pi05 vs openpi训练时长33%差异，升级JAX 0.5.0→0.5.3等6个关键依赖，训练预期从20h压缩至15h</li>
+<li>完成eval.sh运行环境全链路修复：torchvision升级0.22.1+设置conda CUDA_HOME从源码重编译curobo解决ABI不兼容</li>
+<li>为Place Dual Shoes实现5个新数据变量（manip_progress_time/distance_left/right、target_endpose、target_joint），采用move()后回溯patch pickle的后处理架构解决未来状态依赖</li>
+<li>跨6个文件设计实现四组操作进度预测辅助实验（last_token vs special_token × time vs distance），添加stop_gradient隔离策略和ProgressConfig配置开关</li>
+<li>修复CheckpointWeightLoader missing_regex可配置化、pi0.py LeRobot shape squeeze问题，训练step 100 action_loss/aux_loss曲线正常下降</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ 四组辅助实验因LeRobot数据集未包含新字段而阻塞，需重新转换数据集</li>
+<li>⚠️ eval.sh默认checkpoint_id=5000路径不存在，需修正为可用值（15000/25000/29999）</li>
+</ul>
+<h3 id="errorrecoverybenchmark-4-天活跃---active">ErrorRecoveryBenchmark (4 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#errorrecoverybenchmark-4-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>修复monitor.update()返回值丢弃和taxonomy标签映射两个关键Bug，重标注1029条历史场景</li>
+<li>攻克Drop技能物体不掉落问题：调用mujoco.mj_step()运行15个物理步绕过OSC控制器干扰</li>
+<li>修复5个系统性失败技能（drop三技能+grasp_misalignment+trajectory_regression+wrong_object），105单元测试全通过</li>
+<li>E2 Drop按恢复策略语义拆分为3个独立技能（drop_in_transit/drop_at_wrong_place/drop_with_interaction），基准扩展至13技能/29子类型</li>
+<li>修复Stack体名解析静默失败Bug，为11个demo技能生成MP4演示视频，完成v4代码归档</li>
+<li>完成v5.1架构规划（InjectionEngine重构+速度限制+人类示例采集pipeline），确定4月1日前开始recovery训练里程碑</li>
+<li>v5全量运行生成231个场景和MP4；首轮D0生成207个场景</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ D0场景生成距目标600条仍有缺口，5个已修复根因需重新验证</li>
+<li>⚠️ 咖啡机部件散架（lid悬浮、base偏离）kinematic tree结构问题诊断未完成</li>
+<li>⚠️ v5.1离线注入架构实施工作尚未开始</li>
+</ul>
+<h3 id="mihd空间转录组学-3-天活跃---active">MIHD（空间转录组学） (3 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#mihd空间转录组学-3-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>完成151673↔151508跨样本RM-IDEAL benchmark，Layer_1/5正相关（r≤0.66），Layer_3负相关揭示融合嵌入层特异性</li>
+<li>实现CrossModalEnhancer模块（空间邻居构建KV序列+对称InfoNCE），CPU端三模式测试通过</li>
+<li>绕过RTX 2080 Ti cuBLAS大张量Bug（先投影到hidden_dim再聚合邻居+mini-batch对比损失）</li>
+<li>scGPT文献综述证实zero-shot不如PCA/scVI，为gene encoder选择提供战略性证据</li>
+<li>完成MIHD输出目录大重构（14+文件路径引用全部更新）</li>
+<li>发现跨样本embedding方法论根本缺陷并启动raw_shared共享HVG交集（1137基因）基线修复</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ 151676 STAIG embedding全零（模型坍塌），GPU重训因PyTorch 2.9.0+PyG CUDA冲突失败，跨切片可视化阻塞</li>
+<li>⚠️ raw_shared embedding诊断仍在运行中，CrossModalEnhancer完整GPU pipeline评估未完成</li>
+</ul>
+<h3 id="gadget工具链-2-天活跃---active">gadget工具链 (2 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#gadget工具链-2-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>用FastMCP+capture_stdout+asyncio.to_thread封装9个MCP工具，重构为内容返回模式（save参数控制写入）</li>
+<li>增强research_scout日志系统（RotatingFileHandler双输出），零新依赖接入bioRxiv/PubMed多源</li>
+<li>新建6个common/模块消除约500行重复代码，paths.py统一6个路径常量，.gitignore精简为单行outputs/</li>
+<li>实现Homepage-Based学生发现（4阶段策略：主页优先+co-authorship补充），7位具身AI学者完成深度画像</li>
+<li>整合research_scout.py为统一CLI入口（profile/citations子命令），集成Semantic Scholar引用图API，新增Hugo research栏目</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ 7位学者画像Hugo部署尚未完成</li>
+<li>⚠️ LLM生成中文长格式JSON引号污染问题未根治</li>
+</ul>
+<h3 id="calendarpro-2-天活跃---completed">CalendarPro (2 天活跃) — ✅ completed<a hidden class="anchor" aria-hidden="true" href="#calendarpro-2-天活跃---completed">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>实现gadget集成层（ResearchScoutTool+DailySummaryTool+conda run跨环境），每日8AM/11PM自动触发，13单元测试通过</li>
+<li>完成7阶段全面优化（置信度阈值、混合路由、Prompt精简+中文token修正、指数退避、可配置调度权重、自动阈值调优、ThoughtStore缓存）</li>
+<li>修复4个真实误分类场景，Prompt token消耗减少40-60%，230测试全通过</li>
+</ul>
+<h3 id="univlacalvin评测-2-天活跃---active">UniVLA/CALVIN评测 (2 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#univlacalvin评测-2-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>完成CALVIN依赖链分析（4处问题定位），发现评估为纯在线仿真，提取eval-only文件（1.3GB→600KB）</li>
+<li>添加&ndash;single_gpu模式绕过torchrun/DDP，修复多处硬编码路径，安装braceexpand依赖</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ 评测脚本完整流程未验证，仍在迭代调试阶段</li>
+</ul>
+<h2 id="关键任务">关键任务<a hidden class="anchor" aria-hidden="true" href="#关键任务">#</a></h2>
+<ul>
+<li>✅ <strong>CalendarPro 7阶段全面优化</strong> (2026-03-15) — 实施语义路由置信度阈值、混合路由（Dense 70%+Keyword 30%）、Prompt精简（530行→base+11个fragment）+中文token修正（×1.5/字）、指数退避重试、可配置调度权重、自动阈值调优闭环、ThoughtStore内存缓存，修复4个真实误分类场景，token消耗降低40-60%，230测试全通过</li>
+<li>✅ <strong>gadget research工具链CLI整合+引用图+7位学者深度画像</strong> (2026-03-15) — 以research_scout.py为统一CLI整合paper scout和researcher profiler，新增Semantic Scholar引用图API（三阶段报告自动对top-5论文运行引用分析），完成Mingyu Ding/Ruoshi Liu/Xiaolong Wang/Shuran Song/Yunzhu Li/Yuke Zhu/Chelsea Finn 7位学者深度画像，识别完整导师关系网络</li>
+<li>🔄 <strong>ErrorRecoveryBenchmark v5全面修复与13技能/29子类型规模化</strong> (2026-03-15) — 修复5个系统性失败技能，E2拆分为3个语义独立技能，完成v4归档，v5全量运行生成231个场景，首轮D0生成207个场景（目标600），完成v5.1架构规划（InjectionEngine+速度限制+人类示例采集，4月1日前开始recovery训练）</li>
+<li>✅ <strong>gadget common/共享包提取+outputs/统一目录重构</strong> (2026-03-15) — 新建6个common/模块（io/cache/json_utils/llm/hugo），消除约500行重复LLM调用和JSON解析代码，paths.py统一6个路径常量，.gitignore精简为单行outputs/，更新4个CLAUDE.md</li>
+<li>✅ <strong>gadget MCP Server设计实现与工具内容返回重构</strong> (2026-03-09) — 用FastMCP+capture_stdout+asyncio.to_thread封装9个MCP工具，从&rsquo;写文件返回路径&rsquo;重构为&rsquo;返回完整内容+save参数可选写入&rsquo;，确定pip install -e.+console entry point分发方案，全部工具验证通过</li>
+<li>🔄 <strong>MIHD跨样本embedding方法论诊断与修复</strong> (2026-03-15) — 发现per-section独立HVG选择+独立PCA拟合的双重不可比性，否定&rsquo;PCA优于STAIG=输入特征弱&rsquo;的误判，启动共享HVG交集（1137基因）的raw_shared基线方案，发现STAIG在Layer_1/5（SL@50=0.94-1.0）vs中间层全失败的层特异性现象</li>
+<li>✅ <strong>pi05训练性能优化：JAX版本对齐+依赖冲突修复</strong> (2026-03-11) — 通过并行子代理对比pyproject.toml/uv.lock/wandb日志定位JAX版本差异（0.5.0 vs 0.5.3）为训练慢33%主因，对齐6个关键依赖，用uv override-dependencies解决lerobot torch&lt;2.7冲突，成功完成uv lock（305个包）</li>
+<li>🔄 <strong>pi05四组操作进度预测辅助实验设计与实现</strong> (2026-03-14) — 在JAX/Flax NNX框架下跨6个文件实现manip_progress辅助预测头（last_token vs special_token × time vs distance），添加stop_gradient隔离策略和ProgressConfig配置开关，修复CheckpointWeightLoader和LeRobot shape问题，训练step 100 loss曲线正常下降</li>
+<li>✅ <strong>ErrorRecoveryBenchmark v5.1架构规划</strong> (2026-03-15) — 将ContextReplayEngine重构为InjectionEngine（直接恢复注入帧sim state，绕过无context window的VLA假设），添加运动速度限制，设计键盘遥操作人类示例采集pipeline，数据源限定为MimicGen demo，明确Mar 16-31分阶段实施计划</li>
+<li>✅ <strong>RoboTwin新数据变量后处理收集架构实现</strong> (2026-03-13) — 采用move()完成后回溯patch pickle的后处理方案实现5个新变量，解决target_endpose/target_joint对未来状态的依赖问题，修复manip_progress_distance负值（np.clip到[0,1]），pkl2hdf5.py通用递归设计无需修改</li>
+<li>🔄 <strong>VLA eval.sh运行环境全链路修复</strong> (2026-03-12) — 升级torchvision 0.22.1+cu126修复nms算子不匹配，设置CUDA_HOME指向conda targets目录从源码重编译curobo解决ABI不兼容，剩余checkpoint_id=5000路径不存在问题待修正</li>
+<li>✅ <strong>gadget Homepage-Based学生发现策略实现</strong> (2026-03-15) — 实现homepage_discovery.py模块（~200行），4阶段发现策略（主页优先+co-authorship补充），多策略URL发现（S2 homepage字段+LLM建议+&ndash;homepage参数），HTMLParser文本提取，2MB限制+7天缓存TTL，解决S2共作者分析对顶级大佬完全失效的根本问题</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="1-drop技能osc控制器在envstep中主动维持eef位置impedance-control夹爪打开后物体被手指托住无法自由落体-errorrecoverybenchmark-2026-03-15">1. Drop技能：OSC控制器在env.step()中主动维持EEF位置（impedance control），夹爪打开后物体被手指托住无法自由落体 [ErrorRecoveryBenchmark] (2026-03-15)<a hidden class="anchor" aria-hidden="true" href="#1-drop技能osc控制器在envstep中主动维持eef位置impedance-control夹爪打开后物体被手指托住无法自由落体-errorrecoverybenchmark-2026-03-15">#</a></h3>
+<p><strong>解决方案:</strong> 绕过控制器直接设置MuJoCo qpos/qvel后，调用mujoco.mj_step()运行15个物理步完成初始分离，再进入标准控制循环</p>
+<h3 id="2-mihd跨样本embedding比较无效per-section独立hvg选择独立pca拟合导致特征空间不可比pca优于staig结论为方法论错误-mihd-2026-03-15">2. MIHD跨样本embedding比较无效：per-section独立HVG选择+独立PCA拟合导致特征空间不可比，&lsquo;PCA优于STAIG&rsquo;结论为方法论错误 [MIHD] (2026-03-15)<a hidden class="anchor" aria-hidden="true" href="#2-mihd跨样本embedding比较无效per-section独立hvg选择独立pca拟合导致特征空间不可比pca优于staig结论为方法论错误-mihd-2026-03-15">#</a></h3>
+<p><strong>解决方案:</strong> 改用共享HVG交集（1137基因）+统一处理的raw_shared方案作为正确基线，直接从原始HDF5加载而非依赖per-section缓存（存在var_names整数化bug）</p>
+<h3 id="3-stack体名解析静默失败stackyaml用cubeacubebmujoco实际名为cubea_main_sim_body_name2id返回-1python负索引导致任务阶段检测全部误判为pre_reach-errorrecoverybenchmark-2026-03-15">3. Stack体名解析静默失败：stack.yaml用cubeA/cubeB，MuJoCo实际名为cubeA_main，_sim_body_name2id返回-1，Python负索引导致任务阶段检测全部误判为pre_reach [ErrorRecoveryBenchmark] (2026-03-15)<a hidden class="anchor" aria-hidden="true" href="#3-stack体名解析静默失败stackyaml用cubeacubebmujoco实际名为cubea_main_sim_body_name2id返回-1python负索引导致任务阶段检测全部误判为pre_reach-errorrecoverybenchmark-2026-03-15">#</a></h3>
+<p><strong>解决方案:</strong> 修复体名字段，在_sim_body_name2id中添加_main/_body0后缀回退逻辑，查找失败输出WARNING而非静默返回-1</p>
+<h3 id="4-pi05训练比openpi慢3320h-vs-15h直觉指向硬件差异根因不明-vla-robotwinpi05-2026-03-11">4. pi05训练比openpi慢33%（20h vs 15h），直觉指向硬件差异，根因不明 [VLA-RoboTwin/pi05] (2026-03-11)<a hidden class="anchor" aria-hidden="true" href="#4-pi05训练比openpi慢3320h-vs-15h直觉指向硬件差异根因不明-vla-robotwinpi05-2026-03-11">#</a></h3>
+<p><strong>解决方案:</strong> 通过并行子代理对比软件层面（pyproject.toml/uv.lock/wandb日志），定位JAX版本差异（0.5.0 vs 0.5.3）为主因，XLA编译器优化积累；用uv override-dependencies解决lerobot torch版本上界约束冲突</p>
+<h3 id="5-curobo预编译so与torch-271-abi不兼容undefined-symboljit重编译因conda-cuda头文件路径非标准而失败-vla-robotwin-2026-03-12">5. curobo预编译.so与torch 2.7.1 ABI不兼容（undefined symbol），JIT重编译因conda CUDA头文件路径非标准而失败 [VLA-RoboTwin] (2026-03-12)<a hidden class="anchor" aria-hidden="true" href="#5-curobo预编译so与torch-271-abi不兼容undefined-symboljit重编译因conda-cuda头文件路径非标准而失败-vla-robotwin-2026-03-12">#</a></h3>
+<p><strong>解决方案:</strong> 设置CUDA_HOME=conda环境根目录，CPATH指向targets/x86_64-linux/include/，pip install -e.从源码重编译</p>
+<h3 id="6-在线配额生成严重不均衡premature_release自然捕获7233条7种类型完全为0策略行为分布不均无法控制-errorrecoverybenchmark-2026-03-09">6. 在线配额生成严重不均衡：premature_release自然捕获7233条，7种类型完全为0，策略行为分布不均无法控制 [ErrorRecoveryBenchmark] (2026-03-09)<a hidden class="anchor" aria-hidden="true" href="#6-在线配额生成严重不均衡premature_release自然捕获7233条7种类型完全为0策略行为分布不均无法控制-errorrecoverybenchmark-2026-03-09">#</a></h3>
+<p><strong>解决方案:</strong> 确立离线注入架构：先完整rollout收集轨迹，离线检测可注入点建索引，再按配额选择性注入；已满类型跳过</p>
+<h3 id="7-calendarpro意图误分类无置信度阈值052也当有效分类时间表达式被关键词路由误判短确认词无上下文理解中文token估算偏差3倍-calendarpro-2026-03-15">7. CalendarPro意图误分类：无置信度阈值（0.52也当有效分类）、时间表达式被关键词路由误判、短确认词无上下文理解、中文token估算偏差3倍 [CalendarPro] (2026-03-15)<a hidden class="anchor" aria-hidden="true" href="#7-calendarpro意图误分类无置信度阈值052也当有效分类时间表达式被关键词路由误判短确认词无上下文理解中文token估算偏差3倍-calendarpro-2026-03-15">#</a></h3>
+<p><strong>解决方案:</strong> 添加per-route置信度阈值（0.40-0.60），引入关键词评分器与embedding 70/30混合路由，系统prompt拆分为base+11个fragment按需注入，中文token改为×1.5估算</p>
+<h3 id="8-s2共作者分析对顶级大佬levineabbeelfinn等完全失效depth-2全空xiaolong-wangshuran-song存在严重同名歧义-gadget-2026-03-15">8. S2共作者分析对顶级大佬（Levine/Abbeel/Finn等）完全失效（depth-2全空），Xiaolong Wang/Shuran Song存在严重同名歧义 [gadget] (2026-03-15)<a hidden class="anchor" aria-hidden="true" href="#8-s2共作者分析对顶级大佬levineabbeelfinn等完全失效depth-2全空xiaolong-wangshuran-song存在严重同名歧义-gadget-2026-03-15">#</a></h3>
+<p><strong>解决方案:</strong> 重构为homepage-first策略：优先从教授个人主页抓取学生列表，co-authorship仅作补充；多策略URL发现；同名歧义标注WARNING建议使用S2 authorId精确查询</p>
+<h3 id="9-vla-context-replay架构假设错误设计了完整n-1帧回放机制但大多数vla没有context-window该开销为无用设计-errorrecoverybenchmark-2026-03-15">9. VLA context replay架构假设错误：设计了完整N-1帧回放机制，但大多数VLA没有context window，该开销为无用设计 [ErrorRecoveryBenchmark] (2026-03-15)<a hidden class="anchor" aria-hidden="true" href="#9-vla-context-replay架构假设错误设计了完整n-1帧回放机制但大多数vla没有context-window该开销为无用设计-errorrecoverybenchmark-2026-03-15">#</a></h3>
+<p><strong>解决方案:</strong> 将ContextReplayEngine重构为InjectionEngine，直接恢复注入帧sim state；数据源限定为可控性更高的MimicGen demo数据</p>
+<h3 id="10-rtx-2080-ti--pytorch-290对n3500高维张量触发cublas-cublas_status_execution_failed-mihd-2026-03-09">10. RTX 2080 Ti + PyTorch 2.9.0对N&gt;3500高维张量触发cuBLAS CUBLAS_STATUS_EXECUTION_FAILED [MIHD] (2026-03-09)<a hidden class="anchor" aria-hidden="true" href="#10-rtx-2080-ti--pytorch-290对n3500高维张量触发cublas-cublas_status_execution_failed-mihd-2026-03-09">#</a></h3>
+<p><strong>解决方案:</strong> 先用Linear投影到hidden_dim(128)再索引邻居（避免高维大张量进入cuBLAS），InfoNCE改为mini-batch对比损失（batch_size=512）</p>
+<h3 id="11-mcp-server工具写文件返回路径ai无法直接消费内容-gadget-2026-03-09">11. MCP Server工具写文件返回路径，AI无法直接消费内容 [gadget] (2026-03-09)<a hidden class="anchor" aria-hidden="true" href="#11-mcp-server工具写文件返回路径ai无法直接消费内容-gadget-2026-03-09">#</a></h3>
+<p><strong>解决方案:</strong> 重构工具绕过cmd_*包装器直接调用底层函数返回完整内容（markdown/JSON），通过save参数控制文件写入</p>
+<h3 id="12-pi0py对lerobot内部行为假设错误推断shape1特征保持b1形状并修改代码实际lerobot-dataloader会squeeze为b导致训练时shape不匹配-vla-robotwinpi05-2026-03-15">12. pi0.py对LeRobot内部行为假设错误：推断shape=(1,)特征保持(b,1)形状并修改代码，实际LeRobot DataLoader会squeeze为(b,)导致训练时shape不匹配 [VLA-RoboTwin/pi05] (2026-03-15)<a hidden class="anchor" aria-hidden="true" href="#12-pi0py对lerobot内部行为假设错误推断shape1特征保持b1形状并修改代码实际lerobot-dataloader会squeeze为b导致训练时shape不匹配-vla-robotwinpi05-2026-03-15">#</a></h3>
+<p><strong>解决方案:</strong> 通过实际运行训练并观察日志（&lsquo;aux_targets[&hellip;]: (32,)@float32&rsquo;）确认真实shape，还原原始[:, None]和jnp.stack操作</p>
+<h2 id="学习收获">学习收获<a hidden class="anchor" aria-hidden="true" href="#学习收获">#</a></h2>
+<h3 id="架构-architecture">架构 (architecture)<a hidden class="anchor" aria-hidden="true" href="#架构-architecture">#</a></h3>
+<ul>
+<li>跨样本embedding比较的必要前提是特征空间共享：per-section独立HVG选择+独立PCA拟合=双重不可比性。有效基线必须使用共享HVG交集+联合处理，或固定预训练权重的foundation model</li>
+<li>MuJoCo中直接状态操作与反馈控制器（OSC）存在根本冲突：sim.forward()仅更新运动学，mujoco.mj_step()才推进动力学并绕过控制器。仿真注入设计必须明确选择一条路径</li>
+<li>Error类型语义拆分应基于&rsquo;恢复策略是否相同&rsquo;而非&rsquo;注入机制是否相同&rsquo;：drop_in_transit/drop_at_wrong_place/drop_with_interaction的检测条件和恢复逻辑截然不同，即使注入动作相同也必须分开建模</li>
+<li>语义路由器架构缺陷：embedding最近邻总产生结果，无法表达&rsquo;不确定&rsquo;。置信度阈值+备选LLM+关键词评分器混合是最实用修复模式，可推广至所有基于向量检索的分类系统（RAG路由、工具选择等）</li>
+<li>MCP工具应以AI消费为首要目标：返回完整内容，文件写入为可选副作用。通用benchmark不应假设模型有context window，InjectionEngine直接恢复sim state比context replay更通用</li>
+<li>对顶级学者（500+篇论文），S2共作者频率分析无法识别学生——first-author信号被大量合作者稀释。教授主页显式列出学生，可靠性高一个数量级。引用图（前向+后向）是研究工具链核心特性，&lsquo;相关性&rsquo;与&rsquo;引用数/流行程度&rsquo;应解耦处理</li>
+<li>离线注入架构比在线配额系统更适合构建均衡错误场景数据集：将&rsquo;探索可注入性&rsquo;与&rsquo;执行注入&rsquo;解耦，可精确控制每种错误类型数量；在线自然捕获受策略行为分布影响极大，无法控制类型均衡</li>
+</ul>
+<h3 id="调试-debugging">调试 (debugging)<a hidden class="anchor" aria-hidden="true" href="#调试-debugging">#</a></h3>
+<ul>
+<li>JAX小版本升级（0.5.0→0.5.3）可带来约33%训练提速，XLA编译器优化积累效应不可忽视。uv override-dependencies可强制忽略transitive dependency版本约束，是解决第三方库版本冲突的有效工具</li>
+<li>conda环境中编译CUDA扩展：CUDA_HOME=conda环境根目录，CPATH=envs/<name>/targets/x86_64-linux/include/（非/usr/local/cuda/include/）；torch大版本升级后所有依赖torch C++ ABI的.so文件都需重编</li>
+<li>对第三方框架内部行为假设必须通过实际运行验证：LeRobot对shape=(1,)单标量特征在DataLoader时会自动squeeze为(batch_size,)，代码推断不可靠。训练配置实际生效值需从wandb日志验证，代码默认值可能被CLI参数覆盖</li>
+<li>K8s容器内GPU监控：扫描/proc/<pid>/fd/下/dev/nvidia*设备链接+优先读取CUDA_VISIBLE_DEVICES，可绕过PID命名空间隔离；打开全部GPU设备但不占显存的进程通常是监控工具，可据此过滤</li>
+<li>静默失败是最危险的bug模式：body_xpos[-1]负索引在两个cube始终返回同一位置；缓存var_names整数化导致基因名交集为0。任何解析失败都应立即WARNING而非返回哨兵值，缓存数据使用前应做健全性检查</li>
+</ul>
+<h3 id="领域知识-domain">领域知识 (domain)<a hidden class="anchor" aria-hidden="true" href="#领域知识-domain">#</a></h3>
+<ul>
+<li>scGPT独立benchmark（Genome Biology 2025）证实zero-shot不如PCA/scVI；scGPT-spatial只与弱baseline比较（ARI≈0.30-0.40），SOTA（GraphST，ARI≈0.55-0.63）未纳入，无独立第三方验证。评估新方法必须验证其baseline是否为当前SOTA</li>
+<li>CALVIN评估是纯在线仿真，完全不读episode数据，只需validation/.hydra/merged_config.yaml，1.3GB数据集可压缩为600KB eval-only版本</li>
+<li>具身AI学者导师谱系：Mingyu Ding←Jitendra Malik，Ruoshi Liu←Carl Vondrick，Xiaolong Wang←Abhinav Gupta，Shuran Song←Thomas Funkhouser，Yunzhu Li←Antonio Torralba，Yuke Zhu←Li Fei-Fei——呈现顶级感知/机器人导师群体向具身AI的系统性学生输出</li>
+<li>流匹配正成为VLA主流动作解码架构。Pi0时间约定：t=1纯噪声→t=0目标动作。Pi0.5用adaRMS注入时间条件优于简单拼接。VLA辅助任务中stop_gradient隔离主任务梯度是安全起点</li>
+</ul>
+<h3 id="工具-tools">工具 (tools)<a hidden class="anchor" aria-hidden="true" href="#工具-tools">#</a></h3>
+<ul>
+<li>Prompt工程按需注入策略：系统prompt拆分为base（~50行）+intent-specific fragment（按分类动态注入），可减少40-60% token消耗。中文字符token密度约为英文字符6倍（1.5 token/字 vs 0.25 token/字符），不修正会系统性低估context长度</li>
+<li>多工具共存项目的输出目录应按&rsquo;文件类型优先&rsquo;组织（outputs/reports/summarize/ 而非 summarize/reports/），可将.gitignore精简为单行outputs/；Python re-export shim模式（仅包含from x import y; <strong>all</strong>=[&hellip;]）是向后兼容的优雅迁移方式</li>
+<li>PubMed esearch→efetch两步E-utilities API可免费索引Nature/Cell/Science等订阅期刊元数据；bioRxiv API同样开放，均无需新依赖（urllib.request）；小批量验证pipeline可行性优于直接冲满量</li>
+</ul>
+<h2 id="ai-使用备注">AI 使用备注<a hidden class="anchor" aria-hidden="true" href="#ai-使用备注">#</a></h2>
+<p><strong>有效模式:</strong></p>
+<ul>
+<li>✓ 并行子代理加速多维度代码分析：依赖版本差异诊断、代码库探索中同时启动3+子代理覆盖不同文件集，显著压缩分析时间</li>
+<li>✓ 目标驱动委托+迭代调试循环：用户给出清晰终止条件（&lsquo;修复到没报错&rsquo;），AI独立迭代运行→报错→最小修改，内建纠错机制</li>
+<li>✓ 深度代码库探索识别架构级挑战：CrossModalEnhancer中主动识别单spot KV退化问题（每spot只有一个向量），提出空间邻居构建KV序列方案</li>
+<li>✓ sys.path hack → common/包的渐进式重构：re-export shim模式保持向后兼容同时消除重复代码</li>
+<li>✓ 小批量验证pipeline可行性（207个场景暴露5个系统性缺陷）优于直接冲满量，端到端集成测试比单元测试更能发现pipeline级隐式依赖</li>
+</ul>
+<p><strong>局限性:</strong></p>
+<ul>
+<li>✗ 实验结论反思能力不足：从数值结果直接归因，未主动质疑实验设计有效性前提（MIHD embedding方法论缺陷需用户外部触发才修正）</li>
+<li>✗ 静默失败模式未被主动发现：Stack体名解析返回-1+Python负索引、缓存var_names整数化，均因缺乏健全性检查而需用户发现</li>
+<li>✗ 过度工程化与架构假设错误：VLA context replay基于&rsquo;所有VLA需要context window&rsquo;的错误假设；对LeRobot shape行为做错误推断并修改代码，均需用户纠正或运行验证</li>
+<li>✗ 方法论适用边界主动质疑能力不足：S2学生发现失效时继续调试代码逻辑，未主动质疑方法论本身边界，需用户点拨才转向主页方案</li>
+<li>✗ Semantic Scholar同名歧义处理能力弱：对常见中文英译名缺乏主动entity disambiguation，LLM分析也无法自动识别歧义研究者</li>
+<li>✗ API使用前未验证签名：FastMCP version参数、conda &ndash;no-banner均在运行失败后才发现不兼容</li>
+</ul>
+<h2 id="下周展望">下周展望<a hidden class="anchor" aria-hidden="true" href="#下周展望">#</a></h2>
+<p>下周（2026-W12）重点：①ErrorRecoveryBenchmark v5.1实施——完成5个已修复技能的D0场景重新生成（目标600+条），推进InjectionEngine重构、运动速度限制、键盘遥操作人类示例采集pipeline，里程碑：4月1日前开始recovery策略训练；②VLA-RoboTwin/pi05——重新转换LeRobot数据集（含manip_progress等5个新字段），启动四组辅助实验训练并对比分析，修正eval.sh checkpoint_id后进行正式策略评估；③MIHD——完成raw_shared基线诊断并得出方法论修复结论，解决151676 GPU重训问题（固定PyTorch版本），评估CrossModalEnhancer完整GPU pipeline效果；④gadget/research——将7位学者画像部署至Hugo research栏目，在prompt中明确要求英文引号根治LLM生成中文JSON污染问题；⑤UniVLA——完成CALVIN评测完整流程验证（&ndash;single_gpu模式）。</p>
+<h2 id="token-用量统计">Token 用量统计<a hidden class="anchor" aria-hidden="true" href="#token-用量统计">#</a></h2>
+<h3 id="每日费用趋势">每日费用趋势<a hidden class="anchor" aria-hidden="true" href="#每日费用趋势">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>日期</th>
+          <th>Token (百万)</th>
+          <th>费用 ($)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2026-03-09</td>
+          <td>46.9</td>
+          <td>32.17</td>
+      </tr>
+      <tr>
+          <td>2026-03-11</td>
+          <td>30.5</td>
+          <td>20.75</td>
+      </tr>
+      <tr>
+          <td>2026-03-12</td>
+          <td>2.0</td>
+          <td>2.22</td>
+      </tr>
+      <tr>
+          <td>2026-03-13</td>
+          <td>3.0</td>
+          <td>2.23</td>
+      </tr>
+      <tr>
+          <td>2026-03-14</td>
+          <td>19.0</td>
+          <td>13.13</td>
+      </tr>
+      <tr>
+          <td>2026-03-15</td>
+          <td>135.3</td>
+          <td>100.70</td>
+      </tr>
+      <tr>
+          <td>unknown</td>
+          <td>72.5</td>
+          <td>56.27</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>峰值日:</strong> 2026-03-15 — $100.70 / 135.3M tokens</p>
+<h3 id="claude-code">Claude Code<a hidden class="anchor" aria-hidden="true" href="#claude-code">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>309,110,118</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>315,228</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>1,023,671</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>22,299,827</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>285,471,392</td>
+      </tr>
+      <tr>
+          <td>总费用</td>
+          <td>$227.47</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="模型使用分布">模型使用分布<a hidden class="anchor" aria-hidden="true" href="#模型使用分布">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>费用 ($)</th>
+          <th>输入 Token</th>
+          <th>输出 Token</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>203.57</td>
+          <td>170,917</td>
+          <td>554,482</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>19.77</td>
+          <td>144,115</td>
+          <td>468,454</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>4.12</td>
+          <td>196</td>
+          <td>735</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

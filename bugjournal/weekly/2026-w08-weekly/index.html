@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Weekly Summary 2026-W08 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal, Weekly Summary">
+<meta name="description" content="本周以 MIHD 空间转录组项目为主线，完成了 H&amp;E Image-Only 聚类的系统性调研（确立 ARI 0.11–0.16 文献基线）、三种自监督增强方案实现（SCAN 将 ARI 从 0.251 提升至 0.303，&#43;20.6%）及 Vision Refinement 两阶段融合框架搭建；同时在 tianhe 集群上并行推进 Error Recovery Benchmark（M14 评估基础设施验证、649 场景全量评估启动）和 Phoenix pi0.5 复现数据流水线（18.4GB MimicGen 数据集入库、训练配置就位）。全周解决了 STEGO NaN、双重归一化 bug、lerobot 版本冲突、HuggingFace 代理等多个工程阻塞，Pi0.5 OOM 与 visualize_scene.py 视频验证两项阻塞延至下周。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/weekly/2026-w08-weekly/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.c3b562a4103ddad215966d26b061d89cb16e1dade8748d9f57c4abc19a840c1a.css" integrity="sha256-w7VipBA92tIVlm0msGHYnLFuHa3odI2fV8SrwZqEDBo=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/weekly/2026-w08-weekly/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://tzj2006.github.io/bugjournal/weekly/2026-w08-weekly/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Weekly Summary 2026-W08">
+  <meta property="og:description" content="本周以 MIHD 空间转录组项目为主线，完成了 H&amp;E Image-Only 聚类的系统性调研（确立 ARI 0.11–0.16 文献基线）、三种自监督增强方案实现（SCAN 将 ARI 从 0.251 提升至 0.303，&#43;20.6%）及 Vision Refinement 两阶段融合框架搭建；同时在 tianhe 集群上并行推进 Error Recovery Benchmark（M14 评估基础设施验证、649 场景全量评估启动）和 Phoenix pi0.5 复现数据流水线（18.4GB MimicGen 数据集入库、训练配置就位）。全周解决了 STEGO NaN、双重归一化 bug、lerobot 版本冲突、HuggingFace 代理等多个工程阻塞，Pi0.5 OOM 与 visualize_scene.py 视频验证两项阻塞延至下周。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-22T23:59:00-05:00">
+    <meta property="article:modified_time" content="2026-02-22T23:59:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Weekly Summary 2026-W08">
+  <meta name="twitter:description" content="本周以 MIHD 空间转录组项目为主线，完成了 H&amp;E Image-Only 聚类的系统性调研（确立 ARI 0.11–0.16 文献基线）、三种自监督增强方案实现（SCAN 将 ARI 从 0.251 提升至 0.303，&#43;20.6%）及 Vision Refinement 两阶段融合框架搭建；同时在 tianhe 集群上并行推进 Error Recovery Benchmark（M14 评估基础设施验证、649 场景全量评估启动）和 Phoenix pi0.5 复现数据流水线（18.4GB MimicGen 数据集入库、训练配置就位）。全周解决了 STEGO NaN、双重归一化 bug、lerobot 版本冲突、HuggingFace 代理等多个工程阻塞，Pi0.5 OOM 与 visualize_scene.py 视频验证两项阻塞延至下周。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Weekly Summaries",
+      "item": "https://tzj2006.github.io/bugjournal/weekly/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Weekly Summary 2026-W08",
+      "item": "https://tzj2006.github.io/bugjournal/weekly/2026-w08-weekly/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Weekly Summary 2026-W08",
+  "name": "Weekly Summary 2026-W08",
+  "description": "本周以 MIHD 空间转录组项目为主线，完成了 H\u0026amp;E Image-Only 聚类的系统性调研（确立 ARI 0.11–0.16 文献基线）、三种自监督增强方案实现（SCAN 将 ARI 从 0.251 提升至 0.303，+20.6%）及 Vision Refinement 两阶段融合框架搭建；同时在 tianhe 集群上并行推进 Error Recovery Benchmark（M14 评估基础设施验证、649 场景全量评估启动）和 Phoenix pi0.5 复现数据流水线（18.4GB MimicGen 数据集入库、训练配置就位）。全周解决了 STEGO NaN、双重归一化 bug、lerobot 版本冲突、HuggingFace 代理等多个工程阻塞，Pi0.5 OOM 与 visualize_scene.py 视频验证两项阻塞延至下周。",
+  "keywords": [
+    "Bug Journal", "Weekly Summary"
+  ],
+  "articleBody": "周报 — 2026-W08 (2026-02-16 ~ 2026-02-22) 本周以 MIHD 空间转录组项目为主线，完成了 H\u0026E Image-Only 聚类的系统性调研（确立 ARI 0.11–0.16 文献基线）、三种自监督增强方案实现（SCAN 将 ARI 从 0.251 提升至 0.303，+20.6%）及 Vision Refinement 两阶段融合框架搭建；同时在 tianhe 集群上并行推进 Error Recovery Benchmark（M14 评估基础设施验证、649 场景全量评估启动）和 Phoenix pi0.5 复现数据流水线（18.4GB MimicGen 数据集入库、训练配置就位）。全周解决了 STEGO NaN、双重归一化 bug、lerobot 版本冲突、HuggingFace 代理等多个工程阻塞，Pi0.5 OOM 与 visualize_scene.py 视频验证两项阻塞延至下周。\n本周概览 指标 数值 日期范围 2026-02-16 ~ 2026-02-22 活跃天数 3 / 7 总对话数 9 涉及项目 4 完成任务 11 进行中任务 5 总 Token 28,509,501 总费用 $14.13 日均费用 $4.71 项目进展 MIHD（空间转录组聚类） (3 天活跃) — 🔄 active 完成项:\n完成四份核心技术文档：RM-IDEAL 双语说明、视觉编码器使用指南、病理 PFM 文献综述、UNI/UNI2 原论文评测分析 系统调研 H\u0026E Image-Only 方法，确立 DLPFC ARI 文献基线（SpaConTDS=0.16，stLearn=0.11），分析 Foundation Model 失效五大根因 实现并验证 STEGO/BYOL+GAT/SCAN 三种自监督增强方案，SCAN 以 ARI=0.303 最优（baseline 0.251，+20.6%），其嵌入与基因特征融合互补性验证（mean fusion +0.065 ARI） 发现并修复 eval_scan_fusion.py 中 STAIG 双重归一化 bug，决策改用 run_benchmark.py 正确路径 run_benchmark.py 集成 CacheManager embedding 缓存（秒级加载，支持 scan_uni2 自定义缓存名） 实现 Vision Refinement 两阶段融合框架（–vision_refine 参数，~60 行最小侵入），启动 7 种 fusion 策略后台批量实验 批量重新生成全部 11 个 section 可视化（利用 .npz 缓存，无需重新推理），新增 H\u0026E 原图面板 阻塞项:\n⚠️ eval_scan_fusion.py 坐标维度 bug 导致 SCAN 融合联合评估脚本调试未完成 ⚠️ Vision Refinement 首次实验（scan_cluster + concat，ARI=0.313）低于直接 concat（0.387），自监督压缩损失特征多样性问题待分析 ⚠️ ENHANCEMENT_PLAN_CN.md 大目标 7 的 ImageEncoder 增强实施尚未开始 Error Recovery Benchmark \u0026 Phoenix pi0.5 复现 (1 天活跃) — 🔄 active 完成项:\n制定含 7 步、覆盖 G1–G7 大目标和 M12–M15 里程碑的完整 Phase II 执行计划，关键路径约 16 天 M14 基线评估基础设施验证（sanity check 10 场景通过），649 场景全量 CPU 评估启动（超出预期 454，+43%） 完成 Phoenix pi0.5 复现完整数据流水线：convert_mimicgen_to_lerobot.py、evaluate_mimicgen.py、OpenPI 训练配置（100K 步，4-GPU）、18.4GB MimicGen 数据集下载与格式转换（7-8/9 任务完成） 诊断 Pi0.5 OOM 阻塞点，将 GPU 访问方式从 SSH 规范化为 srun –overlap 解决 lerobot 0.1.0 与 datasets\u003e=4.0 不兼容问题（降级至 3.6.0） 建立 hf-mirror.com 作为集群 HuggingFace 数据获取标准方案 阻塞项:\n⚠️ Pi0.5 OOM 未解决（GPU 显存不足 150MB），baseline 评估仍阻塞 ⚠️ visualize_scene.py 力参数扩展完成但视频验证因 SLURM 节点权限问题阻塞 ⚠️ Pi0 VLA Server 端口冲突（port 5555 被占用）导致会话中断 关键任务 ✅ H\u0026E Image-Only 聚类方法系统调研 (2026-02-19) — 搜集 MILWRM/F-SEG/Deep Contrastive Clustering 等方法全貌，从消融实验中核实 image-only DLPFC ARI 数值（SpaConTDS=0.16，stLearn=0.11），深度调研 BYOL/STEGO/SCAN 在病理学中的应用，梳理 CV 社区四级 domain gap 解决框架 ✅ MIHD 技术文档体系建立 (2026-02-19) — 创建四份核心技术文档：RM-IDEAL 双语结构文档、视觉编码器使用指南（12 章节）、病理 PFM 文献综述、UNI/UNI2 原论文评测分析（34 个临床任务） ✅ Foundation Model 在空间域识别失效根因分析 (2026-02-19) — 从训练数据 domain 不匹配、预训练任务 mismatch、脑组织层间形态差异极小、特征冗余、缺乏空间上下文五维度系统分析，结合 UNI2 棕色重复 patch 现象提供案例支撑 ✅ Image-Only 聚类增强方案实现（STEGO/BYOL+GAT/SCAN） (2026-02-19) — 新建 STEGOHead/BYOLAdapter/SpatialGATRefiner/SCANHead 四个模型文件，在 151673 section 完成对比测试，SCAN ARI=0.303 最优（+20.6%） ✅ STAIG fusion 双重归一化 bug 调查与架构决策 (2026-02-20) — 确认 eval_scan_fusion.py 未传 staig_alignment_config 导致 STAIGTrainer 内部再次 StandardScaler；决策改用 run_benchmark.py 正确路径而非修复独立脚本 ✅ run_benchmark.py 集成 embedding 缓存机制 (2026-02-20) — 引入 CacheManager，在 gene/vision encoding 前先检查缓存，命中则跳过 encoder 实例化（秒级加载），支持 scan_uni2 自定义缓存名，vision 缓存分 standard/freq/staig_strict 三种 variant 🔄 M14 基线评估基础设施验证与全量评估启动 (2026-02-22) — sanity check（60 episodes，约 7 分钟，SR=0% 符合预期），随后启动 649 场景×2 策略×3 seed 全量 CPU 评估（约 3894 episodes），后台运行中 🔄 Phoenix pi0.5 复现完整数据流水线搭建 (2026-02-22) — 编写 convert_mimicgen_to_lerobot.py 和 evaluate_mimicgen.py，配置 pi05_base_mimicgen_phoenix 训练参数，通过 hf-mirror.com 下载 18.4GB MimicGen 数据集（9 任务 9000 demos），完成格式转换 7-8/9 任务 🔄 SCAN 嵌入与多模态 Fusion 联合评估 (2026-02-19) — 编写 eval_scan_fusion.py，将 SCAN 优化后 256 维视觉嵌入与 PCA 基因特征做所有 fusion 方法对比；mean fusion ARI +0.065，coords 维度 bug 部分修复，脚本调试中 🔄 MIHD Vision Refinement 两阶段融合框架实现与批量实验 (2026-02-22) — 新增 –vision_refine 参数（scan_cluster/stego_refine/byol_spatial），约 60 行代码最小侵入式集成，首次实验 ARI=0.313 低于 baseline concat 0.387；7 种 fusion 策略后台批量实验运行中 ✅ Error Recovery Benchmark Phase II 完整执行计划制定 (2026-02-22) — 分析 G1–G7 大目标和 M12–M15 里程碑依赖关系，制定含 7 步的执行计划，明确 GPU 分配策略（srun –overlap，显存≥50% 空闲），关键路径约 16 天 ✅ Error Recovery Benchmark baseline 诊断与 GPU 访问规范更新 (2026-02-22) — 确认 Pi0.5 OOM（显存不足 150MB）、BC-RNN obs key 问题已修复、649 场景就绪；将 CLAUDE.md 和 MEMORY.md 中 GPU 访问方式规范化为 srun –overlap 🚫 visualize_scene.py 力参数扩展 (2026-02-22) — 完成 force_override/duration_override/settle_steps 参数添加和 Phase 3 neutral action 逻辑；视频验证因 SLURM 节点权限阻塞未完成 ✅ STAIG fusion 专项对比实验（151673） (2026-02-20) — 单独测试 staig_fusion × {UNI2_raw, SCAN(UNI2)}，ARI 分别为 0.3929/0.3880，几乎持平；验证 STAIG 内部 StandardScaler+PCA 抵消 SCAN 优化效果 ✅ UNI2 可视化添加 H\u0026E 面板并批量更新 (2026-02-19) — 修改为 1×3 布局（H\u0026E + GT + 预测），利用 .npz 缓存批量重新生成全部 11 个 section 可视化，151510 通过 hires→lowres symlink 修复 问题与解决方案 1. STEGO 训练 loss 全程 NaN，3639×3639 dense 相似度矩阵在 temperature=0.07 下 float32 指数运算溢出 [MIHD] (2026-02-19) 解决方案: 双步修复：对输入 image_emb 做 L2 归一化；将 InfoNCE 改为数值稳定版本（减行最大值再做 logsumexp，temperature 提高至 0.1）\n2. MILWRM 被错误归类为 Image-Only 方法，AI 初次汇总将多模态方法混入 image-only 结果，第一版调研结论需大幅修订 [MIHD] (2026-02-19) 解决方案: 通过 WebFetch 阅读 PMC 全文确认 MILWRM 实际基于基因表达，专门从 SpaConTDS 等文章的消融实验中定向挖掘 image-only 数据点\n3. eval_scan_fusion.py 中 staig_fusion 存在双重归一化 bug（STAIGTrainer 内部再次 StandardScaler） [MIHD] (2026-02-20) 解决方案: 放弃修复独立脚本，直接改用已正确传递 staig_alignment_config 的 run_benchmark.py，复用已验证路径\n4. run_benchmark.py 每次重新实例化 encoder 提取 embeddings，缺少 pipeline 级别缓存支持 [MIHD] (2026-02-20) 解决方案: 集成 pipeline/cache_manager.py 的 CacheManager，encoding 前优先从缓存加载，提取后写入缓存，命中时跳过 encoder 实例化\n5. lerobot 0.1.0 与 datasets\u003e=4.0 不兼容（torch.stack 报 TypeError：Column 对象替换了 list） [Error Recovery Benchmark / Phoenix pi0.5] (2026-02-22) 解决方案: 将 datasets 从 4.4.1 降级至 3.6.0（\u003c4.0）；datasets 4.0 将 dataset[‘column’] 返回值从 list 改为 Column 对象，lerobot 期望 list/tuple of tensors\n6. HuggingFace 官方下载因代理（Squid 503）失败，Python 下载脚本无法连通 [Error Recovery Benchmark / Phoenix pi0.5] (2026-02-22) 解决方案: 改用 hf-mirror.com + wget，URL 格式：https://hf-mirror.com/datasets/{repo_id}/resolve/main/{file_path}，通过集群 HTTP 代理可达 40–200MB/s\n7. Slurm GPU 节点访问不稳定：srun 未加 –overlap 导致命令 hang，SSH 直连不可靠，多分区提交被拒 [Error Recovery Benchmark / Phoenix pi0.5] (2026-02-22) 解决方案: 规范化工作流：source set-XY-I.sh → squeue → srun –jobid= –overlap；禁止直接 SSH 到 GPU 节点\n8. eval_scan_fusion.py 中空间坐标维度异常（变成 (1,2)），多个 fusion 方法报错 [MIHD] (2026-02-19) 解决方案: 放弃调用 load_spatial_coordinates()（barcode 匹配失败），改为直接从 adata.obsm[‘spatial’] 读取坐标，修复 load_dlpfc_data 返回值解包错误\n学习收获 领域知识 (domain) 纯 Image-Only 在 DLPFC 精细分层任务上 ARI 仅 0.11–0.16（多模态可达 0.45–0.64），是脑组织层间形态学差异极小与 Foundation Model 训练 domain 不匹配的综合结果；多模态方法的消融实验几乎从不单独测试 image-only，这本身是值得关注的 research gap Foundation Model 在空间域识别失效的五大根因：①训练以癌症组织为主（domain gap）；②预训练任务与层间梯度识别不匹配；③脑皮层层间形态差异极微小；④图像特征与基因表达高度冗余；⑤单 patch 独立编码缺乏空间位置上下文 STAIG 使用 BYOL 在目标数据集 H\u0026E patch 上做无监督域适配（训练后保留 encoder，丢弃 projector/predictor）是将无监督域适配引入空间转录组的直接先例；BYOL 无需负样本的设计对小 batch ST 场景（每 section 数千 patch）天然友好 CV 社区处理「domain gap + 细粒度任务 + 无标注」的四级框架：Level 1 直接预训练特征聚类 → Level 2 STEGO/SCAN 特征精炼 → Level 3 域内 SSL 重新预训练（BYOL/MAE）→ Level 4 专属 foundation model；GPFM/CHIEF 是空间域识别 ARI 最优 PFM，UNI2 是 spot 检索最优 架构 (architecture) SCAN 在 image-only 空间转录组场景中 ARI 最优（0.303，+20.6%），核心优势是离线特征 k-NN 挖掘解耦了嵌入学习与聚类，其 256 维优化嵌入与基因特征融合具有真实互补性（mean fusion +0.065 ARI） 两阶段融合并非必然优于单阶段：scan_cluster 将视觉 embedding 从 1536d 压缩到 256d 后，多模态融合 ARI（0.313）低于直接 concat（0.387），说明自监督压缩会损失融合任务所需的原始特征多样性，自监督聚类优化目标与下游融合任务存在目标不一致 STAIG fusion 内部 StandardScaler+PCA 预处理会吸收外部 embedding 优化效果（SCAN vs UNI2_raw ARI 差异仅 0.005），embedding 缓存应保存归一化前的 raw embeddings，post-encoder normalization 在加载后执行，确保不同调用路径结果一致 VLA 基线评估需明确声明 Checkpoint 来源：使用非目标任务微调模型（pi0_libero、pi05_base）评估的是零样本跨域恢复能力，论文必须主动声明此实验设置，后续需增加微调后对比实验完整论证数据集有用性 在复杂实验系统中应优先复用已有的、经过验证的工具路径（如 run_benchmark.py），独立脚本容易引入预处理不一致等隐蔽 bug；项目内部函数调用前应实时读取源码核验函数签名，而非依赖记忆 调试 (debugging) 大规模 dense 相似度矩阵（n\u003e3000）计算 InfoNCE 对比损失时，必须使用数值稳定的 log-sum-exp（减去行最大值），否则在 float32 精度下 temperature=0.07 的指数运算会溢出导致 NaN；这是大规模对比学习实现的关键工程约束 工具 (tools) lerobot 0.1.0 对 datasets 版本有严格约束，需 pin 到 \u003c4.0（推荐 3.x）；datasets 4.0 将 dataset[‘column’] 返回值改为 Column 对象，导致 torch.stack 报 TypeError；MimicGen 与 LIBERO obs/action 格式完全兼容（84×84 图像，8D 状态，7D 动作），可直接复用 OpenPI 的 LeRobotLiberoDataConfig 中国大陆 HPC 集群访问 HuggingFace 的标准方案是 hf-mirror.com，URL 格式：https://hf-mirror.com/datasets/{repo_id}/resolve/main/{file_path}，通过 wget + HTTP 代理可达 40–200MB/s，应作为默认方案 OpenPI 的 JAX 训练天然支持多 GPU data parallelism，只需 CUDA_VISIBLE_DEVICES 指定 GPU 列表，JAX 自动构建 2D mesh 并行，无需修改 TrainConfig；Slurm –overlap 是在已有 interactive job 上叠加运行新命令的关键参数，是 Claude Code 环境调用集群 GPU 节点的核心技巧 AI 使用备注 有效模式:\n✓ 并行子任务探索项目结构并制定清理计划（MIHD 整理任务），减少串行探索耗时 ✓ GPU 上并行后台执行三种方案（STEGO/BYOL/SCAN）对比验证，大幅缩短总实验耗时 ✓ 利用 .npz 缓存批量重新生成可视化，完全解耦推理与可视化，11/11 section 成功 ✓ 独立临时脚本（_test_staig_scan.py）隔离测试单一 fusion 方法，将 2 小时长任务缩短为 30 秒 ✓ 独立探索 JAX 多 GPU 机制（无需修改 config）和 hf-mirror.com 替代下载方案，无需用户介入 ✓ 最小侵入式代码修改（约 60 行）在 run_benchmark.py 中插入 Vision Refinement 阶段，保持架构稳定性 局限性:\n✗ 文献归类准确性不足：将 MILWRM 错误归类为 image-only 方法，初次调研汇总混入多模态结果，需用户两次干预才收敛到正确研究边界 ✗ 缺乏主动暴露关键实验假设意识：未主动说明 VLA 评估使用 LIBERO 微调版 checkpoint 对实验有效性的影响，需用户追问才展开讨论 ✗ API 使用倾向依赖记忆而非实时核验：eval_scan_fusion.py 多次出现函数签名/返回值解包错误，应在调用前 Read 源码确认 ✗ Slurm 权限问题时倾向穷举多个分区（5+ 次），未快速向用户询问正确账户/分区信息 ✗ 后台任务状态判断不足：数据转换仍在运行时触发 LeRobot 数据集验证，导致误报 timestamp violation 错误；频繁 sleep 轮询被多次打断 ✗ 在 HPC 环境中默认使用 CPU 进行模型验证，掩盖真实性能问题，造成额外交互摩擦 下周展望 下周重点集中在三条并行线：①MIHD：修复 eval_scan_fusion.py 坐标 bug 完成 SCAN 嵌入与全量 fusion 策略联合评估，分析 7 种 fusion 策略批量实验结果并诊断 Vision Refinement 压缩损失特征的根因，考虑调整 refinement hidden_dim 或切换 stego_refine/byol_spatial 方法；②Error Recovery Benchmark：整理 M14 649 场景全量 CPU 评估结果，解决 Pi0.5 OOM 问题（申请更大显存 GPU 或减小 batch size），启动 Phoenix pi0.5 100K 步 4-GPU 训练；③工程阻塞清理：解决 SLURM 节点权限问题完成 visualize_scene.py 视频验证，解决 Pi0 VLA Server 端口冲突（lsof -i:5555 检测 + 备用端口机制），推进 ENHANCEMENT_PLAN_CN.md 大目标 7 的 ImageEncoder 增强实施。\nToken 用量统计 每日费用趋势 日期 Token (百万) 费用 ($) 2026-02-19 3.2 2.14 2026-02-20 19.3 10.00 2026-02-22 6.0 1.99 峰值日: 2026-02-20 — $10.00 / 19.3M tokens\nClaude Code 指标 数值 总 Token 28,509,501 输入 Token 93,255 输出 Token 16,437 Cache 创建 2,761,832 Cache 读取 25,637,977 总费用 $14.13 模型使用分布 模型 费用 ($) 输入 Token 输出 Token claude-opus-4-6 9.57 15,496 14,319 claude-haiku-4-5-20251001 4.14 77,744 2,084 claude-sonnet-4-6 0.42 15 34 ",
+  "wordCount" : "1129",
+  "inLanguage": "en",
+  "datePublished": "2026-02-22T23:59:00-05:00",
+  "dateModified": "2026-02-22T23:59:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/weekly/2026-w08-weekly/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                    <ul class="lang-switch"><li>|</li>
+                        <li>
+                            <a href="https://tzj2006.github.io/zh/" title="中文"
+                                aria-label="中文">中文</a>
+                        </li>
+                    </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span>bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/weekly/">Weekly Summaries</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Weekly Summary 2026-W08
+    </h1>
+    <div class="post-meta"><span title='2026-02-22 23:59:00 -0500 EST'>February 22, 2026</span>&nbsp;·&nbsp;<span>6 min</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="周报--2026-w08-2026-02-16--2026-02-22">周报 — 2026-W08 (2026-02-16 ~ 2026-02-22)<a hidden class="anchor" aria-hidden="true" href="#周报--2026-w08-2026-02-16--2026-02-22">#</a></h1>
+<blockquote>
+<p>本周以 MIHD 空间转录组项目为主线，完成了 H&amp;E Image-Only 聚类的系统性调研（确立 ARI 0.11–0.16 文献基线）、三种自监督增强方案实现（SCAN 将 ARI 从 0.251 提升至 0.303，+20.6%）及 Vision Refinement 两阶段融合框架搭建；同时在 tianhe 集群上并行推进 Error Recovery Benchmark（M14 评估基础设施验证、649 场景全量评估启动）和 Phoenix pi0.5 复现数据流水线（18.4GB MimicGen 数据集入库、训练配置就位）。全周解决了 STEGO NaN、双重归一化 bug、lerobot 版本冲突、HuggingFace 代理等多个工程阻塞，Pi0.5 OOM 与 visualize_scene.py 视频验证两项阻塞延至下周。</p>
+</blockquote>
+<h2 id="本周概览">本周概览<a hidden class="anchor" aria-hidden="true" href="#本周概览">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>日期范围</td>
+          <td>2026-02-16 ~ 2026-02-22</td>
+      </tr>
+      <tr>
+          <td>活跃天数</td>
+          <td>3 / 7</td>
+      </tr>
+      <tr>
+          <td>总对话数</td>
+          <td>9</td>
+      </tr>
+      <tr>
+          <td>涉及项目</td>
+          <td>4</td>
+      </tr>
+      <tr>
+          <td>完成任务</td>
+          <td>11</td>
+      </tr>
+      <tr>
+          <td>进行中任务</td>
+          <td>5</td>
+      </tr>
+      <tr>
+          <td>总 Token</td>
+          <td>28,509,501</td>
+      </tr>
+      <tr>
+          <td>总费用</td>
+          <td>$14.13</td>
+      </tr>
+      <tr>
+          <td>日均费用</td>
+          <td>$4.71</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="项目进展">项目进展<a hidden class="anchor" aria-hidden="true" href="#项目进展">#</a></h2>
+<h3 id="mihd空间转录组聚类-3-天活跃---active">MIHD（空间转录组聚类） (3 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#mihd空间转录组聚类-3-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>完成四份核心技术文档：RM-IDEAL 双语说明、视觉编码器使用指南、病理 PFM 文献综述、UNI/UNI2 原论文评测分析</li>
+<li>系统调研 H&amp;E Image-Only 方法，确立 DLPFC ARI 文献基线（SpaConTDS=0.16，stLearn=0.11），分析 Foundation Model 失效五大根因</li>
+<li>实现并验证 STEGO/BYOL+GAT/SCAN 三种自监督增强方案，SCAN 以 ARI=0.303 最优（baseline 0.251，+20.6%），其嵌入与基因特征融合互补性验证（mean fusion +0.065 ARI）</li>
+<li>发现并修复 eval_scan_fusion.py 中 STAIG 双重归一化 bug，决策改用 run_benchmark.py 正确路径</li>
+<li>run_benchmark.py 集成 CacheManager embedding 缓存（秒级加载，支持 scan_uni2 自定义缓存名）</li>
+<li>实现 Vision Refinement 两阶段融合框架（&ndash;vision_refine 参数，~60 行最小侵入），启动 7 种 fusion 策略后台批量实验</li>
+<li>批量重新生成全部 11 个 section 可视化（利用 .npz 缓存，无需重新推理），新增 H&amp;E 原图面板</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ eval_scan_fusion.py 坐标维度 bug 导致 SCAN 融合联合评估脚本调试未完成</li>
+<li>⚠️ Vision Refinement 首次实验（scan_cluster + concat，ARI=0.313）低于直接 concat（0.387），自监督压缩损失特征多样性问题待分析</li>
+<li>⚠️ ENHANCEMENT_PLAN_CN.md 大目标 7 的 ImageEncoder 增强实施尚未开始</li>
+</ul>
+<h3 id="error-recovery-benchmark--phoenix-pi05-复现-1-天活跃---active">Error Recovery Benchmark &amp; Phoenix pi0.5 复现 (1 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark--phoenix-pi05-复现-1-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>制定含 7 步、覆盖 G1–G7 大目标和 M12–M15 里程碑的完整 Phase II 执行计划，关键路径约 16 天</li>
+<li>M14 基线评估基础设施验证（sanity check 10 场景通过），649 场景全量 CPU 评估启动（超出预期 454，+43%）</li>
+<li>完成 Phoenix pi0.5 复现完整数据流水线：convert_mimicgen_to_lerobot.py、evaluate_mimicgen.py、OpenPI 训练配置（100K 步，4-GPU）、18.4GB MimicGen 数据集下载与格式转换（7-8/9 任务完成）</li>
+<li>诊断 Pi0.5 OOM 阻塞点，将 GPU 访问方式从 SSH 规范化为 srun &ndash;overlap</li>
+<li>解决 lerobot 0.1.0 与 datasets&gt;=4.0 不兼容问题（降级至 3.6.0）</li>
+<li>建立 hf-mirror.com 作为集群 HuggingFace 数据获取标准方案</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ Pi0.5 OOM 未解决（GPU 显存不足 150MB），baseline 评估仍阻塞</li>
+<li>⚠️ visualize_scene.py 力参数扩展完成但视频验证因 SLURM 节点权限问题阻塞</li>
+<li>⚠️ Pi0 VLA Server 端口冲突（port 5555 被占用）导致会话中断</li>
+</ul>
+<h2 id="关键任务">关键任务<a hidden class="anchor" aria-hidden="true" href="#关键任务">#</a></h2>
+<ul>
+<li>✅ <strong>H&amp;E Image-Only 聚类方法系统调研</strong> (2026-02-19) — 搜集 MILWRM/F-SEG/Deep Contrastive Clustering 等方法全貌，从消融实验中核实 image-only DLPFC ARI 数值（SpaConTDS=0.16，stLearn=0.11），深度调研 BYOL/STEGO/SCAN 在病理学中的应用，梳理 CV 社区四级 domain gap 解决框架</li>
+<li>✅ <strong>MIHD 技术文档体系建立</strong> (2026-02-19) — 创建四份核心技术文档：RM-IDEAL 双语结构文档、视觉编码器使用指南（12 章节）、病理 PFM 文献综述、UNI/UNI2 原论文评测分析（34 个临床任务）</li>
+<li>✅ <strong>Foundation Model 在空间域识别失效根因分析</strong> (2026-02-19) — 从训练数据 domain 不匹配、预训练任务 mismatch、脑组织层间形态差异极小、特征冗余、缺乏空间上下文五维度系统分析，结合 UNI2 棕色重复 patch 现象提供案例支撑</li>
+<li>✅ <strong>Image-Only 聚类增强方案实现（STEGO/BYOL+GAT/SCAN）</strong> (2026-02-19) — 新建 STEGOHead/BYOLAdapter/SpatialGATRefiner/SCANHead 四个模型文件，在 151673 section 完成对比测试，SCAN ARI=0.303 最优（+20.6%）</li>
+<li>✅ <strong>STAIG fusion 双重归一化 bug 调查与架构决策</strong> (2026-02-20) — 确认 eval_scan_fusion.py 未传 staig_alignment_config 导致 STAIGTrainer 内部再次 StandardScaler；决策改用 run_benchmark.py 正确路径而非修复独立脚本</li>
+<li>✅ <strong>run_benchmark.py 集成 embedding 缓存机制</strong> (2026-02-20) — 引入 CacheManager，在 gene/vision encoding 前先检查缓存，命中则跳过 encoder 实例化（秒级加载），支持 scan_uni2 自定义缓存名，vision 缓存分 standard/freq/staig_strict 三种 variant</li>
+<li>🔄 <strong>M14 基线评估基础设施验证与全量评估启动</strong> (2026-02-22) — sanity check（60 episodes，约 7 分钟，SR=0% 符合预期），随后启动 649 场景×2 策略×3 seed 全量 CPU 评估（约 3894 episodes），后台运行中</li>
+<li>🔄 <strong>Phoenix pi0.5 复现完整数据流水线搭建</strong> (2026-02-22) — 编写 convert_mimicgen_to_lerobot.py 和 evaluate_mimicgen.py，配置 pi05_base_mimicgen_phoenix 训练参数，通过 hf-mirror.com 下载 18.4GB MimicGen 数据集（9 任务 9000 demos），完成格式转换 7-8/9 任务</li>
+<li>🔄 <strong>SCAN 嵌入与多模态 Fusion 联合评估</strong> (2026-02-19) — 编写 eval_scan_fusion.py，将 SCAN 优化后 256 维视觉嵌入与 PCA 基因特征做所有 fusion 方法对比；mean fusion ARI +0.065，coords 维度 bug 部分修复，脚本调试中</li>
+<li>🔄 <strong>MIHD Vision Refinement 两阶段融合框架实现与批量实验</strong> (2026-02-22) — 新增 &ndash;vision_refine 参数（scan_cluster/stego_refine/byol_spatial），约 60 行代码最小侵入式集成，首次实验 ARI=0.313 低于 baseline concat 0.387；7 种 fusion 策略后台批量实验运行中</li>
+<li>✅ <strong>Error Recovery Benchmark Phase II 完整执行计划制定</strong> (2026-02-22) — 分析 G1–G7 大目标和 M12–M15 里程碑依赖关系，制定含 7 步的执行计划，明确 GPU 分配策略（srun &ndash;overlap，显存≥50% 空闲），关键路径约 16 天</li>
+<li>✅ <strong>Error Recovery Benchmark baseline 诊断与 GPU 访问规范更新</strong> (2026-02-22) — 确认 Pi0.5 OOM（显存不足 150MB）、BC-RNN obs key 问题已修复、649 场景就绪；将 CLAUDE.md 和 MEMORY.md 中 GPU 访问方式规范化为 srun &ndash;overlap</li>
+<li>🚫 <strong>visualize_scene.py 力参数扩展</strong> (2026-02-22) — 完成 force_override/duration_override/settle_steps 参数添加和 Phase 3 neutral action 逻辑；视频验证因 SLURM 节点权限阻塞未完成</li>
+<li>✅ <strong>STAIG fusion 专项对比实验（151673）</strong> (2026-02-20) — 单独测试 staig_fusion × {UNI2_raw, SCAN(UNI2)}，ARI 分别为 0.3929/0.3880，几乎持平；验证 STAIG 内部 StandardScaler+PCA 抵消 SCAN 优化效果</li>
+<li>✅ <strong>UNI2 可视化添加 H&amp;E 面板并批量更新</strong> (2026-02-19) — 修改为 1×3 布局（H&amp;E + GT + 预测），利用 .npz 缓存批量重新生成全部 11 个 section 可视化，151510 通过 hires→lowres symlink 修复</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="1-stego-训练-loss-全程-nan36393639-dense-相似度矩阵在-temperature007-下-float32-指数运算溢出-mihd-2026-02-19">1. STEGO 训练 loss 全程 NaN，3639×3639 dense 相似度矩阵在 temperature=0.07 下 float32 指数运算溢出 [MIHD] (2026-02-19)<a hidden class="anchor" aria-hidden="true" href="#1-stego-训练-loss-全程-nan36393639-dense-相似度矩阵在-temperature007-下-float32-指数运算溢出-mihd-2026-02-19">#</a></h3>
+<p><strong>解决方案:</strong> 双步修复：对输入 image_emb 做 L2 归一化；将 InfoNCE 改为数值稳定版本（减行最大值再做 logsumexp，temperature 提高至 0.1）</p>
+<h3 id="2-milwrm-被错误归类为-image-only-方法ai-初次汇总将多模态方法混入-image-only-结果第一版调研结论需大幅修订-mihd-2026-02-19">2. MILWRM 被错误归类为 Image-Only 方法，AI 初次汇总将多模态方法混入 image-only 结果，第一版调研结论需大幅修订 [MIHD] (2026-02-19)<a hidden class="anchor" aria-hidden="true" href="#2-milwrm-被错误归类为-image-only-方法ai-初次汇总将多模态方法混入-image-only-结果第一版调研结论需大幅修订-mihd-2026-02-19">#</a></h3>
+<p><strong>解决方案:</strong> 通过 WebFetch 阅读 PMC 全文确认 MILWRM 实际基于基因表达，专门从 SpaConTDS 等文章的消融实验中定向挖掘 image-only 数据点</p>
+<h3 id="3-eval_scan_fusionpy-中-staig_fusion-存在双重归一化-bugstaigtrainer-内部再次-standardscaler-mihd-2026-02-20">3. eval_scan_fusion.py 中 staig_fusion 存在双重归一化 bug（STAIGTrainer 内部再次 StandardScaler） [MIHD] (2026-02-20)<a hidden class="anchor" aria-hidden="true" href="#3-eval_scan_fusionpy-中-staig_fusion-存在双重归一化-bugstaigtrainer-内部再次-standardscaler-mihd-2026-02-20">#</a></h3>
+<p><strong>解决方案:</strong> 放弃修复独立脚本，直接改用已正确传递 staig_alignment_config 的 run_benchmark.py，复用已验证路径</p>
+<h3 id="4-run_benchmarkpy-每次重新实例化-encoder-提取-embeddings缺少-pipeline-级别缓存支持-mihd-2026-02-20">4. run_benchmark.py 每次重新实例化 encoder 提取 embeddings，缺少 pipeline 级别缓存支持 [MIHD] (2026-02-20)<a hidden class="anchor" aria-hidden="true" href="#4-run_benchmarkpy-每次重新实例化-encoder-提取-embeddings缺少-pipeline-级别缓存支持-mihd-2026-02-20">#</a></h3>
+<p><strong>解决方案:</strong> 集成 pipeline/cache_manager.py 的 CacheManager，encoding 前优先从缓存加载，提取后写入缓存，命中时跳过 encoder 实例化</p>
+<h3 id="5-lerobot-010-与-datasets40-不兼容torchstack-报-typeerrorcolumn-对象替换了-list-error-recovery-benchmark--phoenix-pi05-2026-02-22">5. lerobot 0.1.0 与 datasets&gt;=4.0 不兼容（torch.stack 报 TypeError：Column 对象替换了 list） [Error Recovery Benchmark / Phoenix pi0.5] (2026-02-22)<a hidden class="anchor" aria-hidden="true" href="#5-lerobot-010-与-datasets40-不兼容torchstack-报-typeerrorcolumn-对象替换了-list-error-recovery-benchmark--phoenix-pi05-2026-02-22">#</a></h3>
+<p><strong>解决方案:</strong> 将 datasets 从 4.4.1 降级至 3.6.0（&lt;4.0）；datasets 4.0 将 dataset[&lsquo;column&rsquo;] 返回值从 list 改为 Column 对象，lerobot 期望 list/tuple of tensors</p>
+<h3 id="6-huggingface-官方下载因代理squid-503失败python-下载脚本无法连通-error-recovery-benchmark--phoenix-pi05-2026-02-22">6. HuggingFace 官方下载因代理（Squid 503）失败，Python 下载脚本无法连通 [Error Recovery Benchmark / Phoenix pi0.5] (2026-02-22)<a hidden class="anchor" aria-hidden="true" href="#6-huggingface-官方下载因代理squid-503失败python-下载脚本无法连通-error-recovery-benchmark--phoenix-pi05-2026-02-22">#</a></h3>
+<p><strong>解决方案:</strong> 改用 hf-mirror.com + wget，URL 格式：https://hf-mirror.com/datasets/{repo_id}/resolve/main/{file_path}，通过集群 HTTP 代理可达 40–200MB/s</p>
+<h3 id="7-slurm-gpu-节点访问不稳定srun-未加-overlap-导致命令-hangssh-直连不可靠多分区提交被拒-error-recovery-benchmark--phoenix-pi05-2026-02-22">7. Slurm GPU 节点访问不稳定：srun 未加 &ndash;overlap 导致命令 hang，SSH 直连不可靠，多分区提交被拒 [Error Recovery Benchmark / Phoenix pi0.5] (2026-02-22)<a hidden class="anchor" aria-hidden="true" href="#7-slurm-gpu-节点访问不稳定srun-未加-overlap-导致命令-hangssh-直连不可靠多分区提交被拒-error-recovery-benchmark--phoenix-pi05-2026-02-22">#</a></h3>
+<p><strong>解决方案:</strong> 规范化工作流：source set-XY-I.sh → squeue → srun &ndash;jobid=<JOBID> &ndash;overlap；禁止直接 SSH 到 GPU 节点</p>
+<h3 id="8-eval_scan_fusionpy-中空间坐标维度异常变成-12多个-fusion-方法报错-mihd-2026-02-19">8. eval_scan_fusion.py 中空间坐标维度异常（变成 (1,2)），多个 fusion 方法报错 [MIHD] (2026-02-19)<a hidden class="anchor" aria-hidden="true" href="#8-eval_scan_fusionpy-中空间坐标维度异常变成-12多个-fusion-方法报错-mihd-2026-02-19">#</a></h3>
+<p><strong>解决方案:</strong> 放弃调用 load_spatial_coordinates()（barcode 匹配失败），改为直接从 adata.obsm[&lsquo;spatial&rsquo;] 读取坐标，修复 load_dlpfc_data 返回值解包错误</p>
+<h2 id="学习收获">学习收获<a hidden class="anchor" aria-hidden="true" href="#学习收获">#</a></h2>
+<h3 id="领域知识-domain">领域知识 (domain)<a hidden class="anchor" aria-hidden="true" href="#领域知识-domain">#</a></h3>
+<ul>
+<li>纯 Image-Only 在 DLPFC 精细分层任务上 ARI 仅 0.11–0.16（多模态可达 0.45–0.64），是脑组织层间形态学差异极小与 Foundation Model 训练 domain 不匹配的综合结果；多模态方法的消融实验几乎从不单独测试 image-only，这本身是值得关注的 research gap</li>
+<li>Foundation Model 在空间域识别失效的五大根因：①训练以癌症组织为主（domain gap）；②预训练任务与层间梯度识别不匹配；③脑皮层层间形态差异极微小；④图像特征与基因表达高度冗余；⑤单 patch 独立编码缺乏空间位置上下文</li>
+<li>STAIG 使用 BYOL 在目标数据集 H&amp;E patch 上做无监督域适配（训练后保留 encoder，丢弃 projector/predictor）是将无监督域适配引入空间转录组的直接先例；BYOL 无需负样本的设计对小 batch ST 场景（每 section 数千 patch）天然友好</li>
+<li>CV 社区处理「domain gap + 细粒度任务 + 无标注」的四级框架：Level 1 直接预训练特征聚类 → Level 2 STEGO/SCAN 特征精炼 → Level 3 域内 SSL 重新预训练（BYOL/MAE）→ Level 4 专属 foundation model；GPFM/CHIEF 是空间域识别 ARI 最优 PFM，UNI2 是 spot 检索最优</li>
+</ul>
+<h3 id="架构-architecture">架构 (architecture)<a hidden class="anchor" aria-hidden="true" href="#架构-architecture">#</a></h3>
+<ul>
+<li>SCAN 在 image-only 空间转录组场景中 ARI 最优（0.303，+20.6%），核心优势是离线特征 k-NN 挖掘解耦了嵌入学习与聚类，其 256 维优化嵌入与基因特征融合具有真实互补性（mean fusion +0.065 ARI）</li>
+<li>两阶段融合并非必然优于单阶段：scan_cluster 将视觉 embedding 从 1536d 压缩到 256d 后，多模态融合 ARI（0.313）低于直接 concat（0.387），说明自监督压缩会损失融合任务所需的原始特征多样性，自监督聚类优化目标与下游融合任务存在目标不一致</li>
+<li>STAIG fusion 内部 StandardScaler+PCA 预处理会吸收外部 embedding 优化效果（SCAN vs UNI2_raw ARI 差异仅 0.005），embedding 缓存应保存归一化前的 raw embeddings，post-encoder normalization 在加载后执行，确保不同调用路径结果一致</li>
+<li>VLA 基线评估需明确声明 Checkpoint 来源：使用非目标任务微调模型（pi0_libero、pi05_base）评估的是零样本跨域恢复能力，论文必须主动声明此实验设置，后续需增加微调后对比实验完整论证数据集有用性</li>
+<li>在复杂实验系统中应优先复用已有的、经过验证的工具路径（如 run_benchmark.py），独立脚本容易引入预处理不一致等隐蔽 bug；项目内部函数调用前应实时读取源码核验函数签名，而非依赖记忆</li>
+</ul>
+<h3 id="调试-debugging">调试 (debugging)<a hidden class="anchor" aria-hidden="true" href="#调试-debugging">#</a></h3>
+<ul>
+<li>大规模 dense 相似度矩阵（n&gt;3000）计算 InfoNCE 对比损失时，必须使用数值稳定的 log-sum-exp（减去行最大值），否则在 float32 精度下 temperature=0.07 的指数运算会溢出导致 NaN；这是大规模对比学习实现的关键工程约束</li>
+</ul>
+<h3 id="工具-tools">工具 (tools)<a hidden class="anchor" aria-hidden="true" href="#工具-tools">#</a></h3>
+<ul>
+<li>lerobot 0.1.0 对 datasets 版本有严格约束，需 pin 到 &lt;4.0（推荐 3.x）；datasets 4.0 将 dataset[&lsquo;column&rsquo;] 返回值改为 Column 对象，导致 torch.stack 报 TypeError；MimicGen 与 LIBERO obs/action 格式完全兼容（84×84 图像，8D 状态，7D 动作），可直接复用 OpenPI 的 LeRobotLiberoDataConfig</li>
+<li>中国大陆 HPC 集群访问 HuggingFace 的标准方案是 hf-mirror.com，URL 格式：https://hf-mirror.com/datasets/{repo_id}/resolve/main/{file_path}，通过 wget + HTTP 代理可达 40–200MB/s，应作为默认方案</li>
+<li>OpenPI 的 JAX 训练天然支持多 GPU data parallelism，只需 CUDA_VISIBLE_DEVICES 指定 GPU 列表，JAX 自动构建 2D mesh 并行，无需修改 TrainConfig；Slurm &ndash;overlap 是在已有 interactive job 上叠加运行新命令的关键参数，是 Claude Code 环境调用集群 GPU 节点的核心技巧</li>
+</ul>
+<h2 id="ai-使用备注">AI 使用备注<a hidden class="anchor" aria-hidden="true" href="#ai-使用备注">#</a></h2>
+<p><strong>有效模式:</strong></p>
+<ul>
+<li>✓ 并行子任务探索项目结构并制定清理计划（MIHD 整理任务），减少串行探索耗时</li>
+<li>✓ GPU 上并行后台执行三种方案（STEGO/BYOL/SCAN）对比验证，大幅缩短总实验耗时</li>
+<li>✓ 利用 .npz 缓存批量重新生成可视化，完全解耦推理与可视化，11/11 section 成功</li>
+<li>✓ 独立临时脚本（_test_staig_scan.py）隔离测试单一 fusion 方法，将 2 小时长任务缩短为 30 秒</li>
+<li>✓ 独立探索 JAX 多 GPU 机制（无需修改 config）和 hf-mirror.com 替代下载方案，无需用户介入</li>
+<li>✓ 最小侵入式代码修改（约 60 行）在 run_benchmark.py 中插入 Vision Refinement 阶段，保持架构稳定性</li>
+</ul>
+<p><strong>局限性:</strong></p>
+<ul>
+<li>✗ 文献归类准确性不足：将 MILWRM 错误归类为 image-only 方法，初次调研汇总混入多模态结果，需用户两次干预才收敛到正确研究边界</li>
+<li>✗ 缺乏主动暴露关键实验假设意识：未主动说明 VLA 评估使用 LIBERO 微调版 checkpoint 对实验有效性的影响，需用户追问才展开讨论</li>
+<li>✗ API 使用倾向依赖记忆而非实时核验：eval_scan_fusion.py 多次出现函数签名/返回值解包错误，应在调用前 Read 源码确认</li>
+<li>✗ Slurm 权限问题时倾向穷举多个分区（5+ 次），未快速向用户询问正确账户/分区信息</li>
+<li>✗ 后台任务状态判断不足：数据转换仍在运行时触发 LeRobot 数据集验证，导致误报 timestamp violation 错误；频繁 sleep 轮询被多次打断</li>
+<li>✗ 在 HPC 环境中默认使用 CPU 进行模型验证，掩盖真实性能问题，造成额外交互摩擦</li>
+</ul>
+<h2 id="下周展望">下周展望<a hidden class="anchor" aria-hidden="true" href="#下周展望">#</a></h2>
+<p>下周重点集中在三条并行线：①MIHD：修复 eval_scan_fusion.py 坐标 bug 完成 SCAN 嵌入与全量 fusion 策略联合评估，分析 7 种 fusion 策略批量实验结果并诊断 Vision Refinement 压缩损失特征的根因，考虑调整 refinement hidden_dim 或切换 stego_refine/byol_spatial 方法；②Error Recovery Benchmark：整理 M14 649 场景全量 CPU 评估结果，解决 Pi0.5 OOM 问题（申请更大显存 GPU 或减小 batch size），启动 Phoenix pi0.5 100K 步 4-GPU 训练；③工程阻塞清理：解决 SLURM 节点权限问题完成 visualize_scene.py 视频验证，解决 Pi0 VLA Server 端口冲突（lsof -i:5555 检测 + 备用端口机制），推进 ENHANCEMENT_PLAN_CN.md 大目标 7 的 ImageEncoder 增强实施。</p>
+<h2 id="token-用量统计">Token 用量统计<a hidden class="anchor" aria-hidden="true" href="#token-用量统计">#</a></h2>
+<h3 id="每日费用趋势">每日费用趋势<a hidden class="anchor" aria-hidden="true" href="#每日费用趋势">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>日期</th>
+          <th>Token (百万)</th>
+          <th>费用 ($)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2026-02-19</td>
+          <td>3.2</td>
+          <td>2.14</td>
+      </tr>
+      <tr>
+          <td>2026-02-20</td>
+          <td>19.3</td>
+          <td>10.00</td>
+      </tr>
+      <tr>
+          <td>2026-02-22</td>
+          <td>6.0</td>
+          <td>1.99</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>峰值日:</strong> 2026-02-20 — $10.00 / 19.3M tokens</p>
+<h3 id="claude-code">Claude Code<a hidden class="anchor" aria-hidden="true" href="#claude-code">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>28,509,501</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>93,255</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>16,437</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>2,761,832</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>25,637,977</td>
+      </tr>
+      <tr>
+          <td>总费用</td>
+          <td>$14.13</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="模型使用分布">模型使用分布<a hidden class="anchor" aria-hidden="true" href="#模型使用分布">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>费用 ($)</th>
+          <th>输入 Token</th>
+          <th>输出 Token</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>9.57</td>
+          <td>15,496</td>
+          <td>14,319</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>4.14</td>
+          <td>77,744</td>
+          <td>2,084</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>0.42</td>
+          <td>15</td>
+          <td>34</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
