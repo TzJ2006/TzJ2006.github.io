@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>缺陷日志 2026-03-22 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="天和集群已成功修复了错误恢复基准测试中的三项核心问题（爪子极性反转、wrong_object过滤逻辑错误、drop_with_interaction注入策略）。训练场景的数量也从1209增加到1627（&#43;35%），同时深入分析了three_piece_assembly相位检测退化的根本原因，以及48个ungenerable cases的物理约束因素。此外，TzJsDesktop系统还完成了批量归档W05-W12历史周报的工作，修复了gadget网站部署过程中的问题，并完成了Hugo站点的导航下拉菜单的改造，同时统一构建了staging环境的架构。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-22/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-22/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-22/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    var stored = localStorage.getItem("pref-lang");
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-22/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="缺陷日志 2026-03-22">
+  <meta property="og:description" content="天和集群已成功修复了错误恢复基准测试中的三项核心问题（爪子极性反转、wrong_object过滤逻辑错误、drop_with_interaction注入策略）。训练场景的数量也从1209增加到1627（&#43;35%），同时深入分析了three_piece_assembly相位检测退化的根本原因，以及48个ungenerable cases的物理约束因素。此外，TzJsDesktop系统还完成了批量归档W05-W12历史周报的工作，修复了gadget网站部署过程中的问题，并完成了Hugo站点的导航下拉菜单的改造，同时统一构建了staging环境的架构。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-22T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-22T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="缺陷日志 2026-03-22">
+  <meta name="twitter:description" content="天和集群已成功修复了错误恢复基准测试中的三项核心问题（爪子极性反转、wrong_object过滤逻辑错误、drop_with_interaction注入策略）。训练场景的数量也从1209增加到1627（&#43;35%），同时深入分析了three_piece_assembly相位检测退化的根本原因，以及48个ungenerable cases的物理约束因素。此外，TzJsDesktop系统还完成了批量归档W05-W12历史周报的工作，修复了gadget网站部署过程中的问题，并完成了Hugo站点的导航下拉菜单的改造，同时统一构建了staging环境的架构。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Daily Summaries",
+      "item": "https://tzj2006.github.io/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "缺陷日志 2026-03-22",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-03-22/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "缺陷日志 2026-03-22",
+  "name": "缺陷日志 2026-03-22",
+  "description": "天和集群已成功修复了错误恢复基准测试中的三项核心问题（爪子极性反转、wrong_object过滤逻辑错误、drop_with_interaction注入策略）。训练场景的数量也从1209增加到1627（+35%），同时深入分析了three_piece_assembly相位检测退化的根本原因，以及48个ungenerable cases的物理约束因素。此外，TzJsDesktop系统还完成了批量归档W05-W12历史周报的工作，修复了gadget网站部署过程中的问题，并完成了Hugo站点的导航下拉菜单的改造，同时统一构建了staging环境的架构。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-03-22 Today’s Highlights What was done: Parallel processing across two devices throughout the day: Tianhe focused on systematic debugging of Error Recovery Benchmark (repairing gripper polarity, rewriting error skill logic, analyzing root causes of three_piece_assembly degradation, attributing 48 ungenerable cases); TzJsDesktop completed batch archiving of historical weekly reports, fixed bugs in the gadget website deployment pipeline, and transformed Hugo site navigation to establish a unified deploy staging architecture. How it was done: Using diagnostic scripts to test gripper qpos behavior to locate polarity bugs, implementing conditional branch repairs based on robot arm types; Slurm 96 workers were used for parallel regeneration to verify repair effects; escalated permissions were used to analyze the code chain for three_piece_assembly degradation; weekly report tools processed daily JSON files in batches; custom Hugo partials and CSS were used to implement dropdown menus; a new common/site_staging.py was created to unify output interfaces. What’s useful: The number of Error Recovery Benchmark training scenarios increased to 1627 (+35%), covering 148 sub-types; the root causes of three_piece_assembly degradation were identified, providing precise code locations for subsequent repairs; historical weekly reports covered February and March; the gadget website deployment pipeline was stable, Hugo site navigation was clear, and the unified deploy pipeline was fully implemented. TzJsDesktop What was done: Batch generated W05-W12 historical weekly reports, fixed bugs in the gadget website deployment pipeline, and transformed Hugo site bugJournal dropdown menus to establish a unified deploy staging architecture. How it was done: Called the gadget summarize weekly report tool to process multi-week daily data; performed git operations to fix PaperMod themes (deleting._pack files, updating themes, resolving merge conflicts); modified two robustness issues in update.sh; iterated fixes to solve Hugo template bugs using Codex sessions, and created new common/site_staging.py and website/sync_staging.py. What’s useful: Historical weekly reports cover W05-W12 of 2026; the website deployment pipeline is stable; Hugo site navigation is clear, and all tool release paths are unified to outputs/site. Tianhe What was done: Completed three core bug repairs in Error Recovery Benchmark (gripper polarity, wrong_object, drop_with_interaction), analyzed root causes of three_piece_assembly phase detection degradation, and attributed 48 ungenerable cases. How it was done: Written diagnostic scripts to test gripper qpos, implemented if-else repairs based on robot arm types; submitted Slurm job 50080 (96 workers) for regeneration verification; escalated permissions were used to bypass bwrap sandbox restrictions when reading code chains; analyzed failure reasons by reading summary.json/meta_partial/parallel_logs. What’s useful: Three bug repairs passed 139 unit tests, with training scenarios increasing from 1209 to 1627; the root causes of three_piece_assembly degradation (get_target_object/InteractionSegmenter both had fixture candidates) were identified; 48 ungenerable cases were attributed to physical constraints rather than pipeline failures. Tianhe cluster completed three core bug repairs in Error Recovery Benchmark (gripper polarity reversal, wrong_object filtering logic, drop_with_interaction injection strategy), with training scenarios increasing from 1209 to 1627 (+35%). The root causes of three_piece_assembly degradation and the attribution of 48 ungenerable cases were analyzed in depth. TzJsDesktop batch archived W05-W12 historical weekly reports, fixed bugs in the gadget website deployment pipeline, and transformed Hugo site navigation dropdown menus to establish a unified deploy staging architecture.\nToday’s Tasks Architecture and Strategy ✅ Three core bug repairs in Error Recovery Benchmark: gripper polarity, wrong_object, drop_with_interaction — Fixed three core bugs: (1) Panda gripper action polarity reversal—detected polarity dynamically based on robot arm type in env_wrapper.py, added get_gripper_action_close/open() helper to replace all hardcoded actions in 9 error skills; (2) wrong_object filtering—only selected objects with non-empty grasp_geoms were considered, excluding fixed devices like coffee machines; (3) drop_with_interaction rewiring—object was moved directly above the non-target (+0.15m) and released, tracking object-object contact during the settle process. The repairs passed 139 unit tests, and Slurm job 50080 (96 workers) was submitted for verification. ✅ Analysis of root causes of three_piece_assembly phase detection degradation — Confirmed that Fix1-3 were implemented, identifying two unresolved root causes: get_target_object() and InteractionSegmenter both selected targets based on nearest distance among all objects. The base fixture’s lift_height could never reach 0.84 due to z≈0.80, resulting in all phases being pre_reach. 887 opportunities had 879 filtered out. Proposed a repair solution: _get_graspable_objects() should take precedence, with all objects being returned if necessary. Code changes were not implemented due to sandbox restrictions. ✅ Establish a unified deploy staging architecture — Created common/site_staging.py to unify output interfaces, and switched Hugo deploy paths for all tools to outputs/site; created website/sync_staging.py to synchronize staging to website (priority given to links, revert to copy if failed, bootstrap migration of historical content during first run); added a complete publish layer to the benchmark (publish.py + –deploy CLI parameters + navigation entry); integrated sync.py synchronization source to outputs/site. ✅ Systematic analysis of ungenerable cases (48 subtypes) — Attributed 48 sub-types that still didn’t meet 10/10 criteria to five physical constraints: collision_eef_object (non-target displacement \u003c1cm threshold), position_error (insufficient injection amplitude for D0/D2), wrong_object (gripper not closed/EEF distance \u003e8cm), grasp series (failure to grasp), drop series (physical constraints of actual dropping). This was attributed to verification threshold issues rather than pipeline failures. ✅ Implementation of Hugo site bugJournal navigation dropdown menu — Overridden the PaperMod default template with a custom header.html partial, added has-submenu/submenu class rendering logic, and implemented hover dropdown effects using bugjournal-menu.css; created new Posts \u0026 Notes section; filtered list.html to only display Daily/Weekly/Monthly sub-sections on the root bugJournal page; legacy root files were kept in place without migration. Implementation and Fixes ✅ Fixing bugs in the gadget website deployment pipeline — Fixed damage to PaperMod pack index (deleting macOS ._pack* files), updated themes to the latest version (fixing get_page-images partial missing for Hugo v0.157.0 requirements), resolved head.html merge conflicts (keeping local MathJax+checkbox scripts), and fixed two robustness issues in update.sh (find cleanup errors + empty commit errors). ✅ Training scenario regeneration: 1209 → 1627 scenarios — Submitted a job with 96 workers for parallel generation, completing about 30 minutes. Total of 1627 scenarios (+35%), covering 148 sub-types. Only three_piece_assembly/collision_eef_object_D0 failed due to timeout. ✅ Documenting 13 error skills throughout the project — Read all 13 error skill codes and updated the project overview.md in tabular form (can_inject conditions, inject method parameters, validate criteria), including design pattern summaries and training generation status. ✅ Batch generating historical weekly reports (W05-W12) — Based on structured daily report data, generated 8 weekly reports for W05 (2/1), W06 (2/2-8), W08 (2/16-22), W09 (2/23-3/1), W10 (3/2-8), W11 (3/9-15), and W12 (3/16-22) of 2026, covering MIHD STAIG ARI repairs, comprehensive upgrade of Error Recovery Benchmark, completion detection for RoboBrain pi0.5 tasks, and phased progress of CalendarPro and other projects. Issues and Solutions Key Issues 1. Panda robot arm gripper action polarity contradicts code assumptions: Panda requires action=+1 to close, but the code hardcodes -1, resulting in all injections failing when the gripper is open, causing failures for coffee/stack/stack_three/throttling injections. Solution: In EnvWrapper.init, check the robot arm type through env.robots[0].gripper.class.name. Set PandaGripper’s close_action to +1.0 and RethinkGripper’s close_action to -1.0; add get_gripper_action_close/open() helper and replace all hardcoded actions [-1].\nKey insight: The comments stating “-1=open, +1=closed” indicate different directions of internal multipliers for Panda and Sawyer, leading to opposite behavior. It cannot be determined by comments; a diagnostic script must be written to measure qpos changes.\n2. Three_piece_assembly scan count decreased from 23 to 4: Out of 887 opportunities, 879 phases were filtered out as pre_reach due to valid_phases. Solution: Root cause analysis: get_target_object() and InteractionSegmenter both selected targets based on nearest distance among all objects. The base fixture’s lift_height could never reach 0.84 due to z≈0.80; the repair solution is to change both to _get_graspable_objects() priority, with all objects being returned if necessary. Code changes are pending next session due to sandbox restrictions.\nKey insight: In multi-object assembly tasks, fixtures will consistently win the ’nearest object’ competition. Target_object selection must be based on grasp_geoms rather than pure distance.\n3. wrong_object generated 0 scenarios in coffee/three_piece_assembly: Skills attempted to grasp fixed devices without grasp_geoms (e.g., coffee machines), where EEF could not reach the center and grippers failed to close. Solution: Filter out non-target candidate objects that have non-empty grasp_geoms in the task configuration’s objects list, excluding fixed devices.\nKey insight: If both grabble objects and fixed devices exist in the task configuration, skills must filter based on grasp_geoms rather than treating all objects as wrong targets.\n4. drop_with_interaction generated 0 scenarios across all 6 tasks: The original implementation only released objects when they were moved 1-3cm above the current position, with object spacing of 10-20cm ensuring no contact. Solution: Rewrite the inject logic: move the object directly above the non-target object (+0.15m) and then release it to fall freely onto the non-target; track object-object contact throughout the settle process in rollout_utils.py.\nKey insight: Object interaction with other objects requires active movement to the collision point. Random motion after a small offset cannot expect to hit neighbors perfectly.\n5. Hugo list template section condition filtering experienced three iterations of failure (Section casing issues, lower(.RelPermalink) still failed), before converging. Solution: Use eq .Title “bugJournal” as the condition to completely avoid differences in case handling within Hugo.\nKey insight: Hugo has inconsistent casing handling for .Section and .RelPermalink on different versions/platesforms. .Title is the most stable identifier for section list pages.\n6. PaperMod theme header.html does not support nested sub-menus. Solution: Create a custom header.html in website/layouts/partials to override the theme default template, add has-submenu/submenu class rendering logic, and implement hover dropdown effects using bugjournal-menu.css.\nKey insight: Hugo supports overriding themes with project-level layouts/partials. The parent field in config.yml declares sub-menu relationships, eliminating the need to fork or modify the theme source code.\n7. Static report directory static/benchmark/ conflicts with content page content/benchmark.md, causing /benchmark/index.html not to be generated; wrapper frontmatter using datetime.now() was recognized as future content and not published. Solution: Renamed the static report directory to benchmark-report/, updating internal links in the packaging pages; removed dynamic timestamps and replaced them with fixed past dates.\nKey insight: Hugo uses the same name for static and content directories, causing the static directory to overwrite the content rendering results. Automatically generating frontmatter should not use the current system time as the date.\nGeneral Issues 8. Damaged PaperMod theme pack index (._pack*.idx) caused git pull failures (non-monotonic index), and Hugo v0.157.0 required a new partial but the old theme was missing, leading to build failures. Solution: Delete macOS resource fork files (._pack*.idx and ._pack*.pack), then use git stash + git pull origin master + git stash pop; update the theme to the latest version, manually resolve head.html merge conflicts by keeping local MathJax and checkbox scripts.\nKey insight: macOS-generated._prefix resource fork files can contaminate the.git/objects/pack directory; themes need to be updated when Hugo major versions are upgraded, and locally customized layouts need to be manually retained during merges.\n9. bwrap sandbox was unavailable on Tianhe node (Unknown option –argv0), resulting in about 10 tool calls failing. Solution: Use the parameter sandbox_permissions=‘require_escalated’ to request elevated privileges, bypassing bwrap restrictions and allowing file reads to proceed normally.\nKey insight: The Codex environment’s sandbox is unavailable on certain HPC nodes by default. Escalated permissions are the only viable solution; the apply_patch tool also suffers from this limitation.\n10. update.sh fails when executed in set -e mode, returning non-zero exit codes for find cleanup of public/ and committing without changes, causing script termination. Solution: Add 2\u003e/dev/null || true at the end of the find command; use git diff –cached –quiet before commit to check for changes, skipping commit and push steps if there are no changes.Key Insights: All cleanup operations in the shell script set -e mode are protected by || true; the deployment script should gracefully exit without errors when there are no changes (idempotency design).\nHuman Thinking vs AI Thinking Strategic Level Gripper Problem Diagnosis and Repair Strategies Role Thought Human The user suggests that it might be a binary issue based on physical intuition. They specifically ask for “if the control of the two robotic arms is different, then some if-else statements should be written to determine this” — preferring clear and concise conditional branches. AI The AI analyzes the robosuite source code and tends to automatically infer polarity through gripper config. This approach is more systematic but also more indirect. However, it requires testing the diagnostic script to draw a definite conclusion. Difference Analysis: The user’s intuition is simpler and more practical (quickly narrowing down the problem). They prefer clear conditional branches. The AI prefers systematic but lengthy code analysis and tends to prefer automatic inference rather than explicit branching.\nRepair Strategy for drop_with_interaction Role Thought Human The user directly suggests that it’s simpler to simply move above the object and then drop it — indicating that active handling is necessary instead of relying on random offsets. AI The original implementation of the AI only applied a 1-3cm offset at the current EEF position before releasing, relying on the object’s natural movement to hit neighbors. This follows the original injection framework too closely and ignores the need for active proximity. Difference Analysis: The user has a more intuitive understanding of physical interactions. The AI did not question this fundamental design flaw during multiple rounds of repairs until it was pointed out by the user.\nAnalysis of the Root Cause of three_piece_assembly Degradation Role Thought Human Before starting the conversation, the user had already completed a complete 5-step causal chain analysis (including specific file lines L144-148/L230-231, NPZ evidence, and statistics from 887/879). The user asked questions with high information density. AI The AI verified the code step by step according to the causal chain provided by the user. It also found that InteractionSegmenter also had problems with fixture priority (the user’s analysis only covered up to the envwrapper layer) and planned the implementation path. Difference Analysis: The user’s pre-analysis was of extremely high quality and accurately identified the main root cause. The AI’s value lies in cross-verifying existing analyses, discovering additional omissions (such as InteractionSegmenter), and planning implementation paths, rather than making original discoveries.\nUnified Deploy Staging Architecture Thought Role Thought Human The user proposed a core architecture: “Put it in a public folder ‘based on the current website folder structure’ ’link the update.sh to the correct location and then push it’” AI The AI was responsible for implementing the details: designing staging helper APIs, considering link-or-copy rollback strategies (considering Windows softlink permissions limitations), handling robustness issues such as bootstrap migration logic during the first run. Difference Analysis: The high-level architecture direction was provided by the user. The AI transformed the concise description into a specific implementation and added edge-case handling such as Windows compatibility.\nAI Limitations Major Limitations When dealing with the internal behavior of underlying libraries (robosuite), AI cannot draw conclusions through static code analysis. It requires testing the diagnostic script to confirm. The initial design of drop_with_interaction had fundamental flaws (small offsets rather than active handling). This flaw was not questioned by the AI during multiple rounds of repairs until it was pointed out by the user. Codex bwrap sandbox limitations caused approximately 10 tool calls to be invalid (on tianhe node). The AI failed to recognize this earlier and needed elevated privileges. The apply_patch tool also had limitations. The complete code patch (envwrapper + InteractionSegmenter double fixes) was not implemented, and the conversation was interrupted at critical points. Hugo template fields lack sufficient understanding of semantics: section conditional statements required three iterations to converge; failed to anticipate conflicts between static directories and content paths; failed to anticipate future date filtering caused by datetime.now(). These are errors that can be avoided in the design phase. General Limitations AI’s assessment of task complexity tends to overestimate it (ExitPlanMode lists too many allowedPrompts, which was criticized by users). Tool calls failed multiple times due to “files not being read first”. The apply_patch tool’s line-level content positioning was not stable enough and required multiple retries. The rg command output exceeding 262144 tokens had to be truncated multiple times, requiring multiple sub-queries to piece together. In generating weekly reports, W09 was generated twice (with highly overlapping content). The AI did not actively recognize this repetition and did not provide feedback on upstream data quality issues when some daily report input formats were abnormal (unknown dates, mixed with individual human_vs_ai entries). Today’s gains Core Gains In robosuite, PandaGripper and RethinkGripper have opposite action polarities: Panda action = +1 for closing, Sawyer action = -1 for closing. The code comments are not reliable, and it must be confirmed through testing qpos changes. When diagnosing unknown behaviors, writing a minimal test script is more reliable and efficient than static code analysis, especially when dealing with the internal behavior of third-party libraries. In multi-object assembly tasks, the selection of target_object must be based on grasping_geoms filtering out fixtures. The pure “nearest object” strategy will systematically select the wrong target when fixtures are close to EEF, resulting in all phase_labels being pre_reach. Non-target candidates for error skills also need to distinguish between graspable objects and fixed devices. The architecture pattern in outputs/site staging area: tools write to outputs/site → website/sync_staging.py synchronization → Hugo build → deployment. This decoupling allows each tool’s release logic to be independent of the website directory structure, with sync_staging executing incremental updates as a single entry point. In physical simulation, making objects interact with other objects requires active handling to the collision position, not relying on natural movement after random offsets (object spacing is usually much larger than the offset). The ungenerable cases caused by benchmark verification thresholds (collision detection at 1cm displacement, position error of 2cm) are physical constraint problems due to insufficient injection strength. It is necessary to adjust injection parameters or verify thresholds instead of running the pipeline again. Hugo best practices collection: .Title is the most reliable field for identifying specific sections (.Section and .RelPermalink have inconsistent capitalization across platforms); static directory names that match the basic name of content pages will cause path conflicts (static files overwrite content rendering results); automatic frontmatter generation should not use the current system time; dropdown menus can be implemented through project-level layouts/partials/safety covering themes without having to fork themes. Practical Gains macOS resource fork files with a._ prefix can contaminate git pack directories, causing non-monotonic index errors. After Hugo major version upgrades, themes need to be updated synchronously. Cleanup operations in shell script set -e mode should be protected by 2\u003e/dev/null || true. The deployment script should gracefully skip commits when there are no changes (idempotency design). Slurm ai partitions must specify –gres=gpu:a800:[N] even if the task does not use a GPU. MUJOCO_GL=disabled allows running physical simulations (CPU-only) without GPU rendering. Batch archiving strategies (generating multiple weeks’ worth of weekly reports at once) are efficient methods for creating retrievable knowledge bases. Session Summary Error Recovery Benchmark 🔄 Three core bug fixes (gripper polarity, wrong_object, drop_with_interaction) + analysis of the root cause of three_piece_assembly degradation + attribution of 48 ungenerable cases 01:12:20.861 | claude_code + codex Throughout the day, systematic debugging was carried out around the quality of training data generation: (1) Statistical findings showed that drop_with_interaction always resulted in zero failures and Panda tasks with no grasp failures; (2) Testing the diagnostic script revealed a reversal in Panda gripper polarity. envwrapper.py and 9 error skills were modified, and Slurm job 50080 was submitted to regenerate (1209→1627 scenes, +35%), passing 139 unit tests; (3) The filtering logic for wrong_object was fixed (excluding fixtures without grasping_geoms); (4) drop_with_interaction was rewritten (actively moving to the non-target position and releasing, with full tracking of contact); (5) The implementation documents for 13 error skills were integrated into the project overview summary; (6) Three_piece_assembly degradation was analyzed in depth with escalated privileges — 887/879 opportunities were identified as pre_reach. The root cause was that fixture was mistakenly selected as target_object by get_target_object() and InteractionSegmenter, and the code fix did not materialize due to sandbox limitations; (7) After rerunning the entire process, the system attributed 48 ungenerable cases to five types of physical constraint thresholds problems, confirming that it was not a pipeline failure.\nGadget ✅ Batch archiving of historical weekly reports (W05-W12) + website deployment pipeline fixes + Hugo site navigation transformation and unified deploy staging architecture 20:08:01.600 | claude_code + codex Three parallel tasks were carried out: (1) Generating 8 historical weekly report JSON files for W05 to W12 in 2026, covering key progress such as MIHD STAIG ARI fixes (0.09→0.54), Error Recovery Benchmark v4→v5 upgrade, completion detection header for RoboBrain pi0.5 tasks, and CalendarPro context-aware intent classification; (2) Fixing damaged PaperMod theme pack indexes, updating themes to the latest version (fixing missing partials in Hugo v0.157.0), fixing two robustness issues in update.sh (find cleanup + empty submission), and stabilizing the website deployment pipeline; (3) Implementing a bugJournal hover dropdown menu (customizing header.html partial + CSS, converging after three iterations with .Title as the judgment condition), creating new Posts \u0026 Notes partitions, establishing unified outputs/site staging areas (common/site_staging.py + website/sync_staging.py), adding a complete release layer to benchmarks, fixing static directory path conflicts and future date bugs, integrating update.sh with staging synchronization, and finally verifying the entire Hugo build process.\nToken Usage Claude Code Overview Metric Value Total Tokens 69,161,269 Input Tokens 135,208 Output Tokens 165,763 Cache Creation 4,592,748 Cache Reading 64,267,550 Cache Hit Rate 93.3% Total Cost (USD) $50.6294 Model Details Model Input Output Cache Creation Cache Reading Cost claude-opus-4-6 49,276 111,729 2,401,502 52,058,136 $44.0781 claude-haiku-4-5-20251001 85,875 53,919 1,315,313 11,988,530 $3.1985 claude-sonnet-4-6 57 115 875,933 220,884 $3.3529 Device Usage Device Total Tokens Input Output Cost tianhe 46,473,057 102,750 122,803 $30.2102 TzJsDesktop 22,688,212 32,458 42,960 $20.4192 Codex Overview Metric Value Total Tokens 17,143,340 Input Tokens 17,039,449 Output Tokens 103,891 Inference Tokens 40,222 Cache Reading 16,036,864 Total Cost (USD) $8.0740 Model Details Model Input Output Inference Cache Reading Cost Percentage gpt-5.4 17,039,449 103,891 40,222 16,036,864 $8.0740 100.0% ",
+  "wordCount" : "3605",
+  "inLanguage": "en",
+  "datePublished": "2026-03-22T00:00:00-05:00",
+  "dateModified": "2026-03-22T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-03-22/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-22/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/daily/">Daily Summaries</a></div>
+    <h1 class="post-title entry-hint-parent">
+      缺陷日志 2026-03-22
+    </h1>
+    <div class="post-meta"><span title='2026-03-22 00:00:00 -0500 -0500'>March 22, 2026</span>&nbsp;·&nbsp;<span>17 min</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="daily-report--2026-03-22">Daily Report — 2026-03-22<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-03-22">#</a></h1>
+<h2 id="todays-highlights">Today&rsquo;s Highlights<a hidden class="anchor" aria-hidden="true" href="#todays-highlights">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Parallel processing across two devices throughout the day: Tianhe focused on systematic debugging of Error Recovery Benchmark (repairing gripper polarity, rewriting error skill logic, analyzing root causes of three_piece_assembly degradation, attributing 48 ungenerable cases); TzJsDesktop completed batch archiving of historical weekly reports, fixed bugs in the gadget website deployment pipeline, and transformed Hugo site navigation to establish a unified deploy staging architecture.</li>
+<li><strong>How it was done:</strong> Using diagnostic scripts to test gripper qpos behavior to locate polarity bugs, implementing conditional branch repairs based on robot arm types; Slurm 96 workers were used for parallel regeneration to verify repair effects; escalated permissions were used to analyze the code chain for three_piece_assembly degradation; weekly report tools processed daily JSON files in batches; custom Hugo partials and CSS were used to implement dropdown menus; a new common/site_staging.py was created to unify output interfaces.</li>
+<li><strong>What&rsquo;s useful:</strong> The number of Error Recovery Benchmark training scenarios increased to 1627 (+35%), covering 148 sub-types; the root causes of three_piece_assembly degradation were identified, providing precise code locations for subsequent repairs; historical weekly reports covered February and March; the gadget website deployment pipeline was stable, Hugo site navigation was clear, and the unified deploy pipeline was fully implemented.</li>
+</ul>
+<h3 id="tzjsdesktop">TzJsDesktop<a hidden class="anchor" aria-hidden="true" href="#tzjsdesktop">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Batch generated W05-W12 historical weekly reports, fixed bugs in the gadget website deployment pipeline, and transformed Hugo site bugJournal dropdown menus to establish a unified deploy staging architecture.</li>
+<li><strong>How it was done:</strong> Called the gadget summarize weekly report tool to process multi-week daily data; performed git operations to fix PaperMod themes (deleting._pack files, updating themes, resolving merge conflicts); modified two robustness issues in update.sh; iterated fixes to solve Hugo template bugs using Codex sessions, and created new common/site_staging.py and website/sync_staging.py.</li>
+<li><strong>What&rsquo;s useful:</strong> Historical weekly reports cover W05-W12 of 2026; the website deployment pipeline is stable; Hugo site navigation is clear, and all tool release paths are unified to outputs/site.</li>
+</ul>
+<h3 id="tianhe">Tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Completed three core bug repairs in Error Recovery Benchmark (gripper polarity, wrong_object, drop_with_interaction), analyzed root causes of three_piece_assembly phase detection degradation, and attributed 48 ungenerable cases.</li>
+<li><strong>How it was done:</strong> Written diagnostic scripts to test gripper qpos, implemented if-else repairs based on robot arm types; submitted Slurm job 50080 (96 workers) for regeneration verification; escalated permissions were used to bypass bwrap sandbox restrictions when reading code chains; analyzed failure reasons by reading summary.json/meta_partial/parallel_logs.</li>
+<li><strong>What&rsquo;s useful:</strong> Three bug repairs passed 139 unit tests, with training scenarios increasing from 1209 to 1627; the root causes of three_piece_assembly degradation (get_target_object/InteractionSegmenter both had fixture candidates) were identified; 48 ungenerable cases were attributed to physical constraints rather than pipeline failures.</li>
+</ul>
+<blockquote>
+<p>Tianhe cluster completed three core bug repairs in Error Recovery Benchmark (gripper polarity reversal, wrong_object filtering logic, drop_with_interaction injection strategy), with training scenarios increasing from 1209 to 1627 (+35%). The root causes of three_piece_assembly degradation and the attribution of 48 ungenerable cases were analyzed in depth. TzJsDesktop batch archived W05-W12 historical weekly reports, fixed bugs in the gadget website deployment pipeline, and transformed Hugo site navigation dropdown menus to establish a unified deploy staging architecture.</p>
+</blockquote>
+<h2 id="todays-tasks">Today&rsquo;s Tasks<a hidden class="anchor" aria-hidden="true" href="#todays-tasks">#</a></h2>
+<h3 id="architecture-and-strategy">Architecture and Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture-and-strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Three core bug repairs in Error Recovery Benchmark: gripper polarity, wrong_object, drop_with_interaction</strong> — Fixed three core bugs: (1) Panda gripper action polarity reversal—detected polarity dynamically based on robot arm type in env_wrapper.py, added get_gripper_action_close/open() helper to replace all hardcoded actions in 9 error skills; (2) wrong_object filtering—only selected objects with non-empty grasp_geoms were considered, excluding fixed devices like coffee machines; (3) drop_with_interaction rewiring—object was moved directly above the non-target (+0.15m) and released, tracking object-object contact during the settle process. The repairs passed 139 unit tests, and Slurm job 50080 (96 workers) was submitted for verification.</li>
+<li>✅ <strong>Analysis of root causes of three_piece_assembly phase detection degradation</strong> — Confirmed that Fix1-3 were implemented, identifying two unresolved root causes: get_target_object() and InteractionSegmenter both selected targets based on nearest distance among all objects. The base fixture&rsquo;s lift_height could never reach 0.84 due to z≈0.80, resulting in all phases being pre_reach. 887 opportunities had 879 filtered out. Proposed a repair solution: _get_graspable_objects() should take precedence, with all objects being returned if necessary. Code changes were not implemented due to sandbox restrictions.</li>
+<li>✅ <strong>Establish a unified deploy staging architecture</strong> — Created common/site_staging.py to unify output interfaces, and switched Hugo deploy paths for all tools to outputs/site; created website/sync_staging.py to synchronize staging to website (priority given to links, revert to copy if failed, bootstrap migration of historical content during first run); added a complete publish layer to the benchmark (publish.py + &ndash;deploy CLI parameters + navigation entry); integrated sync.py synchronization source to outputs/site.</li>
+<li>✅ <strong>Systematic analysis of ungenerable cases (48 subtypes)</strong> — Attributed 48 sub-types that still didn&rsquo;t meet 10/10 criteria to five physical constraints: collision_eef_object (non-target displacement &lt;1cm threshold), position_error (insufficient injection amplitude for D0/D2), wrong_object (gripper not closed/EEF distance &gt;8cm), grasp series (failure to grasp), drop series (physical constraints of actual dropping). This was attributed to verification threshold issues rather than pipeline failures.</li>
+<li>✅ <strong>Implementation of Hugo site bugJournal navigation dropdown menu</strong> — Overridden the PaperMod default template with a custom header.html partial, added has-submenu/submenu class rendering logic, and implemented hover dropdown effects using bugjournal-menu.css; created new Posts &amp; Notes section; filtered list.html to only display Daily/Weekly/Monthly sub-sections on the root bugJournal page; legacy root files were kept in place without migration.</li>
+</ul>
+<h3 id="implementation-and-fixes">Implementation and Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation-and-fixes">#</a></h3>
+<ul>
+<li>✅ <strong>Fixing bugs in the gadget website deployment pipeline</strong> — Fixed damage to PaperMod pack index (deleting macOS ._pack* files), updated themes to the latest version (fixing get_page-images partial missing for Hugo v0.157.0 requirements), resolved head.html merge conflicts (keeping local MathJax+checkbox scripts), and fixed two robustness issues in update.sh (find cleanup errors + empty commit errors).</li>
+<li>✅ <strong>Training scenario regeneration: 1209 → 1627 scenarios</strong> — Submitted a job with 96 workers for parallel generation, completing about 30 minutes. Total of 1627 scenarios (+35%), covering 148 sub-types. Only three_piece_assembly/collision_eef_object_D0 failed due to timeout.</li>
+<li>✅ <strong>Documenting 13 error skills throughout the project</strong> — Read all 13 error skill codes and updated the project overview.md in tabular form (can_inject conditions, inject method parameters, validate criteria), including design pattern summaries and training generation status.</li>
+<li>✅ <strong>Batch generating historical weekly reports (W05-W12)</strong> — Based on structured daily report data, generated 8 weekly reports for W05 (2/1), W06 (2/2-8), W08 (2/16-22), W09 (2/23-3/1), W10 (3/2-8), W11 (3/9-15), and W12 (3/16-22) of 2026, covering MIHD STAIG ARI repairs, comprehensive upgrade of Error Recovery Benchmark, completion detection for RoboBrain pi0.5 tasks, and phased progress of CalendarPro and other projects.</li>
+</ul>
+<h2 id="issues-and-solutions">Issues and Solutions<a hidden class="anchor" aria-hidden="true" href="#issues-and-solutions">#</a></h2>
+<h3 id="key-issues">Key Issues<a hidden class="anchor" aria-hidden="true" href="#key-issues">#</a></h3>
+<h4 id="1-panda-robot-arm-gripper-action-polarity-contradicts-code-assumptions-panda-requires-action1-to-close-but-the-code-hardcodes--1-resulting-in-all-injections-failing-when-the-gripper-is-open-causing-failures-for-coffeestackstack_threethrottling-injections">1. Panda robot arm gripper action polarity contradicts code assumptions: Panda requires action=+1 to close, but the code hardcodes -1, resulting in all injections failing when the gripper is open, causing failures for coffee/stack/stack_three/throttling injections.<a hidden class="anchor" aria-hidden="true" href="#1-panda-robot-arm-gripper-action-polarity-contradicts-code-assumptions-panda-requires-action1-to-close-but-the-code-hardcodes--1-resulting-in-all-injections-failing-when-the-gripper-is-open-causing-failures-for-coffeestackstack_threethrottling-injections">#</a></h4>
+<p><strong>Solution:</strong> In EnvWrapper.<strong>init</strong>, check the robot arm type through env.robots[0].gripper.<strong>class</strong>.<strong>name</strong>. Set PandaGripper&rsquo;s close_action to +1.0 and RethinkGripper&rsquo;s close_action to -1.0; add get_gripper_action_close/open() helper and replace all hardcoded actions [-1].</p>
+<p><strong>Key insight:</strong> The comments stating &ldquo;-1=open, +1=closed&rdquo; indicate different directions of internal multipliers for Panda and Sawyer, leading to opposite behavior. It cannot be determined by comments; a diagnostic script must be written to measure qpos changes.</p>
+<h4 id="2-three_piece_assembly-scan-count-decreased-from-23-to-4-out-of-887-opportunities-879-phases-were-filtered-out-as-pre_reach-due-to-valid_phases">2. Three_piece_assembly scan count decreased from 23 to 4: Out of 887 opportunities, 879 phases were filtered out as pre_reach due to valid_phases.<a hidden class="anchor" aria-hidden="true" href="#2-three_piece_assembly-scan-count-decreased-from-23-to-4-out-of-887-opportunities-879-phases-were-filtered-out-as-pre_reach-due-to-valid_phases">#</a></h4>
+<p><strong>Solution:</strong> Root cause analysis: get_target_object() and InteractionSegmenter both selected targets based on nearest distance among all objects. The base fixture&rsquo;s lift_height could never reach 0.84 due to z≈0.80; the repair solution is to change both to _get_graspable_objects() priority, with all objects being returned if necessary. Code changes are pending next session due to sandbox restrictions.</p>
+<p><strong>Key insight:</strong> In multi-object assembly tasks, fixtures will consistently win the &rsquo;nearest object&rsquo; competition. Target_object selection must be based on grasp_geoms rather than pure distance.</p>
+<h4 id="3-wrong_object-generated-0-scenarios-in-coffeethree_piece_assembly-skills-attempted-to-grasp-fixed-devices-without-grasp_geoms-eg-coffee-machines-where-eef-could-not-reach-the-center-and-grippers-failed-to-close">3. wrong_object generated 0 scenarios in coffee/three_piece_assembly: Skills attempted to grasp fixed devices without grasp_geoms (e.g., coffee machines), where EEF could not reach the center and grippers failed to close.<a hidden class="anchor" aria-hidden="true" href="#3-wrong_object-generated-0-scenarios-in-coffeethree_piece_assembly-skills-attempted-to-grasp-fixed-devices-without-grasp_geoms-eg-coffee-machines-where-eef-could-not-reach-the-center-and-grippers-failed-to-close">#</a></h4>
+<p><strong>Solution:</strong> Filter out non-target candidate objects that have non-empty grasp_geoms in the task configuration&rsquo;s objects list, excluding fixed devices.</p>
+<p><strong>Key insight:</strong> If both grabble objects and fixed devices exist in the task configuration, skills must filter based on grasp_geoms rather than treating all objects as wrong targets.</p>
+<h4 id="4-drop_with_interaction-generated-0-scenarios-across-all-6-tasks-the-original-implementation-only-released-objects-when-they-were-moved-1-3cm-above-the-current-position-with-object-spacing-of-10-20cm-ensuring-no-contact">4. drop_with_interaction generated 0 scenarios across all 6 tasks: The original implementation only released objects when they were moved 1-3cm above the current position, with object spacing of 10-20cm ensuring no contact.<a hidden class="anchor" aria-hidden="true" href="#4-drop_with_interaction-generated-0-scenarios-across-all-6-tasks-the-original-implementation-only-released-objects-when-they-were-moved-1-3cm-above-the-current-position-with-object-spacing-of-10-20cm-ensuring-no-contact">#</a></h4>
+<p><strong>Solution:</strong> Rewrite the inject logic: move the object directly above the non-target object (+0.15m) and then release it to fall freely onto the non-target; track object-object contact throughout the settle process in rollout_utils.py.</p>
+<p><strong>Key insight:</strong> Object interaction with other objects requires active movement to the collision point. Random motion after a small offset cannot expect to hit neighbors perfectly.</p>
+<h4 id="5-hugo-list-template-section-condition-filtering-experienced-three-iterations-of-failure-section-casing-issues-lowerrelpermalink-still-failed-before-converging">5. Hugo list template section condition filtering experienced three iterations of failure (Section casing issues, lower(.RelPermalink) still failed), before converging.<a hidden class="anchor" aria-hidden="true" href="#5-hugo-list-template-section-condition-filtering-experienced-three-iterations-of-failure-section-casing-issues-lowerrelpermalink-still-failed-before-converging">#</a></h4>
+<p><strong>Solution:</strong> Use eq .Title &ldquo;bugJournal&rdquo; as the condition to completely avoid differences in case handling within Hugo.</p>
+<p><strong>Key insight:</strong> Hugo has inconsistent casing handling for .Section and .RelPermalink on different versions/platesforms. .Title is the most stable identifier for section list pages.</p>
+<h4 id="6-papermod-theme-headerhtml-does-not-support-nested-sub-menus">6. PaperMod theme header.html does not support nested sub-menus.<a hidden class="anchor" aria-hidden="true" href="#6-papermod-theme-headerhtml-does-not-support-nested-sub-menus">#</a></h4>
+<p><strong>Solution:</strong> Create a custom header.html in website/layouts/partials to override the theme default template, add has-submenu/submenu class rendering logic, and implement hover dropdown effects using bugjournal-menu.css.</p>
+<p><strong>Key insight:</strong> Hugo supports overriding themes with project-level layouts/partials. The parent field in config.yml declares sub-menu relationships, eliminating the need to fork or modify the theme source code.</p>
+<h4 id="7-static-report-directory-staticbenchmark-conflicts-with-content-page-contentbenchmarkmd-causing-benchmarkindexhtml-not-to-be-generated-wrapper-frontmatter-using-datetimenow-was-recognized-as-future-content-and-not-published">7. Static report directory static/benchmark/ conflicts with content page content/benchmark.md, causing /benchmark/index.html not to be generated; wrapper frontmatter using datetime.now() was recognized as future content and not published.<a hidden class="anchor" aria-hidden="true" href="#7-static-report-directory-staticbenchmark-conflicts-with-content-page-contentbenchmarkmd-causing-benchmarkindexhtml-not-to-be-generated-wrapper-frontmatter-using-datetimenow-was-recognized-as-future-content-and-not-published">#</a></h4>
+<p><strong>Solution:</strong> Renamed the static report directory to benchmark-report/, updating internal links in the packaging pages; removed dynamic timestamps and replaced them with fixed past dates.</p>
+<p><strong>Key insight:</strong> Hugo uses the same name for static and content directories, causing the static directory to overwrite the content rendering results. Automatically generating frontmatter should not use the current system time as the date.</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="8-damaged-papermod-theme-pack-index-_packidx-caused-git-pull-failures-non-monotonic-index-and-hugo-v01570-required-a-new-partial-but-the-old-theme-was-missing-leading-to-build-failures">8. Damaged PaperMod theme pack index (._pack*.idx) caused git pull failures (non-monotonic index), and Hugo v0.157.0 required a new partial but the old theme was missing, leading to build failures.<a hidden class="anchor" aria-hidden="true" href="#8-damaged-papermod-theme-pack-index-_packidx-caused-git-pull-failures-non-monotonic-index-and-hugo-v01570-required-a-new-partial-but-the-old-theme-was-missing-leading-to-build-failures">#</a></h4>
+<p><strong>Solution:</strong> Delete macOS resource fork files (._pack*.idx and ._pack*.pack), then use git stash + git pull origin master + git stash pop; update the theme to the latest version, manually resolve head.html merge conflicts by keeping local MathJax and checkbox scripts.</p>
+<p><strong>Key insight:</strong> macOS-generated._prefix resource fork files can contaminate the.git/objects/pack directory; themes need to be updated when Hugo major versions are upgraded, and locally customized layouts need to be manually retained during merges.</p>
+<h4 id="9-bwrap-sandbox-was-unavailable-on-tianhe-node-unknown-option-argv0-resulting-in-about-10-tool-calls-failing">9. bwrap sandbox was unavailable on Tianhe node (Unknown option &ndash;argv0), resulting in about 10 tool calls failing.<a hidden class="anchor" aria-hidden="true" href="#9-bwrap-sandbox-was-unavailable-on-tianhe-node-unknown-option-argv0-resulting-in-about-10-tool-calls-failing">#</a></h4>
+<p><strong>Solution:</strong> Use the parameter sandbox_permissions=&lsquo;require_escalated&rsquo; to request elevated privileges, bypassing bwrap restrictions and allowing file reads to proceed normally.</p>
+<p><strong>Key insight:</strong> The Codex environment&rsquo;s sandbox is unavailable on certain HPC nodes by default. Escalated permissions are the only viable solution; the apply_patch tool also suffers from this limitation.</p>
+<h4 id="10-updatesh-fails-when-executed-in-set--e-mode-returning-non-zero-exit-codes-for-find-cleanup-of-public-and-committing-without-changes-causing-script-termination">10. update.sh fails when executed in set -e mode, returning non-zero exit codes for find cleanup of public/ and committing without changes, causing script termination.<a hidden class="anchor" aria-hidden="true" href="#10-updatesh-fails-when-executed-in-set--e-mode-returning-non-zero-exit-codes-for-find-cleanup-of-public-and-committing-without-changes-causing-script-termination">#</a></h4>
+<p><strong>Solution:</strong> Add 2&gt;/dev/null || true at the end of the find command; use git diff &ndash;cached &ndash;quiet before commit to check for changes, skipping commit and push steps if there are no changes.<strong>Key Insights:</strong> All cleanup operations in the shell script set -e mode are protected by || true; the deployment script should gracefully exit without errors when there are no changes (idempotency design).</p>
+<h2 id="human-thinking-vs-ai-thinking">Human Thinking vs AI Thinking<a hidden class="anchor" aria-hidden="true" href="#human-thinking-vs-ai-thinking">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="gripper-problem-diagnosis-and-repair-strategies">Gripper Problem Diagnosis and Repair Strategies<a hidden class="anchor" aria-hidden="true" href="#gripper-problem-diagnosis-and-repair-strategies">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Thought</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>The user suggests that it might be a binary issue based on physical intuition. They specifically ask for &ldquo;if the control of the two robotic arms is different, then some if-else statements should be written to determine this&rdquo; — preferring clear and concise conditional branches.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>The AI analyzes the robosuite source code and tends to automatically infer polarity through gripper config. This approach is more systematic but also more indirect. However, it requires testing the diagnostic script to draw a definite conclusion.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> The user&rsquo;s intuition is simpler and more practical (quickly narrowing down the problem). They prefer clear conditional branches. The AI prefers systematic but lengthy code analysis and tends to prefer automatic inference rather than explicit branching.</p>
+<h4 id="repair-strategy-for-drop_with_interaction">Repair Strategy for drop_with_interaction<a hidden class="anchor" aria-hidden="true" href="#repair-strategy-for-drop_with_interaction">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Thought</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>The user directly suggests that it&rsquo;s simpler to simply move above the object and then drop it — indicating that active handling is necessary instead of relying on random offsets.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>The original implementation of the AI only applied a 1-3cm offset at the current EEF position before releasing, relying on the object&rsquo;s natural movement to hit neighbors. This follows the original injection framework too closely and ignores the need for active proximity.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> The user has a more intuitive understanding of physical interactions. The AI did not question this fundamental design flaw during multiple rounds of repairs until it was pointed out by the user.</p>
+<h4 id="analysis-of-the-root-cause-of-three_piece_assembly-degradation">Analysis of the Root Cause of three_piece_assembly Degradation<a hidden class="anchor" aria-hidden="true" href="#analysis-of-the-root-cause-of-three_piece_assembly-degradation">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Thought</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Before starting the conversation, the user had already completed a complete 5-step causal chain analysis (including specific file lines L144-148/L230-231, NPZ evidence, and statistics from 887/879). The user asked questions with high information density.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>The AI verified the code step by step according to the causal chain provided by the user. It also found that InteractionSegmenter also had problems with fixture priority (the user&rsquo;s analysis only covered up to the envwrapper layer) and planned the implementation path.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> The user&rsquo;s pre-analysis was of extremely high quality and accurately identified the main root cause. The AI&rsquo;s value lies in cross-verifying existing analyses, discovering additional omissions (such as InteractionSegmenter), and planning implementation paths, rather than making original discoveries.</p>
+<h4 id="unified-deploy-staging-architecture-thought">Unified Deploy Staging Architecture Thought<a hidden class="anchor" aria-hidden="true" href="#unified-deploy-staging-architecture-thought">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Thought</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>The user proposed a core architecture: &ldquo;Put it in a public folder &lsquo;based on the current website folder structure&rsquo; &rsquo;link the update.sh to the correct location and then push it&rsquo;&rdquo;</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>The AI was responsible for implementing the details: designing staging helper APIs, considering link-or-copy rollback strategies (considering Windows softlink permissions limitations), handling robustness issues such as bootstrap migration logic during the first run.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> The high-level architecture direction was provided by the user. The AI transformed the concise description into a specific implementation and added edge-case handling such as Windows compatibility.</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="major-limitations">Major Limitations<a hidden class="anchor" aria-hidden="true" href="#major-limitations">#</a></h3>
+<ul>
+<li>When dealing with the internal behavior of underlying libraries (robosuite), AI cannot draw conclusions through static code analysis. It requires testing the diagnostic script to confirm. The initial design of drop_with_interaction had fundamental flaws (small offsets rather than active handling). This flaw was not questioned by the AI during multiple rounds of repairs until it was pointed out by the user.</li>
+<li>Codex bwrap sandbox limitations caused approximately 10 tool calls to be invalid (on tianhe node). The AI failed to recognize this earlier and needed elevated privileges. The apply_patch tool also had limitations. The complete code patch (envwrapper + InteractionSegmenter double fixes) was not implemented, and the conversation was interrupted at critical points.</li>
+<li>Hugo template fields lack sufficient understanding of semantics: section conditional statements required three iterations to converge; failed to anticipate conflicts between static directories and content paths; failed to anticipate future date filtering caused by datetime.now(). These are errors that can be avoided in the design phase.</li>
+</ul>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>AI&rsquo;s assessment of task complexity tends to overestimate it (ExitPlanMode lists too many allowedPrompts, which was criticized by users). Tool calls failed multiple times due to &ldquo;files not being read first&rdquo;. The apply_patch tool&rsquo;s line-level content positioning was not stable enough and required multiple retries. The rg command output exceeding 262144 tokens had to be truncated multiple times, requiring multiple sub-queries to piece together.</li>
+<li>In generating weekly reports, W09 was generated twice (with highly overlapping content). The AI did not actively recognize this repetition and did not provide feedback on upstream data quality issues when some daily report input formats were abnormal (unknown dates, mixed with individual human_vs_ai entries).</li>
+<li>Today&rsquo;s gains</li>
+</ul>
+<h3 id="core-gains">Core Gains<a hidden class="anchor" aria-hidden="true" href="#core-gains">#</a></h3>
+<ul>
+<li>In robosuite, PandaGripper and RethinkGripper have opposite action polarities: Panda action = +1 for closing, Sawyer action = -1 for closing. The code comments are not reliable, and it must be confirmed through testing qpos changes. When diagnosing unknown behaviors, writing a minimal test script is more reliable and efficient than static code analysis, especially when dealing with the internal behavior of third-party libraries.</li>
+<li>In multi-object assembly tasks, the selection of target_object must be based on grasping_geoms filtering out fixtures. The pure &ldquo;nearest object&rdquo; strategy will systematically select the wrong target when fixtures are close to EEF, resulting in all phase_labels being pre_reach. Non-target candidates for error skills also need to distinguish between graspable objects and fixed devices.</li>
+<li>The architecture pattern in outputs/site staging area: tools write to outputs/site → website/sync_staging.py synchronization → Hugo build → deployment. This decoupling allows each tool&rsquo;s release logic to be independent of the website directory structure, with sync_staging executing incremental updates as a single entry point.</li>
+<li>In physical simulation, making objects interact with other objects requires active handling to the collision position, not relying on natural movement after random offsets (object spacing is usually much larger than the offset). The ungenerable cases caused by benchmark verification thresholds (collision detection at 1cm displacement, position error of 2cm) are physical constraint problems due to insufficient injection strength. It is necessary to adjust injection parameters or verify thresholds instead of running the pipeline again.</li>
+<li>Hugo best practices collection: .Title is the most reliable field for identifying specific sections (.Section and .RelPermalink have inconsistent capitalization across platforms); static directory names that match the basic name of content pages will cause path conflicts (static files overwrite content rendering results); automatic frontmatter generation should not use the current system time; dropdown menus can be implemented through project-level layouts/partials/safety covering themes without having to fork themes.</li>
+</ul>
+<h3 id="practical-gains">Practical Gains<a hidden class="anchor" aria-hidden="true" href="#practical-gains">#</a></h3>
+<ul>
+<li>macOS resource fork files with a._ prefix can contaminate git pack directories, causing non-monotonic index errors. After Hugo major version upgrades, themes need to be updated synchronously. Cleanup operations in shell script set -e mode should be protected by 2&gt;/dev/null || true. The deployment script should gracefully skip commits when there are no changes (idempotency design).</li>
+<li>Slurm ai partitions must specify &ndash;gres=gpu:a800:[N] even if the task does not use a GPU. MUJOCO_GL=disabled allows running physical simulations (CPU-only) without GPU rendering. Batch archiving strategies (generating multiple weeks&rsquo; worth of weekly reports at once) are efficient methods for creating retrievable knowledge bases.</li>
+</ul>
+<h2 id="session-summary">Session Summary<a hidden class="anchor" aria-hidden="true" href="#session-summary">#</a></h2>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 Three core bug fixes (gripper polarity, wrong_object, drop_with_interaction) + analysis of the root cause of three_piece_assembly degradation + attribution of 48 ungenerable cases</strong>
+<em>01:12:20.861 | claude_code + codex</em>
+Throughout the day, systematic debugging was carried out around the quality of training data generation: (1) Statistical findings showed that drop_with_interaction always resulted in zero failures and Panda tasks with no grasp failures; (2) Testing the diagnostic script revealed a reversal in Panda gripper polarity. envwrapper.py and 9 error skills were modified, and Slurm job 50080 was submitted to regenerate (1209→1627 scenes, +35%), passing 139 unit tests; (3) The filtering logic for wrong_object was fixed (excluding fixtures without grasping_geoms); (4) drop_with_interaction was rewritten (actively moving to the non-target position and releasing, with full tracking of contact); (5) The implementation documents for 13 error skills were integrated into the project overview summary; (6) Three_piece_assembly degradation was analyzed in depth with escalated privileges — 887/879 opportunities were identified as pre_reach. The root cause was that fixture was mistakenly selected as target_object by get_target_object() and InteractionSegmenter, and the code fix did not materialize due to sandbox limitations; (7) After rerunning the entire process, the system attributed 48 ungenerable cases to five types of physical constraint thresholds problems, confirming that it was not a pipeline failure.</p>
+<h3 id="gadget">Gadget<a hidden class="anchor" aria-hidden="true" href="#gadget">#</a></h3>
+<p><strong>✅ Batch archiving of historical weekly reports (W05-W12) + website deployment pipeline fixes + Hugo site navigation transformation and unified deploy staging architecture</strong>
+<em>20:08:01.600 | claude_code + codex</em>
+Three parallel tasks were carried out: (1) Generating 8 historical weekly report JSON files for W05 to W12 in 2026, covering key progress such as MIHD STAIG ARI fixes (0.09→0.54), Error Recovery Benchmark v4→v5 upgrade, completion detection header for RoboBrain pi0.5 tasks, and CalendarPro context-aware intent classification; (2) Fixing damaged PaperMod theme pack indexes, updating themes to the latest version (fixing missing partials in Hugo v0.157.0), fixing two robustness issues in update.sh (find cleanup + empty submission), and stabilizing the website deployment pipeline; (3) Implementing a bugJournal hover dropdown menu (customizing header.html partial + CSS, converging after three iterations with .Title as the judgment condition), creating new Posts &amp; Notes partitions, establishing unified outputs/site staging areas (common/site_staging.py + website/sync_staging.py), adding a complete release layer to benchmarks, fixing static directory path conflicts and future date bugs, integrating update.sh with staging synchronization, and finally verifying the entire Hugo build process.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<h3 id="claude-code">Claude Code<a hidden class="anchor" aria-hidden="true" href="#claude-code">#</a></h3>
+<h4 id="overview">Overview<a hidden class="anchor" aria-hidden="true" href="#overview">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Metric</th>
+          <th>Value</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Total Tokens</td>
+          <td>69,161,269</td>
+      </tr>
+      <tr>
+          <td>Input Tokens</td>
+          <td>135,208</td>
+      </tr>
+      <tr>
+          <td>Output Tokens</td>
+          <td>165,763</td>
+      </tr>
+      <tr>
+          <td>Cache Creation</td>
+          <td>4,592,748</td>
+      </tr>
+      <tr>
+          <td>Cache Reading</td>
+          <td>64,267,550</td>
+      </tr>
+      <tr>
+          <td>Cache Hit Rate</td>
+          <td>93.3%</td>
+      </tr>
+      <tr>
+          <td>Total Cost (USD)</td>
+          <td>$50.6294</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="model-details">Model Details<a hidden class="anchor" aria-hidden="true" href="#model-details">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Model</th>
+          <th>Input</th>
+          <th>Output</th>
+          <th>Cache Creation</th>
+          <th>Cache Reading</th>
+          <th>Cost</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>49,276</td>
+          <td>111,729</td>
+          <td>2,401,502</td>
+          <td>52,058,136</td>
+          <td>$44.0781</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>85,875</td>
+          <td>53,919</td>
+          <td>1,315,313</td>
+          <td>11,988,530</td>
+          <td>$3.1985</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>57</td>
+          <td>115</td>
+          <td>875,933</td>
+          <td>220,884</td>
+          <td>$3.3529</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="device-usage">Device Usage<a hidden class="anchor" aria-hidden="true" href="#device-usage">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Device</th>
+          <th>Total Tokens</th>
+          <th>Input</th>
+          <th>Output</th>
+          <th>Cost</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>tianhe</td>
+          <td>46,473,057</td>
+          <td>102,750</td>
+          <td>122,803</td>
+          <td>$30.2102</td>
+      </tr>
+      <tr>
+          <td>TzJsDesktop</td>
+          <td>22,688,212</td>
+          <td>32,458</td>
+          <td>42,960</td>
+          <td>$20.4192</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="codex">Codex<a hidden class="anchor" aria-hidden="true" href="#codex">#</a></h3>
+<h4 id="overview-1">Overview<a hidden class="anchor" aria-hidden="true" href="#overview-1">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Metric</th>
+          <th>Value</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Total Tokens</td>
+          <td>17,143,340</td>
+      </tr>
+      <tr>
+          <td>Input Tokens</td>
+          <td>17,039,449</td>
+      </tr>
+      <tr>
+          <td>Output Tokens</td>
+          <td>103,891</td>
+      </tr>
+      <tr>
+          <td>Inference Tokens</td>
+          <td>40,222</td>
+      </tr>
+      <tr>
+          <td>Cache Reading</td>
+          <td>16,036,864</td>
+      </tr>
+      <tr>
+          <td>Total Cost (USD)</td>
+          <td>$8.0740</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="model-details-1">Model Details<a hidden class="anchor" aria-hidden="true" href="#model-details-1">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Model</th>
+          <th>Input</th>
+          <th>Output</th>
+          <th>Inference</th>
+          <th>Cache Reading</th>
+          <th>Cost</th>
+          <th>Percentage</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>gpt-5.4</td>
+          <td>17,039,449</td>
+          <td>103,891</td>
+          <td>40,222</td>
+          <td>16,036,864</td>
+          <td>$8.0740</td>
+          <td>100.0%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+document.getElementById("lang-toggle").addEventListener("click", function() {
+    var current = this.getAttribute("data-current-lang");
+    var url = this.getAttribute("data-translation-url");
+    var newLang = (current === "en") ? "zh" : "en";
+    localStorage.setItem("pref-lang", newLang);
+    if (url) {
+        window.location.href = url;
+    } else {
+        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+    }
+});
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-04-04 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="深度调试并修复 TokenMonitor FloatBall 在 Linux 下的多个系统级 bug（GTK 尺寸协商根本问题、WM clamp 定位偏移等），完成 NeurIPS 2025 D&amp;B Track 63 篇论文系统性研究调研，以及 Life-Copilot 多项重大功能落地（Discord Bot 架构重构净删 2823 行、Screen Time Tracker 全量实现、飞书 Bot 快速想法捕获、Codex/Anthropic 后端接入），并探索 AionUI 远程 SSH 接入可行性。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-04/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-04-04/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-04/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    var stored = localStorage.getItem("pref-lang");
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-04/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-04-04">
+  <meta property="og:description" content="深度调试并修复 TokenMonitor FloatBall 在 Linux 下的多个系统级 bug（GTK 尺寸协商根本问题、WM clamp 定位偏移等），完成 NeurIPS 2025 D&amp;B Track 63 篇论文系统性研究调研，以及 Life-Copilot 多项重大功能落地（Discord Bot 架构重构净删 2823 行、Screen Time Tracker 全量实现、飞书 Bot 快速想法捕获、Codex/Anthropic 后端接入），并探索 AionUI 远程 SSH 接入可行性。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-04-04T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-04-04T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-04-04">
+  <meta name="twitter:description" content="深度调试并修复 TokenMonitor FloatBall 在 Linux 下的多个系统级 bug（GTK 尺寸协商根本问题、WM clamp 定位偏移等），完成 NeurIPS 2025 D&amp;B Track 63 篇论文系统性研究调研，以及 Life-Copilot 多项重大功能落地（Discord Bot 架构重构净删 2823 行、Screen Time Tracker 全量实现、飞书 Bot 快速想法捕获、Codex/Anthropic 后端接入），并探索 AionUI 远程 SSH 接入可行性。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "每日总结",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-04-04",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/2026-04-04/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-04-04",
+  "name": "Bug Journal 2026-04-04",
+  "description": "深度调试并修复 TokenMonitor FloatBall 在 Linux 下的多个系统级 bug（GTK 尺寸协商根本问题、WM clamp 定位偏移等），完成 NeurIPS 2025 D\u0026amp;B Track 63 篇论文系统性研究调研，以及 Life-Copilot 多项重大功能落地（Discord Bot 架构重构净删 2823 行、Screen Time Tracker 全量实现、飞书 Bot 快速想法捕获、Codex/Anthropic 后端接入），并探索 AionUI 远程 SSH 接入可行性。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-04-04 今日概览 做了什么： 在四个项目上并行推进：TokenMonitor 完成 GTK 尺寸协商根本修复及一系列 FloatBall Linux bug，并持续调试 WM clamp 导致的位置偏移；Gadget Research Scout 完成 NeurIPS 2025 D\u0026B Track 63 篇论文调研与写作指南；Life-Copilot 完成 Discord Bot 对话系统整体重构为多 CLI Agent 架构，并先后实现屏幕时间追踪、飞书想法捕获、Codex/Anthropic 后端等新功能；同时探索了 AionUI 使用方式与远程 SSH 接入可行性。 怎么做的： 通过运行时日志分析定位 GTK bottom-up 尺寸协商等底层系统机制；使用 ccplan + Critic agent 对抗审查对多项功能进行结构化规划，提前发现 Wayland 兼容性、lark-oapi 线程阻塞等高价值风险；以 subagent 并行开发加速大规模重构实现；通过 arXiv 多阶段 LLM 评估管线完成研究论文分析。 有什么用： Life-Copilot 代码净减少 2823 行，获得屏幕时间感知、飞书输入渠道和 11 级 AI 降级链等新能力；TokenMonitor 在 Linux X11 下首次正确运行 FloatBall（尺寸可控、吸附生效、收起无跳变），并积累了完整的 Linux 透明浮窗架构性约束诊断；NeurIPS 调研为研究者提供了可操作的投稿指南。 深度调试并修复 TokenMonitor FloatBall 在 Linux 下的多个系统级 bug（GTK 尺寸协商根本问题、WM clamp 定位偏移等），完成 NeurIPS 2025 D\u0026B Track 63 篇论文系统性研究调研，以及 Life-Copilot 多项重大功能落地（Discord Bot 架构重构净删 2823 行、Screen Time Tracker 全量实现、飞书 Bot 快速想法捕获、Codex/Anthropic 后端接入），并探索 AionUI 远程 SSH 接入可行性。\n今日任务 架构与策略 ✅ TokenMonitor FloatBall Linux 根本问题修复（GTK 尺寸协商 + 系列 bug） — 定位并修复 GTK bottom-up 尺寸协商导致窗口恒为 400x400 的根本原因：通过 with_webview() 回调调用 widget.set_size_request()，移除 set_resizable 切换（防止异步回调生效前被锁死），Linux 永久 resizable。同步修复：deferred reposition 缺失（指数退避重试）、多显示器展开方向误判（修复为 monitor.position.x + width/2）、pointerdown 竞态（dragGeneration + pendingPointerId）、GTK ScrolledWindow 滚动条（GTK 层 set_policy Never）、拖拽闪烁（非 resize 只调一次 set_position）、CSS capsule 尺寸溢出（min(56px, 100%)）、收起两阶段跳变（Linux 路径先 Rust 原子缩窗口再 CSS）、测试与实现语义分叉。全部测试通过，svelte-check 零错误。 ✅ Life-Copilot Discord Bot 对话系统完整重构 — 将 3170 行复杂意图路由（semantic/、24 个 handle* 方法、conversation_history）替换为 CLIAdapter + SessionManager + MCP Server（19 个工具）+ Skills（4 个）架构，支持 Claude/Codex/Gemini CLI fallback 链，通过 Skills JSON 协议触发 Discord UI（Views/Modals）实现解耦。全项目净删除 2823 行，419 个测试通过。 🔄 TokenMonitor Linux 浮球 WM clamp 定位问题深度调试 — 通过分析 backend.log 确认 WM 按旧 expanded 宽度 clamp 收起后窗口坐标（系统性偏移 ~305px）。历经多轮 GTK gravity（引入新偏移）、GDK move_resize、probe 纠偏（双帧闪烁）等方案，定位根因为 Linux 透明无边框 Tauri 浮窗缺乏单一可信几何真相源（WM/GTK/WebView 三层几何不同步），属于架构性平台限制，正确方案应为固定大尺寸窗口 + 内部 CSS 展开收起。 ✅ NeurIPS 2025 D\u0026B Track 系统性论文调研与综合写作指南 — 在 gadget research scout 框架下搜索 63 篇论文，筛选 20 篇高相关，深度分析 TTA-VLM、DATE-LM、CAB、KG-RAG Pitfalls、DCAD-2000 共 5 篇 top 论文，生成写作结构/发表要素/知识提取三维分析报告及综合写作指南（五段式叙事、审稿关注点、可复用方法论）。同时生成 3 个可执行研究方向（VLM 可信度多维评估基准、训练时微调与 TTA 协同效应基准、在线持续学习时序基准）。 ✅ Life-Copilot Bot 四项积累性 bug 修复 — 修复 MCP Server 未实际 serve（新建 main.py + mcp_servers.json）、ClaudeCLIAdapter.is_available() 缺少 async 导致静默降级到 Codex（await 同步方法 TypeError 被 except 吞掉）、butler 系统指令从未注入 Claude CLI（添加 –append-system-prompt）、多轮对话上下文丢失（_process_input 从未传 last_assistant_message 和 last_intent 参数）。新增 ensure_instruction_files() 幂等自愈生成 AGENTS.md/GEMINI.md。 ✅ Life-Copilot Screen Time Tracker 全量实现 — 通过 ccplan 9 阶段规划（Critic 对抗审查发现 Wayland 兼容性等关键风险），实现跨平台窗口追踪（GNOME Introspect D-Bus → xprop → cmdline 降级）、AI 应用分类器（100+ 预置 + 持久化缓存 + async lock）、日期分区 JSONL 存储、独立 asyncio.Task 采样循环，并与 PreferenceLearner/ContextAssembler/BackgroundCoordinator 集成。26/26 测试通过，零回归。 ✅ Life-Copilot 飞书 Bot 快速想法捕获平台、Codex/Anthropic 后端接入与全链路 token 验证 — ccplan 规划飞书 Bot，Critic 预先发现 lark-oapi 线程阻塞和 ThoughtStore 非单例两个 critical 问题，实现 ThoughtCaptureService 共享服务层 + AutoCategorizer（10 类中英文）+ daemon 线程 asyncio 桥接 + REST API 三端点；新增 CodexProvider 和 AnthropicProvider，fallback 链扩展到 11 级；新建 key_validator.py 对所有服务做真实 API 验证，修复 Google Calendar scope 不匹配（calendarList → events.list），每日 06:00 重检 cron job。 ❌ OpenReview 审稿意见获取 — OpenReview API 对未认证访问全面返回 403 Forbidden，NeurIPS D\u0026B Track 使用独立 venue ID 而非主会议路径，两个问题叠加导致功能完全失效，需账号凭证（OPENREVIEW_USERNAME/OPENREVIEW_PASSWORD）才能继续。 ✅ AionUI 使用方式与远程 SSH 接入可行性调研 — 调研 AionUI 模型切换、思考深度配置及 Skills 跨 CLI 平台（Codex/Gemini）适配性；确认 AionUI 远程 Agent 仅支持 URL 连接，无法直连 headless 服务器上的 Claude Code CLI 进程（CLI 进程无 HTTP 端点，架构层面根本限制），建议 tmux 作为临时替代并向 AionUI 团队提 feature request。 实现与修复 ✅ Research pipeline 环境依赖修复与幂等性问题处理 — 安装 arxiv/openreview-py 包并改用绝对路径调用脚本；清除 insight 缓存目录下 5 个缓存文件解决缓存命中旧结果；手动删除 overview.md 中因多次 pipeline 执行写入的 4 份重复日报。 问题与解决方案 关键问题 1. Linux 下 FloatBall 窗口恒为 400x400，Tauri set_size() 完全无效 解决方案: GTK bottom-up 尺寸协商取 max(window_requested, widget_natural_size)，WebKitGTK natural size ≈200x200 导致窗口锁死。修复：通过 with_webview() 在 GTK 主线程调用 widget.set_size_request()，移除 set_resizable 切换（with_webview 是异步派发，set_resizable(false) 在回调执行前入队会锁死旧尺寸），Linux 永久保持 resizable。\n关键洞察: Tauri 的 set_size/set_min_size/set_max_size 走 GTK window 级别 hint，GTK bottom-up 协商会无视这些 hint 去满足 widget natural size。with_webview() 返回时回调还未执行，后续 Tauri API 调用依然是 FIFO 异步入队。\n2. Linux 收起视觉跳变：两阶段序列暴露中间态 + WM clamp 旧宽度导致坐标系统性偏移 解决方案: 两阶段序列：macOS 有 250ms 动画缓冲，Linux 禁用过渡后中间态刺眼，改为 Linux 路径先 Rust 原子缩窗口到 56px，再设 CSS expanded=false（此时 100%=56px，变化不可见）。WM clamp 问题：GTK gravity 在该 WM 不生效（反而引入系统性偏移），probe + corrective reapply 产生双帧闪烁，根本解法为固定大尺寸窗口+内部 CSS（待实施）。\n关键洞察: 禁用 CSS 过渡的同时必须同步调整 JS/Rust 时序逻辑；GTK gravity 并非所有 WM 支持；事后补救本身就是可见闪烁的来源，根本解法是让 WM 一次性接受正确坐标。\n3. Life-Copilot MCP Server 三层断裂：有 Calendar token 但 agent 仍报无法连接 解决方案: 三处同时断裂：FastMCP 只被实例化未调用 run()、.claude/mcp_servers.json 缺失、butler 指令（含 MCP tools 列表）从未传给 Claude CLI 子进程。新建 main.py 启动 stdio transport、新建 mcp_servers.json、ClaudeAdapter 添加 –append-system-prompt，19 个 MCP tools 全部恢复正常。\n关键洞察: “代码写了\"和\"代码被调用\"是两回事；factory 模式创建对象不等于服务启动；外部程序需要配置文件才能发现服务；App 验证层和 CLI 工具上下文注入是两个独立层，token 验证通过不代表 CLI 工具收到了正确的上下文。\n4. Linux Screen Time Tracker 初始方案使用 xdotool，不支持 Wayland（用户机器运行 GNOME 50 Wayland） 解决方案: 可行性探测确认 Wayland 环境，改用 GNOME Introspect D-Bus（org.gnome.Shell.Introspect.GetWindows()）作为主路径，xprop 作为 XWayland 回退，PID→cmdline 作为最终降级，所有 subprocess 调用加 5 秒超时 + proc.kill()。\n关键洞察: GNOME 41+ 提供标准 Introspect D-Bus 接口，是 Wayland 下获取活跃窗口的正确方式；此问题由 Critic 子代理对抗审查主动发现，若遗漏会导致功能在用户机器上完全不可用。\n5. AionUI 无法通过 URL 以外方式（SSH）连接远程 headless 服务器上的 Claude Code CLI 解决方案: AionUI 远程 Agent 架构假定 Agent 暴露 HTTP 端口，CLI 进程无 HTTP 端点，根本上不兼容。建议 tmux/screen 管理多会话作为临时替代，并向 AionUI 团队提 feature request。\n关键洞察: AionUI 数据库已有 remote_agents 表（含 allow_insecure 字段），说明开发团队正在构建远程 Agent 能力，SSH 直连可能是未来 roadmap 方向。\n6. X11 WM 拒绝半出屏窗口定位，导致吸附和收起位置漂移 解决方案: Mutter/GNOME 等 X11 WM 将无装饰窗口夹在可见区域内，拒绝 x \u003c 0 或 x \u003e screen_width - window_width 的定位。Linux 使用 edge_offset=0，macOS/Windows 使用 edge_offset=ball_size/2。\n关键洞察: macOS 和 Windows 允许无装饰窗口部分超出屏幕边界，X11 WM 通常不允许，两个平台需要不同的边缘偏移量。\n7. ClaudeCLIAdapter.is_available() 缺少 async 导致 Claude 静默降级到 Codex 并超时 解决方案: await 普通方法不报编译错误，运行时 TypeError 被 except Exception 吞掉，Claude 被判定不可用。添加 async 关键字后 Claude available: True 恢复正常。\n关键洞察: Python 中 await 同步方法产生 TypeError，若被宽泛 except Exception 静默捕获，会导致逻辑产生错误的 False 结果，表现为功能降级而非报错，极难排查。\n8. 多轮对话中 bot 无法理解跨轮指代（DualVerifier 参数接线断裂） 解决方案: DualVerifier、SemanticRouter、KeywordScorer 均已实现 last_assistant_message 和 last_intent 参数，但 _process_input() 调用时从未传递。修复接线即可，无需改任何分类逻辑。\n关键洞察: “功能已实现参数接口\"不等于\"参数已被传递”；integration layer 是最常见的接线断裂点，验证时要检查调用侧而不只是实现侧。\n9. Codex CLI session resume 有 bug，三个 CLI session 机制差异过大无法统一 解决方案: 放弃依赖 CLI 原生 session，在 Adapter 层维护轻量历史 ring buffer（last-20 条），CLI 切换时将历史注入为 prompt 前缀，实现透明的跨 CLI 对话历史传递。\n关键洞察: 统一抽象层（history injection）比适配各 CLI 的 session 机制更可靠，session 机制的不一致性是多 CLI 架构的主要隐患。\n10. lark-oapi WebSocket client 阻塞式运行，无法与 FastAPI asyncio 主循环共用 解决方案: 在独立 daemon 线程中启动飞书 bot，消息回调通过 asyncio.run_coroutine_threadsafe() 桥接到主 event loop。\n关键洞察: lark-oapi v1.5.3 的 Client.start() 本质是同步阻塞的，必须线程隔离而非在 asyncio 任务中直接 await；此问题由 Critic agent 对抗审查预先发现。\n11. WebKitGTK 内部 ScrolledWindow 滚动条无法用 CSS 抑制 解决方案: WebKitGTK 滚动条属于 gtk::ScrolledWindow 层而非 WebKit 渲染树，CSS 伪元素无法触及。在 with_webview 回调中遍历 widget 祖先链，对每个 ScrolledWindow 调用 set_policy(Never, Never)。\n关键洞察: WebKitGTK 的 UI chrome 属于 GTK widget 层，CSS 选择器无法选中，必须在 GTK 代码层处理。\n12. OpenReview API 对未认证访问全面返回 403，NeurIPS D\u0026B Track 审稿意见获取失败 解决方案: 识别两个叠加问题：OpenReview 近期收紧匿名访问策略（需账号认证）；NeurIPS D\u0026B Track 使用独立 venue ID 而非主会议子路径，两者叠加导致完全失效。当前阻塞，需 OPENREVIEW_USERNAME/OPENREVIEW_PASSWORD 环境变量。\n关键洞察: OpenReview venue ID 体系中，卫星 track 使用独立 venue 而非 parent conference 路径，需单独确认 ID；近期 API 策略已全面收紧。\n一般问题 13. Research pipeline 重复执行导致 overview.md 重复写入，缓存命中旧结果导致依赖修复后仍使用空结果 解决方案: 手动删除重复 block；手动清除 insight 缓存目录后重新运行。根本问题：auto-append 机制缺乏幂等性保护，缓存系统不感知依赖库安装状态变化。\n关键洞察: 修复依赖后必须手动失效缓存；pipeline 应在写入前检查当日记录是否已存在。\n人类思路 vs AI 思路 战略层面 GTK 根本原因定位与视觉缺陷发现 角色 思路 人类 通过 backend.log 实证直接指出窗口实际 400x400 而非期望 112x112，问题不在几何算法而在 Linux 窗口尺寸层；观察到\"收起时先整体右移再缩小\"的两步现象，描述精确迫使 AI 解释机制。 AI AI 在无日志证据时错误假设 Tauri set_size() 有效，多次修复几何算法；因两阶段 collapse 有注释说明是有意为之，不会从用户视觉体验角度质疑其 Linux 适用性。 差异分析: 人类通过日志实证推理和用户体验感知跳到根本原因；AI 从代码逻辑推断，缺乏运行时验证时容易在错误假设上反复迭代。\n多轮修复失败后停止修复转向根因分析 角色 思路 人类 在 WM clamp 问题多轮修复仍未解决后，明确要求\"不需要再修改，给我错误原因就可以”，并最终归结为\"这个 WM 夹窗口有办法解决吗\"，隐含对底层平台限制的感知。 AI AI 每次看到新日志就继续尝试下一个技术方案，没有主动提出\"当前方向已达到边界\"，在被明确要求之前不会主动跳出单点修复思路。 差异分析: 人类更早判断出\"继续迭代无效\"并主动要求架构性诊断；AI 缺乏在反复修复失败后主动建议停止并做架构总结的能力。\nDiscord Bot 架构重构方向 角色 思路 人类 直接提议\"直接全部用 claude code cli 或者 codex cli 解决不就完事了吗？\"——一句话提出激进简化，扔掉整个意图路由引擎。 AI AI 详细分析了现有 3170 行架构的问题清单，但倾向在现有框架内优化，没有主动提出换引擎。 差异分析: 人类提出激进简化方向，AI 初始倾向渐进优化。最终证明人类方向正确，删除代码远多于新增（-6061 vs +3238），项目得到本质性简化。\nWayland 兼容性与 AI 分类成本的主动识别 角色 思路 人类 人类未主动提出这两个问题。 AI AI 通过 Critic 子代理主动发现 xdotool 不支持 Wayland，并主动识别每 30 秒调 LLM 的成本问题，提出应用名级缓存策略。 差异分析: 这是 AI 独立发现的高价值问题，通过系统化对抗审查规避了功能在用户机器上完全不可用的风险。\n让所有 CLI agent 获得 butler 指令的方案选择 角色 思路 人类 用户直接提出\"你就自动为所有 agent 创建一个 agent.md 和一个 claude.md，这有什么难的\"——指出最简洁通用的方案。 AI AI 选择给 Claude 注入 –append-system-prompt 参数，未主动考虑 Codex/Gemini 可直接读约定文件的方案。 差异分析: 人类看到更通用的方案（约定文件 \u003e 运行时注入）；AI 陷入\"如何注入\"而非\"能否约定\"的思维定式。\nAionUI 远程接入的真实需求与产品信息准确性 角色 思路 人类 明确表达核心需求是统一管理面板；直接纠正 AI 关于 Claude 200k context window 的过时信息（实际已更新至 1M）。 AI AI 最初专注技术方案（SSH 隧道、端口转发），未主动挖掘用户深层需求；以确定口吻陈述过时的模型规格。 差异分析: 用户掌握比 AI 更新的产品信息；用户主动说出深层需求后 AI 才转向更有针对性的建议。\nAI 局限性 重要局限 缺乏运行时实证时，错误假设底层 API（Tauri set_size、GTK gravity、Google Calendar calendarList scope）按预期工作，需要日志证据或用户报错才能纠正方向；多次修复几何算法而未质疑底层 OS 机制是否生效。 多轮修复失败后未能主动识别\"继续修补不能解决架构性问题\"，每次看到新日志就继续尝试下一个技术方案，需要用户明确要求停止才会进行根因总结。 引入新机制前未验证平台支持：GTK gravity 未确认 WM 是否支持（引入后反而产生系统性偏移）；透明安全边距方案引入后立即破坏拖拽和 WM clamp 两个问题，未在修改前预判副作用。 对大型代码库全局依赖图感知不完整：ccplan Critic agent 发现了 AI 规划时遗漏的 4 个隐藏依赖（BackgroundCoordinator、slash 命令等）；并发/竞态修复容易遗漏边界情况（pointerUp 在异步初始化前触发的场景需追问才发现）。 在快速迭代的产品领域提供过时或编造信息：编造了 AionUI 的 /model 和 /effort 斜杠命令（用户验证后失败），以确定口吻陈述 Claude 200k context window（实际已 1M），不应以确定口吻陈述快速更新的技术参数。 对工具链外部 API 限制（OpenReview 403、lark-oapi 线程阻塞、Codex session bug）无法在规划阶段预见，需实际运行或 Critic 对抗审查才能发现；无法主动提供 OpenReview 认证墙的工作替代方案。 一般局限 调查路径分散：面对多层断裂问题（日历无法连接、Discord 上下文异常）时从各个独立症状分别入手，未能快速从架构层面整体定位根因，需要多轮工具调用才汇聚到结论。 今日收获 核心收获 GTK 窗口尺寸控制机制全貌：GTK bottom-up 协商取 max(window_requested, widget_natural_size)；WebKitGTK natural size ≈200x200 logical，突破必须调用 widget.set_size_request()，Tauri 的 set_size/set_min_size/set_max_size 对 WebKitGTK 窗口无效；with_webview() 是异步派发，后续 Tauri API 调用会在回调执行前入队，FIFO 下可能锁死旧尺寸；WebKitGTK 滚动条属于 GTK widget 层，必须用 set_policy(Never, Never) 在 GTK 代码层禁用。 Linux 透明无边框 Tauri/WebKitGTK 浮窗的架构性约束：WM、GTK、WebView 内容区三者尺寸/位置不会自动同步，这是平台约束而非 bug。正确架构应为固定大尺寸 native window + 内部纯 CSS 展开/收起，不依赖频繁 resize 外层窗口；GTK gravity 并非所有 WM 支持，用右边界坐标 move 会造成系统性偏移；probe + corrective reapply 无法消除用户可见的过渡帧；在 native 坐标层做可见 rect 和窗口 rect 分离会使拖拽起点和鼠标漂移。 运行时日志是底层系统调试的根本手段：当出现 GTK、WM、OS 等底层系统行为时，应优先通过日志/探针实证确认假设，而非从代码推断；跨平台动画策略需整体一致，禁用 CSS 过渡的同时必须同步调整对应的 JS/Rust 时序逻辑；X11 WM 将无装饰窗口强制夹在可见区域内（edge_offset 需平台差异化），macOS/Windows 允许半出屏。 NeurIPS D\u0026B Track 投稿策略：“领域纠偏者”（通过量化现有基准具体缺陷，如 57% 正确率，触发评估范式重构）比\"新方法提出者\"更容易被接受且影响力更持久；审稿人最重视多维度评估、公平基线对比、人工验证机制（κ≥0.68）和反直觉负面发现；反事实实体替换可消除词汇重叠偏差；符号化验证闭环（SPARQL/SQL 执行对比 + N 次自动修复）可将数据正确率从 57% 提升至 96%+；数据清洗可重构为无监督异常检测（Isolation Forest + Z-score 跨语言标准化）。 激进简化（换掉引擎）往往比渐进修补更有效：Thin Adapter + MCP Server + Skills 三层模式替代专有路由逻辑，获得跨 CLI 通用性；大型重构应在编码前进行对抗性审查（Critic subagent），可提前发现隐藏依赖和架构风险，本日多项目中 Critic 阶段共发现 Wayland 兼容性、lark-oapi 线程阻塞、ThoughtStore 非单例、4 个隐藏代码依赖等高价值问题，ROI 极高。 “代码已实现参数接口\"不等于\"参数已被传递”：integration layer 是最常见的接线断裂点，验证时要检查调用侧而非只看实现侧；FastMCP 的\"创建\"和\"serve\"是两步，同时需要 mcp_servers.json 声明外部程序才能发现；Python await 同步方法的 TypeError 若被 except Exception 吞掉会导致功能静默降级而非报错。 现代 Linux 桌面（Ubuntu 22.04+）已默认使用 Wayland，跨平台窗口追踪方案必须以 GNOME Introspect D-Bus 为主路径，xdotool/xprop 只能作为 XWayland 回退；后台采样任务不应全部依赖 CronScheduler（最小 tick 60s），需要非整分钟周期的任务应用独立 asyncio.Task 循环；ECL 文档将设计决策结构化持久化，是多阶段复杂功能开发的关键工程实践。 多 CLI 系统设计最佳实践：不同 CLI 工具（Claude Code/Codex/Gemini）各有约定指令文件（CLAUDE.md/AGENTS.md/GEMINI.md），利用约定文件比运行时注入更简单可靠；Skills 本质是 Markdown 提示词，跨平台迁移只需工具名称映射；App 状态验证与 CLI 工具上下文注入是两个独立层，token 验证通过不代表 CLI 工具收到了正确的上下文；统一 history ring buffer 比适配各 CLI session 机制更可靠。 AionUI 远程 Agent 仅支持 URL 连接（CLI 进程无 HTTP 端点，架构层面根本限制），但 AionUI 数据库已有 remote_agents 表，SSH 直连可能是未来 roadmap；AI 在快速迭代的产品领域不应以确定口吻陈述技术参数（命令、模型规格），应声明知识截止时间并建议用户验证。 lark-oapi WebSocket 正确架构：Client.start() 是阻塞式的，必须用独立 daemon 线程 + asyncio.run_coroutine_threadsafe() 桥接；Google Calendar OAuth scope 精细划分，验证 token 应用 events.list(calendarId=‘primary’) 而非 calendarList.list()；日志级别是零成本可观测性杠杆，将 provider 错误从 DEBUG 改为 WARNING 立即显著改善运维体验。 会话摘要 TokenMonitor ✅ FloatBall Linux 代码审查、四个 bug 修复与 GTK 根本问题（尺寸协商 + 收起序列）完整修复 19:42:04.443 | claude_code 用户请求解释 FloatBall Linux 逻辑后发现多处不准确，随即深入代码审查，识别并修复 4 个 bug（deferred reposition 缺失、多显示器方向误判、pointerdown 竞态含 pendingPointerId 补全、测试分叉）。随后报告 3 个新 Linux bug，AI 通过几何修复未解决根本问题。同事提供 backend.log 后确认 GTK bottom-up 尺寸协商为根本原因，通过 with_webview() 调用 widget.set_size_request() 修复，移除 set_resizable 切换，添加 GTK 层 ScrolledWindow set_policy 抑制滚动条。最终 CSS capsule 改 min(56px, 100%)，收起序列倒置（Linux 路径先 Rust 缩窗口再 CSS）消除两阶段跳变。全部测试通过，svelte-check 零错误。\n🔄 Linux 浮球 WM clamp 定位问题：日志诊断与多轮调试，最终确认架构性限制 00:57:20.724 | codex 用户报告浮球在 Linux 上位置乱跳。AI 通过日志分析确认 WM 按旧 expanded 宽度 clamp 收起后坐标（系统性偏移 ~305px）。历经 GTK gravity（引入新偏移）、GDK move_resize、probe 纠偏（双帧闪烁）、透明安全边距（破坏鼠标跟手）等多轮修复均未彻底解决。用户要求停止修改后，AI 系统性总结根因：Linux 透明无边框 Tauri 浮窗缺乏单一可信几何真相源（WM/GTK/WebView 三层几何不同步），属架构性平台限制，正确方案为固定大尺寸窗口 + 内部 CSS 展开收起。\nGadget Research Scout 🔄 NeurIPS 2025 D\u0026B Track 63 篇论文完整调研、5 篇深度分析与综合写作指南生成 20:18:09.048 | claude_code 在已有 nips2025-benchmark 项目基础上，修复 arxiv/openreview-py 依赖并清除 insight 缓存，三次运行 pipeline，完成 63 篇搜索/20 篇高相关筛选/5 篇（TTA-VLM、DATE-LM、CAB、KG-RAG Pitfalls、DCAD-2000）深度三维分析（写作结构/发表要素/知识提取），并生成涵盖五段式叙事、审稿关注点、可复用方法论的综合写作指南，同时生成 3 个可执行研究方向。OpenReview 审稿意见因 API 403 全面失败，需账号认证。\nLife Copilot ✅ Discord Bot 完整架构重构：从意图路由到多 CLI Agent 架构（规划 + 全量执行） 19:40:36.464 | claude_code 用户提议用 Claude/Codex/Gemini CLI 子进程替代 3170 行的复杂意图路由。经 ccplan 规划（含对抗性审查发现 7 个 critical/high 风险、Codex session bug 可行性探针）和 writing-plans 制定 18 个任务后，通过 subagent-driven-development 并行实现：CLIAdapter（三 CLI + fallback 链）、SessionManager（ring buffer 历史）、MCP Server（19 个工具）、Skills（4 个 SKILL.md）、Discord UI 通过 Skills JSON 协议解耦、slash 命令迁移、代码清理。全项目净删除 2823 行，419 个测试通过。\n✅ Screen Time Tracker 完整需求规划与实现（ccplan 9 阶段 + 三波次并行子代理） 03:19:12.046 | claude_code 用户提出为 LifeCopilot 构建屏幕时间追踪功能。通过 ccplan 9 阶段规划，Critic 对抗审查发现 Wayland 兼容性等 32 个问题（含 event loop 阻塞），用户审批方案 1（EventBus 集成）。三波次并行子代理实现：抽象 PlatformTracker + GNOME Introspect D-Bus 主路径、AI 分类器（100+ 预置缓存）、日期分区 JSONL 存储、独立 asyncio.Task 采样循环，以及与 PreferenceLearner/ContextAssembler/BackgroundCoordinator 集成。26/26 测试通过，零回归。\n✅ 修复重构后四项积累性 bug：MCP 未 serve、Claude async 缺失、butler 未注入、多轮上下文丢失 22:38:00.853 | claude_code 用户报告有 token 但 agent 说连不上日历，发现是三层同时断裂（MCP 未 run、缺 mcp_servers.json、butler 指令未传）。逐一修复后 19 个 MCP tools 全部可用。随后修复 ClaudeCLIAdapter async 缺失（Claude available: True 恢复），新增 ensure_instruction_files() 幂等生成 AGENTS.md/GEMINI.md，修复 _process_input 从未传递对话历史参数导致的跨轮指代失败。\n✅ 飞书 Bot 快速想法捕获、Codex/Anthropic 后端接入与全链路 token 验证体系建立 03:15:58.220 | claude_code 三个功能整合实现：(1) ccplan 规划飞书 Bot，Critic 预先发现 lark-oapi 线程阻塞（critical）和 ThoughtStore 非单例（critical），实现 ThoughtCaptureService + AutoCategorizer + daemon 线程 asyncio 桥接 + REST API 三端点；(2) 新增 CodexProvider 和 AnthropicProvider，fallback 链扩展到 11 级；(3) key_validator.py 对所有服务做真实 API 验证，修复 Google Calendar scope 不匹配（calendarList → events.list），注册每日 06:00 重检 cron job。启动日志显示全服务验证状态。\nAionUI 🔍 AionUI 使用方式探索与远程 SSH 服务器接入可行性评估及 Skills 跨平台分析 19:36:59.842 | claude_code 用户在 AionUI 中询问模型切换（/model）和思考深度（/effort）指令，AI 给出的命令均无效（AI 承认系猜测），用户提出核心需求是统一管理面板接入远程 headless 服务器 Claude Code CLI。经技术方案探讨，确认 AionUI 远程 Agent 仅支持 URL 连接，架构上根本不兼容 CLI 进程。同时分析 Skills 跨平台本质（Markdown 提示词，跨平台迁移需工具名称映射）。建议 tmux 临时替代并提 feature request；AI 被纠正 Claude context window 已从 200k 更新至 1M。\nToken 用量 Claude Code 总览 指标 数值 总 Token 135,084,309 输入 Token 43,775 输出 Token 419,203 Cache 创建 5,687,355 Cache 读取 128,933,976 Cache 命中率 95.8% 总费用 (USD) $95.9250 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 25,307 323,732 3,642,945 115,985,769 $88.9811 92.8% claude-sonnet-4-6 85 36,799 796,638 1,190,037 $3.8966 4.1% claude-haiku-4-5-20251001 18,383 58,672 1,247,772 11,758,170 $3.0473 3.2% Codex 总览 指标 数值 总 Token 50,553,332 输入 Token 50,144,484 输出 Token 408,848 推理 Token 249,100 Cache 读取 47,165,568 总费用 (USD) $25.3714 模型明细 模型 输入 输出 推理 Cache 读取 费用 占比 gpt-5.4 50,144,484 408,848 249,100 47,165,568 $25.3714 100.0% ",
+  "wordCount" : "1746",
+  "inLanguage": "zh",
+  "datePublished": "2026-04-04T00:00:00-05:00",
+  "dateModified": "2026-04-04T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/daily/2026-04-04/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="zh"
+                        data-translation-url="https://tzj2006.github.io/bugjournal/daily/2026-04-04/">EN
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/zh/">主页</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/daily/">每日总结</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-04-04
+    </h1>
+    <div class="post-meta"><span title='2026-04-04 00:00:00 -0500 -0500'>2026年4月4日</span>&nbsp;·&nbsp;<span>9 分钟</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-04-04">日报 — 2026-04-04<a hidden class="anchor" aria-hidden="true" href="#日报--2026-04-04">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 在四个项目上并行推进：TokenMonitor 完成 GTK 尺寸协商根本修复及一系列 FloatBall Linux bug，并持续调试 WM clamp 导致的位置偏移；Gadget Research Scout 完成 NeurIPS 2025 D&amp;B Track 63 篇论文调研与写作指南；Life-Copilot 完成 Discord Bot 对话系统整体重构为多 CLI Agent 架构，并先后实现屏幕时间追踪、飞书想法捕获、Codex/Anthropic 后端等新功能；同时探索了 AionUI 使用方式与远程 SSH 接入可行性。</li>
+<li><strong>怎么做的：</strong> 通过运行时日志分析定位 GTK bottom-up 尺寸协商等底层系统机制；使用 ccplan + Critic agent 对抗审查对多项功能进行结构化规划，提前发现 Wayland 兼容性、lark-oapi 线程阻塞等高价值风险；以 subagent 并行开发加速大规模重构实现；通过 arXiv 多阶段 LLM 评估管线完成研究论文分析。</li>
+<li><strong>有什么用：</strong> Life-Copilot 代码净减少 2823 行，获得屏幕时间感知、飞书输入渠道和 11 级 AI 降级链等新能力；TokenMonitor 在 Linux X11 下首次正确运行 FloatBall（尺寸可控、吸附生效、收起无跳变），并积累了完整的 Linux 透明浮窗架构性约束诊断；NeurIPS 调研为研究者提供了可操作的投稿指南。</li>
+</ul>
+<blockquote>
+<p>深度调试并修复 TokenMonitor FloatBall 在 Linux 下的多个系统级 bug（GTK 尺寸协商根本问题、WM clamp 定位偏移等），完成 NeurIPS 2025 D&amp;B Track 63 篇论文系统性研究调研，以及 Life-Copilot 多项重大功能落地（Discord Bot 架构重构净删 2823 行、Screen Time Tracker 全量实现、飞书 Bot 快速想法捕获、Codex/Anthropic 后端接入），并探索 AionUI 远程 SSH 接入可行性。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>TokenMonitor FloatBall Linux 根本问题修复（GTK 尺寸协商 + 系列 bug）</strong> — 定位并修复 GTK bottom-up 尺寸协商导致窗口恒为 400x400 的根本原因：通过 with_webview() 回调调用 widget.set_size_request()，移除 set_resizable 切换（防止异步回调生效前被锁死），Linux 永久 resizable。同步修复：deferred reposition 缺失（指数退避重试）、多显示器展开方向误判（修复为 monitor.position.x + width/2）、pointerdown 竞态（dragGeneration + pendingPointerId）、GTK ScrolledWindow 滚动条（GTK 层 set_policy Never）、拖拽闪烁（非 resize 只调一次 set_position）、CSS capsule 尺寸溢出（min(56px, 100%)）、收起两阶段跳变（Linux 路径先 Rust 原子缩窗口再 CSS）、测试与实现语义分叉。全部测试通过，svelte-check 零错误。</li>
+<li>✅ <strong>Life-Copilot Discord Bot 对话系统完整重构</strong> — 将 3170 行复杂意图路由（semantic/、24 个 <em>handle</em>* 方法、conversation_history）替换为 CLIAdapter + SessionManager + MCP Server（19 个工具）+ Skills（4 个）架构，支持 Claude/Codex/Gemini CLI fallback 链，通过 Skills JSON 协议触发 Discord UI（Views/Modals）实现解耦。全项目净删除 2823 行，419 个测试通过。</li>
+<li>🔄 <strong>TokenMonitor Linux 浮球 WM clamp 定位问题深度调试</strong> — 通过分析 backend.log 确认 WM 按旧 expanded 宽度 clamp 收起后窗口坐标（系统性偏移 ~305px）。历经多轮 GTK gravity（引入新偏移）、GDK move_resize、probe 纠偏（双帧闪烁）等方案，定位根因为 Linux 透明无边框 Tauri 浮窗缺乏单一可信几何真相源（WM/GTK/WebView 三层几何不同步），属于架构性平台限制，正确方案应为固定大尺寸窗口 + 内部 CSS 展开收起。</li>
+<li>✅ <strong>NeurIPS 2025 D&amp;B Track 系统性论文调研与综合写作指南</strong> — 在 gadget research scout 框架下搜索 63 篇论文，筛选 20 篇高相关，深度分析 TTA-VLM、DATE-LM、CAB、KG-RAG Pitfalls、DCAD-2000 共 5 篇 top 论文，生成写作结构/发表要素/知识提取三维分析报告及综合写作指南（五段式叙事、审稿关注点、可复用方法论）。同时生成 3 个可执行研究方向（VLM 可信度多维评估基准、训练时微调与 TTA 协同效应基准、在线持续学习时序基准）。</li>
+<li>✅ <strong>Life-Copilot Bot 四项积累性 bug 修复</strong> — 修复 MCP Server 未实际 serve（新建 <strong>main</strong>.py + mcp_servers.json）、ClaudeCLIAdapter.is_available() 缺少 async 导致静默降级到 Codex（await 同步方法 TypeError 被 except 吞掉）、butler 系统指令从未注入 Claude CLI（添加 &ndash;append-system-prompt）、多轮对话上下文丢失（_process_input 从未传 last_assistant_message 和 last_intent 参数）。新增 ensure_instruction_files() 幂等自愈生成 AGENTS.md/GEMINI.md。</li>
+<li>✅ <strong>Life-Copilot Screen Time Tracker 全量实现</strong> — 通过 ccplan 9 阶段规划（Critic 对抗审查发现 Wayland 兼容性等关键风险），实现跨平台窗口追踪（GNOME Introspect D-Bus → xprop → cmdline 降级）、AI 应用分类器（100+ 预置 + 持久化缓存 + async lock）、日期分区 JSONL 存储、独立 asyncio.Task 采样循环，并与 PreferenceLearner/ContextAssembler/BackgroundCoordinator 集成。26/26 测试通过，零回归。</li>
+<li>✅ <strong>Life-Copilot 飞书 Bot 快速想法捕获平台、Codex/Anthropic 后端接入与全链路 token 验证</strong> — ccplan 规划飞书 Bot，Critic 预先发现 lark-oapi 线程阻塞和 ThoughtStore 非单例两个 critical 问题，实现 ThoughtCaptureService 共享服务层 + AutoCategorizer（10 类中英文）+ daemon 线程 asyncio 桥接 + REST API 三端点；新增 CodexProvider 和 AnthropicProvider，fallback 链扩展到 11 级；新建 key_validator.py 对所有服务做真实 API 验证，修复 Google Calendar scope 不匹配（calendarList → events.list），每日 06:00 重检 cron job。</li>
+<li>❌ <strong>OpenReview 审稿意见获取</strong> — OpenReview API 对未认证访问全面返回 403 Forbidden，NeurIPS D&amp;B Track 使用独立 venue ID 而非主会议路径，两个问题叠加导致功能完全失效，需账号凭证（OPENREVIEW_USERNAME/OPENREVIEW_PASSWORD）才能继续。</li>
+<li>✅ <strong>AionUI 使用方式与远程 SSH 接入可行性调研</strong> — 调研 AionUI 模型切换、思考深度配置及 Skills 跨 CLI 平台（Codex/Gemini）适配性；确认 AionUI 远程 Agent 仅支持 URL 连接，无法直连 headless 服务器上的 Claude Code CLI 进程（CLI 进程无 HTTP 端点，架构层面根本限制），建议 tmux 作为临时替代并向 AionUI 团队提 feature request。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>Research pipeline 环境依赖修复与幂等性问题处理</strong> — 安装 arxiv/openreview-py 包并改用绝对路径调用脚本；清除 insight 缓存目录下 5 个缓存文件解决缓存命中旧结果；手动删除 overview.md 中因多次 pipeline 执行写入的 4 份重复日报。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-linux-下-floatball-窗口恒为-400x400tauri-set_size-完全无效">1. Linux 下 FloatBall 窗口恒为 400x400，Tauri set_size() 完全无效<a hidden class="anchor" aria-hidden="true" href="#1-linux-下-floatball-窗口恒为-400x400tauri-set_size-完全无效">#</a></h4>
+<p><strong>解决方案:</strong> GTK bottom-up 尺寸协商取 max(window_requested, widget_natural_size)，WebKitGTK natural size ≈200x200 导致窗口锁死。修复：通过 with_webview() 在 GTK 主线程调用 widget.set_size_request()，移除 set_resizable 切换（with_webview 是异步派发，set_resizable(false) 在回调执行前入队会锁死旧尺寸），Linux 永久保持 resizable。</p>
+<p><strong>关键洞察:</strong> Tauri 的 set_size/set_min_size/set_max_size 走 GTK window 级别 hint，GTK bottom-up 协商会无视这些 hint 去满足 widget natural size。with_webview() 返回时回调还未执行，后续 Tauri API 调用依然是 FIFO 异步入队。</p>
+<h4 id="2-linux-收起视觉跳变两阶段序列暴露中间态--wm-clamp-旧宽度导致坐标系统性偏移">2. Linux 收起视觉跳变：两阶段序列暴露中间态 + WM clamp 旧宽度导致坐标系统性偏移<a hidden class="anchor" aria-hidden="true" href="#2-linux-收起视觉跳变两阶段序列暴露中间态--wm-clamp-旧宽度导致坐标系统性偏移">#</a></h4>
+<p><strong>解决方案:</strong> 两阶段序列：macOS 有 250ms 动画缓冲，Linux 禁用过渡后中间态刺眼，改为 Linux 路径先 Rust 原子缩窗口到 56px，再设 CSS expanded=false（此时 100%=56px，变化不可见）。WM clamp 问题：GTK gravity 在该 WM 不生效（反而引入系统性偏移），probe + corrective reapply 产生双帧闪烁，根本解法为固定大尺寸窗口+内部 CSS（待实施）。</p>
+<p><strong>关键洞察:</strong> 禁用 CSS 过渡的同时必须同步调整 JS/Rust 时序逻辑；GTK gravity 并非所有 WM 支持；事后补救本身就是可见闪烁的来源，根本解法是让 WM 一次性接受正确坐标。</p>
+<h4 id="3-life-copilot-mcp-server-三层断裂有-calendar-token-但-agent-仍报无法连接">3. Life-Copilot MCP Server 三层断裂：有 Calendar token 但 agent 仍报无法连接<a hidden class="anchor" aria-hidden="true" href="#3-life-copilot-mcp-server-三层断裂有-calendar-token-但-agent-仍报无法连接">#</a></h4>
+<p><strong>解决方案:</strong> 三处同时断裂：FastMCP 只被实例化未调用 run()、.claude/mcp_servers.json 缺失、butler 指令（含 MCP tools 列表）从未传给 Claude CLI 子进程。新建 <strong>main</strong>.py 启动 stdio transport、新建 mcp_servers.json、ClaudeAdapter 添加 &ndash;append-system-prompt，19 个 MCP tools 全部恢复正常。</p>
+<p><strong>关键洞察:</strong> &ldquo;代码写了&quot;和&quot;代码被调用&quot;是两回事；factory 模式创建对象不等于服务启动；外部程序需要配置文件才能发现服务；App 验证层和 CLI 工具上下文注入是两个独立层，token 验证通过不代表 CLI 工具收到了正确的上下文。</p>
+<h4 id="4-linux-screen-time-tracker-初始方案使用-xdotool不支持-wayland用户机器运行-gnome-50-wayland">4. Linux Screen Time Tracker 初始方案使用 xdotool，不支持 Wayland（用户机器运行 GNOME 50 Wayland）<a hidden class="anchor" aria-hidden="true" href="#4-linux-screen-time-tracker-初始方案使用-xdotool不支持-wayland用户机器运行-gnome-50-wayland">#</a></h4>
+<p><strong>解决方案:</strong> 可行性探测确认 Wayland 环境，改用 GNOME Introspect D-Bus（org.gnome.Shell.Introspect.GetWindows()）作为主路径，xprop 作为 XWayland 回退，PID→cmdline 作为最终降级，所有 subprocess 调用加 5 秒超时 + proc.kill()。</p>
+<p><strong>关键洞察:</strong> GNOME 41+ 提供标准 Introspect D-Bus 接口，是 Wayland 下获取活跃窗口的正确方式；此问题由 Critic 子代理对抗审查主动发现，若遗漏会导致功能在用户机器上完全不可用。</p>
+<h4 id="5-aionui-无法通过-url-以外方式ssh连接远程-headless-服务器上的-claude-code-cli">5. AionUI 无法通过 URL 以外方式（SSH）连接远程 headless 服务器上的 Claude Code CLI<a hidden class="anchor" aria-hidden="true" href="#5-aionui-无法通过-url-以外方式ssh连接远程-headless-服务器上的-claude-code-cli">#</a></h4>
+<p><strong>解决方案:</strong> AionUI 远程 Agent 架构假定 Agent 暴露 HTTP 端口，CLI 进程无 HTTP 端点，根本上不兼容。建议 tmux/screen 管理多会话作为临时替代，并向 AionUI 团队提 feature request。</p>
+<p><strong>关键洞察:</strong> AionUI 数据库已有 remote_agents 表（含 allow_insecure 字段），说明开发团队正在构建远程 Agent 能力，SSH 直连可能是未来 roadmap 方向。</p>
+<h4 id="6-x11-wm-拒绝半出屏窗口定位导致吸附和收起位置漂移">6. X11 WM 拒绝半出屏窗口定位，导致吸附和收起位置漂移<a hidden class="anchor" aria-hidden="true" href="#6-x11-wm-拒绝半出屏窗口定位导致吸附和收起位置漂移">#</a></h4>
+<p><strong>解决方案:</strong> Mutter/GNOME 等 X11 WM 将无装饰窗口夹在可见区域内，拒绝 x &lt; 0 或 x &gt; screen_width - window_width 的定位。Linux 使用 edge_offset=0，macOS/Windows 使用 edge_offset=ball_size/2。</p>
+<p><strong>关键洞察:</strong> macOS 和 Windows 允许无装饰窗口部分超出屏幕边界，X11 WM 通常不允许，两个平台需要不同的边缘偏移量。</p>
+<h4 id="7-claudecliadapteris_available-缺少-async-导致-claude-静默降级到-codex-并超时">7. ClaudeCLIAdapter.is_available() 缺少 async 导致 Claude 静默降级到 Codex 并超时<a hidden class="anchor" aria-hidden="true" href="#7-claudecliadapteris_available-缺少-async-导致-claude-静默降级到-codex-并超时">#</a></h4>
+<p><strong>解决方案:</strong> await 普通方法不报编译错误，运行时 TypeError 被 except Exception 吞掉，Claude 被判定不可用。添加 async 关键字后 Claude available: True 恢复正常。</p>
+<p><strong>关键洞察:</strong> Python 中 await 同步方法产生 TypeError，若被宽泛 except Exception 静默捕获，会导致逻辑产生错误的 False 结果，表现为功能降级而非报错，极难排查。</p>
+<h4 id="8-多轮对话中-bot-无法理解跨轮指代dualverifier-参数接线断裂">8. 多轮对话中 bot 无法理解跨轮指代（DualVerifier 参数接线断裂）<a hidden class="anchor" aria-hidden="true" href="#8-多轮对话中-bot-无法理解跨轮指代dualverifier-参数接线断裂">#</a></h4>
+<p><strong>解决方案:</strong> DualVerifier、SemanticRouter、KeywordScorer 均已实现 last_assistant_message 和 last_intent 参数，但 _process_input() 调用时从未传递。修复接线即可，无需改任何分类逻辑。</p>
+<p><strong>关键洞察:</strong> &ldquo;功能已实现参数接口&quot;不等于&quot;参数已被传递&rdquo;；integration layer 是最常见的接线断裂点，验证时要检查调用侧而不只是实现侧。</p>
+<h4 id="9-codex-cli-session-resume-有-bug三个-cli-session-机制差异过大无法统一">9. Codex CLI session resume 有 bug，三个 CLI session 机制差异过大无法统一<a hidden class="anchor" aria-hidden="true" href="#9-codex-cli-session-resume-有-bug三个-cli-session-机制差异过大无法统一">#</a></h4>
+<p><strong>解决方案:</strong> 放弃依赖 CLI 原生 session，在 Adapter 层维护轻量历史 ring buffer（last-20 条），CLI 切换时将历史注入为 prompt 前缀，实现透明的跨 CLI 对话历史传递。</p>
+<p><strong>关键洞察:</strong> 统一抽象层（history injection）比适配各 CLI 的 session 机制更可靠，session 机制的不一致性是多 CLI 架构的主要隐患。</p>
+<h4 id="10-lark-oapi-websocket-client-阻塞式运行无法与-fastapi-asyncio-主循环共用">10. lark-oapi WebSocket client 阻塞式运行，无法与 FastAPI asyncio 主循环共用<a hidden class="anchor" aria-hidden="true" href="#10-lark-oapi-websocket-client-阻塞式运行无法与-fastapi-asyncio-主循环共用">#</a></h4>
+<p><strong>解决方案:</strong> 在独立 daemon 线程中启动飞书 bot，消息回调通过 asyncio.run_coroutine_threadsafe() 桥接到主 event loop。</p>
+<p><strong>关键洞察:</strong> lark-oapi v1.5.3 的 Client.start() 本质是同步阻塞的，必须线程隔离而非在 asyncio 任务中直接 await；此问题由 Critic agent 对抗审查预先发现。</p>
+<h4 id="11-webkitgtk-内部-scrolledwindow-滚动条无法用-css-抑制">11. WebKitGTK 内部 ScrolledWindow 滚动条无法用 CSS 抑制<a hidden class="anchor" aria-hidden="true" href="#11-webkitgtk-内部-scrolledwindow-滚动条无法用-css-抑制">#</a></h4>
+<p><strong>解决方案:</strong> WebKitGTK 滚动条属于 gtk::ScrolledWindow 层而非 WebKit 渲染树，CSS 伪元素无法触及。在 with_webview 回调中遍历 widget 祖先链，对每个 ScrolledWindow 调用 set_policy(Never, Never)。</p>
+<p><strong>关键洞察:</strong> WebKitGTK 的 UI chrome 属于 GTK widget 层，CSS 选择器无法选中，必须在 GTK 代码层处理。</p>
+<h4 id="12-openreview-api-对未认证访问全面返回-403neurips-db-track-审稿意见获取失败">12. OpenReview API 对未认证访问全面返回 403，NeurIPS D&amp;B Track 审稿意见获取失败<a hidden class="anchor" aria-hidden="true" href="#12-openreview-api-对未认证访问全面返回-403neurips-db-track-审稿意见获取失败">#</a></h4>
+<p><strong>解决方案:</strong> 识别两个叠加问题：OpenReview 近期收紧匿名访问策略（需账号认证）；NeurIPS D&amp;B Track 使用独立 venue ID 而非主会议子路径，两者叠加导致完全失效。当前阻塞，需 OPENREVIEW_USERNAME/OPENREVIEW_PASSWORD 环境变量。</p>
+<p><strong>关键洞察:</strong> OpenReview venue ID 体系中，卫星 track 使用独立 venue 而非 parent conference 路径，需单独确认 ID；近期 API 策略已全面收紧。</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="13-research-pipeline-重复执行导致-overviewmd-重复写入缓存命中旧结果导致依赖修复后仍使用空结果">13. Research pipeline 重复执行导致 overview.md 重复写入，缓存命中旧结果导致依赖修复后仍使用空结果<a hidden class="anchor" aria-hidden="true" href="#13-research-pipeline-重复执行导致-overviewmd-重复写入缓存命中旧结果导致依赖修复后仍使用空结果">#</a></h4>
+<p><strong>解决方案:</strong> 手动删除重复 block；手动清除 insight 缓存目录后重新运行。根本问题：auto-append 机制缺乏幂等性保护，缓存系统不感知依赖库安装状态变化。</p>
+<p><strong>关键洞察:</strong> 修复依赖后必须手动失效缓存；pipeline 应在写入前检查当日记录是否已存在。</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="gtk-根本原因定位与视觉缺陷发现">GTK 根本原因定位与视觉缺陷发现<a hidden class="anchor" aria-hidden="true" href="#gtk-根本原因定位与视觉缺陷发现">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>通过 backend.log 实证直接指出窗口实际 400x400 而非期望 112x112，问题不在几何算法而在 Linux 窗口尺寸层；观察到&quot;收起时先整体右移再缩小&quot;的两步现象，描述精确迫使 AI 解释机制。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 在无日志证据时错误假设 Tauri set_size() 有效，多次修复几何算法；因两阶段 collapse 有注释说明是有意为之，不会从用户视觉体验角度质疑其 Linux 适用性。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类通过日志实证推理和用户体验感知跳到根本原因；AI 从代码逻辑推断，缺乏运行时验证时容易在错误假设上反复迭代。</p>
+<h4 id="多轮修复失败后停止修复转向根因分析">多轮修复失败后停止修复转向根因分析<a hidden class="anchor" aria-hidden="true" href="#多轮修复失败后停止修复转向根因分析">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>在 WM clamp 问题多轮修复仍未解决后，明确要求&quot;不需要再修改，给我错误原因就可以&rdquo;，并最终归结为&quot;这个 WM 夹窗口有办法解决吗&quot;，隐含对底层平台限制的感知。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 每次看到新日志就继续尝试下一个技术方案，没有主动提出&quot;当前方向已达到边界&quot;，在被明确要求之前不会主动跳出单点修复思路。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类更早判断出&quot;继续迭代无效&quot;并主动要求架构性诊断；AI 缺乏在反复修复失败后主动建议停止并做架构总结的能力。</p>
+<h4 id="discord-bot-架构重构方向">Discord Bot 架构重构方向<a hidden class="anchor" aria-hidden="true" href="#discord-bot-架构重构方向">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>直接提议&quot;直接全部用 claude code cli 或者 codex cli 解决不就完事了吗？&quot;——一句话提出激进简化，扔掉整个意图路由引擎。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 详细分析了现有 3170 行架构的问题清单，但倾向在现有框架内优化，没有主动提出换引擎。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类提出激进简化方向，AI 初始倾向渐进优化。最终证明人类方向正确，删除代码远多于新增（-6061 vs +3238），项目得到本质性简化。</p>
+<h4 id="wayland-兼容性与-ai-分类成本的主动识别">Wayland 兼容性与 AI 分类成本的主动识别<a hidden class="anchor" aria-hidden="true" href="#wayland-兼容性与-ai-分类成本的主动识别">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类未主动提出这两个问题。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 通过 Critic 子代理主动发现 xdotool 不支持 Wayland，并主动识别每 30 秒调 LLM 的成本问题，提出应用名级缓存策略。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 这是 AI 独立发现的高价值问题，通过系统化对抗审查规避了功能在用户机器上完全不可用的风险。</p>
+<h4 id="让所有-cli-agent-获得-butler-指令的方案选择">让所有 CLI agent 获得 butler 指令的方案选择<a hidden class="anchor" aria-hidden="true" href="#让所有-cli-agent-获得-butler-指令的方案选择">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户直接提出&quot;你就自动为所有 agent 创建一个 agent.md 和一个 claude.md，这有什么难的&quot;——指出最简洁通用的方案。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 选择给 Claude 注入 &ndash;append-system-prompt 参数，未主动考虑 Codex/Gemini 可直接读约定文件的方案。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类看到更通用的方案（约定文件 &gt; 运行时注入）；AI 陷入&quot;如何注入&quot;而非&quot;能否约定&quot;的思维定式。</p>
+<h4 id="aionui-远程接入的真实需求与产品信息准确性">AionUI 远程接入的真实需求与产品信息准确性<a hidden class="anchor" aria-hidden="true" href="#aionui-远程接入的真实需求与产品信息准确性">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>明确表达核心需求是统一管理面板；直接纠正 AI 关于 Claude 200k context window 的过时信息（实际已更新至 1M）。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 最初专注技术方案（SSH 隧道、端口转发），未主动挖掘用户深层需求；以确定口吻陈述过时的模型规格。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户掌握比 AI 更新的产品信息；用户主动说出深层需求后 AI 才转向更有针对性的建议。</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>缺乏运行时实证时，错误假设底层 API（Tauri set_size、GTK gravity、Google Calendar calendarList scope）按预期工作，需要日志证据或用户报错才能纠正方向；多次修复几何算法而未质疑底层 OS 机制是否生效。</li>
+<li>多轮修复失败后未能主动识别&quot;继续修补不能解决架构性问题&quot;，每次看到新日志就继续尝试下一个技术方案，需要用户明确要求停止才会进行根因总结。</li>
+<li>引入新机制前未验证平台支持：GTK gravity 未确认 WM 是否支持（引入后反而产生系统性偏移）；透明安全边距方案引入后立即破坏拖拽和 WM clamp 两个问题，未在修改前预判副作用。</li>
+<li>对大型代码库全局依赖图感知不完整：ccplan Critic agent 发现了 AI 规划时遗漏的 4 个隐藏依赖（BackgroundCoordinator、slash 命令等）；并发/竞态修复容易遗漏边界情况（pointerUp 在异步初始化前触发的场景需追问才发现）。</li>
+<li>在快速迭代的产品领域提供过时或编造信息：编造了 AionUI 的 /model 和 /effort 斜杠命令（用户验证后失败），以确定口吻陈述 Claude 200k context window（实际已 1M），不应以确定口吻陈述快速更新的技术参数。</li>
+<li>对工具链外部 API 限制（OpenReview 403、lark-oapi 线程阻塞、Codex session bug）无法在规划阶段预见，需实际运行或 Critic 对抗审查才能发现；无法主动提供 OpenReview 认证墙的工作替代方案。</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>调查路径分散：面对多层断裂问题（日历无法连接、Discord 上下文异常）时从各个独立症状分别入手，未能快速从架构层面整体定位根因，需要多轮工具调用才汇聚到结论。</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>GTK 窗口尺寸控制机制全貌：GTK bottom-up 协商取 max(window_requested, widget_natural_size)；WebKitGTK natural size ≈200x200 logical，突破必须调用 widget.set_size_request()，Tauri 的 set_size/set_min_size/set_max_size 对 WebKitGTK 窗口无效；with_webview() 是异步派发，后续 Tauri API 调用会在回调执行前入队，FIFO 下可能锁死旧尺寸；WebKitGTK 滚动条属于 GTK widget 层，必须用 set_policy(Never, Never) 在 GTK 代码层禁用。</li>
+<li>Linux 透明无边框 Tauri/WebKitGTK 浮窗的架构性约束：WM、GTK、WebView 内容区三者尺寸/位置不会自动同步，这是平台约束而非 bug。正确架构应为固定大尺寸 native window + 内部纯 CSS 展开/收起，不依赖频繁 resize 外层窗口；GTK gravity 并非所有 WM 支持，用右边界坐标 move 会造成系统性偏移；probe + corrective reapply 无法消除用户可见的过渡帧；在 native 坐标层做可见 rect 和窗口 rect 分离会使拖拽起点和鼠标漂移。</li>
+<li>运行时日志是底层系统调试的根本手段：当出现 GTK、WM、OS 等底层系统行为时，应优先通过日志/探针实证确认假设，而非从代码推断；跨平台动画策略需整体一致，禁用 CSS 过渡的同时必须同步调整对应的 JS/Rust 时序逻辑；X11 WM 将无装饰窗口强制夹在可见区域内（edge_offset 需平台差异化），macOS/Windows 允许半出屏。</li>
+<li>NeurIPS D&amp;B Track 投稿策略：&ldquo;领域纠偏者&rdquo;（通过量化现有基准具体缺陷，如 57% 正确率，触发评估范式重构）比&quot;新方法提出者&quot;更容易被接受且影响力更持久；审稿人最重视多维度评估、公平基线对比、人工验证机制（κ≥0.68）和反直觉负面发现；反事实实体替换可消除词汇重叠偏差；符号化验证闭环（SPARQL/SQL 执行对比 + N 次自动修复）可将数据正确率从 57% 提升至 96%+；数据清洗可重构为无监督异常检测（Isolation Forest + Z-score 跨语言标准化）。</li>
+<li>激进简化（换掉引擎）往往比渐进修补更有效：Thin Adapter + MCP Server + Skills 三层模式替代专有路由逻辑，获得跨 CLI 通用性；大型重构应在编码前进行对抗性审查（Critic subagent），可提前发现隐藏依赖和架构风险，本日多项目中 Critic 阶段共发现 Wayland 兼容性、lark-oapi 线程阻塞、ThoughtStore 非单例、4 个隐藏代码依赖等高价值问题，ROI 极高。</li>
+<li>&ldquo;代码已实现参数接口&quot;不等于&quot;参数已被传递&rdquo;：integration layer 是最常见的接线断裂点，验证时要检查调用侧而非只看实现侧；FastMCP 的&quot;创建&quot;和&quot;serve&quot;是两步，同时需要 mcp_servers.json 声明外部程序才能发现；Python await 同步方法的 TypeError 若被 except Exception 吞掉会导致功能静默降级而非报错。</li>
+<li>现代 Linux 桌面（Ubuntu 22.04+）已默认使用 Wayland，跨平台窗口追踪方案必须以 GNOME Introspect D-Bus 为主路径，xdotool/xprop 只能作为 XWayland 回退；后台采样任务不应全部依赖 CronScheduler（最小 tick 60s），需要非整分钟周期的任务应用独立 asyncio.Task 循环；ECL 文档将设计决策结构化持久化，是多阶段复杂功能开发的关键工程实践。</li>
+<li>多 CLI 系统设计最佳实践：不同 CLI 工具（Claude Code/Codex/Gemini）各有约定指令文件（CLAUDE.md/AGENTS.md/GEMINI.md），利用约定文件比运行时注入更简单可靠；Skills 本质是 Markdown 提示词，跨平台迁移只需工具名称映射；App 状态验证与 CLI 工具上下文注入是两个独立层，token 验证通过不代表 CLI 工具收到了正确的上下文；统一 history ring buffer 比适配各 CLI session 机制更可靠。</li>
+<li>AionUI 远程 Agent 仅支持 URL 连接（CLI 进程无 HTTP 端点，架构层面根本限制），但 AionUI 数据库已有 remote_agents 表，SSH 直连可能是未来 roadmap；AI 在快速迭代的产品领域不应以确定口吻陈述技术参数（命令、模型规格），应声明知识截止时间并建议用户验证。</li>
+<li>lark-oapi WebSocket 正确架构：Client.start() 是阻塞式的，必须用独立 daemon 线程 + asyncio.run_coroutine_threadsafe() 桥接；Google Calendar OAuth scope 精细划分，验证 token 应用 events.list(calendarId=&lsquo;primary&rsquo;) 而非 calendarList.list()；日志级别是零成本可观测性杠杆，将 provider 错误从 DEBUG 改为 WARNING 立即显著改善运维体验。</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="tokenmonitor">TokenMonitor<a hidden class="anchor" aria-hidden="true" href="#tokenmonitor">#</a></h3>
+<p><strong>✅ FloatBall Linux 代码审查、四个 bug 修复与 GTK 根本问题（尺寸协商 + 收起序列）完整修复</strong>
+<em>19:42:04.443 | claude_code</em>
+用户请求解释 FloatBall Linux 逻辑后发现多处不准确，随即深入代码审查，识别并修复 4 个 bug（deferred reposition 缺失、多显示器方向误判、pointerdown 竞态含 pendingPointerId 补全、测试分叉）。随后报告 3 个新 Linux bug，AI 通过几何修复未解决根本问题。同事提供 backend.log 后确认 GTK bottom-up 尺寸协商为根本原因，通过 with_webview() 调用 widget.set_size_request() 修复，移除 set_resizable 切换，添加 GTK 层 ScrolledWindow set_policy 抑制滚动条。最终 CSS capsule 改 min(56px, 100%)，收起序列倒置（Linux 路径先 Rust 缩窗口再 CSS）消除两阶段跳变。全部测试通过，svelte-check 零错误。</p>
+<p><strong>🔄 Linux 浮球 WM clamp 定位问题：日志诊断与多轮调试，最终确认架构性限制</strong>
+<em>00:57:20.724 | codex</em>
+用户报告浮球在 Linux 上位置乱跳。AI 通过日志分析确认 WM 按旧 expanded 宽度 clamp 收起后坐标（系统性偏移 ~305px）。历经 GTK gravity（引入新偏移）、GDK move_resize、probe 纠偏（双帧闪烁）、透明安全边距（破坏鼠标跟手）等多轮修复均未彻底解决。用户要求停止修改后，AI 系统性总结根因：Linux 透明无边框 Tauri 浮窗缺乏单一可信几何真相源（WM/GTK/WebView 三层几何不同步），属架构性平台限制，正确方案为固定大尺寸窗口 + 内部 CSS 展开收起。</p>
+<h3 id="gadget-research-scout">Gadget Research Scout<a hidden class="anchor" aria-hidden="true" href="#gadget-research-scout">#</a></h3>
+<p><strong>🔄 NeurIPS 2025 D&amp;B Track 63 篇论文完整调研、5 篇深度分析与综合写作指南生成</strong>
+<em>20:18:09.048 | claude_code</em>
+在已有 nips2025-benchmark 项目基础上，修复 arxiv/openreview-py 依赖并清除 insight 缓存，三次运行 pipeline，完成 63 篇搜索/20 篇高相关筛选/5 篇（TTA-VLM、DATE-LM、CAB、KG-RAG Pitfalls、DCAD-2000）深度三维分析（写作结构/发表要素/知识提取），并生成涵盖五段式叙事、审稿关注点、可复用方法论的综合写作指南，同时生成 3 个可执行研究方向。OpenReview 审稿意见因 API 403 全面失败，需账号认证。</p>
+<h3 id="life-copilot">Life Copilot<a hidden class="anchor" aria-hidden="true" href="#life-copilot">#</a></h3>
+<p><strong>✅ Discord Bot 完整架构重构：从意图路由到多 CLI Agent 架构（规划 + 全量执行）</strong>
+<em>19:40:36.464 | claude_code</em>
+用户提议用 Claude/Codex/Gemini CLI 子进程替代 3170 行的复杂意图路由。经 ccplan 规划（含对抗性审查发现 7 个 critical/high 风险、Codex session bug 可行性探针）和 writing-plans 制定 18 个任务后，通过 subagent-driven-development 并行实现：CLIAdapter（三 CLI + fallback 链）、SessionManager（ring buffer 历史）、MCP Server（19 个工具）、Skills（4 个 SKILL.md）、Discord UI 通过 Skills JSON 协议解耦、slash 命令迁移、代码清理。全项目净删除 2823 行，419 个测试通过。</p>
+<p><strong>✅ Screen Time Tracker 完整需求规划与实现（ccplan 9 阶段 + 三波次并行子代理）</strong>
+<em>03:19:12.046 | claude_code</em>
+用户提出为 LifeCopilot 构建屏幕时间追踪功能。通过 ccplan 9 阶段规划，Critic 对抗审查发现 Wayland 兼容性等 32 个问题（含 event loop 阻塞），用户审批方案 1（EventBus 集成）。三波次并行子代理实现：抽象 PlatformTracker + GNOME Introspect D-Bus 主路径、AI 分类器（100+ 预置缓存）、日期分区 JSONL 存储、独立 asyncio.Task 采样循环，以及与 PreferenceLearner/ContextAssembler/BackgroundCoordinator 集成。26/26 测试通过，零回归。</p>
+<p><strong>✅ 修复重构后四项积累性 bug：MCP 未 serve、Claude async 缺失、butler 未注入、多轮上下文丢失</strong>
+<em>22:38:00.853 | claude_code</em>
+用户报告有 token 但 agent 说连不上日历，发现是三层同时断裂（MCP 未 run、缺 mcp_servers.json、butler 指令未传）。逐一修复后 19 个 MCP tools 全部可用。随后修复 ClaudeCLIAdapter async 缺失（Claude available: True 恢复），新增 ensure_instruction_files() 幂等生成 AGENTS.md/GEMINI.md，修复 _process_input 从未传递对话历史参数导致的跨轮指代失败。</p>
+<p><strong>✅ 飞书 Bot 快速想法捕获、Codex/Anthropic 后端接入与全链路 token 验证体系建立</strong>
+<em>03:15:58.220 | claude_code</em>
+三个功能整合实现：(1) ccplan 规划飞书 Bot，Critic 预先发现 lark-oapi 线程阻塞（critical）和 ThoughtStore 非单例（critical），实现 ThoughtCaptureService + AutoCategorizer + daemon 线程 asyncio 桥接 + REST API 三端点；(2) 新增 CodexProvider 和 AnthropicProvider，fallback 链扩展到 11 级；(3) key_validator.py 对所有服务做真实 API 验证，修复 Google Calendar scope 不匹配（calendarList → events.list），注册每日 06:00 重检 cron job。启动日志显示全服务验证状态。</p>
+<h3 id="aionui">AionUI<a hidden class="anchor" aria-hidden="true" href="#aionui">#</a></h3>
+<p><strong>🔍 AionUI 使用方式探索与远程 SSH 服务器接入可行性评估及 Skills 跨平台分析</strong>
+<em>19:36:59.842 | claude_code</em>
+用户在 AionUI 中询问模型切换（/model）和思考深度（/effort）指令，AI 给出的命令均无效（AI 承认系猜测），用户提出核心需求是统一管理面板接入远程 headless 服务器 Claude Code CLI。经技术方案探讨，确认 AionUI 远程 Agent 仅支持 URL 连接，架构上根本不兼容 CLI 进程。同时分析 Skills 跨平台本质（Markdown 提示词，跨平台迁移需工具名称映射）。建议 tmux 临时替代并提 feature request；AI 被纠正 Claude context window 已从 200k 更新至 1M。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="claude-code">Claude Code<a hidden class="anchor" aria-hidden="true" href="#claude-code">#</a></h3>
+<h4 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>135,084,309</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>43,775</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>419,203</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>5,687,355</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>128,933,976</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>95.8%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$95.9250</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>25,307</td>
+          <td>323,732</td>
+          <td>3,642,945</td>
+          <td>115,985,769</td>
+          <td>$88.9811</td>
+          <td>92.8%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>85</td>
+          <td>36,799</td>
+          <td>796,638</td>
+          <td>1,190,037</td>
+          <td>$3.8966</td>
+          <td>4.1%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>18,383</td>
+          <td>58,672</td>
+          <td>1,247,772</td>
+          <td>11,758,170</td>
+          <td>$3.0473</td>
+          <td>3.2%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="codex">Codex<a hidden class="anchor" aria-hidden="true" href="#codex">#</a></h3>
+<h4 id="总览-1">总览<a hidden class="anchor" aria-hidden="true" href="#总览-1">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>50,553,332</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>50,144,484</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>408,848</td>
+      </tr>
+      <tr>
+          <td>推理 Token</td>
+          <td>249,100</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>47,165,568</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$25.3714</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="模型明细-1">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细-1">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>推理</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>gpt-5.4</td>
+          <td>50,144,484</td>
+          <td>408,848</td>
+          <td>249,100</td>
+          <td>47,165,568</td>
+          <td>$25.3714</td>
+          <td>100.0%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+document.getElementById("lang-toggle").addEventListener("click", function() {
+    var current = this.getAttribute("data-current-lang");
+    var url = this.getAttribute("data-translation-url");
+    var newLang = (current === "en") ? "zh" : "en";
+    localStorage.setItem("pref-lang", newLang);
+    if (url) {
+        window.location.href = url;
+    } else {
+        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+    }
+});
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

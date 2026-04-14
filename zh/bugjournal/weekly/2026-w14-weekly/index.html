@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Weekly Summary 2026-W14 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal, Weekly Summary">
+<meta name="description" content="本周三条主线并行推进：MIHD多模态空间转录组论文准备（5天，DCC）完成TEDDY全量embedding benchmark、Leiden对比实验、HD融合评估与论文双语骨架写作，确立&quot;零样本FM嵌入融合&quot;差异化研究定位；TokenMonitor Linux FloatBall系统性修复（5天）历经多轮迭代从症状修复演进到固定窗口&#43;GDK Input Shape架构重构，同步完成PR #4全部21项代码审查问题；Life-Copilot Discord Bot完整重构（2天）净删2823行引入多CLI Agent架构，并落地屏幕时间追踪、飞书输入渠道、MCP工具集成等多项新功能。此外完成NeurIPS 2025 D&amp;B Track 63篇论文调研与新Linux工作站环境搭建。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/weekly/2026-w14-weekly/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/weekly/2026-w14-weekly/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/weekly/2026-w14-weekly/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    var stored = localStorage.getItem("pref-lang");
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/weekly/2026-w14-weekly/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Weekly Summary 2026-W14">
+  <meta property="og:description" content="本周三条主线并行推进：MIHD多模态空间转录组论文准备（5天，DCC）完成TEDDY全量embedding benchmark、Leiden对比实验、HD融合评估与论文双语骨架写作，确立&#34;零样本FM嵌入融合&#34;差异化研究定位；TokenMonitor Linux FloatBall系统性修复（5天）历经多轮迭代从症状修复演进到固定窗口&#43;GDK Input Shape架构重构，同步完成PR #4全部21项代码审查问题；Life-Copilot Discord Bot完整重构（2天）净删2823行引入多CLI Agent架构，并落地屏幕时间追踪、飞书输入渠道、MCP工具集成等多项新功能。此外完成NeurIPS 2025 D&amp;B Track 63篇论文调研与新Linux工作站环境搭建。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-04-05T23:59:00-05:00">
+    <meta property="article:modified_time" content="2026-04-05T23:59:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Weekly Summary 2026-W14">
+  <meta name="twitter:description" content="本周三条主线并行推进：MIHD多模态空间转录组论文准备（5天，DCC）完成TEDDY全量embedding benchmark、Leiden对比实验、HD融合评估与论文双语骨架写作，确立&#34;零样本FM嵌入融合&#34;差异化研究定位；TokenMonitor Linux FloatBall系统性修复（5天）历经多轮迭代从症状修复演进到固定窗口&#43;GDK Input Shape架构重构，同步完成PR #4全部21项代码审查问题；Life-Copilot Discord Bot完整重构（2天）净删2823行引入多CLI Agent架构，并落地屏幕时间追踪、飞书输入渠道、MCP工具集成等多项新功能。此外完成NeurIPS 2025 D&amp;B Track 63篇论文调研与新Linux工作站环境搭建。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "每周总结",
+      "item": "https://tzj2006.github.io/zh/bugjournal/weekly/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Weekly Summary 2026-W14",
+      "item": "https://tzj2006.github.io/zh/bugjournal/weekly/2026-w14-weekly/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Weekly Summary 2026-W14",
+  "name": "Weekly Summary 2026-W14",
+  "description": "本周三条主线并行推进：MIHD多模态空间转录组论文准备（5天，DCC）完成TEDDY全量embedding benchmark、Leiden对比实验、HD融合评估与论文双语骨架写作，确立\u0026quot;零样本FM嵌入融合\u0026quot;差异化研究定位；TokenMonitor Linux FloatBall系统性修复（5天）历经多轮迭代从症状修复演进到固定窗口+GDK Input Shape架构重构，同步完成PR #4全部21项代码审查问题；Life-Copilot Discord Bot完整重构（2天）净删2823行引入多CLI Agent架构，并落地屏幕时间追踪、飞书输入渠道、MCP工具集成等多项新功能。此外完成NeurIPS 2025 D\u0026amp;B Track 63篇论文调研与新Linux工作站环境搭建。",
+  "keywords": [
+    "Bug Journal", "Weekly Summary"
+  ],
+  "articleBody": "周报 — 2026-W14 (2026-03-30 ~ 2026-04-05) 本周三条主线并行推进：MIHD多模态空间转录组论文准备（5天，DCC）完成TEDDY全量embedding benchmark、Leiden对比实验、HD融合评估与论文双语骨架写作，确立\"零样本FM嵌入融合\"差异化研究定位；TokenMonitor Linux FloatBall系统性修复（5天）历经多轮迭代从症状修复演进到固定窗口+GDK Input Shape架构重构，同步完成PR #4全部21项代码审查问题；Life-Copilot Discord Bot完整重构（2天）净删2823行引入多CLI Agent架构，并落地屏幕时间追踪、飞书输入渠道、MCP工具集成等多项新功能。此外完成NeurIPS 2025 D\u0026B Track 63篇论文调研与新Linux工作站环境搭建。\n本周概览 指标 数值 日期范围 2026-03-30 ~ 2026-04-05 活跃天数 7 / 7 总对话数 29 涉及项目 12 完成任务 44 进行中任务 9 总 Token 328,660,991 总费用 $218.53 Claude Code Token 273,046,863 Claude Code 费用 $189.80 Codex Token 55,614,128 Codex 费用 $28.73 日均费用 $31.22 项目进展 MIHD多模态空间转录组论文 (5 天活跃) — 🔄 active 完成项:\n完成TEDDY-G 400M全量11切片embedding提取与多策略评估，确认STAIG框架对gene encoder具高度鲁棒性（Teddy ARI=0.495 vs PCA ARI=0.497） 集成Leiden聚类（二分搜索匹配n_clusters）和STHD病理GT，完成DLPFC全量Leiden对比（9/9组），核心结论：高质量embedding优于聚类方法选择（STAIG+mclust=0.546 vs STAIG+Leiden=0.513） 完成HD 13种融合策略评估，获关键负面发现：简单融合（concat ARI=0.191）低于单模态PCA（ARI=0.351），adaln在HD大规模数据崩溃（ARI=0.003） 确立论文核心叙事框架（Setting=零样本FM嵌入融合无系统研究/Finding=融合策略»编码器、简单融合是陷阱、空间图学习是关键/Application=跨切片检索），参照Yuan et al. 2024 Nature Methods创建完整双语论文骨架 创建4个GPU Slurm作业脚本和3个论文分析脚本（跨切片Query汇总、Fig可视化、HD Marker Gene可视化），重组docs/文件夹并归档12个过期脚本 阻塞项:\n⚠️ basic_contrastive HD融合实验仍在运行（48h时限），HD学习式融合结果集未完整 ⚠️ 151676切片STAIG model collapse根因未深入分析，暂以跳过处理 TokenMonitor FloatBall Linux适配 (5 天活跃) — 🔄 active 完成项:\n修复Linux主窗口Wayland定位问题（强制GDK_BACKEND=x11回退XWayland） 完成PR #4全部21项代码审查修复：assert!()→Result传播、SSH锁跨异步边界、路径穿越白名单防护、I/O错误区分、Svelte 5双重fetch、FloatBall监听器竞态等，Rust零警告、199个前端测试通过 定位GTK尺寸协商根本问题（WebKitGTK natural size导致set_size()无效），通过with_webview()回调set_size_request()解决，同步修复deferred reposition、多显示器误判、pointerdown竞态、滚动条等系列问题 完成固定窗口+GDK Input Shape架构重构：窗口永久保持expanded尺寸，用cairo::Region控制点击穿透区域，删除约150行probe/corrective补丁代码，284 Rust+205前端测试通过 整理git历史（git reset –soft压缩24个commit为2个语义提交）推送GitHub，新Linux工作站构建v0.6.1（deb/rpm/AppImage） 阻塞项:\n⚠️ 固定窗口+GDK Input Shape方案等待最终真实设备运行时验证 ⚠️ Linux WM clamp的架构性约束（正确方案为固定大尺寸+内部CSS）待完整验证 Life-Copilot Discord Bot (2 天活跃) — 🔄 active 完成项:\n将3170行复杂意图路由完整重构为CLIAdapter+SessionManager+MCP Server（19个工具）+Skills（4个）架构，净删2823行，419个测试通过 实现Screen Time Tracker（GNOME Introspect D-Bus→xprop→cmdline三级降级，AI应用分类器，独立asyncio.Task采样循环，26/26测试通过） 集成飞书Bot快速想法捕获（daemon线程asyncio桥接解决lark-oapi阻塞，10类自动分类），新增Codex/Anthropic后端，fallback链扩展至11级 修复MCP工具调用两大叠加问题（claude -p需–mcp-config和–permission-mode bypassPermissions），新增structlog结构化日志+完整对话JSONL审计 阻塞项:\n⚠️ OpenReview审稿意见获取因API全面403阻塞，需OPENREVIEW_USERNAME/OPENREVIEW_PASSWORD环境变量 新Linux工作站环境搭建 (2 天活跃) — ✅ completed 完成项:\n完成系统全套初始化（NVIDIA驱动确认、Miniconda、SSH密钥迁移7个文件、TinyProxy代理、GitHub SSH验证），RTX 5090验证BF16=220 TFLOPS/s 配置gadget rclone双向同步（gdrive remote，覆盖summarize/research/website/test四类数据），安装Claude Code技能与12个插件 NeurIPS 2025 D\u0026B Track研究调研 (1 天活跃) — ✅ completed 完成项:\n在gadget research scout框架下分析63篇论文，深度分析5篇top论文，生成写作结构/发表要素/知识提取三维报告及综合写作指南 提炼3个可执行研究方向（VLM可信度多维评估基准、TTA与微调协同效应基准、在线持续学习时序基准） 关键任务 ✅ TokenMonitor PR #4全部21项代码审查修复 (2026-04-02) — 按CRITICAL/HIGH/MEDIUM优先级系统修复：assert!()改Result传播、SSH锁跨异步边界（Clone提前释放）、路径穿越白名单防护、I/O错误区分、Svelte 5双重fetch、FloatBall监听器竞态、NaiveDate overflow等，Rust零编译警告，199个前端测试通过 ✅ Life-Copilot Discord Bot对话系统完整重构 (2026-04-04) — 将3170行复杂意图路由替换为CLIAdapter+SessionManager+MCP Server+Skills四层架构，支持Claude/Codex/Gemini CLI fallback链，Skills JSON协议触发Discord UI解耦，净删2823行，419个测试通过 ✅ TokenMonitor FloatBall Linux GTK尺寸协商根本修复 (2026-04-04) — 定位WebKitGTK natural size导致set_size()无效的根本原因，通过with_webview()回调调用widget.set_size_request()解决，同步修复deferred reposition、多显示器展开方向误判、pointerdown竞态、GTK ScrolledWindow滚动条、收起两阶段跳变等系列问题，全部测试通过 🔄 TokenMonitor FloatBall Linux固定窗口+GDK Input Shape架构重构 (2026-04-05) — 将浮球从动态resize架构重构为固定expanded尺寸窗口+GDK input_shape_combine_region控制点击穿透，彻底消除WM +305px系统性偏移，删除约150行probe/corrective补丁代码，284 Rust+205前端测试通过，等待最终运行时验证 ✅ MIHD论文叙事线梳理与双语骨架创建 (2026-04-03) — 确立’零样本FM嵌入融合’差异化研究定位，设计Setting+Finding+Application三层叙事（简单融合是陷阱→空间图学习是桥梁→正确融合超越单模态），参照Yuan et al. 2024 Nature Methods创建完整双语论文骨架（含Abstract/Introduction/Results R1-R6/Discussion/Methods） ✅ Leiden vs KMeans全量对比实验 (2026-04-01) — 完成9/9组合Leiden聚类对比，核心结论：STAIG+mclust(0.546) \u003e STAIG+Leiden(0.513)，Leiden对弱embedding提升明显（+29%）但对强embedding几乎无额外收益（+6%），确立高质量embedding优于聚类方法选择的核心论点 ✅ MIHD论文Fig 1-6框架规划 (2026-03-31) — 参考MISO、STAIG、QueST、Yuan四篇竞争论文结构，规划Fig1=框架、Fig2=DLPFC benchmark、Fig3=消融、Fig4=HD应用、Fig5=跨切片Query、Fig6=Query生物发现，写入ECL YAML和plans.md ✅ Life-Copilot Screen Time Tracker全量实现 (2026-04-04) — 9阶段ccplan规划+Critic对抗审查（预发现Wayland兼容性等关键风险），实现GNOME Introspect D-Bus→xprop→cmdline三级降级窗口追踪，AI应用分类器（100+预置+持久化缓存），独立asyncio.Task采样循环，与ContextAssembler/BackgroundCoordinator集成，26/26测试通过 ✅ Life-Copilot Discord Bot MCP工具调用完整修复 (2026-04-05) — 修复两个叠加问题：claude -p需显式–mcp-config加载项目级MCP配置；非交互模式需–permission-mode bypassPermissions，–allowedTools通配符因与MCP server初始化存在竞争条件不可靠，通过直接运行claude -p命令复现permission_denials字段定位根因 ✅ NeurIPS 2025 D\u0026B Track系统性论文调研 (2026-04-04) — 搜索63篇论文，深度分析5篇top论文（TTA-VLM、DATE-LM、CAB、KG-RAG Pitfalls、DCAD-2000），生成写作结构/发表要素/知识提取三维分析报告及综合写作指南，提炼3个可执行研究方向 ✅ Teddy + STAIG融合评估（全量11切片） (2026-03-30) — 完成10/11切片评估（151676 model collapse跳过），Avg ARI=0.495，对比PCA+STAIG的0.497，NMI上Teddy 6/10切片胜出，揭示STAIG框架对gene encoder的高度鲁棒性，为后续替换编码器策略提供实验依据 ✅ Life-Copilot飞书Bot+Codex/Anthropic后端+全链路token验证 (2026-04-04) — 实现ThoughtCaptureService共享服务层+AutoCategorizer（10类中英文）+daemon线程asyncio桥接；新增CodexProvider和AnthropicProvider，fallback链扩展至11级；新建key_validator.py对所有服务做真实API验证，修复Google Calendar scope不匹配 ✅ FEAT-003: STHD Ground Truth集成 (2026-03-31) — 新增_load_sthd_annotations()函数，自动加载545913条标注，CE+Tumor合并（Neoplasm+Non-neoplastic Epithelium→Epithelium），17502/17502 spots 100%匹配，3个有效clusters，为HD ARI/NMI评估提供GT基础 ✅ TokenMonitor Linux主窗口Wayland定位修复 (2026-04-02) — 定位Wayland协议级禁止客户端设置绝对位置，在run()入口检测WAYLAND_DISPLAY后强制设置GDK_BACKEND=x11使应用通过XWayland运行，283个Rust测试通过 ✅ MIHD GPU Slurm脚本与论文分析脚本批量创建 (2026-04-02) — 并行创建4个独立Slurm GPU作业脚本（STAIG/contrastive/LLaVA/AdaLN）及3个Python分析脚本（跨切片Query汇总、论文Figure可视化、HD Marker Gene可视化），所有脚本通过语法验证 ✅ Life-Copilot结构化日志与操作审计系统 (2026-04-05) — 用structlog替换stdlib logging，实现dev彩色输出+prod JSON格式+10MB rotation，新建audit_log.py在Discord on_message、FastAPI中间件、CLISelector.send三处写入完整对话JSONL审计记录，修复ExtraAdder遗漏，420个测试通过 ✅ TEDDY-G 400M全量embedding提取（11切片） (2026-03-30) — 在conda teddy环境中为DLPFC 11个切片提取1024d gene embedding并缓存至embeddings_cache/gene/teddy/，总计185MB，同步提取UNI2 staig_strict视觉特征（256×256 patch、无ImageNet归一化、频域滤波） 🔄 HD学习式融合GPU实验 (2026-04-01) — staig(ARI=0.258)/llava(ARI=0.201)/adaln(ARI=0.003)已完成，basic_contrastive仍在运行（48h时限）。获关键负面发现：adaln在HD大规模数据（17502 spots）完全崩溃，揭示数据规模是融合方法选择的关键变量 ✅ docs/文件夹重组与代码差距分析 (2026-04-03) — 归档5个过期文档，创建docs/paper/figures/三层目录结构，系统分析draft_en.md所需能力vs现有代码，归档12个过期脚本，规划Leiden结果恢复脚本、figure生成脚本、空间连续性指标和多seed支持4个代码任务 问题与解决方案 1. GTK bottom-up尺寸协商导致FloatBall窗口恒为400x400，Tauri set_size()完全无效 [TokenMonitor] (2026-04-04) 解决方案: 通过with_webview()回调在GTK主线程调用widget.set_size_request()突破WebKitGTK natural size约束；移除set_resizable切换（with_webview是异步派发，后续API调用会在回调执行前入队会锁死旧尺寸），Linux永久保持resizable\n2. Linux透明无边框窗口动态resize导致WM系统性+305px/+113px位置偏移，probe/corrective机制产生可见闪烁，WebView与native window尺寸不一致 [TokenMonitor] (2026-04-05) 解决方案: 架构重构为固定expanded尺寸窗口+GDK input_shape_combine_region：collapsed时仅球区域（56×56）接受事件，展开及拖拽时全窗口接受，彻底消除resize操作，删除150行补丁代码\n3. Linux/Wayland上Tauri主窗口set_position()被合成器完全忽略，窗口出现在屏幕中央 [TokenMonitor] (2026-04-02) 解决方案: 在run()入口检测WAYLAND_DISPLAY后强制设置GDK_BACKEND=x11，使应用通过XWayland运行，绕过Wayland协议层面禁止客户端设置绝对位置的根本限制\n4. ssh_remote.rs中assert!()在路径校验失败时panic崩溃整个程序，provider参数未校验可用于路径穿越攻击 [TokenMonitor] (2026-04-02) 解决方案: 函数签名改为Result，使用?传播错误；添加validate_provider()白名单函数（仅允许’claude’和’codex’）\n5. sync_ssh_host在持有RwLock读锁时跨越长达数秒的SSH I/O await点，阻塞所有读者 [TokenMonitor] (2026-04-02) 解决方案: 给SshCacheManager添加#[derive(Clone)]，在await前克隆manager提前释放锁\n6. Life-Copilot MCP服务三层同时断裂：FastMCP未调用run()、mcp_servers.json缺失、butler指令从未传给Claude CLI子进程 [Life-Copilot] (2026-04-04) 解决方案: 新建__main__.py启动stdio transport；新建.claude/mcp_servers.json；ClaudeAdapter添加–append-system-prompt参数；同时为Codex/Gemini创建约定文件（AGENTS.md/GEMINI.md），19个MCP工具全部恢复\n7. Discord Bot日程查询持续回复’需要OAuth认证’，根因为两个叠加问题：claude -p不加载项目级MCP配置+非交互模式权限被静默拒绝 [Life-Copilot] (2026-04-05) 解决方案: 命令中依次添加–mcp-config .claude/mcp_servers.json和–permission-mode bypassPermissions；–allowedTools通配符因与MCP server初始化竞争条件不可靠，bypassPermissions是后端服务调用的正确模式\n8. ClaudeCLIAdapter.is_available()缺少async，await同步方法产生TypeError被except Exception静默吞掉，导致Claude静默降级至Codex并超时 [Life-Copilot] (2026-04-04) 解决方案: 添加async关键字，Claude available: True恢复正常。同步修复多轮对话上下文丢失问题（_process_input从未传递last_assistant_message和last_intent参数）\n9. Linux Screen Time Tracker初始方案使用xdotool，在用户Wayland环境（GNOME）完全不可用 [Life-Copilot] (2026-04-04) 解决方案: 改用GNOME Introspect D-Bus（org.gnome.Shell.Introspect.GetWindows()）为主路径，xprop作为XWayland回退，PID→cmdline作为最终降级，所有subprocess调用加5秒超时+proc.kill()。此问题由Critic subagent对抗审查主动发现\n10. evaluation_planner.py对151676切片的staig_gene_feat缓存检查误报（硬编码检查3000个基因，实际文件为5000），导致Phase 2 sys.exit(1)终止 [MIHD] (2026-03-30) 解决方案: 修改has_staig_gene_feat检查逻辑，动态解析切片配置中的实际top_genes数量（来自staig_utils.py的num_gene字段）\n11. STAIG HD实验结果ARI=1.0异常，根因为旧缓存文件（staig_gene_feat缓存缺失导致实验静默失败但保留Feb 28旧npz文件） [MIHD] (2026-04-01) 解决方案: 排查npz文件时间戳确认旧缓存来源，手动准备HD STAIG基因特征缓存后删除旧npz重跑，同时识别pipeline的skip_completed机制无法检测内容无效文件的结构性缺陷\n12. Leiden clustering无法精确匹配n_clusters，与KMeans公平对比受限 [MIHD] (2026-03-31) 解决方案: 在cluster_with_leiden()中实现二分搜索：在[0.01, 10]区间最多20次迭代调整resolution直到cluster数匹配，利用resolution与cluster数的单调关系高效收敛\n13. lark-oapi WebSocket客户端阻塞式运行，Client.start()与FastAPI asyncio主循环冲突 [Life-Copilot] (2026-04-04) 解决方案: 在独立daemon线程中启动飞书bot，消息回调通过asyncio.run_coroutine_threadsafe()桥接到主event loop；此问题由Critic subagent对抗审查预先发现\n学习收获 架构 (architecture) Linux透明无边框Tauri/WebKitGTK浮窗的正确架构是固定大尺寸native window+内部纯CSS展开/收起，不依赖频繁resize外层窗口。GTK bottom-up协商取max(window_requested, widget_natural_size)，必须通过with_webview()回调调用widget.set_size_request()才能突破WebKitGTK natural size约束；WM、GTK、WebView内容区三者尺寸/位置不会自动同步，这是平台约束而非bug Wayland协议在设计层面禁止客户端控制窗口绝对位置，任何set_position()重试策略都无效；正确解法是检测WAYLAND_DISPLAY后强制GDK_BACKEND=x11回退到XWayland。X11 WM将无装饰窗口强制夹在可见区域内，边缘偏移量需平台差异化（Linux edge_offset=0，macOS/Windows可半出屏） 激进简化往往比渐进修补更有效：Thin Adapter+MCP Server+Skills三层模式替代3170行专有路由逻辑，净删2823行并获得跨CLI通用性。多CLI系统应利用约定文件（CLAUDE.md/AGENTS.md/GEMINI.md）而非运行时注入，统一history ring buffer比适配各CLI session机制更可靠 Claude CLI -p非交互模式的MCP完整配置需两步：(1)显式传–mcp-config加载项目级工具；(2)添加–permission-mode bypassPermissions绕过权限确认。–allowedTools通配符在此模式下因与MCP server初始化存在竞争条件而不可靠，bypassPermissions是后端服务调用的正确模式 调试 (debugging) 运行时日志是底层系统调试的根本手段：当出现GTK、WM、OS等底层系统行为时，应优先通过日志/探针实证确认假设（如backend.log显示+305px系统性偏移）而非从代码推断。多轮修复失败后应主动识别’继续修补不能解决架构性问题’的边界，停止局部修复转向根因总结 ‘代码已实现参数接口’不等于’参数已被传递’：integration layer是最常见的接线断裂点，验证时要检查调用侧而非只看实现侧。Python中await同步方法产生TypeError，若被宽泛except Exception静默捕获，会导致功能静默降级而非报错，极难排查 调试嵌套进程CLI工具（主进程→Claude CLI→MCP server）时，先记录实际传递的命令行参数再逐一隔离验证参数效果，比直接猜测参数行为更高效。pipeline的skip_completed机制无法检测内容无效（gt_labels全为-1）的文件，需主动校验内容合法性 工具 (tools) ccplan技能的发散探索（多方案）+Critic对抗审查+可行性探测流程能有效将复杂平台架构问题转化为可执行计划。本周Critic阶段共预先发现Wayland兼容性、lark-oapi线程阻塞、ThoughtStore非单例、4个隐藏代码依赖等高价值问题，ROI极高，是处理不确定性高任务的关键工程实践 GDK input_shape_combine_region在X11层拦截事件，setPointerCapture不能越过它；拖拽场景需在Rust侧临时扩展input shape到全窗口。GTK的resizable(false) WM hint同时阻止用户拖拽和编程式set_size()，需要动态调整尺寸时必须临时解锁 Rust生产代码中assert!()和unwrap()在接受外部输入的路径上是潜在崩溃点，统一改为Result并用?传播。锁跨await点是异步编程中常见隐患，解法是在await前Clone出所需数据提前释放锁。任何拼接到文件路径的用户输入必须做白名单校验（比黑名单更可靠） structlog包装stdlib logging时需显式添加ExtraAdder() processor，否则extra={}字段静默丢失且无报错。git reset –soft是整理commit历史的高效方法，可将任意数量commit压缩为语义清晰的提交，适合CI环境和自动化工具 领域知识 (domain) MIHD核心实验结论：高质量embedding本身比聚类方法选择更重要（STAIG+mclust ARI=0.546 vs STAIG+Leiden=0.513）；STAIG融合框架对gene encoder具有高度鲁棒性（Teddy ARI=0.495 vs PCA ARI=0.497），空间图对比学习机制主导聚类性能，gene embedding质量的影响被大幅稀释 Foundation Model在跨域下游任务上存在系统性迁移损失（Teddy gene-only ARI=0.186不如PCA=0.255，优化目标不匹配）；HD维度不平衡问题（concat融合1586d=50d PCA+1536d UNI2反而差于单模态）；数据规模是关键变量（adaln在DLPFC有效但在HD 17502 spots完全崩溃） 多模态融合论文叙事需同等重视负面结果与正面结果。论文Setting应以研究空白定义（‘当前没有zero-shot FM融合的系统研究’）而非方法性能；单模态也能做检索这一反驳纳入核心论点可形成更强论证链（简单融合是陷阱→空间图学习是桥梁→正确融合才能超越单模态） NeurIPS D\u0026B Track投稿策略：‘领域纠偏者’（量化现有基准具体缺陷触发评估范式重构）比’新方法提出者’更容易被接受；审稿人最重视多维度评估、公平基线对比、人工验证机制（κ≥0.68）和反直觉负面发现。Nature Methods Analysis级别要求每个方法跑10次报mean±std、4维评估 现代Linux桌面（Ubuntu 22.04+）已默认Wayland，跨平台窗口追踪必须以GNOME Introspect D-Bus为主路径，xdotool/xprop仅作XWayland回退。后台采样任务不应依赖最小tick 60s的CronScheduler，非整分钟周期任务需独立asyncio.Task循环 AI 使用备注 有效模式:\n✓ Critic subagent对抗审查：在规划阶段主动发现Wayland兼容性、lark-oapi线程阻塞、ThoughtStore非单例、4个隐藏代码依赖等高价值架构风险，避免事后大规模返工，是本周多项目成功交付的关键 ✓ 并行subagent批量生成代码：同时创建多个分析脚本（跨切片Query汇总、Fig可视化、HD Marker Gene可视化），大幅缩短多任务串行时间 ✓ 系统化多层排查：从日志证据出发（backend.log的+305px偏移、permission_denials字段），逐层确认假设定位根因，在MCP三层断裂、GTK尺寸协商等复杂问题上表现突出 ✓ ccplan结构化规划将FloatBall Linux修复等复杂平台问题分解为6个备选方案，配合可行性探测后收敛最优解 ✓ ECL文档跨会话上下文持久化：FloatBall多天连续修复中，通过/compact恢复上下文，减少重复分析成本 局限性:\n✗ 缺乏运行环境时错误假设底层API（Tauri set_size、GTK gravity、Google Calendar calendarList scope）按预期工作，多次在错误层面迭代修复，需用户实测反馈或日志证据才能纠正方向 ✗ 多轮修复失败后未能主动识别’继续修补不能解决架构性问题’的边界，每次看到新日志就继续尝试下一方案，需用户明确要求才进行根因总结 ✗ 在快速迭代产品领域提供过时或编造信息（AionUI斜杠命令、Claude context window规格），不应以确定口吻陈述快速更新的技术参数 ✗ 缺乏本地环境感知，默认尝试从GitHub克隆已存在于本地的仓库，未优先搜索本地文件系统 ✗ git操作范围判断失误：在用户要求’回退本会话改动’时误用git stash影响所有未提交改动，险些造成历史工作丢失 ✗ 对大型代码库全局依赖感知不完整，integration layer的接线断裂（参数未传递）等问题需多轮排查才能定位 下周展望 下周重点四个方向：(1) MIHD论文——收集basic_contrastive HD实验最终结果完整HD评估表，推进代码差距任务（Leiden结果恢复脚本、figure生成脚本、空间连续性指标、多seed支持），启动论文图表生成与draft写作，目标达到可投稿草稿水平；(2) TokenMonitor——在真实Linux设备上最终验证固定窗口+GDK Input Shape方案，确认WM clamp问题根治，如验证通过提交PR合并，关闭Linux FloatBall修复这条持续近两周的长线任务；(3) Life-Copilot——获取OpenReview账号凭证解锁NeurIPS审稿意见获取功能，在生产环境验证Screen Time Tracker稳定性，持续观察11级fallback链在真实使用中的表现；(4) 研究探索——将NeurIPS D\u0026B Track调研结论转化为具体实验设计，评估VLM可信度多维评估基准的可行性，同时跟进AionUI远程SSH接入feature request进展。\nToken 用量统计 每日费用趋势 日期 Token (百万) 费用 ($) 2026-03-30 1.7 1.85 2026-03-31 43.2 25.94 2026-04-01 50.6 32.57 2026-04-02 4.4 4.69 2026-04-03 37.5 25.88 2026-04-04 185.6 121.30 2026-04-05 5.6 6.30 峰值日: 2026-04-04 — $121.30 / 185.6M tokens\nClaude Code 指标 数值 总 Token 273,046,863 输入 Token 107,256 输出 Token 749,686 Cache 创建 12,155,429 Cache 读取 260,034,492 总费用 $189.80 模型使用分布 模型 费用 ($) 输入 Token 输出 Token claude-opus-4-6 177.68 64,310 543,915 claude-haiku-4-5-20251001 8.22 42,861 168,972 claude-sonnet-4-6 3.90 85 36,799 Codex 指标 数值 总 Token 55,614,128 输入 Token 55,129,898 输出 Token 484,230 推理 Token 300,231 Cache 读取 51,714,048 总费用 $28.73 模型使用分布 模型 费用 ($) 输入 Token 输出 Token 推理 Token gpt-5.4 28.73 55,129,898 484,230 300,231 ",
+  "wordCount" : "729",
+  "inLanguage": "zh",
+  "datePublished": "2026-04-05T23:59:00-05:00",
+  "dateModified": "2026-04-05T23:59:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/weekly/2026-w14-weekly/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="zh"
+                        data-translation-url="https://tzj2006.github.io/bugjournal/weekly/2026-w14-weekly/">EN
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span>bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/zh/">主页</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/weekly/">每周总结</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Weekly Summary 2026-W14
+    </h1>
+    <div class="post-meta"><span title='2026-04-05 23:59:00 -0500 -0500'>2026年4月5日</span>&nbsp;·&nbsp;<span>4 分钟</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="周报--2026-w14-2026-03-30--2026-04-05">周报 — 2026-W14 (2026-03-30 ~ 2026-04-05)<a hidden class="anchor" aria-hidden="true" href="#周报--2026-w14-2026-03-30--2026-04-05">#</a></h1>
+<blockquote>
+<p>本周三条主线并行推进：MIHD多模态空间转录组论文准备（5天，DCC）完成TEDDY全量embedding benchmark、Leiden对比实验、HD融合评估与论文双语骨架写作，确立&quot;零样本FM嵌入融合&quot;差异化研究定位；TokenMonitor Linux FloatBall系统性修复（5天）历经多轮迭代从症状修复演进到固定窗口+GDK Input Shape架构重构，同步完成PR #4全部21项代码审查问题；Life-Copilot Discord Bot完整重构（2天）净删2823行引入多CLI Agent架构，并落地屏幕时间追踪、飞书输入渠道、MCP工具集成等多项新功能。此外完成NeurIPS 2025 D&amp;B Track 63篇论文调研与新Linux工作站环境搭建。</p>
+</blockquote>
+<h2 id="本周概览">本周概览<a hidden class="anchor" aria-hidden="true" href="#本周概览">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>日期范围</td>
+          <td>2026-03-30 ~ 2026-04-05</td>
+      </tr>
+      <tr>
+          <td>活跃天数</td>
+          <td>7 / 7</td>
+      </tr>
+      <tr>
+          <td>总对话数</td>
+          <td>29</td>
+      </tr>
+      <tr>
+          <td>涉及项目</td>
+          <td>12</td>
+      </tr>
+      <tr>
+          <td>完成任务</td>
+          <td>44</td>
+      </tr>
+      <tr>
+          <td>进行中任务</td>
+          <td>9</td>
+      </tr>
+      <tr>
+          <td>总 Token</td>
+          <td>328,660,991</td>
+      </tr>
+      <tr>
+          <td>总费用</td>
+          <td>$218.53</td>
+      </tr>
+      <tr>
+          <td>Claude Code Token</td>
+          <td>273,046,863</td>
+      </tr>
+      <tr>
+          <td>Claude Code 费用</td>
+          <td>$189.80</td>
+      </tr>
+      <tr>
+          <td>Codex Token</td>
+          <td>55,614,128</td>
+      </tr>
+      <tr>
+          <td>Codex 费用</td>
+          <td>$28.73</td>
+      </tr>
+      <tr>
+          <td>日均费用</td>
+          <td>$31.22</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="项目进展">项目进展<a hidden class="anchor" aria-hidden="true" href="#项目进展">#</a></h2>
+<h3 id="mihd多模态空间转录组论文-5-天活跃---active">MIHD多模态空间转录组论文 (5 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#mihd多模态空间转录组论文-5-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>完成TEDDY-G 400M全量11切片embedding提取与多策略评估，确认STAIG框架对gene encoder具高度鲁棒性（Teddy ARI=0.495 vs PCA ARI=0.497）</li>
+<li>集成Leiden聚类（二分搜索匹配n_clusters）和STHD病理GT，完成DLPFC全量Leiden对比（9/9组），核心结论：高质量embedding优于聚类方法选择（STAIG+mclust=0.546 vs STAIG+Leiden=0.513）</li>
+<li>完成HD 13种融合策略评估，获关键负面发现：简单融合（concat ARI=0.191）低于单模态PCA（ARI=0.351），adaln在HD大规模数据崩溃（ARI=0.003）</li>
+<li>确立论文核心叙事框架（Setting=零样本FM嵌入融合无系统研究/Finding=融合策略&raquo;编码器、简单融合是陷阱、空间图学习是关键/Application=跨切片检索），参照Yuan et al. 2024 Nature Methods创建完整双语论文骨架</li>
+<li>创建4个GPU Slurm作业脚本和3个论文分析脚本（跨切片Query汇总、Fig可视化、HD Marker Gene可视化），重组docs/文件夹并归档12个过期脚本</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ basic_contrastive HD融合实验仍在运行（48h时限），HD学习式融合结果集未完整</li>
+<li>⚠️ 151676切片STAIG model collapse根因未深入分析，暂以跳过处理</li>
+</ul>
+<h3 id="tokenmonitor-floatball-linux适配-5-天活跃---active">TokenMonitor FloatBall Linux适配 (5 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#tokenmonitor-floatball-linux适配-5-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>修复Linux主窗口Wayland定位问题（强制GDK_BACKEND=x11回退XWayland）</li>
+<li>完成PR #4全部21项代码审查修复：assert!()→Result传播、SSH锁跨异步边界、路径穿越白名单防护、I/O错误区分、Svelte 5双重fetch、FloatBall监听器竞态等，Rust零警告、199个前端测试通过</li>
+<li>定位GTK尺寸协商根本问题（WebKitGTK natural size导致set_size()无效），通过with_webview()回调set_size_request()解决，同步修复deferred reposition、多显示器误判、pointerdown竞态、滚动条等系列问题</li>
+<li>完成固定窗口+GDK Input Shape架构重构：窗口永久保持expanded尺寸，用cairo::Region控制点击穿透区域，删除约150行probe/corrective补丁代码，284 Rust+205前端测试通过</li>
+<li>整理git历史（git reset &ndash;soft压缩24个commit为2个语义提交）推送GitHub，新Linux工作站构建v0.6.1（deb/rpm/AppImage）</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ 固定窗口+GDK Input Shape方案等待最终真实设备运行时验证</li>
+<li>⚠️ Linux WM clamp的架构性约束（正确方案为固定大尺寸+内部CSS）待完整验证</li>
+</ul>
+<h3 id="life-copilot-discord-bot-2-天活跃---active">Life-Copilot Discord Bot (2 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#life-copilot-discord-bot-2-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>将3170行复杂意图路由完整重构为CLIAdapter+SessionManager+MCP Server（19个工具）+Skills（4个）架构，净删2823行，419个测试通过</li>
+<li>实现Screen Time Tracker（GNOME Introspect D-Bus→xprop→cmdline三级降级，AI应用分类器，独立asyncio.Task采样循环，26/26测试通过）</li>
+<li>集成飞书Bot快速想法捕获（daemon线程asyncio桥接解决lark-oapi阻塞，10类自动分类），新增Codex/Anthropic后端，fallback链扩展至11级</li>
+<li>修复MCP工具调用两大叠加问题（claude -p需&ndash;mcp-config和&ndash;permission-mode bypassPermissions），新增structlog结构化日志+完整对话JSONL审计</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ OpenReview审稿意见获取因API全面403阻塞，需OPENREVIEW_USERNAME/OPENREVIEW_PASSWORD环境变量</li>
+</ul>
+<h3 id="新linux工作站环境搭建-2-天活跃---completed">新Linux工作站环境搭建 (2 天活跃) — ✅ completed<a hidden class="anchor" aria-hidden="true" href="#新linux工作站环境搭建-2-天活跃---completed">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>完成系统全套初始化（NVIDIA驱动确认、Miniconda、SSH密钥迁移7个文件、TinyProxy代理、GitHub SSH验证），RTX 5090验证BF16=220 TFLOPS/s</li>
+<li>配置gadget rclone双向同步（gdrive remote，覆盖summarize/research/website/test四类数据），安装Claude Code技能与12个插件</li>
+</ul>
+<h3 id="neurips-2025-db-track研究调研-1-天活跃---completed">NeurIPS 2025 D&amp;B Track研究调研 (1 天活跃) — ✅ completed<a hidden class="anchor" aria-hidden="true" href="#neurips-2025-db-track研究调研-1-天活跃---completed">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>在gadget research scout框架下分析63篇论文，深度分析5篇top论文，生成写作结构/发表要素/知识提取三维报告及综合写作指南</li>
+<li>提炼3个可执行研究方向（VLM可信度多维评估基准、TTA与微调协同效应基准、在线持续学习时序基准）</li>
+</ul>
+<h2 id="关键任务">关键任务<a hidden class="anchor" aria-hidden="true" href="#关键任务">#</a></h2>
+<ul>
+<li>✅ <strong>TokenMonitor PR #4全部21项代码审查修复</strong> (2026-04-02) — 按CRITICAL/HIGH/MEDIUM优先级系统修复：assert!()改Result传播、SSH锁跨异步边界（Clone提前释放）、路径穿越白名单防护、I/O错误区分、Svelte 5双重fetch、FloatBall监听器竞态、NaiveDate overflow等，Rust零编译警告，199个前端测试通过</li>
+<li>✅ <strong>Life-Copilot Discord Bot对话系统完整重构</strong> (2026-04-04) — 将3170行复杂意图路由替换为CLIAdapter+SessionManager+MCP Server+Skills四层架构，支持Claude/Codex/Gemini CLI fallback链，Skills JSON协议触发Discord UI解耦，净删2823行，419个测试通过</li>
+<li>✅ <strong>TokenMonitor FloatBall Linux GTK尺寸协商根本修复</strong> (2026-04-04) — 定位WebKitGTK natural size导致set_size()无效的根本原因，通过with_webview()回调调用widget.set_size_request()解决，同步修复deferred reposition、多显示器展开方向误判、pointerdown竞态、GTK ScrolledWindow滚动条、收起两阶段跳变等系列问题，全部测试通过</li>
+<li>🔄 <strong>TokenMonitor FloatBall Linux固定窗口+GDK Input Shape架构重构</strong> (2026-04-05) — 将浮球从动态resize架构重构为固定expanded尺寸窗口+GDK input_shape_combine_region控制点击穿透，彻底消除WM +305px系统性偏移，删除约150行probe/corrective补丁代码，284 Rust+205前端测试通过，等待最终运行时验证</li>
+<li>✅ <strong>MIHD论文叙事线梳理与双语骨架创建</strong> (2026-04-03) — 确立&rsquo;零样本FM嵌入融合&rsquo;差异化研究定位，设计Setting+Finding+Application三层叙事（简单融合是陷阱→空间图学习是桥梁→正确融合超越单模态），参照Yuan et al. 2024 Nature Methods创建完整双语论文骨架（含Abstract/Introduction/Results R1-R6/Discussion/Methods）</li>
+<li>✅ <strong>Leiden vs KMeans全量对比实验</strong> (2026-04-01) — 完成9/9组合Leiden聚类对比，核心结论：STAIG+mclust(0.546) &gt; STAIG+Leiden(0.513)，Leiden对弱embedding提升明显（+29%）但对强embedding几乎无额外收益（+6%），确立高质量embedding优于聚类方法选择的核心论点</li>
+<li>✅ <strong>MIHD论文Fig 1-6框架规划</strong> (2026-03-31) — 参考MISO、STAIG、QueST、Yuan四篇竞争论文结构，规划Fig1=框架、Fig2=DLPFC benchmark、Fig3=消融、Fig4=HD应用、Fig5=跨切片Query、Fig6=Query生物发现，写入ECL YAML和plans.md</li>
+<li>✅ <strong>Life-Copilot Screen Time Tracker全量实现</strong> (2026-04-04) — 9阶段ccplan规划+Critic对抗审查（预发现Wayland兼容性等关键风险），实现GNOME Introspect D-Bus→xprop→cmdline三级降级窗口追踪，AI应用分类器（100+预置+持久化缓存），独立asyncio.Task采样循环，与ContextAssembler/BackgroundCoordinator集成，26/26测试通过</li>
+<li>✅ <strong>Life-Copilot Discord Bot MCP工具调用完整修复</strong> (2026-04-05) — 修复两个叠加问题：claude -p需显式&ndash;mcp-config加载项目级MCP配置；非交互模式需&ndash;permission-mode bypassPermissions，&ndash;allowedTools通配符因与MCP server初始化存在竞争条件不可靠，通过直接运行claude -p命令复现permission_denials字段定位根因</li>
+<li>✅ <strong>NeurIPS 2025 D&amp;B Track系统性论文调研</strong> (2026-04-04) — 搜索63篇论文，深度分析5篇top论文（TTA-VLM、DATE-LM、CAB、KG-RAG Pitfalls、DCAD-2000），生成写作结构/发表要素/知识提取三维分析报告及综合写作指南，提炼3个可执行研究方向</li>
+<li>✅ <strong>Teddy + STAIG融合评估（全量11切片）</strong> (2026-03-30) — 完成10/11切片评估（151676 model collapse跳过），Avg ARI=0.495，对比PCA+STAIG的0.497，NMI上Teddy 6/10切片胜出，揭示STAIG框架对gene encoder的高度鲁棒性，为后续替换编码器策略提供实验依据</li>
+<li>✅ <strong>Life-Copilot飞书Bot+Codex/Anthropic后端+全链路token验证</strong> (2026-04-04) — 实现ThoughtCaptureService共享服务层+AutoCategorizer（10类中英文）+daemon线程asyncio桥接；新增CodexProvider和AnthropicProvider，fallback链扩展至11级；新建key_validator.py对所有服务做真实API验证，修复Google Calendar scope不匹配</li>
+<li>✅ <strong>FEAT-003: STHD Ground Truth集成</strong> (2026-03-31) — 新增_load_sthd_annotations()函数，自动加载545913条标注，CE+Tumor合并（Neoplasm+Non-neoplastic Epithelium→Epithelium），17502/17502 spots 100%匹配，3个有效clusters，为HD ARI/NMI评估提供GT基础</li>
+<li>✅ <strong>TokenMonitor Linux主窗口Wayland定位修复</strong> (2026-04-02) — 定位Wayland协议级禁止客户端设置绝对位置，在run()入口检测WAYLAND_DISPLAY后强制设置GDK_BACKEND=x11使应用通过XWayland运行，283个Rust测试通过</li>
+<li>✅ <strong>MIHD GPU Slurm脚本与论文分析脚本批量创建</strong> (2026-04-02) — 并行创建4个独立Slurm GPU作业脚本（STAIG/contrastive/LLaVA/AdaLN）及3个Python分析脚本（跨切片Query汇总、论文Figure可视化、HD Marker Gene可视化），所有脚本通过语法验证</li>
+<li>✅ <strong>Life-Copilot结构化日志与操作审计系统</strong> (2026-04-05) — 用structlog替换stdlib logging，实现dev彩色输出+prod JSON格式+10MB rotation，新建audit_log.py在Discord on_message、FastAPI中间件、CLISelector.send三处写入完整对话JSONL审计记录，修复ExtraAdder遗漏，420个测试通过</li>
+<li>✅ <strong>TEDDY-G 400M全量embedding提取（11切片）</strong> (2026-03-30) — 在conda teddy环境中为DLPFC 11个切片提取1024d gene embedding并缓存至embeddings_cache/gene/teddy/，总计185MB，同步提取UNI2 staig_strict视觉特征（256×256 patch、无ImageNet归一化、频域滤波）</li>
+<li>🔄 <strong>HD学习式融合GPU实验</strong> (2026-04-01) — staig(ARI=0.258)/llava(ARI=0.201)/adaln(ARI=0.003)已完成，basic_contrastive仍在运行（48h时限）。获关键负面发现：adaln在HD大规模数据（17502 spots）完全崩溃，揭示数据规模是融合方法选择的关键变量</li>
+<li>✅ <strong>docs/文件夹重组与代码差距分析</strong> (2026-04-03) — 归档5个过期文档，创建docs/paper/figures/三层目录结构，系统分析draft_en.md所需能力vs现有代码，归档12个过期脚本，规划Leiden结果恢复脚本、figure生成脚本、空间连续性指标和多seed支持4个代码任务</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="1-gtk-bottom-up尺寸协商导致floatball窗口恒为400x400tauri-set_size完全无效-tokenmonitor-2026-04-04">1. GTK bottom-up尺寸协商导致FloatBall窗口恒为400x400，Tauri set_size()完全无效 [TokenMonitor] (2026-04-04)<a hidden class="anchor" aria-hidden="true" href="#1-gtk-bottom-up尺寸协商导致floatball窗口恒为400x400tauri-set_size完全无效-tokenmonitor-2026-04-04">#</a></h3>
+<p><strong>解决方案:</strong> 通过with_webview()回调在GTK主线程调用widget.set_size_request()突破WebKitGTK natural size约束；移除set_resizable切换（with_webview是异步派发，后续API调用会在回调执行前入队会锁死旧尺寸），Linux永久保持resizable</p>
+<h3 id="2-linux透明无边框窗口动态resize导致wm系统性305px113px位置偏移probecorrective机制产生可见闪烁webview与native-window尺寸不一致-tokenmonitor-2026-04-05">2. Linux透明无边框窗口动态resize导致WM系统性+305px/+113px位置偏移，probe/corrective机制产生可见闪烁，WebView与native window尺寸不一致 [TokenMonitor] (2026-04-05)<a hidden class="anchor" aria-hidden="true" href="#2-linux透明无边框窗口动态resize导致wm系统性305px113px位置偏移probecorrective机制产生可见闪烁webview与native-window尺寸不一致-tokenmonitor-2026-04-05">#</a></h3>
+<p><strong>解决方案:</strong> 架构重构为固定expanded尺寸窗口+GDK input_shape_combine_region：collapsed时仅球区域（56×56）接受事件，展开及拖拽时全窗口接受，彻底消除resize操作，删除150行补丁代码</p>
+<h3 id="3-linuxwayland上tauri主窗口set_position被合成器完全忽略窗口出现在屏幕中央-tokenmonitor-2026-04-02">3. Linux/Wayland上Tauri主窗口set_position()被合成器完全忽略，窗口出现在屏幕中央 [TokenMonitor] (2026-04-02)<a hidden class="anchor" aria-hidden="true" href="#3-linuxwayland上tauri主窗口set_position被合成器完全忽略窗口出现在屏幕中央-tokenmonitor-2026-04-02">#</a></h3>
+<p><strong>解决方案:</strong> 在run()入口检测WAYLAND_DISPLAY后强制设置GDK_BACKEND=x11，使应用通过XWayland运行，绕过Wayland协议层面禁止客户端设置绝对位置的根本限制</p>
+<h3 id="4-ssh_remoters中assert在路径校验失败时panic崩溃整个程序provider参数未校验可用于路径穿越攻击-tokenmonitor-2026-04-02">4. ssh_remote.rs中assert!()在路径校验失败时panic崩溃整个程序，provider参数未校验可用于路径穿越攻击 [TokenMonitor] (2026-04-02)<a hidden class="anchor" aria-hidden="true" href="#4-ssh_remoters中assert在路径校验失败时panic崩溃整个程序provider参数未校验可用于路径穿越攻击-tokenmonitor-2026-04-02">#</a></h3>
+<p><strong>解决方案:</strong> 函数签名改为Result&lt;PathBuf, String&gt;，使用?传播错误；添加validate_provider()白名单函数（仅允许&rsquo;claude&rsquo;和&rsquo;codex&rsquo;）</p>
+<h3 id="5-sync_ssh_host在持有rwlock读锁时跨越长达数秒的ssh-io-await点阻塞所有读者-tokenmonitor-2026-04-02">5. sync_ssh_host在持有RwLock读锁时跨越长达数秒的SSH I/O await点，阻塞所有读者 [TokenMonitor] (2026-04-02)<a hidden class="anchor" aria-hidden="true" href="#5-sync_ssh_host在持有rwlock读锁时跨越长达数秒的ssh-io-await点阻塞所有读者-tokenmonitor-2026-04-02">#</a></h3>
+<p><strong>解决方案:</strong> 给SshCacheManager添加#[derive(Clone)]，在await前克隆manager提前释放锁</p>
+<h3 id="6-life-copilot-mcp服务三层同时断裂fastmcp未调用runmcp_serversjson缺失butler指令从未传给claude-cli子进程-life-copilot-2026-04-04">6. Life-Copilot MCP服务三层同时断裂：FastMCP未调用run()、mcp_servers.json缺失、butler指令从未传给Claude CLI子进程 [Life-Copilot] (2026-04-04)<a hidden class="anchor" aria-hidden="true" href="#6-life-copilot-mcp服务三层同时断裂fastmcp未调用runmcp_serversjson缺失butler指令从未传给claude-cli子进程-life-copilot-2026-04-04">#</a></h3>
+<p><strong>解决方案:</strong> 新建__main__.py启动stdio transport；新建.claude/mcp_servers.json；ClaudeAdapter添加&ndash;append-system-prompt参数；同时为Codex/Gemini创建约定文件（AGENTS.md/GEMINI.md），19个MCP工具全部恢复</p>
+<h3 id="7-discord-bot日程查询持续回复需要oauth认证根因为两个叠加问题claude--p不加载项目级mcp配置非交互模式权限被静默拒绝-life-copilot-2026-04-05">7. Discord Bot日程查询持续回复&rsquo;需要OAuth认证&rsquo;，根因为两个叠加问题：claude -p不加载项目级MCP配置+非交互模式权限被静默拒绝 [Life-Copilot] (2026-04-05)<a hidden class="anchor" aria-hidden="true" href="#7-discord-bot日程查询持续回复需要oauth认证根因为两个叠加问题claude--p不加载项目级mcp配置非交互模式权限被静默拒绝-life-copilot-2026-04-05">#</a></h3>
+<p><strong>解决方案:</strong> 命令中依次添加&ndash;mcp-config .claude/mcp_servers.json和&ndash;permission-mode bypassPermissions；&ndash;allowedTools通配符因与MCP server初始化竞争条件不可靠，bypassPermissions是后端服务调用的正确模式</p>
+<h3 id="8-claudecliadapteris_available缺少asyncawait同步方法产生typeerror被except-exception静默吞掉导致claude静默降级至codex并超时-life-copilot-2026-04-04">8. ClaudeCLIAdapter.is_available()缺少async，await同步方法产生TypeError被except Exception静默吞掉，导致Claude静默降级至Codex并超时 [Life-Copilot] (2026-04-04)<a hidden class="anchor" aria-hidden="true" href="#8-claudecliadapteris_available缺少asyncawait同步方法产生typeerror被except-exception静默吞掉导致claude静默降级至codex并超时-life-copilot-2026-04-04">#</a></h3>
+<p><strong>解决方案:</strong> 添加async关键字，Claude available: True恢复正常。同步修复多轮对话上下文丢失问题（_process_input从未传递last_assistant_message和last_intent参数）</p>
+<h3 id="9-linux-screen-time-tracker初始方案使用xdotool在用户wayland环境gnome完全不可用-life-copilot-2026-04-04">9. Linux Screen Time Tracker初始方案使用xdotool，在用户Wayland环境（GNOME）完全不可用 [Life-Copilot] (2026-04-04)<a hidden class="anchor" aria-hidden="true" href="#9-linux-screen-time-tracker初始方案使用xdotool在用户wayland环境gnome完全不可用-life-copilot-2026-04-04">#</a></h3>
+<p><strong>解决方案:</strong> 改用GNOME Introspect D-Bus（org.gnome.Shell.Introspect.GetWindows()）为主路径，xprop作为XWayland回退，PID→cmdline作为最终降级，所有subprocess调用加5秒超时+proc.kill()。此问题由Critic subagent对抗审查主动发现</p>
+<h3 id="10-evaluation_plannerpy对151676切片的staig_gene_feat缓存检查误报硬编码检查3000个基因实际文件为5000导致phase-2-sysexit1终止-mihd-2026-03-30">10. evaluation_planner.py对151676切片的staig_gene_feat缓存检查误报（硬编码检查3000个基因，实际文件为5000），导致Phase 2 sys.exit(1)终止 [MIHD] (2026-03-30)<a hidden class="anchor" aria-hidden="true" href="#10-evaluation_plannerpy对151676切片的staig_gene_feat缓存检查误报硬编码检查3000个基因实际文件为5000导致phase-2-sysexit1终止-mihd-2026-03-30">#</a></h3>
+<p><strong>解决方案:</strong> 修改has_staig_gene_feat检查逻辑，动态解析切片配置中的实际top_genes数量（来自staig_utils.py的num_gene字段）</p>
+<h3 id="11-staig-hd实验结果ari10异常根因为旧缓存文件staig_gene_feat缓存缺失导致实验静默失败但保留feb-28旧npz文件-mihd-2026-04-01">11. STAIG HD实验结果ARI=1.0异常，根因为旧缓存文件（staig_gene_feat缓存缺失导致实验静默失败但保留Feb 28旧npz文件） [MIHD] (2026-04-01)<a hidden class="anchor" aria-hidden="true" href="#11-staig-hd实验结果ari10异常根因为旧缓存文件staig_gene_feat缓存缺失导致实验静默失败但保留feb-28旧npz文件-mihd-2026-04-01">#</a></h3>
+<p><strong>解决方案:</strong> 排查npz文件时间戳确认旧缓存来源，手动准备HD STAIG基因特征缓存后删除旧npz重跑，同时识别pipeline的skip_completed机制无法检测内容无效文件的结构性缺陷</p>
+<h3 id="12-leiden-clustering无法精确匹配n_clusters与kmeans公平对比受限-mihd-2026-03-31">12. Leiden clustering无法精确匹配n_clusters，与KMeans公平对比受限 [MIHD] (2026-03-31)<a hidden class="anchor" aria-hidden="true" href="#12-leiden-clustering无法精确匹配n_clusters与kmeans公平对比受限-mihd-2026-03-31">#</a></h3>
+<p><strong>解决方案:</strong> 在cluster_with_leiden()中实现二分搜索：在[0.01, 10]区间最多20次迭代调整resolution直到cluster数匹配，利用resolution与cluster数的单调关系高效收敛</p>
+<h3 id="13-lark-oapi-websocket客户端阻塞式运行clientstart与fastapi-asyncio主循环冲突-life-copilot-2026-04-04">13. lark-oapi WebSocket客户端阻塞式运行，Client.start()与FastAPI asyncio主循环冲突 [Life-Copilot] (2026-04-04)<a hidden class="anchor" aria-hidden="true" href="#13-lark-oapi-websocket客户端阻塞式运行clientstart与fastapi-asyncio主循环冲突-life-copilot-2026-04-04">#</a></h3>
+<p><strong>解决方案:</strong> 在独立daemon线程中启动飞书bot，消息回调通过asyncio.run_coroutine_threadsafe()桥接到主event loop；此问题由Critic subagent对抗审查预先发现</p>
+<h2 id="学习收获">学习收获<a hidden class="anchor" aria-hidden="true" href="#学习收获">#</a></h2>
+<h3 id="架构-architecture">架构 (architecture)<a hidden class="anchor" aria-hidden="true" href="#架构-architecture">#</a></h3>
+<ul>
+<li>Linux透明无边框Tauri/WebKitGTK浮窗的正确架构是固定大尺寸native window+内部纯CSS展开/收起，不依赖频繁resize外层窗口。GTK bottom-up协商取max(window_requested, widget_natural_size)，必须通过with_webview()回调调用widget.set_size_request()才能突破WebKitGTK natural size约束；WM、GTK、WebView内容区三者尺寸/位置不会自动同步，这是平台约束而非bug</li>
+<li>Wayland协议在设计层面禁止客户端控制窗口绝对位置，任何set_position()重试策略都无效；正确解法是检测WAYLAND_DISPLAY后强制GDK_BACKEND=x11回退到XWayland。X11 WM将无装饰窗口强制夹在可见区域内，边缘偏移量需平台差异化（Linux edge_offset=0，macOS/Windows可半出屏）</li>
+<li>激进简化往往比渐进修补更有效：Thin Adapter+MCP Server+Skills三层模式替代3170行专有路由逻辑，净删2823行并获得跨CLI通用性。多CLI系统应利用约定文件（CLAUDE.md/AGENTS.md/GEMINI.md）而非运行时注入，统一history ring buffer比适配各CLI session机制更可靠</li>
+<li>Claude CLI -p非交互模式的MCP完整配置需两步：(1)显式传&ndash;mcp-config加载项目级工具；(2)添加&ndash;permission-mode bypassPermissions绕过权限确认。&ndash;allowedTools通配符在此模式下因与MCP server初始化存在竞争条件而不可靠，bypassPermissions是后端服务调用的正确模式</li>
+</ul>
+<h3 id="调试-debugging">调试 (debugging)<a hidden class="anchor" aria-hidden="true" href="#调试-debugging">#</a></h3>
+<ul>
+<li>运行时日志是底层系统调试的根本手段：当出现GTK、WM、OS等底层系统行为时，应优先通过日志/探针实证确认假设（如backend.log显示+305px系统性偏移）而非从代码推断。多轮修复失败后应主动识别&rsquo;继续修补不能解决架构性问题&rsquo;的边界，停止局部修复转向根因总结</li>
+<li>&lsquo;代码已实现参数接口&rsquo;不等于&rsquo;参数已被传递&rsquo;：integration layer是最常见的接线断裂点，验证时要检查调用侧而非只看实现侧。Python中await同步方法产生TypeError，若被宽泛except Exception静默捕获，会导致功能静默降级而非报错，极难排查</li>
+<li>调试嵌套进程CLI工具（主进程→Claude CLI→MCP server）时，先记录实际传递的命令行参数再逐一隔离验证参数效果，比直接猜测参数行为更高效。pipeline的skip_completed机制无法检测内容无效（gt_labels全为-1）的文件，需主动校验内容合法性</li>
+</ul>
+<h3 id="工具-tools">工具 (tools)<a hidden class="anchor" aria-hidden="true" href="#工具-tools">#</a></h3>
+<ul>
+<li>ccplan技能的发散探索（多方案）+Critic对抗审查+可行性探测流程能有效将复杂平台架构问题转化为可执行计划。本周Critic阶段共预先发现Wayland兼容性、lark-oapi线程阻塞、ThoughtStore非单例、4个隐藏代码依赖等高价值问题，ROI极高，是处理不确定性高任务的关键工程实践</li>
+<li>GDK input_shape_combine_region在X11层拦截事件，setPointerCapture不能越过它；拖拽场景需在Rust侧临时扩展input shape到全窗口。GTK的resizable(false) WM hint同时阻止用户拖拽和编程式set_size()，需要动态调整尺寸时必须临时解锁</li>
+<li>Rust生产代码中assert!()和unwrap()在接受外部输入的路径上是潜在崩溃点，统一改为Result并用?传播。锁跨await点是异步编程中常见隐患，解法是在await前Clone出所需数据提前释放锁。任何拼接到文件路径的用户输入必须做白名单校验（比黑名单更可靠）</li>
+<li>structlog包装stdlib logging时需显式添加ExtraAdder() processor，否则extra={}字段静默丢失且无报错。git reset &ndash;soft是整理commit历史的高效方法，可将任意数量commit压缩为语义清晰的提交，适合CI环境和自动化工具</li>
+</ul>
+<h3 id="领域知识-domain">领域知识 (domain)<a hidden class="anchor" aria-hidden="true" href="#领域知识-domain">#</a></h3>
+<ul>
+<li>MIHD核心实验结论：高质量embedding本身比聚类方法选择更重要（STAIG+mclust ARI=0.546 vs STAIG+Leiden=0.513）；STAIG融合框架对gene encoder具有高度鲁棒性（Teddy ARI=0.495 vs PCA ARI=0.497），空间图对比学习机制主导聚类性能，gene embedding质量的影响被大幅稀释</li>
+<li>Foundation Model在跨域下游任务上存在系统性迁移损失（Teddy gene-only ARI=0.186不如PCA=0.255，优化目标不匹配）；HD维度不平衡问题（concat融合1586d=50d PCA+1536d UNI2反而差于单模态）；数据规模是关键变量（adaln在DLPFC有效但在HD 17502 spots完全崩溃）</li>
+<li>多模态融合论文叙事需同等重视负面结果与正面结果。论文Setting应以研究空白定义（&lsquo;当前没有zero-shot FM融合的系统研究&rsquo;）而非方法性能；单模态也能做检索这一反驳纳入核心论点可形成更强论证链（简单融合是陷阱→空间图学习是桥梁→正确融合才能超越单模态）</li>
+<li>NeurIPS D&amp;B Track投稿策略：&lsquo;领域纠偏者&rsquo;（量化现有基准具体缺陷触发评估范式重构）比&rsquo;新方法提出者&rsquo;更容易被接受；审稿人最重视多维度评估、公平基线对比、人工验证机制（κ≥0.68）和反直觉负面发现。Nature Methods Analysis级别要求每个方法跑10次报mean±std、4维评估</li>
+<li>现代Linux桌面（Ubuntu 22.04+）已默认Wayland，跨平台窗口追踪必须以GNOME Introspect D-Bus为主路径，xdotool/xprop仅作XWayland回退。后台采样任务不应依赖最小tick 60s的CronScheduler，非整分钟周期任务需独立asyncio.Task循环</li>
+</ul>
+<h2 id="ai-使用备注">AI 使用备注<a hidden class="anchor" aria-hidden="true" href="#ai-使用备注">#</a></h2>
+<p><strong>有效模式:</strong></p>
+<ul>
+<li>✓ Critic subagent对抗审查：在规划阶段主动发现Wayland兼容性、lark-oapi线程阻塞、ThoughtStore非单例、4个隐藏代码依赖等高价值架构风险，避免事后大规模返工，是本周多项目成功交付的关键</li>
+<li>✓ 并行subagent批量生成代码：同时创建多个分析脚本（跨切片Query汇总、Fig可视化、HD Marker Gene可视化），大幅缩短多任务串行时间</li>
+<li>✓ 系统化多层排查：从日志证据出发（backend.log的+305px偏移、permission_denials字段），逐层确认假设定位根因，在MCP三层断裂、GTK尺寸协商等复杂问题上表现突出</li>
+<li>✓ ccplan结构化规划将FloatBall Linux修复等复杂平台问题分解为6个备选方案，配合可行性探测后收敛最优解</li>
+<li>✓ ECL文档跨会话上下文持久化：FloatBall多天连续修复中，通过/compact恢复上下文，减少重复分析成本</li>
+</ul>
+<p><strong>局限性:</strong></p>
+<ul>
+<li>✗ 缺乏运行环境时错误假设底层API（Tauri set_size、GTK gravity、Google Calendar calendarList scope）按预期工作，多次在错误层面迭代修复，需用户实测反馈或日志证据才能纠正方向</li>
+<li>✗ 多轮修复失败后未能主动识别&rsquo;继续修补不能解决架构性问题&rsquo;的边界，每次看到新日志就继续尝试下一方案，需用户明确要求才进行根因总结</li>
+<li>✗ 在快速迭代产品领域提供过时或编造信息（AionUI斜杠命令、Claude context window规格），不应以确定口吻陈述快速更新的技术参数</li>
+<li>✗ 缺乏本地环境感知，默认尝试从GitHub克隆已存在于本地的仓库，未优先搜索本地文件系统</li>
+<li>✗ git操作范围判断失误：在用户要求&rsquo;回退本会话改动&rsquo;时误用git stash影响所有未提交改动，险些造成历史工作丢失</li>
+<li>✗ 对大型代码库全局依赖感知不完整，integration layer的接线断裂（参数未传递）等问题需多轮排查才能定位</li>
+</ul>
+<h2 id="下周展望">下周展望<a hidden class="anchor" aria-hidden="true" href="#下周展望">#</a></h2>
+<p>下周重点四个方向：(1) MIHD论文——收集basic_contrastive HD实验最终结果完整HD评估表，推进代码差距任务（Leiden结果恢复脚本、figure生成脚本、空间连续性指标、多seed支持），启动论文图表生成与draft写作，目标达到可投稿草稿水平；(2) TokenMonitor——在真实Linux设备上最终验证固定窗口+GDK Input Shape方案，确认WM clamp问题根治，如验证通过提交PR合并，关闭Linux FloatBall修复这条持续近两周的长线任务；(3) Life-Copilot——获取OpenReview账号凭证解锁NeurIPS审稿意见获取功能，在生产环境验证Screen Time Tracker稳定性，持续观察11级fallback链在真实使用中的表现；(4) 研究探索——将NeurIPS D&amp;B Track调研结论转化为具体实验设计，评估VLM可信度多维评估基准的可行性，同时跟进AionUI远程SSH接入feature request进展。</p>
+<h2 id="token-用量统计">Token 用量统计<a hidden class="anchor" aria-hidden="true" href="#token-用量统计">#</a></h2>
+<h3 id="每日费用趋势">每日费用趋势<a hidden class="anchor" aria-hidden="true" href="#每日费用趋势">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>日期</th>
+          <th>Token (百万)</th>
+          <th>费用 ($)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2026-03-30</td>
+          <td>1.7</td>
+          <td>1.85</td>
+      </tr>
+      <tr>
+          <td>2026-03-31</td>
+          <td>43.2</td>
+          <td>25.94</td>
+      </tr>
+      <tr>
+          <td>2026-04-01</td>
+          <td>50.6</td>
+          <td>32.57</td>
+      </tr>
+      <tr>
+          <td>2026-04-02</td>
+          <td>4.4</td>
+          <td>4.69</td>
+      </tr>
+      <tr>
+          <td>2026-04-03</td>
+          <td>37.5</td>
+          <td>25.88</td>
+      </tr>
+      <tr>
+          <td>2026-04-04</td>
+          <td>185.6</td>
+          <td>121.30</td>
+      </tr>
+      <tr>
+          <td>2026-04-05</td>
+          <td>5.6</td>
+          <td>6.30</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>峰值日:</strong> 2026-04-04 — $121.30 / 185.6M tokens</p>
+<h3 id="claude-code">Claude Code<a hidden class="anchor" aria-hidden="true" href="#claude-code">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>273,046,863</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>107,256</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>749,686</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>12,155,429</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>260,034,492</td>
+      </tr>
+      <tr>
+          <td>总费用</td>
+          <td>$189.80</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="模型使用分布">模型使用分布<a hidden class="anchor" aria-hidden="true" href="#模型使用分布">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>费用 ($)</th>
+          <th>输入 Token</th>
+          <th>输出 Token</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>177.68</td>
+          <td>64,310</td>
+          <td>543,915</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>8.22</td>
+          <td>42,861</td>
+          <td>168,972</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>3.90</td>
+          <td>85</td>
+          <td>36,799</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="codex">Codex<a hidden class="anchor" aria-hidden="true" href="#codex">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>55,614,128</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>55,129,898</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>484,230</td>
+      </tr>
+      <tr>
+          <td>推理 Token</td>
+          <td>300,231</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>51,714,048</td>
+      </tr>
+      <tr>
+          <td>总费用</td>
+          <td>$28.73</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="模型使用分布-1">模型使用分布<a hidden class="anchor" aria-hidden="true" href="#模型使用分布-1">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>费用 ($)</th>
+          <th>输入 Token</th>
+          <th>输出 Token</th>
+          <th>推理 Token</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>gpt-5.4</td>
+          <td>28.73</td>
+          <td>55,129,898</td>
+          <td>484,230</td>
+          <td>300,231</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+document.getElementById("lang-toggle").addEventListener("click", function() {
+    var current = this.getAttribute("data-current-lang");
+    var url = this.getAttribute("data-translation-url");
+    var newLang = (current === "en") ? "zh" : "en";
+    localStorage.setItem("pref-lang", newLang);
+    if (url) {
+        window.location.href = url;
+    } else {
+        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+    }
+});
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
