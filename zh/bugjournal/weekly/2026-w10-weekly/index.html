@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Weekly Summary 2026-W10 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal, Weekly Summary">
+<meta name="description" content="本周跨DCC、天河超算、TzJsDesktop三台设备，并行推进空间转录组研究、机器人操作训练/评估、AI个人助理、论文管理工具四条主线。MIHD项目完成scGPT&#43;UNI2全套融合实验（QFormer avg ARI=0.370，&#43;117% vs scGPT-only）并确立zero-shot跨样本评估框架；Pi0.5 LoRA精调以整体58.9%成功率全面超越BC-RNN（0%），定量验证VLA模型优势；CalendarPro完成从被动响应到主动决策的架构跃升（321个测试全绿），同时暴露并修复BackgroundCoordinator从未启动等关键集成缺陷；gadget Research Scout从零构建到生产就绪，单日内实现两阶段LLM论文评估管线并首次产出3条研究方向建议；error_recovery_benchmark完成65个symlink全量清理和错误场景MP4可视化基础设施建设。本周最重要的工程经验是：测试通过≠系统可用（集成层必须单独验证），以及设计Agentic系统前应主动研究成熟同类项目的架构模式。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/weekly/2026-w10-weekly/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/weekly/2026-w10-weekly/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/weekly/2026-w10-weekly/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    var stored = localStorage.getItem("pref-lang");
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/weekly/2026-w10-weekly/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Weekly Summary 2026-W10">
+  <meta property="og:description" content="本周跨DCC、天河超算、TzJsDesktop三台设备，并行推进空间转录组研究、机器人操作训练/评估、AI个人助理、论文管理工具四条主线。MIHD项目完成scGPT&#43;UNI2全套融合实验（QFormer avg ARI=0.370，&#43;117% vs scGPT-only）并确立zero-shot跨样本评估框架；Pi0.5 LoRA精调以整体58.9%成功率全面超越BC-RNN（0%），定量验证VLA模型优势；CalendarPro完成从被动响应到主动决策的架构跃升（321个测试全绿），同时暴露并修复BackgroundCoordinator从未启动等关键集成缺陷；gadget Research Scout从零构建到生产就绪，单日内实现两阶段LLM论文评估管线并首次产出3条研究方向建议；error_recovery_benchmark完成65个symlink全量清理和错误场景MP4可视化基础设施建设。本周最重要的工程经验是：测试通过≠系统可用（集成层必须单独验证），以及设计Agentic系统前应主动研究成熟同类项目的架构模式。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-08T23:59:00-05:00">
+    <meta property="article:modified_time" content="2026-03-08T23:59:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Weekly Summary 2026-W10">
+  <meta name="twitter:description" content="本周跨DCC、天河超算、TzJsDesktop三台设备，并行推进空间转录组研究、机器人操作训练/评估、AI个人助理、论文管理工具四条主线。MIHD项目完成scGPT&#43;UNI2全套融合实验（QFormer avg ARI=0.370，&#43;117% vs scGPT-only）并确立zero-shot跨样本评估框架；Pi0.5 LoRA精调以整体58.9%成功率全面超越BC-RNN（0%），定量验证VLA模型优势；CalendarPro完成从被动响应到主动决策的架构跃升（321个测试全绿），同时暴露并修复BackgroundCoordinator从未启动等关键集成缺陷；gadget Research Scout从零构建到生产就绪，单日内实现两阶段LLM论文评估管线并首次产出3条研究方向建议；error_recovery_benchmark完成65个symlink全量清理和错误场景MP4可视化基础设施建设。本周最重要的工程经验是：测试通过≠系统可用（集成层必须单独验证），以及设计Agentic系统前应主动研究成熟同类项目的架构模式。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "每周总结",
+      "item": "https://tzj2006.github.io/zh/bugjournal/weekly/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Weekly Summary 2026-W10",
+      "item": "https://tzj2006.github.io/zh/bugjournal/weekly/2026-w10-weekly/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Weekly Summary 2026-W10",
+  "name": "Weekly Summary 2026-W10",
+  "description": "本周跨DCC、天河超算、TzJsDesktop三台设备，并行推进空间转录组研究、机器人操作训练/评估、AI个人助理、论文管理工具四条主线。MIHD项目完成scGPT+UNI2全套融合实验（QFormer avg ARI=0.370，+117% vs scGPT-only）并确立zero-shot跨样本评估框架；Pi0.5 LoRA精调以整体58.9%成功率全面超越BC-RNN（0%），定量验证VLA模型优势；CalendarPro完成从被动响应到主动决策的架构跃升（321个测试全绿），同时暴露并修复BackgroundCoordinator从未启动等关键集成缺陷；gadget Research Scout从零构建到生产就绪，单日内实现两阶段LLM论文评估管线并首次产出3条研究方向建议；error_recovery_benchmark完成65个symlink全量清理和错误场景MP4可视化基础设施建设。本周最重要的工程经验是：测试通过≠系统可用（集成层必须单独验证），以及设计Agentic系统前应主动研究成熟同类项目的架构模式。",
+  "keywords": [
+    "Bug Journal", "Weekly Summary"
+  ],
+  "articleBody": "周报 — 2026-W10 (2026-03-02 ~ 2026-03-08) 本周跨DCC、天河超算、TzJsDesktop三台设备，并行推进空间转录组研究、机器人操作训练/评估、AI个人助理、论文管理工具四条主线。MIHD项目完成scGPT+UNI2全套融合实验（QFormer avg ARI=0.370，+117% vs scGPT-only）并确立zero-shot跨样本评估框架；Pi0.5 LoRA精调以整体58.9%成功率全面超越BC-RNN（0%），定量验证VLA模型优势；CalendarPro完成从被动响应到主动决策的架构跃升（321个测试全绿），同时暴露并修复BackgroundCoordinator从未启动等关键集成缺陷；gadget Research Scout从零构建到生产就绪，单日内实现两阶段LLM论文评估管线并首次产出3条研究方向建议；error_recovery_benchmark完成65个symlink全量清理和错误场景MP4可视化基础设施建设。本周最重要的工程经验是：测试通过≠系统可用（集成层必须单独验证），以及设计Agentic系统前应主动研究成熟同类项目的架构模式。\n本周概览 指标 数值 日期范围 2026-03-02 ~ 2026-03-08 活跃天数 7 / 7 总对话数 31 涉及项目 18 完成任务 51 进行中任务 11 总 Token 436,851,629 总费用 $306.71 Claude Code Token 424,137,873 Claude Code 费用 $302.72 Codex Token 12,713,756 Codex 费用 $3.99 日均费用 $43.82 项目进展 error_recovery_benchmark（机器人错误恢复基准） (5 天活跃) — 🔄 active 完成项:\nBC-RNN全量评估（5任务×50 rollout），通过代码追踪定位SR=0%根因为observation key bug，而非模型能力问题 项目全景总结.md系统性对齐（M14评估数据726 ep→6474 ep，Pipeline图补充VLA Rollout注入和自然失败捕获两条路径） 65个symlink全量清理（4路并行Agent覆盖9阶段），所有import路径迁移至error_benchmark.framework，127单元测试全绿 coffee/stack/three_piece_assembly三组任务错误场景MP4可视化，3块GPU并行产出9+支视频 pre-error轨迹回放存储层实现（action_history + initial_state入NPZ），为错误前5秒回放奠定基础 阻塞项:\n⚠️ pre-error可视化回放逻辑因context耗尽未完成 ⚠️ BC-RNN observation key bug的正式修复尚未实施 ⚠️ three_piece_assembly injection模式有效场景为零（底座物理过稳），需调整冲量力参数 MIHD（多模态空间转录组融合） (4 天活跃) — 🔄 active 完成项:\n完成scGPT+UNI2五种融合策略全套实验，QFormer avg ARI=0.370（+117%），LLaVA-MLP次之（0.316），均显著优于scGPT-only（0.170） 三层代码追踪发现STAIG实际不使用gene encoder输出（使用原始HVG作为GCN输入），改进应从GNN结构入手 实现跨样本RM-IDEAL benchmark脚本（781行），添加零嵌入运行时检测，完成151673↔151508双向7层评估 Layer_1/5表现优异（Spearman 0.42-0.66），中间层（Layer_3/6）出现负相关，揭示过渡层的嵌入空间局限性 确立zero-shot差异化叙事框架（与STAIG训练依赖方法形成本质对比），完成周一汇报准备 分析QueST论文跨样本评估方法（WWL Graph Kernel构造pseudo ground truth），撰写Cross-Sample Patch Query方法文档（459行） Pi0.5 LoRA训练与评估（天河集群） (4 天活跃) — 🔄 active 完成项:\nBatchedVLAServer并行评估9任务（44分钟），整体SR=58.9%（Stack_D0 100%、Stack_D1 95%、StackThree 80-90%） 三层证据确认所有训练正确使用pi05_base初始化权重（config.py weight_loader + 训练日志 + 对比组） 修复eval pipeline多个关键问题：websocket ping_timeout=None（JAX JIT编译超时）、JIT并发崩溃（错峰启动） 定量确认VLA推理GPU利用率10%根本原因为action chunking，多client并发反比串行慢24% 双节点（an49/an53）9任务续训恢复，从最高step 18000无损继续 阻塞项:\n⚠️ BatchedVLAServer批量推理优化方案设计完成但未落地 ⚠️ 演示视频渲染待确认最终评估结果后执行 CalendarPro（个人智能管家） (3 天活跃) — 🔄 active 完成项:\n参考OpenClaw/GSD架构模式完成整体设计，实现16个新服务文件（GapAnalyzer/AutonomousExecutor/SituationMonitor等），321个测试全绿 修复BackgroundCoordinator.start_all()从未被调用的关键集成缺陷（所有后台服务从未在生产中运行） 补全9个IntentType的Discord Bot Handler，消除意图路由断层 消除16处静默异常（except: pass），删除executor.py死代码并实现真实分发逻辑 452条utterances外部化至JSON，实现UtteranceAugmenter从mismatch日志自动学习（每日2AM定时增广） 编写1674行中文完整使用教程，完成Discord bot上下文感知bug三处根因定位 阻塞项:\n⚠️ 上下文感知bug修复方案已设计（general_keywords精简 + LLM传对话历史 + 语义路由重设）但未实施 Phoenix/FLARE/zhaoganlong框架（机器人训练基础设施） (3 天活跃) — 🔄 active 完成项:\nzhaoganlong 9任务数据准备4步流水线完整执行（5Hz标注→speed dataset→LLaVA JSON 103万条→RGB渲染约100万张） Diffusion Policy（GPU 0单卡）和Pi0.5（GPU 2+3 FSDP）在an53成功启动训练 Phoenix/FLARE代码库从混合库分离为独立项目，155GB降至37MB（符号链接共享大型数据集） 开发6个全任务训练脚本套件，补充3个缺失OpenPI warmup配置 修复Openpi-moe norm_stats/prev_actions归一化隐患（apply_tree静默跳过机制） 阻塞项:\n⚠️ LLaVA MPM训练阻塞：集群无网络访问，缺少liuhaotian/llava-v1.5-7b基础模型，待确认cpx2用户本地副本完整性 gadget/Research Scout（论文管理系统） (2 天活跃) — ✅ completed 完成项:\n从零实现Research Scout完整功能（~2650行）：6命令CLI、arXiv多源搜索、两阶段LLM评估Pipeline 首次完整验证运行，产出3条可执行研究方向（生成式数字孪生场景基准、人类视频恢复原语、文档引导操作） 实现_resolve_param()四层优先级配置、会议论文专项搜索（arXiv comment字段）、作者搜索（au:查询） 实现搜索去重早停（连续5篇已知论文阈值），init –from-overview自动从已有文档提取项目信息 VLA-RoboTwin（机器人操作数据采集） (2 天活跃) — 🔄 active 完成项:\n修复RoboTwin在无头Docker环境的Vulkan渲染失败（从官方.run包提取用户态GL库→三环境变量注入，无需root） 为10个机器人操作任务实现关键区域标注系统，发现critical_region全为0后改为记录原始ee_target_distances 阻塞项:\n⚠️ critical_region阈值需基于实际距离分布数据校准后重新采集（τ=0.10m纯估算偏小） 关键任务 ✅ CalendarPro个人管家系统完整设计规划与Phase 1-3实现 (2026-03-05) — 参考OpenClaw/GSD架构模式设计，实现16个新服务，321个测试全绿；发现并修复BackgroundCoordinator从未启动的关键集成缺陷 ✅ Research Scout两阶段论文评估Pipeline完整实现与验证 (2026-03-07) — Stage 1轻量筛选→Stage 2深度分析（上限20篇），首次运行产出3条可执行研究方向，支持会议搜索、作者搜索、四层参数配置 ✅ MIHD scGPT+UNI2全套融合实验（5种策略） (2026-03-02) — QFormer avg ARI=0.370（+117% vs scGPT-only），确认STAIG不使用gene encoder输出，确立zero-shot叙事框架 ✅ Pi0.5 LoRA批量评估（9任务，整体SR=58.9%） (2026-03-03) — BatchedVLAServer 44分钟完成9任务评估，Stack类任务近乎完美（95-100%），BC-RNN全量0%，定量证明VLA优势 ✅ Pi0.5 LoRA base model核查与9任务续训恢复 (2026-03-03) — 三层证据确认两侧均使用pi05_base，从最高step 18000无损恢复续训；阻止误启动的fresh-start覆盖已有checkpoint ✅ MIHD跨样本RM-IDEAL benchmark实现（781行） (2026-03-03) — 双向跨section评估，添加零嵌入运行时检测与自动重算，Layer_3 Spearman r≈0.44，建立可复用评估框架 ✅ BC-RNN正常任务SR=0%根因定位 (2026-03-04) — 代码探索定位baseline_accuracy评估中object观测键bug，明确区分Normal SR（被bug拦截）vs Error Recovery SR（benchmark核心论点） ✅ Openpi-moe norm_stats/prev_actions归一化链路修复 (2026-03-05) — 发现apply_tree(strict=False)静默跳过缺失键，VAE中已归一化/未归一化动作拼接的scale mismatch隐患；修改compute_norm_stats.py动态检测并写入统计量 ✅ CalendarPro Utterance外部化与UtteranceAugmenter自动增广 (2026-03-05) — 452条硬编码utterances迁移至JSON，实现从mismatch日志自动学习的在线增广机制，每日2AM定时运行 ✅ 修复RoboTwin无头Docker Vulkan渲染失败 (2026-03-06) — 从NVIDIA官方535.104.12 .run包提取用户态GL库，通过VK_ICD_FILENAMES/LD_LIBRARY_PATH注入，无需root权限 ✅ error_recovery_benchmark 65个symlink全量清理与代码迁移 (2026-03-08) — 4路并行Agent覆盖9阶段迁移，所有路径从error_framework迁移至error_benchmark.framework，127单元测试全绿 🔄 VLA-RoboTwin关键区域标注系统实现（10任务） (2026-03-08) — 实现critical_region逐帧标注；发现阈值τ=0.10m估算偏小后改为记录原始ee_target_distances以数据驱动校准 🔄 VLA eval pipeline GPU利用率优化方案设计 (2026-03-02) — 确认action chunking为GPU利用率仅10%的根本原因，设计BatchedVLAServer批量inference方案，方案未最终落地 🔄 CalendarPro Discord bot上下文感知bug根因分析与修复规格 (2026-03-06) — 定位三处根因：general_keywords预检截断跟进消息、_llm_classify不传对话历史、GENERAL路由包含确认词。修复方案已设计待实施 🔄 zhaoganlong 9任务数据准备流水线与双路训练启动 (2026-03-05) — 4步流水线完整执行，Diffusion Policy和Pi0.5 FSDP成功启动；LLaVA MPM因缺少基础模型阻塞 🔄 pre-error轨迹回放存储层开发 (2026-03-08) — rollout_generator添加action_history收集与initial_state保存，NPZ扩展存储，可视化脚本回放逻辑因context耗尽未完成 问题与解决方案 1. STAIG two-stage实际完全忽略gene encoder输出，使用原始HVG作为GCN输入，导致scGPT+UNI2+STAIG≡PCA+UNI2+STAIG [MIHD] (2026-03-02) 解决方案: 三层代码追踪（Fusion.py→runner.py→STAIGTrainer.py）确认架构事实：gene encoder与GNN训练解耦，改进应从GNN结构入手而非替换gene encoder\n2. Pi0.5 eval client报keepalive ping timeout，SR全为0%；多client并发反比串行慢24% [Pi0.5/VLA评估] (2026-03-02) 解决方案: connect()中加入ping_timeout=None禁用20s超时（JAX JIT编译30-60s超过默认值）；确认VLA推理严格串行，多client无效，正确方案为BatchedVLAServer批量inference\n3. STAIG fusion嵌入在某些section上训练坍塌（全为零），导致跨样本评估Spearman r为NaN [MIHD] (2026-03-03) 解决方案: 在load_fused_embeddings()中添加零嵌入检测（norm\u003c1e-6），自动触发–recompute_fusion重训练STAIG（约50秒）\n4. Pi0.5 LoRA训练配置名含’pi05_libero’，用户怀疑初始化权重来自libero而非pi05_base [Pi0.5/VLA训练] (2026-03-03) 解决方案: 三层证据（config.py weight_loader字段 + 训练日志Restoring checkpoint路径 + 对比组配置）确认两侧均正确使用pi05_base；配置名描述数据加载配置，weight_loader才是唯一依据\n5. BC-RNN在所有正常任务上SR=0%，与training rollout完全不符 [error_recovery_benchmark] (2026-03-04) 解决方案: 代码探索定位baseline_accuracy评估中object观测键bug，策略接收空观测；M14中接近0% Error SR是benchmark核心论点（现有策略缺乏错误恢复能力），与Normal SR构成对比才能说明问题\n6. Openpi-moe训练特征norm_stats.json缺少prev_actions键但不报错；VAE中hist_actions（未归一化）与actions（已归一化）直接拼接造成scale mismatch [zhaoganlong/openpi] (2026-03-05) 解决方案: 修改compute_norm_stats.py动态检测prev_actions并写入统计量；根本机制是apply_tree(strict=False)对缺失键静默跳过，新增训练特征必须强制同步归一化脚本\n7. CalendarPro所有后台服务从未在生产环境中运行，321个测试全通过却未发现此集成缺陷 [CalendarPro] (2026-03-05) 解决方案: 在discord_bot.py的on_ready()中添加await coordinator.start_all()；根本原因是注册模式与生命周期管理解耦，单元测试无法发现集成层静默失效\n8. 无头Docker容器SAPIEN报Render Error，bare except隐藏真实异常，apt驱动版本与内核模块不匹配 [VLA-RoboTwin] (2026-03-06) 解决方案: 暴露真实异常→确认NVIDIA Vulkan ICD缺失→从官方535.104.12 .run包提取与内核版本严格匹配的用户态GL库→通过VK_ICD_FILENAMES/LD_LIBRARY_PATH环境变量注入（无需root）\n9. Research Scout初版对全量论文（50篇）单阶段深度评估，token浪费严重且低相关论文占用大量分析资源 [gadget/Research Scout] (2026-03-07) 解决方案: 重构为Stage 1轻量筛选→Stage 2深度分析（高相关论文上限20篇）两阶段pipeline，来自真实研究者阅读习惯\n10. error_recovery_benchmark 65个symlink在代码迁移中造成间接层，symlink移除后sys.path父链深度需重新计算 [error_recovery_benchmark] (2026-03-08) 解决方案: 4路并行Agent按9阶段计划无重叠清理所有symlink，主线程处理Makefile/文档；主动修复2个计划外sys.path深度错误（Path.resolve()不再经过symlink折叠）\n11. VLA-RoboTwin关键区域标注critical_region采集数据全为0，τ=0.10m阈值纯基于估算与实际工作空间尺度不匹配 [VLA-RoboTwin] (2026-03-08) 解决方案: 不直接调参，改为记录原始ee_target_distances（每任务4-8个距离变量），先分析真实数据分布再数据驱动校准阈值\n学习收获 架构 (architecture) 大规模实现后的三项标准检查：(1) 新服务是否接入启动链路；(2) 跨层（IntentType→路由→Handler→服务）是否一致更新；(3) 静默异常（except: pass）是否屏蔽运行时错误。测试通过是必要条件而非充分条件，集成层缺陷只能通过端到端验证发现 设计Agentic系统前应主动研究成熟同类项目——OpenClaw的EventBus/CronScheduler/Plugin注册模式和GSD的STATE.md持久记忆/多Agent上下文隔离是高度可复用的架构模式；相关修复应合并为单次改动而非分阶段实施，避免代码返工 apply_tree(strict=False)是ML训练管道的隐性危险：新增需归一化的训练特征若忘记同步更新norm_stats计算脚本，会导致无声的scale mismatch影响训练质量；AI系统的mismatch记录是免费标注数据，自动回流为utterance增广可实现低成本持续自我改进 两阶段信息处理（粗筛+精评）比单阶段全量处理在token效率和分析深度上均更优：Stage 1关注问题相关性/新颖性/来源权威性（30秒判断），Stage 2聚焦驱动效果的关键insight而非工程细节，并批判性审视作者选择的baseline和指标 调试 (debugging) VLA推理GPU利用率低的根因分析：action chunking使推理调用稀疏化（每trial约8次×2.5s/200s总时间=10%）；多client并发不能提升严格串行推理吞吐量，正确优化方向是BatchedVLAServer批量inference + 多GPU独立部署 BC-RNN SR=0%的诊断路径：先检查observation键名/维度是否与训练一致，再通过历史训练日志区分「评估bug」vs「训练本就失败」，避免误诊为模型能力问题；bare except是渲染/仿真框架中最常见的调试障碍，应立即改为except Exception: traceback.print_exc() 参数设定应实验驱动而非直觉估算：先采集少量数据验证实际分布再设定阈值；关键参数（如距离阈值、驱动版本）估算错误会导致整批数据无效或安装失败 工具 (tools) 4路并行子Agent + 主线程处理不可并行化部分，可将65 symlink大规模代码迁移控制在单session内完成；关键是按文件集合无重叠划分agent任务边界；BatchedVLAServer并行评估（44分钟/9任务）比串行节省约80%时间 无头HPC节点修复Vulkan/EGL渲染的标准方案：从NVIDIA官方.run包提取与内核版本严格匹配的用户态GL库（无需安装内核模块），通过VK_ICD_FILENAMES/__EGL_VENDOR_LIBRARY_FILENAMES/LD_LIBRARY_PATH注入，无需root；EGL/Vulkan设备配置与CUDA独立，CUDA正常不代表Vulkan可用 arXiv comment字段是事实上的会议录用公告区，通过all:“CVPR 2025\"全文搜索+comment后过滤可实现会议论文专项搜索；au:“Author Name” AND (kw1 OR kw2)是系统追踪特定研究者最新工作的有效方式 领域知识 (domain) 学习式融合（QFormer）显著优于简单拼接：scGPT 512d表示本身有价值但需非线性投影才能充分激活（+117% vs scGPT-only）；STAIG的gene encoder与GNN训练解耦，文档与代码差异只能通过代码追踪发现；zero-shot能力是与训练依赖方法的核心差异化竞争点 Pi0.5 LoRA精调在Stack类任务上可达95-100%（整体58.9%），BC-RNN全量失败（0%）；任务复杂度（多步骤、精细操作）是VLA vs 传统序列建模成功率差距的主要决定因素；Pi0.5 LoRA模式也需要至少2张80GB GPU（FSDP是必要前提） AI 使用备注 有效模式:\n✓ 多层代码追踪（3-4层调用栈）精确定位STAIG架构事实，给出代码行级证据，比文档分析更可靠 ✓ 4路并行Agent按文件集合无重叠划分任务，将65 symlink大规模迁移控制在单session内完成 ✓ sacct step时间戳系统性分析正确排除AI操作导致NODE_FAIL的误判，建立操作因果关系证据链 ✓ 通过AskUserQuestion主动澄清模糊需求（作者搜索是否需LLM评估），将产品需求精确转化为工程方案 ✓ 在三层证据系统性核查实验配置正确性（base model来源）上表现优于直觉判断 局限性:\n✗ 实现新功能后未验证是否接入系统启动链路，只依赖单元测试而遗漏集成层检查（BackgroundCoordinator未启动） ✗ 设计Agentic系统时未主动提出研究业界成熟实现，需用户明确指出后才参考OpenClaw/GSD架构模式 ✗ 参数设定缺乏实验验证环节（τ=0.10m纯估算），导致整批critical_region标签数据全为0 ✗ 研究贡献描述倾向技术细节而非竞争优势，zero-shot的差异化定位需用户明确指出 ✗ 初始任务编排倾向保守串行，未主动识别长时GPU任务+轻量可视化任务可并行执行的机会 ✗ 在资源密集型操作（GPU训练）前缺乏必要的resume/fresh-start意图确认，误启动fresh-start覆盖checkpoint 下周展望 下周核心优先级：1) CalendarPro上下文感知bug三处修复实施（精简general_keywords移除确认词/时间词 + _llm_classify传入最近3条对话历史 + 重设GENERAL路由utterances），完成系统从架构升级到实际可用的最后闭环；2) pre-error轨迹可视化回放逻辑补全（存储层已就绪，完成可视化脚本中的初始状态回放与帧渲染部分）；3) zhaoganlong训练结果监控与评估：Diffusion Policy预计2-4天完成，Pi0.5 FSDP还需约31小时，训练完成后立即启动批量eval；4) LLaVA MPM训练解锁：确认cpx2用户本地llava-v1.5-7b完整性，通过–model_name_or_path指向本地路径启动训练；5) VLA-RoboTwin关键区域阈值校准：分析ee_target_distances实际分布后重新设定τ值并重新采集critical_region标签；6) BC-RNN observation key bug正式修复并重新运行正常任务评估；7) 演示视频渲染（Pi0.5高SR任务成功/失败对比）。Research Scout已生产就绪，可开始为MIHD、error_recovery_benchmark等活跃项目配置定期论文发现流程。\nToken 用量统计 每日费用趋势 日期 Token (百万) 费用 ($) 2026-03-02 54.9 35.90 2026-03-03 66.4 40.55 2026-03-04 21.3 13.49 2026-03-05 92.5 61.12 2026-03-06 29.6 17.48 2026-03-07 108.1 91.99 2026-03-08 64.1 46.18 峰值日: 2026-03-07 — $91.99 / 108.1M tokens\nClaude Code 指标 数值 总 Token 424,137,873 输入 Token 648,550 输出 Token 1,268,678 Cache 创建 30,062,586 Cache 读取 392,158,059 总费用 $302.72 模型使用分布 模型 费用 ($) 输入 Token 输出 Token claude-opus-4-6 252.62 233,943 664,457 claude-sonnet-4-6 25.25 484 15,631 claude-haiku-4-5-20251001 24.84 414,123 588,590 Codex 指标 数值 总 Token 12,713,756 输入 Token 12,648,899 输出 Token 64,857 推理 Token 30,268 Cache 读取 12,095,872 总费用 $3.99 模型使用分布 模型 费用 ($) 输入 Token 输出 Token 推理 Token gpt-5.3-codex 3.99 12,648,899 64,857 30,268 ",
+  "wordCount" : "654",
+  "inLanguage": "zh",
+  "datePublished": "2026-03-08T23:59:00-05:00",
+  "dateModified": "2026-03-08T23:59:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/weekly/2026-w10-weekly/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="zh"
+                        data-translation-url="https://tzj2006.github.io/bugjournal/weekly/2026-w10-weekly/">EN
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span>bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/zh/">主页</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/weekly/">每周总结</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Weekly Summary 2026-W10
+    </h1>
+    <div class="post-meta"><span title='2026-03-08 23:59:00 -0500 -0500'>2026年3月8日</span>&nbsp;·&nbsp;<span>4 分钟</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="周报--2026-w10-2026-03-02--2026-03-08">周报 — 2026-W10 (2026-03-02 ~ 2026-03-08)<a hidden class="anchor" aria-hidden="true" href="#周报--2026-w10-2026-03-02--2026-03-08">#</a></h1>
+<blockquote>
+<p>本周跨DCC、天河超算、TzJsDesktop三台设备，并行推进空间转录组研究、机器人操作训练/评估、AI个人助理、论文管理工具四条主线。MIHD项目完成scGPT+UNI2全套融合实验（QFormer avg ARI=0.370，+117% vs scGPT-only）并确立zero-shot跨样本评估框架；Pi0.5 LoRA精调以整体58.9%成功率全面超越BC-RNN（0%），定量验证VLA模型优势；CalendarPro完成从被动响应到主动决策的架构跃升（321个测试全绿），同时暴露并修复BackgroundCoordinator从未启动等关键集成缺陷；gadget Research Scout从零构建到生产就绪，单日内实现两阶段LLM论文评估管线并首次产出3条研究方向建议；error_recovery_benchmark完成65个symlink全量清理和错误场景MP4可视化基础设施建设。本周最重要的工程经验是：测试通过≠系统可用（集成层必须单独验证），以及设计Agentic系统前应主动研究成熟同类项目的架构模式。</p>
+</blockquote>
+<h2 id="本周概览">本周概览<a hidden class="anchor" aria-hidden="true" href="#本周概览">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>日期范围</td>
+          <td>2026-03-02 ~ 2026-03-08</td>
+      </tr>
+      <tr>
+          <td>活跃天数</td>
+          <td>7 / 7</td>
+      </tr>
+      <tr>
+          <td>总对话数</td>
+          <td>31</td>
+      </tr>
+      <tr>
+          <td>涉及项目</td>
+          <td>18</td>
+      </tr>
+      <tr>
+          <td>完成任务</td>
+          <td>51</td>
+      </tr>
+      <tr>
+          <td>进行中任务</td>
+          <td>11</td>
+      </tr>
+      <tr>
+          <td>总 Token</td>
+          <td>436,851,629</td>
+      </tr>
+      <tr>
+          <td>总费用</td>
+          <td>$306.71</td>
+      </tr>
+      <tr>
+          <td>Claude Code Token</td>
+          <td>424,137,873</td>
+      </tr>
+      <tr>
+          <td>Claude Code 费用</td>
+          <td>$302.72</td>
+      </tr>
+      <tr>
+          <td>Codex Token</td>
+          <td>12,713,756</td>
+      </tr>
+      <tr>
+          <td>Codex 费用</td>
+          <td>$3.99</td>
+      </tr>
+      <tr>
+          <td>日均费用</td>
+          <td>$43.82</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="项目进展">项目进展<a hidden class="anchor" aria-hidden="true" href="#项目进展">#</a></h2>
+<h3 id="error_recovery_benchmark机器人错误恢复基准-5-天活跃---active">error_recovery_benchmark（机器人错误恢复基准） (5 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#error_recovery_benchmark机器人错误恢复基准-5-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>BC-RNN全量评估（5任务×50 rollout），通过代码追踪定位SR=0%根因为observation key bug，而非模型能力问题</li>
+<li>项目全景总结.md系统性对齐（M14评估数据726 ep→6474 ep，Pipeline图补充VLA Rollout注入和自然失败捕获两条路径）</li>
+<li>65个symlink全量清理（4路并行Agent覆盖9阶段），所有import路径迁移至error_benchmark.framework，127单元测试全绿</li>
+<li>coffee/stack/three_piece_assembly三组任务错误场景MP4可视化，3块GPU并行产出9+支视频</li>
+<li>pre-error轨迹回放存储层实现（action_history + initial_state入NPZ），为错误前5秒回放奠定基础</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ pre-error可视化回放逻辑因context耗尽未完成</li>
+<li>⚠️ BC-RNN observation key bug的正式修复尚未实施</li>
+<li>⚠️ three_piece_assembly injection模式有效场景为零（底座物理过稳），需调整冲量力参数</li>
+</ul>
+<h3 id="mihd多模态空间转录组融合-4-天活跃---active">MIHD（多模态空间转录组融合） (4 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#mihd多模态空间转录组融合-4-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>完成scGPT+UNI2五种融合策略全套实验，QFormer avg ARI=0.370（+117%），LLaVA-MLP次之（0.316），均显著优于scGPT-only（0.170）</li>
+<li>三层代码追踪发现STAIG实际不使用gene encoder输出（使用原始HVG作为GCN输入），改进应从GNN结构入手</li>
+<li>实现跨样本RM-IDEAL benchmark脚本（781行），添加零嵌入运行时检测，完成151673↔151508双向7层评估</li>
+<li>Layer_1/5表现优异（Spearman 0.42-0.66），中间层（Layer_3/6）出现负相关，揭示过渡层的嵌入空间局限性</li>
+<li>确立zero-shot差异化叙事框架（与STAIG训练依赖方法形成本质对比），完成周一汇报准备</li>
+<li>分析QueST论文跨样本评估方法（WWL Graph Kernel构造pseudo ground truth），撰写Cross-Sample Patch Query方法文档（459行）</li>
+</ul>
+<h3 id="pi05-lora训练与评估天河集群-4-天活跃---active">Pi0.5 LoRA训练与评估（天河集群） (4 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#pi05-lora训练与评估天河集群-4-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>BatchedVLAServer并行评估9任务（44分钟），整体SR=58.9%（Stack_D0 100%、Stack_D1 95%、StackThree 80-90%）</li>
+<li>三层证据确认所有训练正确使用pi05_base初始化权重（config.py weight_loader + 训练日志 + 对比组）</li>
+<li>修复eval pipeline多个关键问题：websocket ping_timeout=None（JAX JIT编译超时）、JIT并发崩溃（错峰启动）</li>
+<li>定量确认VLA推理GPU利用率10%根本原因为action chunking，多client并发反比串行慢24%</li>
+<li>双节点（an49/an53）9任务续训恢复，从最高step 18000无损继续</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ BatchedVLAServer批量推理优化方案设计完成但未落地</li>
+<li>⚠️ 演示视频渲染待确认最终评估结果后执行</li>
+</ul>
+<h3 id="calendarpro个人智能管家-3-天活跃---active">CalendarPro（个人智能管家） (3 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#calendarpro个人智能管家-3-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>参考OpenClaw/GSD架构模式完成整体设计，实现16个新服务文件（GapAnalyzer/AutonomousExecutor/SituationMonitor等），321个测试全绿</li>
+<li>修复BackgroundCoordinator.start_all()从未被调用的关键集成缺陷（所有后台服务从未在生产中运行）</li>
+<li>补全9个IntentType的Discord Bot Handler，消除意图路由断层</li>
+<li>消除16处静默异常（except: pass），删除executor.py死代码并实现真实分发逻辑</li>
+<li>452条utterances外部化至JSON，实现UtteranceAugmenter从mismatch日志自动学习（每日2AM定时增广）</li>
+<li>编写1674行中文完整使用教程，完成Discord bot上下文感知bug三处根因定位</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ 上下文感知bug修复方案已设计（general_keywords精简 + LLM传对话历史 + 语义路由重设）但未实施</li>
+</ul>
+<h3 id="phoenixflarezhaoganlong框架机器人训练基础设施-3-天活跃---active">Phoenix/FLARE/zhaoganlong框架（机器人训练基础设施） (3 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#phoenixflarezhaoganlong框架机器人训练基础设施-3-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>zhaoganlong 9任务数据准备4步流水线完整执行（5Hz标注→speed dataset→LLaVA JSON 103万条→RGB渲染约100万张）</li>
+<li>Diffusion Policy（GPU 0单卡）和Pi0.5（GPU 2+3 FSDP）在an53成功启动训练</li>
+<li>Phoenix/FLARE代码库从混合库分离为独立项目，155GB降至37MB（符号链接共享大型数据集）</li>
+<li>开发6个全任务训练脚本套件，补充3个缺失OpenPI warmup配置</li>
+<li>修复Openpi-moe norm_stats/prev_actions归一化隐患（apply_tree静默跳过机制）</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ LLaVA MPM训练阻塞：集群无网络访问，缺少liuhaotian/llava-v1.5-7b基础模型，待确认cpx2用户本地副本完整性</li>
+</ul>
+<h3 id="gadgetresearch-scout论文管理系统-2-天活跃---completed">gadget/Research Scout（论文管理系统） (2 天活跃) — ✅ completed<a hidden class="anchor" aria-hidden="true" href="#gadgetresearch-scout论文管理系统-2-天活跃---completed">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>从零实现Research Scout完整功能（~2650行）：6命令CLI、arXiv多源搜索、两阶段LLM评估Pipeline</li>
+<li>首次完整验证运行，产出3条可执行研究方向（生成式数字孪生场景基准、人类视频恢复原语、文档引导操作）</li>
+<li>实现_resolve_param()四层优先级配置、会议论文专项搜索（arXiv comment字段）、作者搜索（au:查询）</li>
+<li>实现搜索去重早停（连续5篇已知论文阈值），init &ndash;from-overview自动从已有文档提取项目信息</li>
+</ul>
+<h3 id="vla-robotwin机器人操作数据采集-2-天活跃---active">VLA-RoboTwin（机器人操作数据采集） (2 天活跃) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#vla-robotwin机器人操作数据采集-2-天活跃---active">#</a></h3>
+<p><strong>完成项:</strong></p>
+<ul>
+<li>修复RoboTwin在无头Docker环境的Vulkan渲染失败（从官方.run包提取用户态GL库→三环境变量注入，无需root）</li>
+<li>为10个机器人操作任务实现关键区域标注系统，发现critical_region全为0后改为记录原始ee_target_distances</li>
+</ul>
+<p><strong>阻塞项:</strong></p>
+<ul>
+<li>⚠️ critical_region阈值需基于实际距离分布数据校准后重新采集（τ=0.10m纯估算偏小）</li>
+</ul>
+<h2 id="关键任务">关键任务<a hidden class="anchor" aria-hidden="true" href="#关键任务">#</a></h2>
+<ul>
+<li>✅ <strong>CalendarPro个人管家系统完整设计规划与Phase 1-3实现</strong> (2026-03-05) — 参考OpenClaw/GSD架构模式设计，实现16个新服务，321个测试全绿；发现并修复BackgroundCoordinator从未启动的关键集成缺陷</li>
+<li>✅ <strong>Research Scout两阶段论文评估Pipeline完整实现与验证</strong> (2026-03-07) — Stage 1轻量筛选→Stage 2深度分析（上限20篇），首次运行产出3条可执行研究方向，支持会议搜索、作者搜索、四层参数配置</li>
+<li>✅ <strong>MIHD scGPT+UNI2全套融合实验（5种策略）</strong> (2026-03-02) — QFormer avg ARI=0.370（+117% vs scGPT-only），确认STAIG不使用gene encoder输出，确立zero-shot叙事框架</li>
+<li>✅ <strong>Pi0.5 LoRA批量评估（9任务，整体SR=58.9%）</strong> (2026-03-03) — BatchedVLAServer 44分钟完成9任务评估，Stack类任务近乎完美（95-100%），BC-RNN全量0%，定量证明VLA优势</li>
+<li>✅ <strong>Pi0.5 LoRA base model核查与9任务续训恢复</strong> (2026-03-03) — 三层证据确认两侧均使用pi05_base，从最高step 18000无损恢复续训；阻止误启动的fresh-start覆盖已有checkpoint</li>
+<li>✅ <strong>MIHD跨样本RM-IDEAL benchmark实现（781行）</strong> (2026-03-03) — 双向跨section评估，添加零嵌入运行时检测与自动重算，Layer_3 Spearman r≈0.44，建立可复用评估框架</li>
+<li>✅ <strong>BC-RNN正常任务SR=0%根因定位</strong> (2026-03-04) — 代码探索定位baseline_accuracy评估中object观测键bug，明确区分Normal SR（被bug拦截）vs Error Recovery SR（benchmark核心论点）</li>
+<li>✅ <strong>Openpi-moe norm_stats/prev_actions归一化链路修复</strong> (2026-03-05) — 发现apply_tree(strict=False)静默跳过缺失键，VAE中已归一化/未归一化动作拼接的scale mismatch隐患；修改compute_norm_stats.py动态检测并写入统计量</li>
+<li>✅ <strong>CalendarPro Utterance外部化与UtteranceAugmenter自动增广</strong> (2026-03-05) — 452条硬编码utterances迁移至JSON，实现从mismatch日志自动学习的在线增广机制，每日2AM定时运行</li>
+<li>✅ <strong>修复RoboTwin无头Docker Vulkan渲染失败</strong> (2026-03-06) — 从NVIDIA官方535.104.12 .run包提取用户态GL库，通过VK_ICD_FILENAMES/LD_LIBRARY_PATH注入，无需root权限</li>
+<li>✅ <strong>error_recovery_benchmark 65个symlink全量清理与代码迁移</strong> (2026-03-08) — 4路并行Agent覆盖9阶段迁移，所有路径从error_framework迁移至error_benchmark.framework，127单元测试全绿</li>
+<li>🔄 <strong>VLA-RoboTwin关键区域标注系统实现（10任务）</strong> (2026-03-08) — 实现critical_region逐帧标注；发现阈值τ=0.10m估算偏小后改为记录原始ee_target_distances以数据驱动校准</li>
+<li>🔄 <strong>VLA eval pipeline GPU利用率优化方案设计</strong> (2026-03-02) — 确认action chunking为GPU利用率仅10%的根本原因，设计BatchedVLAServer批量inference方案，方案未最终落地</li>
+<li>🔄 <strong>CalendarPro Discord bot上下文感知bug根因分析与修复规格</strong> (2026-03-06) — 定位三处根因：general_keywords预检截断跟进消息、_llm_classify不传对话历史、GENERAL路由包含确认词。修复方案已设计待实施</li>
+<li>🔄 <strong>zhaoganlong 9任务数据准备流水线与双路训练启动</strong> (2026-03-05) — 4步流水线完整执行，Diffusion Policy和Pi0.5 FSDP成功启动；LLaVA MPM因缺少基础模型阻塞</li>
+<li>🔄 <strong>pre-error轨迹回放存储层开发</strong> (2026-03-08) — rollout_generator添加action_history收集与initial_state保存，NPZ扩展存储，可视化脚本回放逻辑因context耗尽未完成</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="1-staig-two-stage实际完全忽略gene-encoder输出使用原始hvg作为gcn输入导致scgptuni2staigpcauni2staig-mihd-2026-03-02">1. STAIG two-stage实际完全忽略gene encoder输出，使用原始HVG作为GCN输入，导致scGPT+UNI2+STAIG≡PCA+UNI2+STAIG [MIHD] (2026-03-02)<a hidden class="anchor" aria-hidden="true" href="#1-staig-two-stage实际完全忽略gene-encoder输出使用原始hvg作为gcn输入导致scgptuni2staigpcauni2staig-mihd-2026-03-02">#</a></h3>
+<p><strong>解决方案:</strong> 三层代码追踪（Fusion.py→runner.py→STAIGTrainer.py）确认架构事实：gene encoder与GNN训练解耦，改进应从GNN结构入手而非替换gene encoder</p>
+<h3 id="2-pi05-eval-client报keepalive-ping-timeoutsr全为0多client并发反比串行慢24-pi05vla评估-2026-03-02">2. Pi0.5 eval client报keepalive ping timeout，SR全为0%；多client并发反比串行慢24% [Pi0.5/VLA评估] (2026-03-02)<a hidden class="anchor" aria-hidden="true" href="#2-pi05-eval-client报keepalive-ping-timeoutsr全为0多client并发反比串行慢24-pi05vla评估-2026-03-02">#</a></h3>
+<p><strong>解决方案:</strong> connect()中加入ping_timeout=None禁用20s超时（JAX JIT编译30-60s超过默认值）；确认VLA推理严格串行，多client无效，正确方案为BatchedVLAServer批量inference</p>
+<h3 id="3-staig-fusion嵌入在某些section上训练坍塌全为零导致跨样本评估spearman-r为nan-mihd-2026-03-03">3. STAIG fusion嵌入在某些section上训练坍塌（全为零），导致跨样本评估Spearman r为NaN [MIHD] (2026-03-03)<a hidden class="anchor" aria-hidden="true" href="#3-staig-fusion嵌入在某些section上训练坍塌全为零导致跨样本评估spearman-r为nan-mihd-2026-03-03">#</a></h3>
+<p><strong>解决方案:</strong> 在load_fused_embeddings()中添加零嵌入检测（norm&lt;1e-6），自动触发&ndash;recompute_fusion重训练STAIG（约50秒）</p>
+<h3 id="4-pi05-lora训练配置名含pi05_libero用户怀疑初始化权重来自libero而非pi05_base-pi05vla训练-2026-03-03">4. Pi0.5 LoRA训练配置名含&rsquo;pi05_libero&rsquo;，用户怀疑初始化权重来自libero而非pi05_base [Pi0.5/VLA训练] (2026-03-03)<a hidden class="anchor" aria-hidden="true" href="#4-pi05-lora训练配置名含pi05_libero用户怀疑初始化权重来自libero而非pi05_base-pi05vla训练-2026-03-03">#</a></h3>
+<p><strong>解决方案:</strong> 三层证据（config.py weight_loader字段 + 训练日志Restoring checkpoint路径 + 对比组配置）确认两侧均正确使用pi05_base；配置名描述数据加载配置，weight_loader才是唯一依据</p>
+<h3 id="5-bc-rnn在所有正常任务上sr0与training-rollout完全不符-error_recovery_benchmark-2026-03-04">5. BC-RNN在所有正常任务上SR=0%，与training rollout完全不符 [error_recovery_benchmark] (2026-03-04)<a hidden class="anchor" aria-hidden="true" href="#5-bc-rnn在所有正常任务上sr0与training-rollout完全不符-error_recovery_benchmark-2026-03-04">#</a></h3>
+<p><strong>解决方案:</strong> 代码探索定位baseline_accuracy评估中object观测键bug，策略接收空观测；M14中接近0% Error SR是benchmark核心论点（现有策略缺乏错误恢复能力），与Normal SR构成对比才能说明问题</p>
+<h3 id="6-openpi-moe训练特征norm_statsjson缺少prev_actions键但不报错vae中hist_actions未归一化与actions已归一化直接拼接造成scale-mismatch-zhaoganlongopenpi-2026-03-05">6. Openpi-moe训练特征norm_stats.json缺少prev_actions键但不报错；VAE中hist_actions（未归一化）与actions（已归一化）直接拼接造成scale mismatch [zhaoganlong/openpi] (2026-03-05)<a hidden class="anchor" aria-hidden="true" href="#6-openpi-moe训练特征norm_statsjson缺少prev_actions键但不报错vae中hist_actions未归一化与actions已归一化直接拼接造成scale-mismatch-zhaoganlongopenpi-2026-03-05">#</a></h3>
+<p><strong>解决方案:</strong> 修改compute_norm_stats.py动态检测prev_actions并写入统计量；根本机制是apply_tree(strict=False)对缺失键静默跳过，新增训练特征必须强制同步归一化脚本</p>
+<h3 id="7-calendarpro所有后台服务从未在生产环境中运行321个测试全通过却未发现此集成缺陷-calendarpro-2026-03-05">7. CalendarPro所有后台服务从未在生产环境中运行，321个测试全通过却未发现此集成缺陷 [CalendarPro] (2026-03-05)<a hidden class="anchor" aria-hidden="true" href="#7-calendarpro所有后台服务从未在生产环境中运行321个测试全通过却未发现此集成缺陷-calendarpro-2026-03-05">#</a></h3>
+<p><strong>解决方案:</strong> 在discord_bot.py的on_ready()中添加await coordinator.start_all()；根本原因是注册模式与生命周期管理解耦，单元测试无法发现集成层静默失效</p>
+<h3 id="8-无头docker容器sapien报render-errorbare-except隐藏真实异常apt驱动版本与内核模块不匹配-vla-robotwin-2026-03-06">8. 无头Docker容器SAPIEN报Render Error，bare except隐藏真实异常，apt驱动版本与内核模块不匹配 [VLA-RoboTwin] (2026-03-06)<a hidden class="anchor" aria-hidden="true" href="#8-无头docker容器sapien报render-errorbare-except隐藏真实异常apt驱动版本与内核模块不匹配-vla-robotwin-2026-03-06">#</a></h3>
+<p><strong>解决方案:</strong> 暴露真实异常→确认NVIDIA Vulkan ICD缺失→从官方535.104.12 .run包提取与内核版本严格匹配的用户态GL库→通过VK_ICD_FILENAMES/LD_LIBRARY_PATH环境变量注入（无需root）</p>
+<h3 id="9-research-scout初版对全量论文50篇单阶段深度评估token浪费严重且低相关论文占用大量分析资源-gadgetresearch-scout-2026-03-07">9. Research Scout初版对全量论文（50篇）单阶段深度评估，token浪费严重且低相关论文占用大量分析资源 [gadget/Research Scout] (2026-03-07)<a hidden class="anchor" aria-hidden="true" href="#9-research-scout初版对全量论文50篇单阶段深度评估token浪费严重且低相关论文占用大量分析资源-gadgetresearch-scout-2026-03-07">#</a></h3>
+<p><strong>解决方案:</strong> 重构为Stage 1轻量筛选→Stage 2深度分析（高相关论文上限20篇）两阶段pipeline，来自真实研究者阅读习惯</p>
+<h3 id="10-error_recovery_benchmark-65个symlink在代码迁移中造成间接层symlink移除后syspath父链深度需重新计算-error_recovery_benchmark-2026-03-08">10. error_recovery_benchmark 65个symlink在代码迁移中造成间接层，symlink移除后sys.path父链深度需重新计算 [error_recovery_benchmark] (2026-03-08)<a hidden class="anchor" aria-hidden="true" href="#10-error_recovery_benchmark-65个symlink在代码迁移中造成间接层symlink移除后syspath父链深度需重新计算-error_recovery_benchmark-2026-03-08">#</a></h3>
+<p><strong>解决方案:</strong> 4路并行Agent按9阶段计划无重叠清理所有symlink，主线程处理Makefile/文档；主动修复2个计划外sys.path深度错误（Path.resolve()不再经过symlink折叠）</p>
+<h3 id="11-vla-robotwin关键区域标注critical_region采集数据全为0τ010m阈值纯基于估算与实际工作空间尺度不匹配-vla-robotwin-2026-03-08">11. VLA-RoboTwin关键区域标注critical_region采集数据全为0，τ=0.10m阈值纯基于估算与实际工作空间尺度不匹配 [VLA-RoboTwin] (2026-03-08)<a hidden class="anchor" aria-hidden="true" href="#11-vla-robotwin关键区域标注critical_region采集数据全为0τ010m阈值纯基于估算与实际工作空间尺度不匹配-vla-robotwin-2026-03-08">#</a></h3>
+<p><strong>解决方案:</strong> 不直接调参，改为记录原始ee_target_distances（每任务4-8个距离变量），先分析真实数据分布再数据驱动校准阈值</p>
+<h2 id="学习收获">学习收获<a hidden class="anchor" aria-hidden="true" href="#学习收获">#</a></h2>
+<h3 id="架构-architecture">架构 (architecture)<a hidden class="anchor" aria-hidden="true" href="#架构-architecture">#</a></h3>
+<ul>
+<li>大规模实现后的三项标准检查：(1) 新服务是否接入启动链路；(2) 跨层（IntentType→路由→Handler→服务）是否一致更新；(3) 静默异常（except: pass）是否屏蔽运行时错误。测试通过是必要条件而非充分条件，集成层缺陷只能通过端到端验证发现</li>
+<li>设计Agentic系统前应主动研究成熟同类项目——OpenClaw的EventBus/CronScheduler/Plugin注册模式和GSD的STATE.md持久记忆/多Agent上下文隔离是高度可复用的架构模式；相关修复应合并为单次改动而非分阶段实施，避免代码返工</li>
+<li>apply_tree(strict=False)是ML训练管道的隐性危险：新增需归一化的训练特征若忘记同步更新norm_stats计算脚本，会导致无声的scale mismatch影响训练质量；AI系统的mismatch记录是免费标注数据，自动回流为utterance增广可实现低成本持续自我改进</li>
+<li>两阶段信息处理（粗筛+精评）比单阶段全量处理在token效率和分析深度上均更优：Stage 1关注问题相关性/新颖性/来源权威性（30秒判断），Stage 2聚焦驱动效果的关键insight而非工程细节，并批判性审视作者选择的baseline和指标</li>
+</ul>
+<h3 id="调试-debugging">调试 (debugging)<a hidden class="anchor" aria-hidden="true" href="#调试-debugging">#</a></h3>
+<ul>
+<li>VLA推理GPU利用率低的根因分析：action chunking使推理调用稀疏化（每trial约8次×2.5s/200s总时间=10%）；多client并发不能提升严格串行推理吞吐量，正确优化方向是BatchedVLAServer批量inference + 多GPU独立部署</li>
+<li>BC-RNN SR=0%的诊断路径：先检查observation键名/维度是否与训练一致，再通过历史训练日志区分「评估bug」vs「训练本就失败」，避免误诊为模型能力问题；bare except是渲染/仿真框架中最常见的调试障碍，应立即改为except Exception: traceback.print_exc()</li>
+<li>参数设定应实验驱动而非直觉估算：先采集少量数据验证实际分布再设定阈值；关键参数（如距离阈值、驱动版本）估算错误会导致整批数据无效或安装失败</li>
+</ul>
+<h3 id="工具-tools">工具 (tools)<a hidden class="anchor" aria-hidden="true" href="#工具-tools">#</a></h3>
+<ul>
+<li>4路并行子Agent + 主线程处理不可并行化部分，可将65 symlink大规模代码迁移控制在单session内完成；关键是按文件集合无重叠划分agent任务边界；BatchedVLAServer并行评估（44分钟/9任务）比串行节省约80%时间</li>
+<li>无头HPC节点修复Vulkan/EGL渲染的标准方案：从NVIDIA官方.run包提取与内核版本严格匹配的用户态GL库（无需安装内核模块），通过VK_ICD_FILENAMES/__EGL_VENDOR_LIBRARY_FILENAMES/LD_LIBRARY_PATH注入，无需root；EGL/Vulkan设备配置与CUDA独立，CUDA正常不代表Vulkan可用</li>
+<li>arXiv comment字段是事实上的会议录用公告区，通过all:&ldquo;CVPR 2025&quot;全文搜索+comment后过滤可实现会议论文专项搜索；au:&ldquo;Author Name&rdquo; AND (kw1 OR kw2)是系统追踪特定研究者最新工作的有效方式</li>
+</ul>
+<h3 id="领域知识-domain">领域知识 (domain)<a hidden class="anchor" aria-hidden="true" href="#领域知识-domain">#</a></h3>
+<ul>
+<li>学习式融合（QFormer）显著优于简单拼接：scGPT 512d表示本身有价值但需非线性投影才能充分激活（+117% vs scGPT-only）；STAIG的gene encoder与GNN训练解耦，文档与代码差异只能通过代码追踪发现；zero-shot能力是与训练依赖方法的核心差异化竞争点</li>
+<li>Pi0.5 LoRA精调在Stack类任务上可达95-100%（整体58.9%），BC-RNN全量失败（0%）；任务复杂度（多步骤、精细操作）是VLA vs 传统序列建模成功率差距的主要决定因素；Pi0.5 LoRA模式也需要至少2张80GB GPU（FSDP是必要前提）</li>
+</ul>
+<h2 id="ai-使用备注">AI 使用备注<a hidden class="anchor" aria-hidden="true" href="#ai-使用备注">#</a></h2>
+<p><strong>有效模式:</strong></p>
+<ul>
+<li>✓ 多层代码追踪（3-4层调用栈）精确定位STAIG架构事实，给出代码行级证据，比文档分析更可靠</li>
+<li>✓ 4路并行Agent按文件集合无重叠划分任务，将65 symlink大规模迁移控制在单session内完成</li>
+<li>✓ sacct step时间戳系统性分析正确排除AI操作导致NODE_FAIL的误判，建立操作因果关系证据链</li>
+<li>✓ 通过AskUserQuestion主动澄清模糊需求（作者搜索是否需LLM评估），将产品需求精确转化为工程方案</li>
+<li>✓ 在三层证据系统性核查实验配置正确性（base model来源）上表现优于直觉判断</li>
+</ul>
+<p><strong>局限性:</strong></p>
+<ul>
+<li>✗ 实现新功能后未验证是否接入系统启动链路，只依赖单元测试而遗漏集成层检查（BackgroundCoordinator未启动）</li>
+<li>✗ 设计Agentic系统时未主动提出研究业界成熟实现，需用户明确指出后才参考OpenClaw/GSD架构模式</li>
+<li>✗ 参数设定缺乏实验验证环节（τ=0.10m纯估算），导致整批critical_region标签数据全为0</li>
+<li>✗ 研究贡献描述倾向技术细节而非竞争优势，zero-shot的差异化定位需用户明确指出</li>
+<li>✗ 初始任务编排倾向保守串行，未主动识别长时GPU任务+轻量可视化任务可并行执行的机会</li>
+<li>✗ 在资源密集型操作（GPU训练）前缺乏必要的resume/fresh-start意图确认，误启动fresh-start覆盖checkpoint</li>
+</ul>
+<h2 id="下周展望">下周展望<a hidden class="anchor" aria-hidden="true" href="#下周展望">#</a></h2>
+<p>下周核心优先级：1) CalendarPro上下文感知bug三处修复实施（精简general_keywords移除确认词/时间词 + _llm_classify传入最近3条对话历史 + 重设GENERAL路由utterances），完成系统从架构升级到实际可用的最后闭环；2) pre-error轨迹可视化回放逻辑补全（存储层已就绪，完成可视化脚本中的初始状态回放与帧渲染部分）；3) zhaoganlong训练结果监控与评估：Diffusion Policy预计2-4天完成，Pi0.5 FSDP还需约31小时，训练完成后立即启动批量eval；4) LLaVA MPM训练解锁：确认cpx2用户本地llava-v1.5-7b完整性，通过&ndash;model_name_or_path指向本地路径启动训练；5) VLA-RoboTwin关键区域阈值校准：分析ee_target_distances实际分布后重新设定τ值并重新采集critical_region标签；6) BC-RNN observation key bug正式修复并重新运行正常任务评估；7) 演示视频渲染（Pi0.5高SR任务成功/失败对比）。Research Scout已生产就绪，可开始为MIHD、error_recovery_benchmark等活跃项目配置定期论文发现流程。</p>
+<h2 id="token-用量统计">Token 用量统计<a hidden class="anchor" aria-hidden="true" href="#token-用量统计">#</a></h2>
+<h3 id="每日费用趋势">每日费用趋势<a hidden class="anchor" aria-hidden="true" href="#每日费用趋势">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>日期</th>
+          <th>Token (百万)</th>
+          <th>费用 ($)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2026-03-02</td>
+          <td>54.9</td>
+          <td>35.90</td>
+      </tr>
+      <tr>
+          <td>2026-03-03</td>
+          <td>66.4</td>
+          <td>40.55</td>
+      </tr>
+      <tr>
+          <td>2026-03-04</td>
+          <td>21.3</td>
+          <td>13.49</td>
+      </tr>
+      <tr>
+          <td>2026-03-05</td>
+          <td>92.5</td>
+          <td>61.12</td>
+      </tr>
+      <tr>
+          <td>2026-03-06</td>
+          <td>29.6</td>
+          <td>17.48</td>
+      </tr>
+      <tr>
+          <td>2026-03-07</td>
+          <td>108.1</td>
+          <td>91.99</td>
+      </tr>
+      <tr>
+          <td>2026-03-08</td>
+          <td>64.1</td>
+          <td>46.18</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>峰值日:</strong> 2026-03-07 — $91.99 / 108.1M tokens</p>
+<h3 id="claude-code">Claude Code<a hidden class="anchor" aria-hidden="true" href="#claude-code">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>424,137,873</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>648,550</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>1,268,678</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>30,062,586</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>392,158,059</td>
+      </tr>
+      <tr>
+          <td>总费用</td>
+          <td>$302.72</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="模型使用分布">模型使用分布<a hidden class="anchor" aria-hidden="true" href="#模型使用分布">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>费用 ($)</th>
+          <th>输入 Token</th>
+          <th>输出 Token</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>252.62</td>
+          <td>233,943</td>
+          <td>664,457</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>25.25</td>
+          <td>484</td>
+          <td>15,631</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>24.84</td>
+          <td>414,123</td>
+          <td>588,590</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="codex">Codex<a hidden class="anchor" aria-hidden="true" href="#codex">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>12,713,756</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>12,648,899</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>64,857</td>
+      </tr>
+      <tr>
+          <td>推理 Token</td>
+          <td>30,268</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>12,095,872</td>
+      </tr>
+      <tr>
+          <td>总费用</td>
+          <td>$3.99</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="模型使用分布-1">模型使用分布<a hidden class="anchor" aria-hidden="true" href="#模型使用分布-1">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>费用 ($)</th>
+          <th>输入 Token</th>
+          <th>输出 Token</th>
+          <th>推理 Token</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>gpt-5.3-codex</td>
+          <td>3.99</td>
+          <td>12,648,899</td>
+          <td>64,857</td>
+          <td>30,268</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+document.getElementById("lang-toggle").addEventListener("click", function() {
+    var current = this.getAttribute("data-current-lang");
+    var url = this.getAttribute("data-translation-url");
+    var newLang = (current === "en") ? "zh" : "en";
+    localStorage.setItem("pref-lang", newLang);
+    if (url) {
+        window.location.href = url;
+    } else {
+        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+    }
+});
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

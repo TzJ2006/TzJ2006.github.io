@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-30 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="完成 TEDDY-G 400M 基因基础模型在 DLPFC 全量 11 个切片上的 embedding 提取与多策略融合 benchmark，并撰写 W13 周报总结上周实验发现。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-30/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-30/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-30/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    var stored = localStorage.getItem("pref-lang");
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-30/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-30">
+  <meta property="og:description" content="完成 TEDDY-G 400M 基因基础模型在 DLPFC 全量 11 个切片上的 embedding 提取与多策略融合 benchmark，并撰写 W13 周报总结上周实验发现。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-30T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-30T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-30">
+  <meta name="twitter:description" content="完成 TEDDY-G 400M 基因基础模型在 DLPFC 全量 11 个切片上的 embedding 提取与多策略融合 benchmark，并撰写 W13 周报总结上周实验发现。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "每日总结",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-03-30",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/2026-03-30/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-30",
+  "name": "Bug Journal 2026-03-30",
+  "description": "完成 TEDDY-G 400M 基因基础模型在 DLPFC 全量 11 个切片上的 embedding 提取与多策略融合 benchmark，并撰写 W13 周报总结上周实验发现。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-30 今日概览 做了什么： 将 TEDDY-G 400M 集成到 MIHD pipeline，完成全部 11 个 DLPFC 切片的 gene embedding 提取、5 种非 STAIG 融合评估及 STAIG 融合实验 怎么做的： 在专用 conda teddy 环境中逐切片提取 embedding 并以标准缓存格式保存，修复 evaluation_planner.py 中 staig_gene_feat 缓存误报 bug，分阶段运行 Phase 1 提取与 Phase 2 评估 有什么用： 确认 Teddy+UNI2+STAIG（ARI≈0.495）与 PCA+UNI2+STAIG（ARI≈0.497）性能接近，揭示了 STAIG 框架对 gene encoder 选择的鲁棒性，为后续替换编码器策略提供了实验依据 完成 TEDDY-G 400M 基因基础模型在 DLPFC 全量 11 个切片上的 embedding 提取与多策略融合 benchmark，并撰写 W13 周报总结上周实验发现。\n今日任务 架构与策略 ✅ Teddy + STAIG 融合评估 — 完成 10/11 切片评估（151676 因 model collapse 失败）；Avg ARI=0.495，对比 PCA+STAIG 的 0.497，NMI 上 Teddy 6/10 切片胜出 ✅ TEDDY embedding 全量提取（11 切片） — 在 conda teddy 环境中依次为 DLPFC 11 个切片（151508–151676）提取 1024d gene embedding 并缓存至 embeddings_cache/gene/teddy/，总计 185MB ✅ Teddy 非 STAIG 融合评估（5 策略 × 11 切片） — 在 Phase 2 评估 teddy_only、teddy_uni2_concat、teddy_uni2_mean、teddy_uni2_attention、teddy_uni2_llava_mlp 5 种配置；结果：gene-only ARI=0.186，最佳 llava_mlp ARI=0.305 ✅ UNI2 staig_strict 视觉特征提取 — 为 STAIG fusion 提取 UNI2 staig_strict 变体（256×256 patch、无 ImageNet 归一化、频域滤波），覆盖全部 11 个切片 实现与修复 ✅ 撰写 W13 周报 — 综合 docs/plans.md、git 历史、文件时间戳，撰写 docs/WEEKLY_REPORT_2026_W13.md，总结上周两项主要实验及核心结论 ✅ 修复 evaluation_planner.py staig_gene_feat 误报 bug — 151676 使用 5000 个基因（staig_gene_feat_5000.npz），但 planner 硬编码检查 3000，导致 sys.exit(1)；改为动态查询实际文件 ✅ TEDDY 基础模型背景调研 — 通过 Web 搜索整理 TEDDY 论文（arXiv:2503.03485）的完整技术介绍：双向 Transformer + 有监督本体预训练（disease/tissue/cell type），116M 细胞训练，5 种规模（10M–400M） ✅ TokenMonitor HPC 构建可行性评估 — 检查 RHEL 9.7 HPC 环境：Node.js/npm 可用，但 Rust 和 Tauri 所需的 webkit2gtk4.1-devel 等系统库均缺失，且无 sudo 权限，无法在 HPC 上构建 问题与解决方案 关键问题 1. Teddy gene-only ARI（0.186）不如 PCA（0.255），Foundation Model 在聚类任务上未能超越简单基线 解决方案: 分析根本原因：Teddy 以疾病分类为优化目标而非方差最大化；1024d 高维空间使 KMeans 表现变差；训练数据为 dissociated scRNA-seq，与空间转录组分布不同\n关键洞察: 基础模型 embedding 的\"泛化表示\"与\"聚类适配性\"存在根本张力：PCA 直接最大化数据方差，天然适配 KMeans；而 Foundation Model 学习疾病区分性表示，在下游聚类任务上存在系统性迁移损失\n一般问题 2. evaluation_planner.py 对 151676 的 staig_gene_feat 缓存检查误报，导致 Phase 2 以 sys.exit(1) 终止 解决方案: 修改 has_staig_gene_feat 检查逻辑，动态解析切片配置中的实际 top_genes 数量（151676 使用 5000 而非默认 3000），正确识别缓存存在\n关键洞察: 切片特定配置（top_genes 来自 staig_utils.py 的 num_gene 字段）与 planner 的硬编码默认值不一致，这类\"配置隐式分叉\"容易造成难以察觉的假阴性检查\n3. STAIG 融合评估中 151676 切片出现 model collapse，无法产生有效聚类结果 解决方案: 跳过该切片，以 10/11 切片的平均值报告结果（ARI=0.495）\n关键洞察: 151676 是已知的 STAIG 困难切片，其 STAIG collapse 与 gene encoder 无关，是该切片数据特性导致的系统性问题\n4. HPC 上无法构建 TokenMonitor（缺少 Rust、webkit2gtk4.1-devel 等 Tauri 依赖，无 sudo 权限） 解决方案: 建议三条路径：在本地有权限机器构建后拷贝二进制、请 HPC 管理员安装依赖、通过 GitHub Actions CI 构建 Linux 发布包\n关键洞察: Tauri 应用依赖 GTK/WebKit 系统库，这类 GUI 依赖在 HPC 环境中通常不可用，且 module 系统也不提供此类库；HPC 本质上不是 GUI 应用的目标部署环境\n人类思路 vs AI 思路 战略层面 是否在非 STAIG 结果出炉后继续跑 STAIG 融合 角色 思路 人类 看到 llava_mlp 最佳 ARI 仅 0.305、其他融合均弱于 PCA 后，主动要求追加 STAIG 融合实验 AI AI 在呈现非 STAIG 结果时仅提供了选项列表，没有主动推荐优先顺序 差异分析: 人类对\"哪个融合策略最可能接近 SOTA\"有先验判断（STAIG 是已知最强策略），因此主动推进；AI 倾向于将决策权交给用户，未主动预判\n实现层面 staig_gene_feat 误报 bug 的发现与修复 角色 思路 人类 未参与，完全由 AI 发现并修复 AI AI 追踪了 sys.exit 的触发路径，检查了 151676 的实际文件（5000.npz vs 3000.npz），识别出配置隐式分叉并修复 差异分析: 这是 AI 的主动贡献：人类用户未察觉此 bug，AI 在排查 Phase 2 失败原因时独立发现并修复\n上周工作的梳理方式 角色 思路 人类 询问\"上周 plan 是什么、做了什么\"，期望一个整合的叙述 AI AI 综合利用 docs/plans.md 的计划文档、git log 时间线、find 文件时间戳、outputs 目录的实验结果，从多个维度重建了上周工作全图 差异分析: 人类提问是高层次的，AI 系统性地分解为\"计划 vs 实际执行 vs 未完成\"三层，并提供了定量结果支撑\nAI 局限性 重要局限 对 151676 STAIG model collapse 的根本原因未能深入分析，仅归因为\"已知困难切片\"，未尝试调整超参数（如 tau、num_epochs）来规避 一般局限 未能预先识别 evaluation_planner.py 中 staig_gene_feat top_genes 硬编码问题，只有在 sys.exit 实际触发后才追溯到根本原因 后台任务进度监控策略低效：使用多轮 sleep+ls 轮询，而非更优雅的方案（如 inotifywait 或结构化进度文件），导致大量等待时间 在 bash 命令中构造多行 Python f-string 时出现语法错误（unterminated string literal），需要重新修改命令才能执行 今日收获 核心收获 STAIG 融合框架对 gene encoder 具有高度鲁棒性：Teddy 1024d（ARI=0.495）与 PCA 50d（ARI=0.497）在 STAIG 框架下性能几乎相同，说明 STAIG 的空间图对比学习机制主导了聚类性能，gene embedding 质量的影响被大幅稀释 Foundation Model 在跨域下游任务上的系统性迁移损失：Teddy 在疾病分类上 SOTA（ACC=0.72），但在空间转录组聚类上不如 PCA（0.186 vs 0.255），根本原因是优化目标（区分性 vs 方差最大化）的不匹配 HVG1500（原始高变基因直接拼接，无降维）在 151673 单切片上 ARI=0.330，优于所有 Foundation Model；这提示高维原始特征在某些切片上可能因保留更多局部方差信息而受益 实践收获 切片特定配置（如 staig num_gene）与 pipeline 全局默认值之间的隐式分叉是一类高风险 bug，应在缓存检查逻辑中动态解析而非硬编码 会话摘要 MIHD Pipeline ✅ TEDDY-G 400M 全量 DLPFC Benchmark：embedding 提取 → 多融合评估 → STAIG 融合 00:01:05.759 | claude_code 在 DCC 上以 conda teddy 环境逐切片提取 TEDDY 1024d embedding（共 11 切片，约 185MB），随后运行 5 种非 STAIG 融合策略评估（gene-only ARI=0.186，llava_mlp 最佳 ARI=0.305）。用户要求追加 STAIG 融合，AI 提取 UNI2 staig_strict 视觉特征，发现并修复 evaluation_planner.py 中 staig_gene_feat 5000 vs 3000 误报 bug，最终完成 10/11 切片的 Teddy+STAIG 评估（ARI=0.495），与 PCA+STAIG（ARI=0.497）性能接近。\n✅ 上周（W13）MIHD 实验工作回顾与周报生成 21:13:39.566 | claude_code 用户询问上周计划与实际工作内容。AI 综合 docs/plans.md、git log（最近提交止于 2026-02-22，无新 commit）、文件时间戳及实验结果，梳理出 W13 的两项主体工作：8 编码器 benchmark（151673 单切片）和 Teddy 全量融合实验。随后以此为基础撰写 docs/WEEKLY_REPORT_2026_W13.md，包含实验目的、方法、结果及核心结论。\n✅ TEDDY 基础模型技术背景调研与介绍 22:58:07.566 | claude_code 用户请求详细介绍 TEDDY foundation model。AI 通过 Web 搜索整理了论文（arXiv:2503.03485，Merck/BCG X）的完整技术细节：双向 Transformer BERT 风格、5 种参数规模（10M–400M）、TEDDY-G/TEDDY-X 两种变体、有监督本体预训练（disease/tissue/cell type/sex 四个特殊 token）、116M 细胞训练数据，以及与 scGPT/Geneformer 的对比基准。结合 MIHD 项目讨论了集成路径与局限性。\nTokenMonitor 🔍 HPC (RHEL 9.7) 上构建 TokenMonitor 的可行性评估 21:22:13.566 | claude_code 用户询问当前系统信息及是否能构建 TokenMonitor。检查发现 Node.js/npm 可用，但 Rust/Cargo 未安装，Tauri 所需的 webkit2gtk4.1-devel 等系统库缺失，module 系统中也无相关模块，GitHub 上无预构建 release。建议通过 rustup 安装 Rust、联系 HPC 管理员安装系统依赖，或使用 GitHub Actions CI 构建 Linux 包，但指出该 GUI 应用在 HPC 登录节点上运行本身需要 X11/Wayland 支持。\nToken 用量 总览 指标 数值 总 Token 1,735,827 输入 Token 4,219 输出 Token 7,038 Cache 创建 137,917 Cache 读取 1,586,653 Cache 命中率 92.0% 总费用 (USD) $1.8524 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 4,219 7,038 137,917 1,586,653 $1.8524 100.0% ",
+  "wordCount" : "659",
+  "inLanguage": "zh",
+  "datePublished": "2026-03-30T00:00:00-05:00",
+  "dateModified": "2026-03-30T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/daily/2026-03-30/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="zh"
+                        data-translation-url="https://tzj2006.github.io/bugjournal/daily/2026-03-30/">EN
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/zh/">主页</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/daily/">每日总结</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-30
+    </h1>
+    <div class="post-meta"><span title='2026-03-30 00:00:00 -0500 -0500'>2026年3月30日</span>&nbsp;·&nbsp;<span>4 分钟</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-30">日报 — 2026-03-30<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-30">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 将 TEDDY-G 400M 集成到 MIHD pipeline，完成全部 11 个 DLPFC 切片的 gene embedding 提取、5 种非 STAIG 融合评估及 STAIG 融合实验</li>
+<li><strong>怎么做的：</strong> 在专用 conda teddy 环境中逐切片提取 embedding 并以标准缓存格式保存，修复 evaluation_planner.py 中 staig_gene_feat 缓存误报 bug，分阶段运行 Phase 1 提取与 Phase 2 评估</li>
+<li><strong>有什么用：</strong> 确认 Teddy+UNI2+STAIG（ARI≈0.495）与 PCA+UNI2+STAIG（ARI≈0.497）性能接近，揭示了 STAIG 框架对 gene encoder 选择的鲁棒性，为后续替换编码器策略提供了实验依据</li>
+</ul>
+<blockquote>
+<p>完成 TEDDY-G 400M 基因基础模型在 DLPFC 全量 11 个切片上的 embedding 提取与多策略融合 benchmark，并撰写 W13 周报总结上周实验发现。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>Teddy + STAIG 融合评估</strong> — 完成 10/11 切片评估（151676 因 model collapse 失败）；Avg ARI=0.495，对比 PCA+STAIG 的 0.497，NMI 上 Teddy 6/10 切片胜出</li>
+<li>✅ <strong>TEDDY embedding 全量提取（11 切片）</strong> — 在 conda teddy 环境中依次为 DLPFC 11 个切片（151508–151676）提取 1024d gene embedding 并缓存至 embeddings_cache/gene/teddy/，总计 185MB</li>
+<li>✅ <strong>Teddy 非 STAIG 融合评估（5 策略 × 11 切片）</strong> — 在 Phase 2 评估 teddy_only、teddy_uni2_concat、teddy_uni2_mean、teddy_uni2_attention、teddy_uni2_llava_mlp 5 种配置；结果：gene-only ARI=0.186，最佳 llava_mlp ARI=0.305</li>
+<li>✅ <strong>UNI2 staig_strict 视觉特征提取</strong> — 为 STAIG fusion 提取 UNI2 staig_strict 变体（256×256 patch、无 ImageNet 归一化、频域滤波），覆盖全部 11 个切片</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>撰写 W13 周报</strong> — 综合 docs/plans.md、git 历史、文件时间戳，撰写 docs/WEEKLY_REPORT_2026_W13.md，总结上周两项主要实验及核心结论</li>
+<li>✅ <strong>修复 evaluation_planner.py staig_gene_feat 误报 bug</strong> — 151676 使用 5000 个基因（staig_gene_feat_5000.npz），但 planner 硬编码检查 3000，导致 sys.exit(1)；改为动态查询实际文件</li>
+<li>✅ <strong>TEDDY 基础模型背景调研</strong> — 通过 Web 搜索整理 TEDDY 论文（arXiv:2503.03485）的完整技术介绍：双向 Transformer + 有监督本体预训练（disease/tissue/cell type），116M 细胞训练，5 种规模（10M–400M）</li>
+<li>✅ <strong>TokenMonitor HPC 构建可行性评估</strong> — 检查 RHEL 9.7 HPC 环境：Node.js/npm 可用，但 Rust 和 Tauri 所需的 webkit2gtk4.1-devel 等系统库均缺失，且无 sudo 权限，无法在 HPC 上构建</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-teddy-gene-only-ari0186不如-pca0255foundation-model-在聚类任务上未能超越简单基线">1. Teddy gene-only ARI（0.186）不如 PCA（0.255），Foundation Model 在聚类任务上未能超越简单基线<a hidden class="anchor" aria-hidden="true" href="#1-teddy-gene-only-ari0186不如-pca0255foundation-model-在聚类任务上未能超越简单基线">#</a></h4>
+<p><strong>解决方案:</strong> 分析根本原因：Teddy 以疾病分类为优化目标而非方差最大化；1024d 高维空间使 KMeans 表现变差；训练数据为 dissociated scRNA-seq，与空间转录组分布不同</p>
+<p><strong>关键洞察:</strong> 基础模型 embedding 的&quot;泛化表示&quot;与&quot;聚类适配性&quot;存在根本张力：PCA 直接最大化数据方差，天然适配 KMeans；而 Foundation Model 学习疾病区分性表示，在下游聚类任务上存在系统性迁移损失</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="2-evaluation_plannerpy-对-151676-的-staig_gene_feat-缓存检查误报导致-phase-2-以-sysexit1-终止">2. evaluation_planner.py 对 151676 的 staig_gene_feat 缓存检查误报，导致 Phase 2 以 sys.exit(1) 终止<a hidden class="anchor" aria-hidden="true" href="#2-evaluation_plannerpy-对-151676-的-staig_gene_feat-缓存检查误报导致-phase-2-以-sysexit1-终止">#</a></h4>
+<p><strong>解决方案:</strong> 修改 has_staig_gene_feat 检查逻辑，动态解析切片配置中的实际 top_genes 数量（151676 使用 5000 而非默认 3000），正确识别缓存存在</p>
+<p><strong>关键洞察:</strong> 切片特定配置（top_genes 来自 staig_utils.py 的 num_gene 字段）与 planner 的硬编码默认值不一致，这类&quot;配置隐式分叉&quot;容易造成难以察觉的假阴性检查</p>
+<h4 id="3-staig-融合评估中-151676-切片出现-model-collapse无法产生有效聚类结果">3. STAIG 融合评估中 151676 切片出现 model collapse，无法产生有效聚类结果<a hidden class="anchor" aria-hidden="true" href="#3-staig-融合评估中-151676-切片出现-model-collapse无法产生有效聚类结果">#</a></h4>
+<p><strong>解决方案:</strong> 跳过该切片，以 10/11 切片的平均值报告结果（ARI=0.495）</p>
+<p><strong>关键洞察:</strong> 151676 是已知的 STAIG 困难切片，其 STAIG collapse 与 gene encoder 无关，是该切片数据特性导致的系统性问题</p>
+<h4 id="4-hpc-上无法构建-tokenmonitor缺少-rustwebkit2gtk41-devel-等-tauri-依赖无-sudo-权限">4. HPC 上无法构建 TokenMonitor（缺少 Rust、webkit2gtk4.1-devel 等 Tauri 依赖，无 sudo 权限）<a hidden class="anchor" aria-hidden="true" href="#4-hpc-上无法构建-tokenmonitor缺少-rustwebkit2gtk41-devel-等-tauri-依赖无-sudo-权限">#</a></h4>
+<p><strong>解决方案:</strong> 建议三条路径：在本地有权限机器构建后拷贝二进制、请 HPC 管理员安装依赖、通过 GitHub Actions CI 构建 Linux 发布包</p>
+<p><strong>关键洞察:</strong> Tauri 应用依赖 GTK/WebKit 系统库，这类 GUI 依赖在 HPC 环境中通常不可用，且 module 系统也不提供此类库；HPC 本质上不是 GUI 应用的目标部署环境</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="是否在非-staig-结果出炉后继续跑-staig-融合">是否在非 STAIG 结果出炉后继续跑 STAIG 融合<a hidden class="anchor" aria-hidden="true" href="#是否在非-staig-结果出炉后继续跑-staig-融合">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>看到 llava_mlp 最佳 ARI 仅 0.305、其他融合均弱于 PCA 后，主动要求追加 STAIG 融合实验</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 在呈现非 STAIG 结果时仅提供了选项列表，没有主动推荐优先顺序</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类对&quot;哪个融合策略最可能接近 SOTA&quot;有先验判断（STAIG 是已知最强策略），因此主动推进；AI 倾向于将决策权交给用户，未主动预判</p>
+<h3 id="实现层面">实现层面<a hidden class="anchor" aria-hidden="true" href="#实现层面">#</a></h3>
+<h4 id="staig_gene_feat-误报-bug-的发现与修复">staig_gene_feat 误报 bug 的发现与修复<a hidden class="anchor" aria-hidden="true" href="#staig_gene_feat-误报-bug-的发现与修复">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>未参与，完全由 AI 发现并修复</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 追踪了 sys.exit 的触发路径，检查了 151676 的实际文件（5000.npz vs 3000.npz），识别出配置隐式分叉并修复</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 这是 AI 的主动贡献：人类用户未察觉此 bug，AI 在排查 Phase 2 失败原因时独立发现并修复</p>
+<h4 id="上周工作的梳理方式">上周工作的梳理方式<a hidden class="anchor" aria-hidden="true" href="#上周工作的梳理方式">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>询问&quot;上周 plan 是什么、做了什么&quot;，期望一个整合的叙述</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI 综合利用 docs/plans.md 的计划文档、git log 时间线、find 文件时间戳、outputs 目录的实验结果，从多个维度重建了上周工作全图</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类提问是高层次的，AI 系统性地分解为&quot;计划 vs 实际执行 vs 未完成&quot;三层，并提供了定量结果支撑</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>对 151676 STAIG model collapse 的根本原因未能深入分析，仅归因为&quot;已知困难切片&quot;，未尝试调整超参数（如 tau、num_epochs）来规避</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>未能预先识别 evaluation_planner.py 中 staig_gene_feat top_genes 硬编码问题，只有在 sys.exit 实际触发后才追溯到根本原因</li>
+<li>后台任务进度监控策略低效：使用多轮 sleep+ls 轮询，而非更优雅的方案（如 inotifywait 或结构化进度文件），导致大量等待时间</li>
+<li>在 bash 命令中构造多行 Python f-string 时出现语法错误（unterminated string literal），需要重新修改命令才能执行</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>STAIG 融合框架对 gene encoder 具有高度鲁棒性：Teddy 1024d（ARI=0.495）与 PCA 50d（ARI=0.497）在 STAIG 框架下性能几乎相同，说明 STAIG 的空间图对比学习机制主导了聚类性能，gene embedding 质量的影响被大幅稀释</li>
+<li>Foundation Model 在跨域下游任务上的系统性迁移损失：Teddy 在疾病分类上 SOTA（ACC=0.72），但在空间转录组聚类上不如 PCA（0.186 vs 0.255），根本原因是优化目标（区分性 vs 方差最大化）的不匹配</li>
+<li>HVG1500（原始高变基因直接拼接，无降维）在 151673 单切片上 ARI=0.330，优于所有 Foundation Model；这提示高维原始特征在某些切片上可能因保留更多局部方差信息而受益</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>切片特定配置（如 staig num_gene）与 pipeline 全局默认值之间的隐式分叉是一类高风险 bug，应在缓存检查逻辑中动态解析而非硬编码</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd-pipeline">MIHD Pipeline<a hidden class="anchor" aria-hidden="true" href="#mihd-pipeline">#</a></h3>
+<p><strong>✅ TEDDY-G 400M 全量 DLPFC Benchmark：embedding 提取 → 多融合评估 → STAIG 融合</strong>
+<em>00:01:05.759 | claude_code</em>
+在 DCC 上以 conda teddy 环境逐切片提取 TEDDY 1024d embedding（共 11 切片，约 185MB），随后运行 5 种非 STAIG 融合策略评估（gene-only ARI=0.186，llava_mlp 最佳 ARI=0.305）。用户要求追加 STAIG 融合，AI 提取 UNI2 staig_strict 视觉特征，发现并修复 evaluation_planner.py 中 staig_gene_feat 5000 vs 3000 误报 bug，最终完成 10/11 切片的 Teddy+STAIG 评估（ARI=0.495），与 PCA+STAIG（ARI=0.497）性能接近。</p>
+<p><strong>✅ 上周（W13）MIHD 实验工作回顾与周报生成</strong>
+<em>21:13:39.566 | claude_code</em>
+用户询问上周计划与实际工作内容。AI 综合 docs/plans.md、git log（最近提交止于 2026-02-22，无新 commit）、文件时间戳及实验结果，梳理出 W13 的两项主体工作：8 编码器 benchmark（151673 单切片）和 Teddy 全量融合实验。随后以此为基础撰写 docs/WEEKLY_REPORT_2026_W13.md，包含实验目的、方法、结果及核心结论。</p>
+<p><strong>✅ TEDDY 基础模型技术背景调研与介绍</strong>
+<em>22:58:07.566 | claude_code</em>
+用户请求详细介绍 TEDDY foundation model。AI 通过 Web 搜索整理了论文（arXiv:2503.03485，Merck/BCG X）的完整技术细节：双向 Transformer BERT 风格、5 种参数规模（10M–400M）、TEDDY-G/TEDDY-X 两种变体、有监督本体预训练（disease/tissue/cell type/sex 四个特殊 token）、116M 细胞训练数据，以及与 scGPT/Geneformer 的对比基准。结合 MIHD 项目讨论了集成路径与局限性。</p>
+<h3 id="tokenmonitor">TokenMonitor<a hidden class="anchor" aria-hidden="true" href="#tokenmonitor">#</a></h3>
+<p><strong>🔍 HPC (RHEL 9.7) 上构建 TokenMonitor 的可行性评估</strong>
+<em>21:22:13.566 | claude_code</em>
+用户询问当前系统信息及是否能构建 TokenMonitor。检查发现 Node.js/npm 可用，但 Rust/Cargo 未安装，Tauri 所需的 webkit2gtk4.1-devel 等系统库缺失，module 系统中也无相关模块，GitHub 上无预构建 release。建议通过 rustup 安装 Rust、联系 HPC 管理员安装系统依赖，或使用 GitHub Actions CI 构建 Linux 包，但指出该 GUI 应用在 HPC 登录节点上运行本身需要 X11/Wayland 支持。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>1,735,827</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>4,219</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>7,038</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>137,917</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>1,586,653</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>92.0%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$1.8524</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>4,219</td>
+          <td>7,038</td>
+          <td>137,917</td>
+          <td>1,586,653</td>
+          <td>$1.8524</td>
+          <td>100.0%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+document.getElementById("lang-toggle").addEventListener("click", function() {
+    var current = this.getAttribute("data-current-lang");
+    var url = this.getAttribute("data-translation-url");
+    var newLang = (current === "en") ? "zh" : "en";
+    localStorage.setItem("pref-lang", newLang);
+    if (url) {
+        window.location.href = url;
+    } else {
+        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+    }
+});
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

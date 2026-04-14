@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-28 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="DCC上完成MIHD项目Visium HD全链路扩展（8文件修改）与scGPT关键权重加载Bug修复（ARI&#43;44.4%），tianhe上从零实现BC-RNN Phoenix基线训练流水线并成功启动9任务并行训练，同时完成Pi0.5 Phoenix首次评测部署（7/9任务完成）。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-28/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-02-28/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-28/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    var stored = localStorage.getItem("pref-lang");
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-28/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-28">
+  <meta property="og:description" content="DCC上完成MIHD项目Visium HD全链路扩展（8文件修改）与scGPT关键权重加载Bug修复（ARI&#43;44.4%），tianhe上从零实现BC-RNN Phoenix基线训练流水线并成功启动9任务并行训练，同时完成Pi0.5 Phoenix首次评测部署（7/9任务完成）。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-28T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-28T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-28">
+  <meta name="twitter:description" content="DCC上完成MIHD项目Visium HD全链路扩展（8文件修改）与scGPT关键权重加载Bug修复（ARI&#43;44.4%），tianhe上从零实现BC-RNN Phoenix基线训练流水线并成功启动9任务并行训练，同时完成Pi0.5 Phoenix首次评测部署（7/9任务完成）。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "每日总结",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-02-28",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/2026-02-28/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-28",
+  "name": "Bug Journal 2026-02-28",
+  "description": "DCC上完成MIHD项目Visium HD全链路扩展（8文件修改）与scGPT关键权重加载Bug修复（ARI+44.4%），tianhe上从零实现BC-RNN Phoenix基线训练流水线并成功启动9任务并行训练，同时完成Pi0.5 Phoenix首次评测部署（7/9任务完成）。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-02-28 今日概览 做了什么： 两台服务器同步推进三条主线：DCC上MIHD benchmark扩展到Visium HD数据（crop10large，17502 spots）并修复scGPT致命权重加载Bug，tianhe上实现BC-RNN Phoenix基线自动化训练脚本并完成Pi0.5 Phoenix九任务评测部署。 怎么做的： DCC端通过代码审计与checkpoint key比对定位并修复单行遗漏，完成8文件全链路HD支持及189张RM-IDEAL可视化；tianhe端逐步攻克SLURM约束、WebSocket代理拦截、多个robosuite库级兼容问题，最终在单GPU上并行运行9个BC-RNN任务。 有什么用： MIHD benchmark从DLPFC扩展至HD数据集，scGPT恢复17.7%被随机初始化的注意力权重，staig_fusion多模态融合优势得到量化验证；tianhe端建立了可复用的VLA基线评测与BC-RNN训练流水线，为Phoenix论文对照实验奠定基础。 DCC 做了什么： 修复scGPT致命权重加载Bug并重提取11个DLPFC切片embedding；实现Visium HD crop10large全链路支持并完成section 151673全量RM-IDEAL评估（27方法×7层，189张可视化）。 怎么做的： 比对checkpoint与model state_dict的key，定位model.py中遗漏self.use_fast_transformer一行；修改8个核心文件（data_loader/clustering/run_benchmark/pipeline四模块）添加HD无标注支持，Leiden社区发现自动估计k，缓存加速Wasserstein距离计算。 有什么用： scGPT全量ARI平均提升44.4%、NMI提升33.3%；staig_fusion在RM-IDEAL评估排名第一（平均r=0.396，Layer_3峰值r=0.644），多模态融合对空间niche结构捕获能力远超单模态基线（avg r≈0.06-0.12）。 tianhe 做了什么： 调查确认Pi0.5 Phoenix已完成100k步训练，调试并启动九任务rollout评测（7/9完成）；同时实现train_bc_rnn_benchmark.py并修复5处库级Bug，成功在单GPU上并行启动9路BC-RNN训练（附每20 epoch的50次rollout评估）。 怎么做的： 通过checkpoint目录直接确认训练完成状态；逐步解决tyro子命令语法错误、WebSocket被代理拦截、robosuite API版本不兼容、SLURM账户/内存/EGL约束等问题；用srun –overlap复用现有interactive job的GPU节点，修补mujoco_py导入、MimicGen环境注册、get_bounding_box_half_size三处库级缺陷。 有什么用： Pi0.5 Phoenix首次完成评测部署（Stack_D0 24%、Stack_D1 12%）；BC-RNN 9任务并行训练稳定运行（每任务~2.2GB VRAM），TensorBoard记录训练曲线和Success Rate，预计35+小时后完成600 epoch训练。 DCC上完成MIHD项目Visium HD全链路扩展（8文件修改）与scGPT关键权重加载Bug修复（ARI+44.4%），tianhe上从零实现BC-RNN Phoenix基线训练流水线并成功启动9任务并行训练，同时完成Pi0.5 Phoenix首次评测部署（7/9任务完成）。\n今日任务 架构与策略 ✅ 修复scGPT use_fast_transformer权重加载Bug并重提取全量embedding — TransformerModel.__init__中遗漏self.use_fast_transformer，导致load_pretrained()中key重映射永远不执行，12层注意力的Q/K/V权重（9455616参数，占比17.7%）全部随机初始化；修复后重新提取全部11个DLPFC切片（151508~151676）的scGPT embedding，备份旧缓存至scgpt_buggy_backup/，批量生成空间聚类可视化图（outputs/visualization/scgpt_fixed/）。 ✅ Visium HD crop10large全链路支持实现（8文件修改） — 探索HD数据结构后确定使用crop10large子区域（17502 spots）方案；修改data_loader/clustering/run_benchmark/pipeline四模块共8个文件，添加HD数据加载、无标注自动聚类（estimate_n_clusters_leiden）、跳过ARI/NMI的HD专用可视化逻辑及hd_global配置段；修复坐标空间对齐、双重预处理、spot大小等问题，端到端验证成功（leiden k=20，Silhouette=0.086）。 🔄 Pi0.5 Phoenix九任务MimicGen rollout评测部署 — 调查确认Pi0.5 Phoenix（9任务LoRA微调）已完成100k步训练（checkpoint到99999）但从未评估；梳理三种Pi0.5模型形态（官方base/9任务联合LoRA/单任务微调）；调试并启动step 99999的九任务rollout评测（每任务50次，共450次试验），解决多个环境兼容问题后至会话结束时7/9任务完成（Stack_D0 24%、Stack_D1 12%，ThreePieceAssembly D0/D1仍在运行）。 🔄 BC-RNN Phoenix基线脚本实现与9任务并行训练启动（含rollout评估） — 基于MimicGen原始论文超参数、对标Phoenix CVPR 2025论文9个任务setting，实现train_bc_rnn_benchmark.py（generate-configs/train/eval/report/status五模式）；修复三处库级Bug后，用srun –overlap在an49节点单GPU上并行启动全部9个任务训练（Coffee×GPU5，其余8任务×GPU7），每20 epoch进行50次rollout在线评估，确认现有RobomimicPolicyAdapter天然兼容未来错误注入需求。 ✅ Section 151673 RM-IDEAL全量评估（27方法×7层，189张可视化） — 对DLPFC section 151673运行全量27种embedding方法的RM-IDEAL评估，计算余弦相似度与RM-IDEAL ground truth的Spearman r；首次运行仅获取数值后补生成189张三面板可视化（niche query + RM-IDEAL + embedding similarity），结果保存至outputs/rm_ideal_evaluation/151673/summary.csv。 实现与修复 ✅ visualize_from_cache.py HD适配与spot大小修复 — 为visualize_from_cache.py添加HD支持（process_hd_section函数、–dataset/–crop_dir参数），在utils/visualization.py实现create_hd_clustering_visualization（H\u0026E+聚类双面板）；修复sc.pl.spatial size参数（1.0→4.0），对应HD spot_diameter_fullres=7.3与DLPFC~144的差异（k=17，Silhouette=0.302）。 ✅ Pi0.5训练数据溯源与三种模型形态梳理 — 厘清项目中三种Pi0.5的来源和用途：官方预训练base（zero-shot）、9任务LoRA微调（4500 episodes，5个task prompt，100k steps on 4×A800，phoenix_comparison）、zhaoganlong的单任务微调变体；确认9任务训练数据详情（每任务500 demos，84×84双摄像头+8D状态→7D动作）。 ✅ 更新项目全景总结.md（v4.13） — 在Error Recovery Benchmark项目全景总结.md中添加v4.13版本条目、文件清单和版本历史记录。 问题与解决方案 关键问题 1. scGPT TransformerModel.__init__中use_fast_transformer未保存为实例属性，导致load_pretrained()中Wqkv→in_proj_的key重映射永远不执行，17.7%注意力权重随机初始化，strict=False静默跳过不匹配不报错。 解决方案: 在model.py第64行添加self.use_fast_transformer = use_fast_transformer；修复后验证186/186参数全部匹配，ARI平均提升44.4%。\n关键洞察: PyTorch strict=False是双刃剑：允许部分加载的同时静默忽略不匹配key，关键权重可能长期以随机值运行；上游GitHub官方仓库也存在同一Bug，开源代码的权重加载路径需主动审计而非盲目信任。\n2. CoffeeMachineBodyObject缺失get_bounding_box_half_size()方法，MimicGen Coffee任务rollout初始化时报AttributeError，该方法被调用但从未在robosuite基类中实现（MimicGen与当前robosuite版本之间的接口断层）。 解决方案: 追溯完整调用链（coffee_machine.py→CoffeeMachineBodyObject→CompositeBodyObject→MujocoXMLObject），在三个不同层级基类中分别实现get_bounding_box_half_size()，根据各类的几何数据计算包围盒半尺寸。\n关键洞察: 修复第三方库缺失方法必须追溯完整继承链，仅修补最近调用点会导致其他子类仍报错；不同robosuite fork之间存在API不兼容，依赖管理应pin到与模型训练相同的commit。\n3. WebSocket客户端始终报ConnectionRefusedError，即使服务端进程已在监听port 8000；调试过程中尝试了不同地址格式（localhost/127.0.0.1/0.0.0.0）均无效。 解决方案: 发现http_proxy环境变量被设置为127.0.0.1:10087，websockets库通过代理连接导致失败；在run_eval.sh开头unset所有代理变量后连接成功。\n关键洞察: HTTP/HTTPS代理环境变量会透明拦截WebSocket连接，HPC集群调试本地服务时应优先检查代理变量；此类问题在HPC集群上尤为常见，应列入标准排查清单。\n4. robomimic的env_robosuite.py顶层直接import mujoco_py（未安装），且未import mimicgen导致MimicGen环境变体（Coffee_D0等）未注册到robosuite，rollout环境初始化失败。 解决方案: 将import mujoco_py用try/except包裹；同时添加import mimicgen使MimicGen环境通过副作用注册；确认使用与训练相同版本的robosuite（zhaoganlong依赖目录）。\n关键洞察: MimicGen环境通过import副作用注册，任何外部工具调用这些环境前需显式执行该import；robomimic本身不知道这一依赖，需在集成层主动注入。\n5. HD数据adata_8um.h5ad的uns[‘spatial’]中hires图像是全图（6000×3886），坐标在裁剪后的fullres像素空间（0-4966, 0-2971），两者不匹配导致可视化错位；且X已log变换，原有preprocess_data()会再次执行normalize_total+log1p导致双重变换。 解决方案: 在load_hd_data()中替换uns[‘spatial’]图像为cropped_fullres.tif并重新计算scalefactor；为preprocess_data()添加skip_log参数，HD数据传入skip_log=True只做HVG过滤。\n关键洞察: HD预处理后的adata图像和坐标来自不同处理阶段，必须显式对齐坐标空间与图像；数据加载函数应携带已执行的预处理步骤标记，避免双重变换。\n6. robomimic在非TTY环境下遇到已存在的checkpoint目录时发起交互式覆盖确认，收到EOF后直接EOFError退出，导致多次并行启动任务失败（部分失败运行残留目录会触发下次启动的覆盖检查）。 解决方案: 在每次（重）启动前彻底清理对应checkpoint目录，避免触发覆盖检查；用nohup + srun –overlap代替sbatch方式运行，确保进程不随shell退出而终止。\n关键洞察: robomimic的get_exp_dir()在非TTY环境下遇到已存在目录会直接退出，每次启动前需确认目录已彻底清理；已创建的目录会触发下次启动的覆盖检查，形成循环失败。\n7. Pi0.5训练因SLURM job 46553崩溃被认为未成功完成，AI初始基于之前对话缓存（step 5000崩溃记录）给出了训练未完成的错误判断。 解决方案: 直接检查checkpoint目录，发现从step 4000到99999的完整checkpoints均存在，判断训练在崩溃后被恢复并跑完全部100k步。\n关键洞察: checkpoint目录是训练完成最可靠的证据，比日志文件和对话记录更权威；SLURM job崩溃不等于训练失败，应直接验证checkpoint而非依赖记录。\n一般问题 8. HD数据spot_diameter_fullres=7.3（vs DLPFC ~144），sc.pl.spatial(size=1.0)渲染出的点极小，几乎不可见，用户通过直观观察发现问题。 解决方案: 将HD可视化的size参数从1.0调整为4.0，使点直径约为29px（≈bin间距29.2 fullres px）。\n关键洞察: scanpy spatial的size参数是spot_diameter_fullres的倍数，不同分辨率数据集需要不同倍数；HD 8µm的spot diameter约为Visium的1/20，需相应增大size倍数填满bin间距。\n9. 天河集群SLURM多项约束导致任务提交反复失败：缺少–account=sysu_gbli2（组权限）、–mem被策略禁止、MUJOCO_EGL_DEVICE_ID需使用物理GPU编号而非CUDA_VISIBLE_DEVICES逻辑编号；GPU显存分配时未充分检查各卡空闲状态导致coffee_d0 OOM。 解决方案: 通过sacctmgr查询账户名添加–account；将–mem替换为–gres=gpu:1；将MUJOCO_EGL_DEVICE_ID设为实际物理GPU编号（5或7）；实时检查每块GPU的compute-apps占用后重新分配任务。\n关键洞察: EGL设备ID直接对应物理GPU，不受CUDA_VISIBLE_DEVICES重映射影响；新集群首次提交前需通过sacctmgr确认账户名和QOS限制；应检查per-GPU的compute-apps而非仅看显存汇总。\n10. run_benchmark.py中存在与utils/clustering.py功能重复的本地cluster_embeddings副本，修改工具库后本地副本未同步，导致n_clusters=-1时KMeans报InvalidParameterError。 解决方案: 在run_benchmark.py的本地cluster_embeddings函数中同样添加自动Leiden估计逻辑，与utils/clustering.py的修改保持一致。\n关键洞察: 大型脚本常存在与工具库功能重复的本地函数；修改工具库时需检查脚本内是否有同名副本，或通过重构消除重复。\n人类思路 vs AI 思路 战略层面 scGPT Bug溯源：领域经验（同事提示）vs系统代码验证 角色 思路 人类 同事基于Flash Attention与PyTorch不兼容的经验直接指向checkpoint key名称不匹配的根因方向，大幅缩小了问题搜索空间。 AI AI系统性阅读代码、比对checkpoint与model state_dict的key、编写验证脚本，精确定位到具体的一行遗漏代码。 差异分析: 人类依靠领域经验和社区知识快速给出方向性假设；AI负责执行系统化验证和精确定位。两者互补：缺少人类的方向性提示，AI可能需要更多搜索；缺少AI的代码验证，人类的猜测难以确认。\n实验迭代策略：小规模代理数据集优先验证 角色 思路 人类 明确指出先用crop10large子区域（17502 spots）测试，避免直接处理全量545K spots，优先验证方法可行性再扩展。 AI AI初始规划针对全量HD数据，设计了完整的全量处理架构，未主动提议从小规模开始迭代。 差异分析: 人类对实验迭代速度有更强的工程直觉，用小规模代理数据集快速验证；AI倾向于一步到位设计完整方案，缺乏保守验证意识。\nHPC资源管理全局视角（GPU并行策略、rollout开启、资源优先检查） 角色 思路 人类 基于BC-RNN显存占用的先验判断（~2GB/任务）直接提出单GPU并行9个任务的策略；主动要求开启训练时rollout评估；在AI准备执行命令前提醒先检查所有运行中的job和GPU空闲状态。 AI 遵循保守的\"一任务一GPU\"范式，未主动建议高密度并行；按模板默认值生成配置（rollout.enabled=false）而未主动优化；专注于技术障碍解决而忽略宏观资源状态。 差异分析: 人类对HPC资源管理有更强的系统性意识，能将领域经验（显存估算）转化为工程决策；AI倾向于聚焦当前技术障碍而忽略资源约束和配置优化机会。\nBug修复方法论：调用链追溯vs单点修补 角色 思路 人类 只要求\"修复它\"，未指定修复位置或方式。 AI 系统性追溯完整调用链（coffee_machine.py→CoffeeMachineBodyObject→CompositeBodyObject→MujocoXMLObject），在三个不同层级基类中分别添加方法的合理实现。 差异分析: AI的调试路径更系统，正确识别出需要在多个基类中同时添加方法而非只修补最近的调用点，体现了对类继承结构的完整分析能力。\n文献引用溯源：评测setting来源vs算法超参数来源的区分 角色 思路 人类 明确指定：使用Phoenix论文对齐评测setting，但BC-RNN超参数应参考MimicGen原始论文（arXiv:2310.17596）而非Phoenix论文。 AI 试图从Phoenix论文中提取BC-RNN超参数，被网络限制阻塞后进行web search，未能直觉性区分引用来源的不同意图。 差异分析: 人类在学术文献使用上有更清晰的溯源意识，能区分\"评测setting参考文献\"与\"算法超参数参考文献\"；AI需要明确说明才能正确区分引用来源意图。\n未来研究视角：错误注入兼容性的前瞻设计 角色 思路 人类 主动提出未来需要向训练好的BC-RNN注入错误并采集场景，要求代码提前考虑兼容性，将当前工具设计与未来实验需求联系起来。 AI 专注于完成眼前的训练评估功能；收到提示后分析了现有框架（RobomimicPolicyAdapter）并确认已天然兼容，但未主动考虑。 差异分析: 人类具有更长远的研究视角，能预见当前工具的未来用途；AI更倾向于完成眼前任务，缺乏主动规划未来兼容性的意识。\nAI 局限性 重要局限 依赖过时的对话缓存信息（如Pi0.5 step 5000崩溃记录）缺乏主动验证意识，需要实际检查文件系统后才能纠正错误判断；对过时记忆的过度信任可能导致误导性结论，应以实际文件状态为准。 HPC环境陷阱排查缺乏系统性检查清单：未主动检查代理环境变量（WebSocket连接失败初期）、MUJOCO_EGL_DEVICE_ID硬编码为逻辑ID而非物理ID、调试阶段多次启动大型GPU服务未清理旧进程导致OOM，均需人类提示才暴露问题。 srun进程生命周期管理不当：多次因日志为空误判\"任务失败\"并重复清理/重启，缺乏\"先检查进程状态再决策\"的前置判断；进程可能已在运行但未产生可见输出，应与状态检查结合判断。 实验规模规划偏全量，未主动建议从小规模代理数据集迭代验证（HD数据545K全量规划需用户纠正至crop10large），缺乏对实验迭代效率的主动优化意识。 一般局限 未能预判跨文件代码一致性问题（run_benchmark.py本地cluster_embeddings副本未同步）和跨数据集可视化参数差异（HD spot大小过小），需要用户实际观察输出后触发二次修复。 今日收获 核心收获 PyTorch model.load_state_dict(strict=False)会静默忽略不匹配的key，导致关键权重以随机值替代不报错，此类Bug可长期潜伏；生产代码中应主动打印missing_keys/unexpected_keys并在加载后验证参数数值统计。上游GitHub官方仓库也存在同一Bug，开源代码的权重加载路径需主动审计而非盲目信任。 staig_fusion在RM-IDEAL评估上全面领先（151673平均r=0.396，Layer_3峰值r=0.644），证明学习型多模态融合对空间niche结构的捕获能力远超简单融合（concat/mean avg r≈0.15）和单模态基线（gene/vision avg r≈0.06-0.12）。 MimicGen环境变体（Coffee_D0、Stack_D1等）通过import mimicgen的副作用注册到robosuite；任何外部工具（如robomimic）调用这些环境前必须先执行该import；不同robosuite fork之间存在API不兼容，训练与评测必须pin到相同commit。 HTTP/HTTPS代理环境变量（http_proxy/https_proxy）会被Python的websockets库透明代理WebSocket连接，导致ws://localhost:xxxx经代理而失败；HPC集群运行本地WebSocket服务时需在客户端启动前unset代理变量或设置no_proxy=localhost。 修复第三方库缺失方法时需追溯完整的类继承链并在所有涉及的基类中实现，仅在最直接的调用点打补丁会导致其他子类调用时仍报错。 crop10large（17502 spots）是验证HD方法可行性的理想代理数据集：规模与DLPFC相当，有配套裁剪fullres图像，可在不修改架构假设的前提下验证全套pipeline。Leiden社区发现（resolution=1.0）作为无监督聚类数自动估计方法在HD数据上表现良好（k=17-20，Silhouette=0.302），适合无标注HD数据的默认聚类策略。 A800 80GB GPU上BC-RNN单任务训练约占2.2GB VRAM，单块GPU可高密度并行多任务，实际受限于CPU/IO而非VRAM；scanpy spatial可视化的size参数是spot_diameter_fullres的倍数，DLPFC（diameter≈144）用size=1.0，HD 8µm（diameter≈7.3）需size≈4.0才能填满bin间距。 实践收获 天河集群SLURM特殊约束：必须指定–account=sysu_gbli2；–mem被QOS策略禁止需改用–gres=gpu:1；MUJOCO_EGL_DEVICE_ID对应物理GPU编号而非CUDA_VISIBLE_DEVICES逻辑编号；可通过srun –overlap在已有interactive job上附加新step复用节点资源，无需重新提交job。 会话摘要 MIHD ✅ DCC全天工作：scGPT Bug修复+RM-IDEAL全量评估+Visium HD全链路实现 21:23:19.892 | claude_code DCC上完成三项主要任务：① 修复scGPT-spatial TransformerModel中use_fast_transformer属性遗漏Bug，重新提取全部11个DLPFC切片embedding（ARI平均+44.4%，NMI+33.3%），生成scgpt_fixed可视化；② 对section 151673运行27种embedding方法的RM-IDEAL全量评估，staig_fusion以平均r=0.396排名第一（Layer_3峰值r=0.644），借助缓存快速补生成189张三面板可视化；③ 将MIHD benchmark扩展至Visium HD crop10large（17502 spots），修改8个核心文件添加无标注HD支持（Leiden自动估计k），修复HD可视化坐标对齐、双重预处理和spot大小等问题，端到端验证成功（k=17，Silhouette=0.302）。\nError Recovery Benchmark 🔄 tianhe全天工作：Pi0.5 Phoenix评测部署+BC-RNN基线脚本实现与9任务并行训练 20:53:34.791 | claude_code tianhe（an49节点）上完成两条主线：① Pi0.5 Phoenix评测：调查确认100k步训练已完成（checkpoint到99999）但从未评估，梳理三种Pi0.5模型形态，调试解决tyro子命令语法错误、HTTP代理拦截WebSocket、robosuite API版本不兼容、env.seed()缺失等问题，成功启动九任务rollout评测（step 99999，每任务50次），会话结束时7/9任务完成（Stack_D0 24%、Stack_D1 12%，ThreePieceAssembly D0/D1仍在运行）；② BC-RNN基线：参考MimicGen原始论文超参数，创建train_bc_rnn_benchmark.py（5模式），修复SLURM账户/内存/EGL约束、mujoco_py导入、MimicGen环境注册、get_bounding_box_half_size三处库级Bug，用srun –overlap在单GPU上并行启动9路训练（附rollout评估），训练稳定运行（每任务~2.2GB VRAM），确认现有RobomimicPolicyAdapter天然兼容未来错误注入需求，预计35+小时后完成600 epoch。\nToken 用量 总览 指标 数值 总 Token 53,226,640 输入 Token 25,177 输出 Token 129,735 Cache 创建 2,251,309 Cache 读取 50,820,419 Cache 命中率 95.8% 总费用 (USD) $34.9126 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 10,689 85,854 1,506,168 42,629,752 $32.9282 94.3% claude-haiku-4-5-20251001 14,488 43,881 745,141 8,190,667 $1.9844 5.7% 各设备用量 设备 总 Token 输入 输出 费用 DCC 52,737,471 25,154 128,907 $34.5661 tianhe 0 0 0 $0.0000 TzJsDesktop 489,169 23 828 $0.3465 ",
+  "wordCount" : "436",
+  "inLanguage": "zh",
+  "datePublished": "2026-02-28T00:00:00-05:00",
+  "dateModified": "2026-02-28T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/daily/2026-02-28/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="zh"
+                        data-translation-url="https://tzj2006.github.io/bugjournal/daily/2026-02-28/">EN
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/zh/">主页</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/daily/">每日总结</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-28
+    </h1>
+    <div class="post-meta"><span title='2026-02-28 00:00:00 -0500 EST'>2026年2月28日</span>&nbsp;·&nbsp;<span>3 分钟</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-02-28">日报 — 2026-02-28<a hidden class="anchor" aria-hidden="true" href="#日报--2026-02-28">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 两台服务器同步推进三条主线：DCC上MIHD benchmark扩展到Visium HD数据（crop10large，17502 spots）并修复scGPT致命权重加载Bug，tianhe上实现BC-RNN Phoenix基线自动化训练脚本并完成Pi0.5 Phoenix九任务评测部署。</li>
+<li><strong>怎么做的：</strong> DCC端通过代码审计与checkpoint key比对定位并修复单行遗漏，完成8文件全链路HD支持及189张RM-IDEAL可视化；tianhe端逐步攻克SLURM约束、WebSocket代理拦截、多个robosuite库级兼容问题，最终在单GPU上并行运行9个BC-RNN任务。</li>
+<li><strong>有什么用：</strong> MIHD benchmark从DLPFC扩展至HD数据集，scGPT恢复17.7%被随机初始化的注意力权重，staig_fusion多模态融合优势得到量化验证；tianhe端建立了可复用的VLA基线评测与BC-RNN训练流水线，为Phoenix论文对照实验奠定基础。</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 修复scGPT致命权重加载Bug并重提取11个DLPFC切片embedding；实现Visium HD crop10large全链路支持并完成section 151673全量RM-IDEAL评估（27方法×7层，189张可视化）。</li>
+<li><strong>怎么做的：</strong> 比对checkpoint与model state_dict的key，定位model.py中遗漏self.use_fast_transformer一行；修改8个核心文件（data_loader/clustering/run_benchmark/pipeline四模块）添加HD无标注支持，Leiden社区发现自动估计k，缓存加速Wasserstein距离计算。</li>
+<li><strong>有什么用：</strong> scGPT全量ARI平均提升44.4%、NMI提升33.3%；staig_fusion在RM-IDEAL评估排名第一（平均r=0.396，Layer_3峰值r=0.644），多模态融合对空间niche结构捕获能力远超单模态基线（avg r≈0.06-0.12）。</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 调查确认Pi0.5 Phoenix已完成100k步训练，调试并启动九任务rollout评测（7/9完成）；同时实现train_bc_rnn_benchmark.py并修复5处库级Bug，成功在单GPU上并行启动9路BC-RNN训练（附每20 epoch的50次rollout评估）。</li>
+<li><strong>怎么做的：</strong> 通过checkpoint目录直接确认训练完成状态；逐步解决tyro子命令语法错误、WebSocket被代理拦截、robosuite API版本不兼容、SLURM账户/内存/EGL约束等问题；用srun &ndash;overlap复用现有interactive job的GPU节点，修补mujoco_py导入、MimicGen环境注册、get_bounding_box_half_size三处库级缺陷。</li>
+<li><strong>有什么用：</strong> Pi0.5 Phoenix首次完成评测部署（Stack_D0 24%、Stack_D1 12%）；BC-RNN 9任务并行训练稳定运行（每任务~2.2GB VRAM），TensorBoard记录训练曲线和Success Rate，预计35+小时后完成600 epoch训练。</li>
+</ul>
+<blockquote>
+<p>DCC上完成MIHD项目Visium HD全链路扩展（8文件修改）与scGPT关键权重加载Bug修复（ARI+44.4%），tianhe上从零实现BC-RNN Phoenix基线训练流水线并成功启动9任务并行训练，同时完成Pi0.5 Phoenix首次评测部署（7/9任务完成）。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>修复scGPT use_fast_transformer权重加载Bug并重提取全量embedding</strong> — TransformerModel.__init__中遗漏self.use_fast_transformer，导致load_pretrained()中key重映射永远不执行，12层注意力的Q/K/V权重（9455616参数，占比17.7%）全部随机初始化；修复后重新提取全部11个DLPFC切片（151508~151676）的scGPT embedding，备份旧缓存至scgpt_buggy_backup/，批量生成空间聚类可视化图（outputs/visualization/scgpt_fixed/）。</li>
+<li>✅ <strong>Visium HD crop10large全链路支持实现（8文件修改）</strong> — 探索HD数据结构后确定使用crop10large子区域（17502 spots）方案；修改data_loader/clustering/run_benchmark/pipeline四模块共8个文件，添加HD数据加载、无标注自动聚类（estimate_n_clusters_leiden）、跳过ARI/NMI的HD专用可视化逻辑及hd_global配置段；修复坐标空间对齐、双重预处理、spot大小等问题，端到端验证成功（leiden k=20，Silhouette=0.086）。</li>
+<li>🔄 <strong>Pi0.5 Phoenix九任务MimicGen rollout评测部署</strong> — 调查确认Pi0.5 Phoenix（9任务LoRA微调）已完成100k步训练（checkpoint到99999）但从未评估；梳理三种Pi0.5模型形态（官方base/9任务联合LoRA/单任务微调）；调试并启动step 99999的九任务rollout评测（每任务50次，共450次试验），解决多个环境兼容问题后至会话结束时7/9任务完成（Stack_D0 24%、Stack_D1 12%，ThreePieceAssembly D0/D1仍在运行）。</li>
+<li>🔄 <strong>BC-RNN Phoenix基线脚本实现与9任务并行训练启动（含rollout评估）</strong> — 基于MimicGen原始论文超参数、对标Phoenix CVPR 2025论文9个任务setting，实现train_bc_rnn_benchmark.py（generate-configs/train/eval/report/status五模式）；修复三处库级Bug后，用srun &ndash;overlap在an49节点单GPU上并行启动全部9个任务训练（Coffee×GPU5，其余8任务×GPU7），每20 epoch进行50次rollout在线评估，确认现有RobomimicPolicyAdapter天然兼容未来错误注入需求。</li>
+<li>✅ <strong>Section 151673 RM-IDEAL全量评估（27方法×7层，189张可视化）</strong> — 对DLPFC section 151673运行全量27种embedding方法的RM-IDEAL评估，计算余弦相似度与RM-IDEAL ground truth的Spearman r；首次运行仅获取数值后补生成189张三面板可视化（niche query + RM-IDEAL + embedding similarity），结果保存至outputs/rm_ideal_evaluation/151673/summary.csv。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>visualize_from_cache.py HD适配与spot大小修复</strong> — 为visualize_from_cache.py添加HD支持（process_hd_section函数、&ndash;dataset/&ndash;crop_dir参数），在utils/visualization.py实现create_hd_clustering_visualization（H&amp;E+聚类双面板）；修复sc.pl.spatial size参数（1.0→4.0），对应HD spot_diameter_fullres=7.3与DLPFC~144的差异（k=17，Silhouette=0.302）。</li>
+<li>✅ <strong>Pi0.5训练数据溯源与三种模型形态梳理</strong> — 厘清项目中三种Pi0.5的来源和用途：官方预训练base（zero-shot）、9任务LoRA微调（4500 episodes，5个task prompt，100k steps on 4×A800，phoenix_comparison）、zhaoganlong的单任务微调变体；确认9任务训练数据详情（每任务500 demos，84×84双摄像头+8D状态→7D动作）。</li>
+<li>✅ <strong>更新项目全景总结.md（v4.13）</strong> — 在Error Recovery Benchmark项目全景总结.md中添加v4.13版本条目、文件清单和版本历史记录。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-scgpt-transformermodel__init__中use_fast_transformer未保存为实例属性导致load_pretrained中wqkvin_proj_的key重映射永远不执行177注意力权重随机初始化strictfalse静默跳过不匹配不报错">1. scGPT TransformerModel.__init__中use_fast_transformer未保存为实例属性，导致load_pretrained()中Wqkv→in_proj_的key重映射永远不执行，17.7%注意力权重随机初始化，strict=False静默跳过不匹配不报错。<a hidden class="anchor" aria-hidden="true" href="#1-scgpt-transformermodel__init__中use_fast_transformer未保存为实例属性导致load_pretrained中wqkvin_proj_的key重映射永远不执行177注意力权重随机初始化strictfalse静默跳过不匹配不报错">#</a></h4>
+<p><strong>解决方案:</strong> 在model.py第64行添加self.use_fast_transformer = use_fast_transformer；修复后验证186/186参数全部匹配，ARI平均提升44.4%。</p>
+<p><strong>关键洞察:</strong> PyTorch strict=False是双刃剑：允许部分加载的同时静默忽略不匹配key，关键权重可能长期以随机值运行；上游GitHub官方仓库也存在同一Bug，开源代码的权重加载路径需主动审计而非盲目信任。</p>
+<h4 id="2-coffeemachinebodyobject缺失get_bounding_box_half_size方法mimicgen-coffee任务rollout初始化时报attributeerror该方法被调用但从未在robosuite基类中实现mimicgen与当前robosuite版本之间的接口断层">2. CoffeeMachineBodyObject缺失get_bounding_box_half_size()方法，MimicGen Coffee任务rollout初始化时报AttributeError，该方法被调用但从未在robosuite基类中实现（MimicGen与当前robosuite版本之间的接口断层）。<a hidden class="anchor" aria-hidden="true" href="#2-coffeemachinebodyobject缺失get_bounding_box_half_size方法mimicgen-coffee任务rollout初始化时报attributeerror该方法被调用但从未在robosuite基类中实现mimicgen与当前robosuite版本之间的接口断层">#</a></h4>
+<p><strong>解决方案:</strong> 追溯完整调用链（coffee_machine.py→CoffeeMachineBodyObject→CompositeBodyObject→MujocoXMLObject），在三个不同层级基类中分别实现get_bounding_box_half_size()，根据各类的几何数据计算包围盒半尺寸。</p>
+<p><strong>关键洞察:</strong> 修复第三方库缺失方法必须追溯完整继承链，仅修补最近调用点会导致其他子类仍报错；不同robosuite fork之间存在API不兼容，依赖管理应pin到与模型训练相同的commit。</p>
+<h4 id="3-websocket客户端始终报connectionrefusederror即使服务端进程已在监听port-8000调试过程中尝试了不同地址格式localhost1270010000均无效">3. WebSocket客户端始终报ConnectionRefusedError，即使服务端进程已在监听port 8000；调试过程中尝试了不同地址格式（localhost/127.0.0.1/0.0.0.0）均无效。<a hidden class="anchor" aria-hidden="true" href="#3-websocket客户端始终报connectionrefusederror即使服务端进程已在监听port-8000调试过程中尝试了不同地址格式localhost1270010000均无效">#</a></h4>
+<p><strong>解决方案:</strong> 发现http_proxy环境变量被设置为127.0.0.1:10087，websockets库通过代理连接导致失败；在run_eval.sh开头unset所有代理变量后连接成功。</p>
+<p><strong>关键洞察:</strong> HTTP/HTTPS代理环境变量会透明拦截WebSocket连接，HPC集群调试本地服务时应优先检查代理变量；此类问题在HPC集群上尤为常见，应列入标准排查清单。</p>
+<h4 id="4-robomimic的env_robosuitepy顶层直接import-mujoco_py未安装且未import-mimicgen导致mimicgen环境变体coffee_d0等未注册到robosuiterollout环境初始化失败">4. robomimic的env_robosuite.py顶层直接import mujoco_py（未安装），且未import mimicgen导致MimicGen环境变体（Coffee_D0等）未注册到robosuite，rollout环境初始化失败。<a hidden class="anchor" aria-hidden="true" href="#4-robomimic的env_robosuitepy顶层直接import-mujoco_py未安装且未import-mimicgen导致mimicgen环境变体coffee_d0等未注册到robosuiterollout环境初始化失败">#</a></h4>
+<p><strong>解决方案:</strong> 将import mujoco_py用try/except包裹；同时添加import mimicgen使MimicGen环境通过副作用注册；确认使用与训练相同版本的robosuite（zhaoganlong依赖目录）。</p>
+<p><strong>关键洞察:</strong> MimicGen环境通过import副作用注册，任何外部工具调用这些环境前需显式执行该import；robomimic本身不知道这一依赖，需在集成层主动注入。</p>
+<h4 id="5-hd数据adata_8umh5ad的unsspatial中hires图像是全图60003886坐标在裁剪后的fullres像素空间0-4966-0-2971两者不匹配导致可视化错位且x已log变换原有preprocess_data会再次执行normalize_totallog1p导致双重变换">5. HD数据adata_8um.h5ad的uns[&lsquo;spatial&rsquo;]中hires图像是全图（6000×3886），坐标在裁剪后的fullres像素空间（0-4966, 0-2971），两者不匹配导致可视化错位；且X已log变换，原有preprocess_data()会再次执行normalize_total+log1p导致双重变换。<a hidden class="anchor" aria-hidden="true" href="#5-hd数据adata_8umh5ad的unsspatial中hires图像是全图60003886坐标在裁剪后的fullres像素空间0-4966-0-2971两者不匹配导致可视化错位且x已log变换原有preprocess_data会再次执行normalize_totallog1p导致双重变换">#</a></h4>
+<p><strong>解决方案:</strong> 在load_hd_data()中替换uns[&lsquo;spatial&rsquo;]图像为cropped_fullres.tif并重新计算scalefactor；为preprocess_data()添加skip_log参数，HD数据传入skip_log=True只做HVG过滤。</p>
+<p><strong>关键洞察:</strong> HD预处理后的adata图像和坐标来自不同处理阶段，必须显式对齐坐标空间与图像；数据加载函数应携带已执行的预处理步骤标记，避免双重变换。</p>
+<h4 id="6-robomimic在非tty环境下遇到已存在的checkpoint目录时发起交互式覆盖确认收到eof后直接eoferror退出导致多次并行启动任务失败部分失败运行残留目录会触发下次启动的覆盖检查">6. robomimic在非TTY环境下遇到已存在的checkpoint目录时发起交互式覆盖确认，收到EOF后直接EOFError退出，导致多次并行启动任务失败（部分失败运行残留目录会触发下次启动的覆盖检查）。<a hidden class="anchor" aria-hidden="true" href="#6-robomimic在非tty环境下遇到已存在的checkpoint目录时发起交互式覆盖确认收到eof后直接eoferror退出导致多次并行启动任务失败部分失败运行残留目录会触发下次启动的覆盖检查">#</a></h4>
+<p><strong>解决方案:</strong> 在每次（重）启动前彻底清理对应checkpoint目录，避免触发覆盖检查；用nohup + srun &ndash;overlap代替sbatch方式运行，确保进程不随shell退出而终止。</p>
+<p><strong>关键洞察:</strong> robomimic的get_exp_dir()在非TTY环境下遇到已存在目录会直接退出，每次启动前需确认目录已彻底清理；已创建的目录会触发下次启动的覆盖检查，形成循环失败。</p>
+<h4 id="7-pi05训练因slurm-job-46553崩溃被认为未成功完成ai初始基于之前对话缓存step-5000崩溃记录给出了训练未完成的错误判断">7. Pi0.5训练因SLURM job 46553崩溃被认为未成功完成，AI初始基于之前对话缓存（step 5000崩溃记录）给出了训练未完成的错误判断。<a hidden class="anchor" aria-hidden="true" href="#7-pi05训练因slurm-job-46553崩溃被认为未成功完成ai初始基于之前对话缓存step-5000崩溃记录给出了训练未完成的错误判断">#</a></h4>
+<p><strong>解决方案:</strong> 直接检查checkpoint目录，发现从step 4000到99999的完整checkpoints均存在，判断训练在崩溃后被恢复并跑完全部100k步。</p>
+<p><strong>关键洞察:</strong> checkpoint目录是训练完成最可靠的证据，比日志文件和对话记录更权威；SLURM job崩溃不等于训练失败，应直接验证checkpoint而非依赖记录。</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="8-hd数据spot_diameter_fullres73vs-dlpfc-144scplspatialsize10渲染出的点极小几乎不可见用户通过直观观察发现问题">8. HD数据spot_diameter_fullres=7.3（vs DLPFC ~144），sc.pl.spatial(size=1.0)渲染出的点极小，几乎不可见，用户通过直观观察发现问题。<a hidden class="anchor" aria-hidden="true" href="#8-hd数据spot_diameter_fullres73vs-dlpfc-144scplspatialsize10渲染出的点极小几乎不可见用户通过直观观察发现问题">#</a></h4>
+<p><strong>解决方案:</strong> 将HD可视化的size参数从1.0调整为4.0，使点直径约为29px（≈bin间距29.2 fullres px）。</p>
+<p><strong>关键洞察:</strong> scanpy spatial的size参数是spot_diameter_fullres的倍数，不同分辨率数据集需要不同倍数；HD 8µm的spot diameter约为Visium的1/20，需相应增大size倍数填满bin间距。</p>
+<h4 id="9-天河集群slurm多项约束导致任务提交反复失败缺少accountsysu_gbli2组权限mem被策略禁止mujoco_egl_device_id需使用物理gpu编号而非cuda_visible_devices逻辑编号gpu显存分配时未充分检查各卡空闲状态导致coffee_d0-oom">9. 天河集群SLURM多项约束导致任务提交反复失败：缺少&ndash;account=sysu_gbli2（组权限）、&ndash;mem被策略禁止、MUJOCO_EGL_DEVICE_ID需使用物理GPU编号而非CUDA_VISIBLE_DEVICES逻辑编号；GPU显存分配时未充分检查各卡空闲状态导致coffee_d0 OOM。<a hidden class="anchor" aria-hidden="true" href="#9-天河集群slurm多项约束导致任务提交反复失败缺少accountsysu_gbli2组权限mem被策略禁止mujoco_egl_device_id需使用物理gpu编号而非cuda_visible_devices逻辑编号gpu显存分配时未充分检查各卡空闲状态导致coffee_d0-oom">#</a></h4>
+<p><strong>解决方案:</strong> 通过sacctmgr查询账户名添加&ndash;account；将&ndash;mem替换为&ndash;gres=gpu:1；将MUJOCO_EGL_DEVICE_ID设为实际物理GPU编号（5或7）；实时检查每块GPU的compute-apps占用后重新分配任务。</p>
+<p><strong>关键洞察:</strong> EGL设备ID直接对应物理GPU，不受CUDA_VISIBLE_DEVICES重映射影响；新集群首次提交前需通过sacctmgr确认账户名和QOS限制；应检查per-GPU的compute-apps而非仅看显存汇总。</p>
+<h4 id="10-run_benchmarkpy中存在与utilsclusteringpy功能重复的本地cluster_embeddings副本修改工具库后本地副本未同步导致n_clusters-1时kmeans报invalidparametererror">10. run_benchmark.py中存在与utils/clustering.py功能重复的本地cluster_embeddings副本，修改工具库后本地副本未同步，导致n_clusters=-1时KMeans报InvalidParameterError。<a hidden class="anchor" aria-hidden="true" href="#10-run_benchmarkpy中存在与utilsclusteringpy功能重复的本地cluster_embeddings副本修改工具库后本地副本未同步导致n_clusters-1时kmeans报invalidparametererror">#</a></h4>
+<p><strong>解决方案:</strong> 在run_benchmark.py的本地cluster_embeddings函数中同样添加自动Leiden估计逻辑，与utils/clustering.py的修改保持一致。</p>
+<p><strong>关键洞察:</strong> 大型脚本常存在与工具库功能重复的本地函数；修改工具库时需检查脚本内是否有同名副本，或通过重构消除重复。</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="scgpt-bug溯源领域经验同事提示vs系统代码验证">scGPT Bug溯源：领域经验（同事提示）vs系统代码验证<a hidden class="anchor" aria-hidden="true" href="#scgpt-bug溯源领域经验同事提示vs系统代码验证">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>同事基于Flash Attention与PyTorch不兼容的经验直接指向checkpoint key名称不匹配的根因方向，大幅缩小了问题搜索空间。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI系统性阅读代码、比对checkpoint与model state_dict的key、编写验证脚本，精确定位到具体的一行遗漏代码。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类依靠领域经验和社区知识快速给出方向性假设；AI负责执行系统化验证和精确定位。两者互补：缺少人类的方向性提示，AI可能需要更多搜索；缺少AI的代码验证，人类的猜测难以确认。</p>
+<h4 id="实验迭代策略小规模代理数据集优先验证">实验迭代策略：小规模代理数据集优先验证<a hidden class="anchor" aria-hidden="true" href="#实验迭代策略小规模代理数据集优先验证">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>明确指出先用crop10large子区域（17502 spots）测试，避免直接处理全量545K spots，优先验证方法可行性再扩展。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI初始规划针对全量HD数据，设计了完整的全量处理架构，未主动提议从小规模开始迭代。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类对实验迭代速度有更强的工程直觉，用小规模代理数据集快速验证；AI倾向于一步到位设计完整方案，缺乏保守验证意识。</p>
+<h4 id="hpc资源管理全局视角gpu并行策略rollout开启资源优先检查">HPC资源管理全局视角（GPU并行策略、rollout开启、资源优先检查）<a hidden class="anchor" aria-hidden="true" href="#hpc资源管理全局视角gpu并行策略rollout开启资源优先检查">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>基于BC-RNN显存占用的先验判断（~2GB/任务）直接提出单GPU并行9个任务的策略；主动要求开启训练时rollout评估；在AI准备执行命令前提醒先检查所有运行中的job和GPU空闲状态。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>遵循保守的&quot;一任务一GPU&quot;范式，未主动建议高密度并行；按模板默认值生成配置（rollout.enabled=false）而未主动优化；专注于技术障碍解决而忽略宏观资源状态。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类对HPC资源管理有更强的系统性意识，能将领域经验（显存估算）转化为工程决策；AI倾向于聚焦当前技术障碍而忽略资源约束和配置优化机会。</p>
+<h4 id="bug修复方法论调用链追溯vs单点修补">Bug修复方法论：调用链追溯vs单点修补<a hidden class="anchor" aria-hidden="true" href="#bug修复方法论调用链追溯vs单点修补">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>只要求&quot;修复它&quot;，未指定修复位置或方式。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>系统性追溯完整调用链（coffee_machine.py→CoffeeMachineBodyObject→CompositeBodyObject→MujocoXMLObject），在三个不同层级基类中分别添加方法的合理实现。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI的调试路径更系统，正确识别出需要在多个基类中同时添加方法而非只修补最近的调用点，体现了对类继承结构的完整分析能力。</p>
+<h4 id="文献引用溯源评测setting来源vs算法超参数来源的区分">文献引用溯源：评测setting来源vs算法超参数来源的区分<a hidden class="anchor" aria-hidden="true" href="#文献引用溯源评测setting来源vs算法超参数来源的区分">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>明确指定：使用Phoenix论文对齐评测setting，但BC-RNN超参数应参考MimicGen原始论文（arXiv:2310.17596）而非Phoenix论文。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>试图从Phoenix论文中提取BC-RNN超参数，被网络限制阻塞后进行web search，未能直觉性区分引用来源的不同意图。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类在学术文献使用上有更清晰的溯源意识，能区分&quot;评测setting参考文献&quot;与&quot;算法超参数参考文献&quot;；AI需要明确说明才能正确区分引用来源意图。</p>
+<h4 id="未来研究视角错误注入兼容性的前瞻设计">未来研究视角：错误注入兼容性的前瞻设计<a hidden class="anchor" aria-hidden="true" href="#未来研究视角错误注入兼容性的前瞻设计">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>主动提出未来需要向训练好的BC-RNN注入错误并采集场景，要求代码提前考虑兼容性，将当前工具设计与未来实验需求联系起来。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>专注于完成眼前的训练评估功能；收到提示后分析了现有框架（RobomimicPolicyAdapter）并确认已天然兼容，但未主动考虑。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类具有更长远的研究视角，能预见当前工具的未来用途；AI更倾向于完成眼前任务，缺乏主动规划未来兼容性的意识。</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>依赖过时的对话缓存信息（如Pi0.5 step 5000崩溃记录）缺乏主动验证意识，需要实际检查文件系统后才能纠正错误判断；对过时记忆的过度信任可能导致误导性结论，应以实际文件状态为准。</li>
+<li>HPC环境陷阱排查缺乏系统性检查清单：未主动检查代理环境变量（WebSocket连接失败初期）、MUJOCO_EGL_DEVICE_ID硬编码为逻辑ID而非物理ID、调试阶段多次启动大型GPU服务未清理旧进程导致OOM，均需人类提示才暴露问题。</li>
+<li>srun进程生命周期管理不当：多次因日志为空误判&quot;任务失败&quot;并重复清理/重启，缺乏&quot;先检查进程状态再决策&quot;的前置判断；进程可能已在运行但未产生可见输出，应与状态检查结合判断。</li>
+<li>实验规模规划偏全量，未主动建议从小规模代理数据集迭代验证（HD数据545K全量规划需用户纠正至crop10large），缺乏对实验迭代效率的主动优化意识。</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>未能预判跨文件代码一致性问题（run_benchmark.py本地cluster_embeddings副本未同步）和跨数据集可视化参数差异（HD spot大小过小），需要用户实际观察输出后触发二次修复。</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>PyTorch model.load_state_dict(strict=False)会静默忽略不匹配的key，导致关键权重以随机值替代不报错，此类Bug可长期潜伏；生产代码中应主动打印missing_keys/unexpected_keys并在加载后验证参数数值统计。上游GitHub官方仓库也存在同一Bug，开源代码的权重加载路径需主动审计而非盲目信任。</li>
+<li>staig_fusion在RM-IDEAL评估上全面领先（151673平均r=0.396，Layer_3峰值r=0.644），证明学习型多模态融合对空间niche结构的捕获能力远超简单融合（concat/mean avg r≈0.15）和单模态基线（gene/vision avg r≈0.06-0.12）。</li>
+<li>MimicGen环境变体（Coffee_D0、Stack_D1等）通过import mimicgen的副作用注册到robosuite；任何外部工具（如robomimic）调用这些环境前必须先执行该import；不同robosuite fork之间存在API不兼容，训练与评测必须pin到相同commit。</li>
+<li>HTTP/HTTPS代理环境变量（http_proxy/https_proxy）会被Python的websockets库透明代理WebSocket连接，导致ws://localhost:xxxx经代理而失败；HPC集群运行本地WebSocket服务时需在客户端启动前unset代理变量或设置no_proxy=localhost。</li>
+<li>修复第三方库缺失方法时需追溯完整的类继承链并在所有涉及的基类中实现，仅在最直接的调用点打补丁会导致其他子类调用时仍报错。</li>
+<li>crop10large（17502 spots）是验证HD方法可行性的理想代理数据集：规模与DLPFC相当，有配套裁剪fullres图像，可在不修改架构假设的前提下验证全套pipeline。Leiden社区发现（resolution=1.0）作为无监督聚类数自动估计方法在HD数据上表现良好（k=17-20，Silhouette=0.302），适合无标注HD数据的默认聚类策略。</li>
+<li>A800 80GB GPU上BC-RNN单任务训练约占2.2GB VRAM，单块GPU可高密度并行多任务，实际受限于CPU/IO而非VRAM；scanpy spatial可视化的size参数是spot_diameter_fullres的倍数，DLPFC（diameter≈144）用size=1.0，HD 8µm（diameter≈7.3）需size≈4.0才能填满bin间距。</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>天河集群SLURM特殊约束：必须指定&ndash;account=sysu_gbli2；&ndash;mem被QOS策略禁止需改用&ndash;gres=gpu:1；MUJOCO_EGL_DEVICE_ID对应物理GPU编号而非CUDA_VISIBLE_DEVICES逻辑编号；可通过srun &ndash;overlap在已有interactive job上附加新step复用节点资源，无需重新提交job。</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>✅ DCC全天工作：scGPT Bug修复+RM-IDEAL全量评估+Visium HD全链路实现</strong>
+<em>21:23:19.892 | claude_code</em>
+DCC上完成三项主要任务：① 修复scGPT-spatial TransformerModel中use_fast_transformer属性遗漏Bug，重新提取全部11个DLPFC切片embedding（ARI平均+44.4%，NMI+33.3%），生成scgpt_fixed可视化；② 对section 151673运行27种embedding方法的RM-IDEAL全量评估，staig_fusion以平均r=0.396排名第一（Layer_3峰值r=0.644），借助缓存快速补生成189张三面板可视化；③ 将MIHD benchmark扩展至Visium HD crop10large（17502 spots），修改8个核心文件添加无标注HD支持（Leiden自动估计k），修复HD可视化坐标对齐、双重预处理和spot大小等问题，端到端验证成功（k=17，Silhouette=0.302）。</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 tianhe全天工作：Pi0.5 Phoenix评测部署+BC-RNN基线脚本实现与9任务并行训练</strong>
+<em>20:53:34.791 | claude_code</em>
+tianhe（an49节点）上完成两条主线：① Pi0.5 Phoenix评测：调查确认100k步训练已完成（checkpoint到99999）但从未评估，梳理三种Pi0.5模型形态，调试解决tyro子命令语法错误、HTTP代理拦截WebSocket、robosuite API版本不兼容、env.seed()缺失等问题，成功启动九任务rollout评测（step 99999，每任务50次），会话结束时7/9任务完成（Stack_D0 24%、Stack_D1 12%，ThreePieceAssembly D0/D1仍在运行）；② BC-RNN基线：参考MimicGen原始论文超参数，创建train_bc_rnn_benchmark.py（5模式），修复SLURM账户/内存/EGL约束、mujoco_py导入、MimicGen环境注册、get_bounding_box_half_size三处库级Bug，用srun &ndash;overlap在单GPU上并行启动9路训练（附rollout评估），训练稳定运行（每任务~2.2GB VRAM），确认现有RobomimicPolicyAdapter天然兼容未来错误注入需求，预计35+小时后完成600 epoch。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>53,226,640</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>25,177</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>129,735</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>2,251,309</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>50,820,419</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>95.8%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$34.9126</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>10,689</td>
+          <td>85,854</td>
+          <td>1,506,168</td>
+          <td>42,629,752</td>
+          <td>$32.9282</td>
+          <td>94.3%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>14,488</td>
+          <td>43,881</td>
+          <td>745,141</td>
+          <td>8,190,667</td>
+          <td>$1.9844</td>
+          <td>5.7%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>52,737,471</td>
+          <td>25,154</td>
+          <td>128,907</td>
+          <td>$34.5661</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>$0.0000</td>
+      </tr>
+      <tr>
+          <td>TzJsDesktop</td>
+          <td>489,169</td>
+          <td>23</td>
+          <td>828</td>
+          <td>$0.3465</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+document.getElementById("lang-toggle").addEventListener("click", function() {
+    var current = this.getAttribute("data-current-lang");
+    var url = this.getAttribute("data-translation-url");
+    var newLang = (current === "en") ? "zh" : "en";
+    localStorage.setItem("pref-lang", newLang);
+    if (url) {
+        window.location.href = url;
+    } else {
+        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+    }
+});
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

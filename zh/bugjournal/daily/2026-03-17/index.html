@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-17 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="DCC端对MIHD多模态空间转录组项目执行代码重构（/simplify修复9处问题）并更新文档；tianhe端多位研究员并行完成robobrain_pi任务状态机bug修复与训练loss分离监控、LIBERO测试套件集成确认、error recovery benchmark 2920场景数据质量核验、CALVIN格式转换脚本修复、GPU监控工具去重与键盘导航新增、RoboCasa MimicGen预训练数据下载上游根因确认。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-17/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-17/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-17/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    var stored = localStorage.getItem("pref-lang");
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-17/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-17">
+  <meta property="og:description" content="DCC端对MIHD多模态空间转录组项目执行代码重构（/simplify修复9处问题）并更新文档；tianhe端多位研究员并行完成robobrain_pi任务状态机bug修复与训练loss分离监控、LIBERO测试套件集成确认、error recovery benchmark 2920场景数据质量核验、CALVIN格式转换脚本修复、GPU监控工具去重与键盘导航新增、RoboCasa MimicGen预训练数据下载上游根因确认。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-17T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-17T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-17">
+  <meta name="twitter:description" content="DCC端对MIHD多模态空间转录组项目执行代码重构（/simplify修复9处问题）并更新文档；tianhe端多位研究员并行完成robobrain_pi任务状态机bug修复与训练loss分离监控、LIBERO测试套件集成确认、error recovery benchmark 2920场景数据质量核验、CALVIN格式转换脚本修复、GPU监控工具去重与键盘导航新增、RoboCasa MimicGen预训练数据下载上游根因确认。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "每日总结",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-03-17",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/2026-03-17/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-17",
+  "name": "Bug Journal 2026-03-17",
+  "description": "DCC端对MIHD多模态空间转录组项目执行代码重构（/simplify修复9处问题）并更新文档；tianhe端多位研究员并行完成robobrain_pi任务状态机bug修复与训练loss分离监控、LIBERO测试套件集成确认、error recovery benchmark 2920场景数据质量核验、CALVIN格式转换脚本修复、GPU监控工具去重与键盘导航新增、RoboCasa MimicGen预训练数据下载上游根因确认。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "日报 — 2026-03-17 今日概览 做了什么： 两台设备多位研究员并行推进五个研究/工具项目：DCC端对MIHD多模态空间转录组项目进行全面代码重构，tianhe端并行推进robobrain_pi机器人训练系统修复与优化、CALVIN数据集格式转换修复、GPU监控工具改进、以及多个数据集可用性调查。 怎么做的： 通过/simplify三路并行代码审查、系统性状态机逻辑诊断、schema文件精准问题定位、FD扫描+父进程链双重GPU进程过滤、JAX has_aux机制改造等多种方法并行推进各项任务。 有什么用： 消除MIHD HD数据OOM风险和robobrain_pi任务状态无限循环bug、实现wandb三曲线独立监控、修复CALVIN转换脚本并可正常运行、gpumon从35个重复进程降至8个真实进程并支持键盘导航、确认MimicGen数据链接为上游未发布问题无需修代码。 DCC 做了什么： 对MIHD空间转录组多模态融合项目进行全面代码重构，修复9处代码复用和效率问题，并整理项目计划文档。 怎么做的： 通过/simplify命令启动三路并行代码审查（复用/质量/效率），定位关键问题后逐一修复，最后通过/init更新CLAUDE.md并重构plans.md。 有什么用： 集中NEEDS_COORDS_FUSIONS常量（同时修复遗漏的adaln_attention潜在bug）、O(N²)cdist替换为KDTree防止HD数据OOM、消除8处重复device判断逻辑，plans.md未来方向重构为三层时间优先级。 tianhe 做了什么： 多位研究员并行推进多个项目：robobrain_pi任务状态汇报bug修复与训练loss分离监控、LIBERO自定义套件集成确认、error recovery benchmark数据质量核验；同日修复CALVIN RLDS→LeRobot转换脚本运行时错误、消除GPU监控工具重复进程显示并新增键盘导航、确认RoboCasa MimicGen预训练数据下载失败为上游问题。 怎么做的： 系统性代码审查定位vla_infer.py状态机逻辑缺陷并修复；通过读取features.json和box_links_ds.json等schema/配置文件精准诊断数据集问题；FD扫描+父进程链去重双重策略消除GPU监控误报；JSON和NPZ文件分析验证benchmark数据分布。 有什么用： 消除robobrain_pi任务完成后的无限循环触发bug并实现wandb三曲线独立监控；CALVIN转换脚本可正常运行；gpumon从35个重复进程降至8个并支持键盘浏览完整命令；确认2920个error scene生成（同时发现threading阶段标注全为pre_reach的系统性问题）；确认MimicGen数据链接为上游未发布问题。 DCC端对MIHD多模态空间转录组项目执行代码重构（/simplify修复9处问题）并更新文档；tianhe端多位研究员并行完成robobrain_pi任务状态机bug修复与训练loss分离监控、LIBERO测试套件集成确认、error recovery benchmark 2920场景数据质量核验、CALVIN格式转换脚本修复、GPU监控工具去重与键盘导航新增、RoboCasa MimicGen预训练数据下载上游根因确认。\n今日任务 架构与策略 ✅ robobrain_pi 任务状态汇报bug修复 — 分析并修复vla_infer.py中5个问题：None检查顺序错误（潜在崩溃）、任务完成后未清空current_prompt（无限循环发送done）、未广播idle状态、调试日志阈值不一致（chunk 3/4静默）、打印文案误称为手动标记。 ✅ MIHD /simplify 代码审查与重构 — 对MIHD项目21个修改的Python文件进行三路并行审查（复用/质量/效率），修复9处问题：集中NEEDS_COORDS_FUSIONS常量并补充遗漏的adaln_attention、KDTree替换O(N²)cdist防HD数据OOM、hoisted device resolution消除8处重复判断、复用DataPreparer实例、删除vestigial train_staig()包装器、修复n_pseudo_clusters重复赋值、移除未使用import等，所有修改通过Python AST语法验证。 ✅ robobrain_pi action_loss与task_loss分离监控 — 修改model.py抽象方法返回类型为tuple[loss_array, dict]，pi0.py返回(combined_loss, aux_dict)元组，pi0_fast.py同步更新填零，train.py使用has_aux=True解包辅助指标并加入info字典，wandb和进度条中新增action_loss和task_loss独立曲线。 ✅ RoboCasa MimicGen 预训练数据下载失败根因诊断 — 诊断download_datasets –source mimicgen对所有任务报错的根因：box_links_ds.json中完全没有MimicGen下载链接（0/350条）、317个任务中仅60个注册了mg_path，属于上游数据未发布问题，无需代码修复。 ✅ Error Recovery Benchmark 生成数据统计与问题诊断 — 确认6个任务共2920个error scene成功生成（coffee 1076、stack 499、three_piece_assembly 487、pick_place 326、stack_three 382、threading 150），统计task×error×难度分布，发现7个D0 error类型数量不足10个，以及threading任务所有轨迹阶段标注均为pre_reach的系统性问题。 ✅ gpumon.py 重复进程bug修复 — 修复GPU监控工具显示大量重复进程的问题：要求同时具备/dev/nvidia* FD证据才认定为GPU进程（消除继承环境变量的误报），并在get_gpu_procs中添加父进程链去重（折叠DDP worker等子进程）。进程数从35降至8。 实现与修复 ✅ LIBERO libero_object_com测试套件集成确认 — 分析并确认libero_object_com套件已基本完成集成：libero_suite_task_map.py、init.py（含LIBERO_OBJECT_COM类和libero_suites注册）、bddl_files目录均已完成，main.py已更新默认套件名和max_steps=300，无需创建init_files。 ✅ CALVIN dataset RLDS→LeRobot 转换脚本修复 — 修复rlds_to_lerobot.py中多个问题：添加进度条、修正数据集名称（calvin_abc_d→calvin_abc）、修正观测键名（image→rgb_static，wrist_image→rgb_gripper）、添加输出目录自动创建和覆盖确认逻辑。脚本可正确运行。 ✅ robobrain_pi git工作流管理 — 多次提交（command.txt更新、vla_infer bug修复、loss分离功能），解决git代理冲突（本地配置覆盖为可用的localhost:9999），分支切换、cherry-pick同步command.txt到dev/mlp_old，回退main分支的错误merge commit。 ✅ gpumon.py 键盘交互导航功能 — 新增nvitop风格的键盘交互：上下键选择进程行（反显高亮），左右键水平滚动查看完整命令（每次10字符，含…溢出指示），Esc取消选中，q退出，底部提示栏动态更新。 ✅ MIHD 项目文档整理（CLAUDE.md + plans.md） — 更新CLAUDE.md将’新增融合策略’章节中的needs_coords描述改为引用NEEDS_COORDS_FUSIONS常量；整理plans.md将底部散落原始笔记整合到正式章节，重构未来方向为三层时间优先级（近期/中期/远期），区分当前单切片与近期目标跨切片两阶段架构路线图。 ✅ wandb 目录级账号配置方案 — 为共享服务器用户提供个人wandb账号覆盖全局登录的方案，优先推荐direnv（.envrc设置WANDB_API_KEY）或~/.bashrc中导出环境变量，说明WANDB_API_KEY优先级高于~/.netrc。 问题与解决方案 关键问题 1. MIHD的refine_labels_spatial_majority使用scipy.cdist计算全对距离矩阵，HD空间转录组数据（17K+细胞）时内存需求为O(N²)，必然OOM崩溃。 解决方案: 替换为scipy.spatial.cKDTree.query_ball_point，内存复杂度从O(N²)降至O(N·k)。\n关键洞察: 近邻查询只需找radius内邻居而非全对距离矩阵，KD树是标准解法；cdist适合矩阵乘法场景而非大规模近邻搜索。\n2. vla_infer.py任务完成判定后未清空current_prompt，下一次循环迭代中prompt未变化、chunk_count仍\u003e=5、模型分数大概率仍高，立即再次触发done消息，造成无限循环汇报任务完成。 解决方案: 在任务完成处理块末尾添加current_prompt=‘‘和_publish_state(‘idle’)，同时将调试日志阈值从\u003c3改为\u003c5以覆盖全部被屏蔽的chunk。\n关键洞察: 状态机设计中完成后必须同时重置触发条件并广播状态变更，只做其中一件都会留下隐性bug。\n3. MIHD的NEEDS_COORDS_FUSIONS集合在runner.py和evaluation_planner.py中各自独立维护，且两处均遗漏了adaln_attention策略，导致该策略在运行时缺少空间坐标而出错。 解决方案: 在Fusion.py中定义集中常量NEEDS_COORDS_FUSIONS并补充adaln_attention，两处改为from models.Fusion import NEEDS_COORDS_FUSIONS。\n关键洞察: 重复维护同一集合不可避免产生不一致，单一真相来源（Single Source of Truth）是消除此类隐性bug的根本解法。\n4. pi0.py的compute_loss只返回合并的loss数组，train.py只记录单一loss曲线，无法在wandb中分别观察action_loss和task_loss的训练动态。 解决方案: compute_loss返回类型改为(loss_array, aux_dict)，train.py使用nnx.value_and_grad的has_aux=True参数解包辅助字典，info中加入action_loss和task_loss字段。\n关键洞察: JAX的has_aux机制专为此场景设计：在不影响反向传播计算的前提下携带监控指标，是比全局变量或重复计算更干净的解法。\n5. threading任务的清洁轨迹phase_labels全部为pre_reach，导致只有collision_empty能被注入，benchmark数据严重不均衡；同时7个D0 error类型数量不足10个。 解决方案: （待处理）需检查threading任务的get_task_completion_stages()实现是否正确感知reach/grasp阶段；不足10个的D0类型需扩大清洁轨迹数量或针对性增加注入机会。\n关键洞察: threading是穿针任务，其gripper关闭判定与通用框架逻辑不兼容，需任务级定制；数据分布不均衡问题应在pipeline设计阶段就加入监控和平衡机制。\n6. gpumon.py显示大量重复进程：所有继承了CUDA_VISIBLE_DEVICES的进程（bash、ffmpeg、claude）和所有DDP worker子进程都被误判为GPU进程，35个进程中真实GPU进程仅8个。 解决方案: 双重过滤：①要求同时有/dev/nvidia* FD打开才算GPU进程；②默认模式下若进程的祖先也在GPU列表且GPU集合相同则折叠到祖先。\n关键洞察: 仅凭CUDA_VISIBLE_DEVICES无法区分真实GPU使用进程和继承环境变量的无关进程，FD证据是更可靠的判定依据；在Kubernetes PID命名空间隔离环境下nvidia-smi无法显示进程信息，/proc//fd扫描是替代方案。\n7. RoboCasa MimicGen下载命令对所有任务报错，用户误以为是代码bug。 解决方案: 分析box_links_ds.json发现其中不含任何MimicGen路径（0/350条），317个任务中只有60个注册了mg_path。结论：上游数据链接未发布，无代码修复空间。\n关键洞察: 错误信息分两类（无mg_path注册 vs 有注册但无Box链接），需区分才能正确判断根因；直接检查配置文件比分析错误信息更高效。\n8. vla_infer.py对task_completed无条件调用.item()，None检查在之后，非pi05模型返回None时直接崩溃（AttributeError）。 解决方案: 将None检查提前到print之前，用isinstance判断是numpy数组还是标量决定是否调用.item()。\n关键洞察: 防御性编程：None检查必须先于任何属性访问；当前不崩溃只是因为恰好总用pi05模型，不是代码正确的证明。\n一般问题 9. 服务器git全局配置了不可达的代理172.16.31.200:3138，导致所有git fetch/push操作失败。 解决方案: 用curl测试发现localhost:9999可用（HTTP 200），通过git config –local覆盖全局代理配置。\n关键洞察: git config的local \u003e global \u003e system优先级可以针对单仓库覆盖全局设置而不影响其他仓库。\n10. CALVIN数据集名称不匹配（代码写的calvin_abc_d，实际目录为calvin_abc）导致tfds.builder找不到版本；观测键名错误（image vs rgb_static/rgb_gripper）导致KeyError；上次运行残留的空目录结构导致LeRobotDataset.create()抛出FileExistsError。 解决方案: 通过检查目录结构发现名称不匹配；通过读取features.json获取真实schema更新键名；添加目录存在检测逻辑询问是否覆盖。\n关键洞察: RLDS数据集字段名因数据集而异，必须通过features.json确认实际schema；LeRobot的create()不支持覆盖现有目录，需在调用前手动清理。\n人类思路 vs AI 思路 战略层面 MimicGen下载失败根因 角色 思路 人类 用户认为是代码问题，通过下载命令触发错误后求助AI。 AI AI通过逐层检查（脚本逻辑→registry注册→box_links.json内容）最终确认根因是上游数据链接未发布，并区分了两类不同错误信息的来源。 差异分析: 用户假设是本地代码bug，AI通过系统性调查发现是上游数据发布问题——这一结论改变了用户的行动方向（无需修代码）。\nvla_infer.py bug发现的切入角度 角色 思路 人类 人类以’检查任务状态汇报分类是怎么实现的，相关改动有没有问题’为切入点，带着对特定提交的隐性怀疑发起审查。 AI AI以数据流为线索从pi0.py→real_policy.py→utils.py→vla_infer.py系统梳理，整理出5个bug并按严重程度排序，Bug 2（无限循环）和Bug 3（None崩溃）是AI独立发现的隐患。 差异分析: 人类有直觉目标（怀疑chunk计数逻辑），AI提供了系统覆盖和优先级排序；None检查顺序的潜在崩溃是AI通过代码逻辑推演发现的，人类关注点主要在运行时行为。\ngpumon重复进程问题定位 角色 思路 人类 用户直接观察到现象（6、7卡只有一个进程但显示多个），提供了准确的问题描述，无需AI主动发现。 AI AI通过运行调试脚本分析每个进程的FD集合和CUDA_VISIBLE_DEVICES，发现了两个独立根因（环境变量误报+子进程重复），提出了双重过滤方案。 差异分析: 问题发现来自用户观察，技术根因分析和解决方案设计来自AI。\ncompute_loss返回类型修改的范围决策 角色 思路 人类 人类只描述了需求（wandb能分别监控三个指标），未指定实现方案，也未明确是否接受破坏抽象接口。 AI AI选择修改BaseModel抽象方法签名（需同步修改pi0_fast.py填充zeros），理由是JAX-native且最干净；而非备选方案（在train.py外部重复计算loss或使用全局副作用）。 差异分析: AI方案影响范围超出最小修改原则，但保持了代码一致性和可维护性。\nError Recovery Benchmark的数据验证策略 角色 思路 人类 人类问’现在生成到哪里了’，隐含对进度和质量的关注。 AI AI先查squeue确认job状态，再查文件数量确认完成度，最后通过JSON解析做细粒度统计（按error×degree分类），主动发现并报告D0不足10个和threading阶段标注异常两个问题。 差异分析: AI主动发现了超出原始问题范围的两个数据质量问题，体现了主动诊断倾向。\nAI 局限性 重要局限 threading阶段标注全为pre_reach的问题：AI能诊断症状（检查NPZ文件和get_task_completion_stages代码），但无法运行robosuite环境实际验证传感器读数，只能推测根因并提供排查方向。 一般局限 AI倾向于先查外部文档/远程资源而非优先利用本地已有信息：LIBERO套件分析时连续启动多个Explore subagent而git status已包含答案；CALVIN数据集问题诊断时首先尝试fetch外部GitHub URL而非读取用户指定的本地代码文件。应优先读取diff/status和本地文件，再决定是否深入探索。 git远程认证无法代为处理：SSH key、GitHub token、VS Code credential helper均在用户端，AI只能提供命令方案而无法直接执行push；在服务器环境中credential helper不可用时需要用户介入。 CALVIN转换脚本需要多轮迭代（名称错误→键名错误→目录存在错误）才解决，每次修复后运行才暴露下一个问题，未能一次性通过features.json和完整代码审查预见所有问题。 今日收获 核心收获 任务状态机设计原则：完成事件必须同时做两件事——重置触发条件（清空current_prompt）和广播状态变更（_publish_state(‘idle’)）。只做其中一件会留下无限循环或上游感知失效的隐性bug，两者缺一不可。 JAX has_aux机制：nnx.value_and_grad支持has_aux=True参数，compute_loss可以返回(loss_array, aux_dict)，梯度只对loss_array计算，aux_dict透明携带监控指标；这是JAX函数式设计中携带副信息的标准方式。 空间数据近邻查询：大规模点云（\u003e10K点）的半径近邻查询应优先KD树（O(N log N)预处理），而非cdist（O(N²)内存）。在HD空间转录组（17K+细胞）场景两者差异可达OOM vs 正常运行。 GPU进程检测的可靠方法：在Kubernetes PID命名空间隔离环境下nvidia-smi无法显示进程信息；通过扫描/proc//fd中的/dev/nvidia* FD是更可靠的检测方式，但必须同时要求FD证据才能避免继承环境变量的误报。 单一真相来源（Single Source of Truth）原则：需要跨多文件引用的常量集合（如NEEDS_COORDS_FUSIONS）必须从唯一定义处import，手动维护多份副本不可避免产生不一致，且不一致往往在边缘情况才触发（如遗漏的adaln_attention）。 数据集下载工具的错误信息可能来自多个不同层次（registry未注册 vs 下载链接不存在），需要区分才能正确判断根因；直接检查配置文件（如box_links_ds.json）比分析错误信息更高效，有时能发现根因是上游数据未发布而非本地代码bug。 Benchmark数据质量：数据分布不均衡（部分error类型D0\u003c10）是系统性问题，需在pipeline设计阶段就加入分布监控和平衡机制；特定任务（如threading穿针）的通用框架适配需要明确的任务级测试验证。 实践收获 RLDS格式的TFRecord数据集观测字段名因数据集而异，必须通过features.json确认实际schema，不能依赖其他数据集的经验或代码模板中的默认键名。 共享服务器上WANDB_API_KEY环境变量的优先级高于~/.netrc（wandb login存储位置），可作为覆盖全局账号的轻量方案，无需修改wandb配置文件。 会话摘要 MIHD ✅ MIHD项目代码重构（/simplify 9处修复）与文档整理 13:54:46.661 | claude_code 对MIHD空间转录组项目21个修改的Python文件进行三路并行代码审查，修复9处问题（KDTree替换O(N²)cdist防OOM、集中NEEDS_COORDS_FUSIONS常量并补充遗漏的adaln_attention、hoisted device resolution消除8处重复判断等），所有修改通过Python AST语法验证。随后更新CLAUDE.md引用新常量，整理plans.md将散落笔记整合为三层时间优先级未来方向并更新架构路线图。\nRoboBrain-Pi ✅ robobrain_pi任务状态bug修复、训练loss分离监控实现与git工作流管理 11:09:28.373 | claude_code 系统性审查vla_infer.py中task_completed数据流（pi0.py→real_policy.py→utils.py→vla_infer.py），发现并修复5个bug（任务完成后未清空current_prompt导致无限循环触发done、None检查顺序错误导致潜在崩溃、idle状态未广播、调试日志阈值不完整、文案错误）。同步实现action_loss/task_loss分离监控：四文件联动修改（model.py返回tuple、pi0.py携带辅助字典、pi0_fast.py填零、train.py用has_aux=True解包），wandb新增三曲线独立显示。期间处理git代理冲突（本地配置覆盖不可达全局代理）、cherry-pick同步dev/mlp_old分支、误merge回退等多个git工作流问题，完成多个commit提交。\nLIBERO-Benchmark ✅ LIBERO libero_object_com测试套件集成分析与确认 09:16:47.373 | claude_code 分析添加自定义libero_object_com测试套件所需的文件改动，探索发现大部分工作已完成：libero_suite_task_map.py中已添加10个任务名、init.py已注册LIBERO_OBJECT_COM类、bddl_files/libero_object_com/下10个.bddl文件已存在、main.py已更新默认套件名和max_steps=300。唯一未创建的init_files目录因main.py已注释相关代码而不需要，集成完成无需额外修改。\nError-Recovery-Benchmark 🔄 Error Recovery Benchmark生成完成统计与问题诊断 14:03:00.373 | claude_code 确认pipeline job已完成，6个任务共生成2920个error scene（coffee最多1076，threading最少150）。统计每task×error类型×D0/D1/D2的分布，发现7个D0子类型\u003c10个（需补充），以及threading所有轨迹phase_labels全为pre_reach（影响其他error类型注入）。深入诊断发现threading任务未被正确phase标注，get_task_completion_stages()实现需要检查，该问题待后续处理。\nCALVIN Dataset Converter ✅ 修复CALVIN RLDS→LeRobot转换脚本的多个运行时错误并增加进度条 06:51:06.033 | claude_code 用户chenjunye请求添加进度条并发现数据目录结构与代码配置不一致。通过读取目录结构和features.json逐步修复数据集名称错误（calvin_abc_d→calvin_abc）、观测键名错误（image→rgb_static/rgb_gripper）以及输出目录已存在时的FileExistsError，并添加用户确认覆盖的交互逻辑。脚本可正确运行。\nGPU Monitor (gpumon) ✅ 修复gpumon.py重复进程显示问题并新增键盘交互导航 03:01:28.167 | claude_code 用户chenxingping发现gpumon.py在GPU 6/7上只有一个实际进程但显示多个重复项。通过调试发现两个根因：继承CUDA_VISIBLE_DEVICES的无关进程（bash/claude等）和DDP worker子进程重复计数。修复方案为双重过滤（FD证据要求+父进程链去重），进程数从35降至8。随后按用户要求新增了nvitop风格的上下键选择、左右键命令滚动功能。\nRoboCasa MimicGen 数据下载 ✅ 诊断并确认MimicGen预训练数据下载全部失败的上游根因 03:38:33.780 | claude_code 用户chenjunye运行download_datasets –source mimicgen时所有任务均报错。通过系统性检查（脚本逻辑→dataset_registry.py注册情况→box_links_ds.json内容）发现根因：文件中完全不含MimicGen路径（0/350条），317个任务中仅60个注册了mg_path，属于上游数据链接未发布问题。第二次会话通过grep验证了关键结论，区分了两类错误提示来源（无mg_path注册 vs 有注册但无Box链接）。最终确认无需代码修复。\nchenxingping 工作环境配置 ✅ 共享服务器上配置目录级wandb个人账号 07:46:38.767 | claude_code 为用户chenxingping提供在共享服务器上让个人目录下项目使用个人wandb账号的方案，优先推荐direnv（.envrc中设置WANDB_API_KEY）和~/.bashrc导出环境变量，说明WANDB_API_KEY环境变量优先级高于~/.netrc。\nToken 用量 总览 指标 数值 总 Token 19,270,122 输入 Token 9,271 输出 Token 53,817 Cache 创建 1,756,812 Cache 读取 17,450,222 Cache 命中率 90.9% 总费用 (USD) $14.8924 模型明细 模型 输入 输出 Cache 创建 Cache 读取 费用 占比 claude-opus-4-6 1,530 19,996 923,018 7,217,146 $9.8850 66.4% claude-sonnet-4-6 1,334 21,046 507,280 6,418,277 $4.1475 27.8% claude-haiku-4-5-20251001 6,407 12,775 326,514 3,814,799 $0.8599 5.8% 各设备用量 设备 总 Token 输入 输出 费用 DCC 5,753,481 1,268 14,740 $7.0047 tianhe 13,516,641 8,003 39,077 $7.8876 ",
+  "wordCount" : "468",
+  "inLanguage": "zh",
+  "datePublished": "2026-03-17T00:00:00-05:00",
+  "dateModified": "2026-03-17T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/daily/2026-03-17/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="zh"
+                        data-translation-url="https://tzj2006.github.io/bugjournal/daily/2026-03-17/">EN
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/zh/">主页</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/daily/">每日总结</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-17
+    </h1>
+    <div class="post-meta"><span title='2026-03-17 00:00:00 -0500 -0500'>2026年3月17日</span>&nbsp;·&nbsp;<span>3 分钟</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="日报--2026-03-17">日报 — 2026-03-17<a hidden class="anchor" aria-hidden="true" href="#日报--2026-03-17">#</a></h1>
+<h2 id="今日概览">今日概览<a hidden class="anchor" aria-hidden="true" href="#今日概览">#</a></h2>
+<ul>
+<li><strong>做了什么：</strong> 两台设备多位研究员并行推进五个研究/工具项目：DCC端对MIHD多模态空间转录组项目进行全面代码重构，tianhe端并行推进robobrain_pi机器人训练系统修复与优化、CALVIN数据集格式转换修复、GPU监控工具改进、以及多个数据集可用性调查。</li>
+<li><strong>怎么做的：</strong> 通过/simplify三路并行代码审查、系统性状态机逻辑诊断、schema文件精准问题定位、FD扫描+父进程链双重GPU进程过滤、JAX has_aux机制改造等多种方法并行推进各项任务。</li>
+<li><strong>有什么用：</strong> 消除MIHD HD数据OOM风险和robobrain_pi任务状态无限循环bug、实现wandb三曲线独立监控、修复CALVIN转换脚本并可正常运行、gpumon从35个重复进程降至8个真实进程并支持键盘导航、确认MimicGen数据链接为上游未发布问题无需修代码。</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 对MIHD空间转录组多模态融合项目进行全面代码重构，修复9处代码复用和效率问题，并整理项目计划文档。</li>
+<li><strong>怎么做的：</strong> 通过/simplify命令启动三路并行代码审查（复用/质量/效率），定位关键问题后逐一修复，最后通过/init更新CLAUDE.md并重构plans.md。</li>
+<li><strong>有什么用：</strong> 集中NEEDS_COORDS_FUSIONS常量（同时修复遗漏的adaln_attention潜在bug）、O(N²)cdist替换为KDTree防止HD数据OOM、消除8处重复device判断逻辑，plans.md未来方向重构为三层时间优先级。</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>做了什么：</strong> 多位研究员并行推进多个项目：robobrain_pi任务状态汇报bug修复与训练loss分离监控、LIBERO自定义套件集成确认、error recovery benchmark数据质量核验；同日修复CALVIN RLDS→LeRobot转换脚本运行时错误、消除GPU监控工具重复进程显示并新增键盘导航、确认RoboCasa MimicGen预训练数据下载失败为上游问题。</li>
+<li><strong>怎么做的：</strong> 系统性代码审查定位vla_infer.py状态机逻辑缺陷并修复；通过读取features.json和box_links_ds.json等schema/配置文件精准诊断数据集问题；FD扫描+父进程链去重双重策略消除GPU监控误报；JSON和NPZ文件分析验证benchmark数据分布。</li>
+<li><strong>有什么用：</strong> 消除robobrain_pi任务完成后的无限循环触发bug并实现wandb三曲线独立监控；CALVIN转换脚本可正常运行；gpumon从35个重复进程降至8个并支持键盘浏览完整命令；确认2920个error scene生成（同时发现threading阶段标注全为pre_reach的系统性问题）；确认MimicGen数据链接为上游未发布问题。</li>
+</ul>
+<blockquote>
+<p>DCC端对MIHD多模态空间转录组项目执行代码重构（/simplify修复9处问题）并更新文档；tianhe端多位研究员并行完成robobrain_pi任务状态机bug修复与训练loss分离监控、LIBERO测试套件集成确认、error recovery benchmark 2920场景数据质量核验、CALVIN格式转换脚本修复、GPU监控工具去重与键盘导航新增、RoboCasa MimicGen预训练数据下载上游根因确认。</p>
+</blockquote>
+<h2 id="今日任务">今日任务<a hidden class="anchor" aria-hidden="true" href="#今日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>robobrain_pi 任务状态汇报bug修复</strong> — 分析并修复vla_infer.py中5个问题：None检查顺序错误（潜在崩溃）、任务完成后未清空current_prompt（无限循环发送done）、未广播idle状态、调试日志阈值不一致（chunk 3/4静默）、打印文案误称为手动标记。</li>
+<li>✅ <strong>MIHD /simplify 代码审查与重构</strong> — 对MIHD项目21个修改的Python文件进行三路并行审查（复用/质量/效率），修复9处问题：集中NEEDS_COORDS_FUSIONS常量并补充遗漏的adaln_attention、KDTree替换O(N²)cdist防HD数据OOM、hoisted device resolution消除8处重复判断、复用DataPreparer实例、删除vestigial train_staig()包装器、修复n_pseudo_clusters重复赋值、移除未使用import等，所有修改通过Python AST语法验证。</li>
+<li>✅ <strong>robobrain_pi action_loss与task_loss分离监控</strong> — 修改model.py抽象方法返回类型为tuple[loss_array, dict]，pi0.py返回(combined_loss, aux_dict)元组，pi0_fast.py同步更新填零，train.py使用has_aux=True解包辅助指标并加入info字典，wandb和进度条中新增action_loss和task_loss独立曲线。</li>
+<li>✅ <strong>RoboCasa MimicGen 预训练数据下载失败根因诊断</strong> — 诊断download_datasets &ndash;source mimicgen对所有任务报错的根因：box_links_ds.json中完全没有MimicGen下载链接（0/350条）、317个任务中仅60个注册了mg_path，属于上游数据未发布问题，无需代码修复。</li>
+<li>✅ <strong>Error Recovery Benchmark 生成数据统计与问题诊断</strong> — 确认6个任务共2920个error scene成功生成（coffee 1076、stack 499、three_piece_assembly 487、pick_place 326、stack_three 382、threading 150），统计task×error×难度分布，发现7个D0 error类型数量不足10个，以及threading任务所有轨迹阶段标注均为pre_reach的系统性问题。</li>
+<li>✅ <strong>gpumon.py 重复进程bug修复</strong> — 修复GPU监控工具显示大量重复进程的问题：要求同时具备/dev/nvidia* FD证据才认定为GPU进程（消除继承环境变量的误报），并在get_gpu_procs中添加父进程链去重（折叠DDP worker等子进程）。进程数从35降至8。</li>
+</ul>
+<h3 id="实现与修复">实现与修复<a hidden class="anchor" aria-hidden="true" href="#实现与修复">#</a></h3>
+<ul>
+<li>✅ <strong>LIBERO libero_object_com测试套件集成确认</strong> — 分析并确认libero_object_com套件已基本完成集成：libero_suite_task_map.py、<strong>init</strong>.py（含LIBERO_OBJECT_COM类和libero_suites注册）、bddl_files目录均已完成，main.py已更新默认套件名和max_steps=300，无需创建init_files。</li>
+<li>✅ <strong>CALVIN dataset RLDS→LeRobot 转换脚本修复</strong> — 修复rlds_to_lerobot.py中多个问题：添加进度条、修正数据集名称（calvin_abc_d→calvin_abc）、修正观测键名（image→rgb_static，wrist_image→rgb_gripper）、添加输出目录自动创建和覆盖确认逻辑。脚本可正确运行。</li>
+<li>✅ <strong>robobrain_pi git工作流管理</strong> — 多次提交（command.txt更新、vla_infer bug修复、loss分离功能），解决git代理冲突（本地配置覆盖为可用的localhost:9999），分支切换、cherry-pick同步command.txt到dev/mlp_old，回退main分支的错误merge commit。</li>
+<li>✅ <strong>gpumon.py 键盘交互导航功能</strong> — 新增nvitop风格的键盘交互：上下键选择进程行（反显高亮），左右键水平滚动查看完整命令（每次10字符，含…溢出指示），Esc取消选中，q退出，底部提示栏动态更新。</li>
+<li>✅ <strong>MIHD 项目文档整理（CLAUDE.md + plans.md）</strong> — 更新CLAUDE.md将&rsquo;新增融合策略&rsquo;章节中的needs_coords描述改为引用NEEDS_COORDS_FUSIONS常量；整理plans.md将底部散落原始笔记整合到正式章节，重构未来方向为三层时间优先级（近期/中期/远期），区分当前单切片与近期目标跨切片两阶段架构路线图。</li>
+<li>✅ <strong>wandb 目录级账号配置方案</strong> — 为共享服务器用户提供个人wandb账号覆盖全局登录的方案，优先推荐direnv（.envrc设置WANDB_API_KEY）或~/.bashrc中导出环境变量，说明WANDB_API_KEY优先级高于~/.netrc。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-mihd的refine_labels_spatial_majority使用scipycdist计算全对距离矩阵hd空间转录组数据17k细胞时内存需求为on必然oom崩溃">1. MIHD的refine_labels_spatial_majority使用scipy.cdist计算全对距离矩阵，HD空间转录组数据（17K+细胞）时内存需求为O(N²)，必然OOM崩溃。<a hidden class="anchor" aria-hidden="true" href="#1-mihd的refine_labels_spatial_majority使用scipycdist计算全对距离矩阵hd空间转录组数据17k细胞时内存需求为on必然oom崩溃">#</a></h4>
+<p><strong>解决方案:</strong> 替换为scipy.spatial.cKDTree.query_ball_point，内存复杂度从O(N²)降至O(N·k)。</p>
+<p><strong>关键洞察:</strong> 近邻查询只需找radius内邻居而非全对距离矩阵，KD树是标准解法；cdist适合矩阵乘法场景而非大规模近邻搜索。</p>
+<h4 id="2-vla_inferpy任务完成判定后未清空current_prompt下一次循环迭代中prompt未变化chunk_count仍5模型分数大概率仍高立即再次触发done消息造成无限循环汇报任务完成">2. vla_infer.py任务完成判定后未清空current_prompt，下一次循环迭代中prompt未变化、chunk_count仍&gt;=5、模型分数大概率仍高，立即再次触发done消息，造成无限循环汇报任务完成。<a hidden class="anchor" aria-hidden="true" href="#2-vla_inferpy任务完成判定后未清空current_prompt下一次循环迭代中prompt未变化chunk_count仍5模型分数大概率仍高立即再次触发done消息造成无限循环汇报任务完成">#</a></h4>
+<p><strong>解决方案:</strong> 在任务完成处理块末尾添加current_prompt=&lsquo;&lsquo;和_publish_state(&lsquo;idle&rsquo;)，同时将调试日志阈值从&lt;3改为&lt;5以覆盖全部被屏蔽的chunk。</p>
+<p><strong>关键洞察:</strong> 状态机设计中完成后必须同时重置触发条件并广播状态变更，只做其中一件都会留下隐性bug。</p>
+<h4 id="3-mihd的needs_coords_fusions集合在runnerpy和evaluation_plannerpy中各自独立维护且两处均遗漏了adaln_attention策略导致该策略在运行时缺少空间坐标而出错">3. MIHD的NEEDS_COORDS_FUSIONS集合在runner.py和evaluation_planner.py中各自独立维护，且两处均遗漏了adaln_attention策略，导致该策略在运行时缺少空间坐标而出错。<a hidden class="anchor" aria-hidden="true" href="#3-mihd的needs_coords_fusions集合在runnerpy和evaluation_plannerpy中各自独立维护且两处均遗漏了adaln_attention策略导致该策略在运行时缺少空间坐标而出错">#</a></h4>
+<p><strong>解决方案:</strong> 在Fusion.py中定义集中常量NEEDS_COORDS_FUSIONS并补充adaln_attention，两处改为from models.Fusion import NEEDS_COORDS_FUSIONS。</p>
+<p><strong>关键洞察:</strong> 重复维护同一集合不可避免产生不一致，单一真相来源（Single Source of Truth）是消除此类隐性bug的根本解法。</p>
+<h4 id="4-pi0py的compute_loss只返回合并的loss数组trainpy只记录单一loss曲线无法在wandb中分别观察action_loss和task_loss的训练动态">4. pi0.py的compute_loss只返回合并的loss数组，train.py只记录单一loss曲线，无法在wandb中分别观察action_loss和task_loss的训练动态。<a hidden class="anchor" aria-hidden="true" href="#4-pi0py的compute_loss只返回合并的loss数组trainpy只记录单一loss曲线无法在wandb中分别观察action_loss和task_loss的训练动态">#</a></h4>
+<p><strong>解决方案:</strong> compute_loss返回类型改为(loss_array, aux_dict)，train.py使用nnx.value_and_grad的has_aux=True参数解包辅助字典，info中加入action_loss和task_loss字段。</p>
+<p><strong>关键洞察:</strong> JAX的has_aux机制专为此场景设计：在不影响反向传播计算的前提下携带监控指标，是比全局变量或重复计算更干净的解法。</p>
+<h4 id="5-threading任务的清洁轨迹phase_labels全部为pre_reach导致只有collision_empty能被注入benchmark数据严重不均衡同时7个d0-error类型数量不足10个">5. threading任务的清洁轨迹phase_labels全部为pre_reach，导致只有collision_empty能被注入，benchmark数据严重不均衡；同时7个D0 error类型数量不足10个。<a hidden class="anchor" aria-hidden="true" href="#5-threading任务的清洁轨迹phase_labels全部为pre_reach导致只有collision_empty能被注入benchmark数据严重不均衡同时7个d0-error类型数量不足10个">#</a></h4>
+<p><strong>解决方案:</strong> （待处理）需检查threading任务的get_task_completion_stages()实现是否正确感知reach/grasp阶段；不足10个的D0类型需扩大清洁轨迹数量或针对性增加注入机会。</p>
+<p><strong>关键洞察:</strong> threading是穿针任务，其gripper关闭判定与通用框架逻辑不兼容，需任务级定制；数据分布不均衡问题应在pipeline设计阶段就加入监控和平衡机制。</p>
+<h4 id="6-gpumonpy显示大量重复进程所有继承了cuda_visible_devices的进程bashffmpegclaude和所有ddp-worker子进程都被误判为gpu进程35个进程中真实gpu进程仅8个">6. gpumon.py显示大量重复进程：所有继承了CUDA_VISIBLE_DEVICES的进程（bash、ffmpeg、claude）和所有DDP worker子进程都被误判为GPU进程，35个进程中真实GPU进程仅8个。<a hidden class="anchor" aria-hidden="true" href="#6-gpumonpy显示大量重复进程所有继承了cuda_visible_devices的进程bashffmpegclaude和所有ddp-worker子进程都被误判为gpu进程35个进程中真实gpu进程仅8个">#</a></h4>
+<p><strong>解决方案:</strong> 双重过滤：①要求同时有/dev/nvidia* FD打开才算GPU进程；②默认模式下若进程的祖先也在GPU列表且GPU集合相同则折叠到祖先。</p>
+<p><strong>关键洞察:</strong> 仅凭CUDA_VISIBLE_DEVICES无法区分真实GPU使用进程和继承环境变量的无关进程，FD证据是更可靠的判定依据；在Kubernetes PID命名空间隔离环境下nvidia-smi无法显示进程信息，/proc/<pid>/fd扫描是替代方案。</p>
+<h4 id="7-robocasa-mimicgen下载命令对所有任务报错用户误以为是代码bug">7. RoboCasa MimicGen下载命令对所有任务报错，用户误以为是代码bug。<a hidden class="anchor" aria-hidden="true" href="#7-robocasa-mimicgen下载命令对所有任务报错用户误以为是代码bug">#</a></h4>
+<p><strong>解决方案:</strong> 分析box_links_ds.json发现其中不含任何MimicGen路径（0/350条），317个任务中只有60个注册了mg_path。结论：上游数据链接未发布，无代码修复空间。</p>
+<p><strong>关键洞察:</strong> 错误信息分两类（无mg_path注册 vs 有注册但无Box链接），需区分才能正确判断根因；直接检查配置文件比分析错误信息更高效。</p>
+<h4 id="8-vla_inferpy对task_completed无条件调用itemnone检查在之后非pi05模型返回none时直接崩溃attributeerror">8. vla_infer.py对task_completed无条件调用.item()，None检查在之后，非pi05模型返回None时直接崩溃（AttributeError）。<a hidden class="anchor" aria-hidden="true" href="#8-vla_inferpy对task_completed无条件调用itemnone检查在之后非pi05模型返回none时直接崩溃attributeerror">#</a></h4>
+<p><strong>解决方案:</strong> 将None检查提前到print之前，用isinstance判断是numpy数组还是标量决定是否调用.item()。</p>
+<p><strong>关键洞察:</strong> 防御性编程：None检查必须先于任何属性访问；当前不崩溃只是因为恰好总用pi05模型，不是代码正确的证明。</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="9-服务器git全局配置了不可达的代理17216312003138导致所有git-fetchpush操作失败">9. 服务器git全局配置了不可达的代理172.16.31.200:3138，导致所有git fetch/push操作失败。<a hidden class="anchor" aria-hidden="true" href="#9-服务器git全局配置了不可达的代理17216312003138导致所有git-fetchpush操作失败">#</a></h4>
+<p><strong>解决方案:</strong> 用curl测试发现localhost:9999可用（HTTP 200），通过git config &ndash;local覆盖全局代理配置。</p>
+<p><strong>关键洞察:</strong> git config的local &gt; global &gt; system优先级可以针对单仓库覆盖全局设置而不影响其他仓库。</p>
+<h4 id="10-calvin数据集名称不匹配代码写的calvin_abc_d实际目录为calvin_abc导致tfdsbuilder找不到版本观测键名错误image-vs-rgb_staticrgb_gripper导致keyerror上次运行残留的空目录结构导致lerobotdatasetcreate抛出fileexistserror">10. CALVIN数据集名称不匹配（代码写的calvin_abc_d，实际目录为calvin_abc）导致tfds.builder找不到版本；观测键名错误（image vs rgb_static/rgb_gripper）导致KeyError；上次运行残留的空目录结构导致LeRobotDataset.create()抛出FileExistsError。<a hidden class="anchor" aria-hidden="true" href="#10-calvin数据集名称不匹配代码写的calvin_abc_d实际目录为calvin_abc导致tfdsbuilder找不到版本观测键名错误image-vs-rgb_staticrgb_gripper导致keyerror上次运行残留的空目录结构导致lerobotdatasetcreate抛出fileexistserror">#</a></h4>
+<p><strong>解决方案:</strong> 通过检查目录结构发现名称不匹配；通过读取features.json获取真实schema更新键名；添加目录存在检测逻辑询问是否覆盖。</p>
+<p><strong>关键洞察:</strong> RLDS数据集字段名因数据集而异，必须通过features.json确认实际schema；LeRobot的create()不支持覆盖现有目录，需在调用前手动清理。</p>
+<h2 id="人类思路-vs-ai-思路">人类思路 vs AI 思路<a hidden class="anchor" aria-hidden="true" href="#人类思路-vs-ai-思路">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="mimicgen下载失败根因">MimicGen下载失败根因<a hidden class="anchor" aria-hidden="true" href="#mimicgen下载失败根因">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户认为是代码问题，通过下载命令触发错误后求助AI。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI通过逐层检查（脚本逻辑→registry注册→box_links.json内容）最终确认根因是上游数据链接未发布，并区分了两类不同错误信息的来源。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 用户假设是本地代码bug，AI通过系统性调查发现是上游数据发布问题——这一结论改变了用户的行动方向（无需修代码）。</p>
+<h4 id="vla_inferpy-bug发现的切入角度">vla_infer.py bug发现的切入角度<a hidden class="anchor" aria-hidden="true" href="#vla_inferpy-bug发现的切入角度">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类以&rsquo;检查任务状态汇报分类是怎么实现的，相关改动有没有问题&rsquo;为切入点，带着对特定提交的隐性怀疑发起审查。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI以数据流为线索从pi0.py→real_policy.py→utils.py→vla_infer.py系统梳理，整理出5个bug并按严重程度排序，Bug 2（无限循环）和Bug 3（None崩溃）是AI独立发现的隐患。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 人类有直觉目标（怀疑chunk计数逻辑），AI提供了系统覆盖和优先级排序；None检查顺序的潜在崩溃是AI通过代码逻辑推演发现的，人类关注点主要在运行时行为。</p>
+<h4 id="gpumon重复进程问题定位">gpumon重复进程问题定位<a hidden class="anchor" aria-hidden="true" href="#gpumon重复进程问题定位">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户直接观察到现象（6、7卡只有一个进程但显示多个），提供了准确的问题描述，无需AI主动发现。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI通过运行调试脚本分析每个进程的FD集合和CUDA_VISIBLE_DEVICES，发现了两个独立根因（环境变量误报+子进程重复），提出了双重过滤方案。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> 问题发现来自用户观察，技术根因分析和解决方案设计来自AI。</p>
+<h4 id="compute_loss返回类型修改的范围决策">compute_loss返回类型修改的范围决策<a hidden class="anchor" aria-hidden="true" href="#compute_loss返回类型修改的范围决策">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类只描述了需求（wandb能分别监控三个指标），未指定实现方案，也未明确是否接受破坏抽象接口。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI选择修改BaseModel抽象方法签名（需同步修改pi0_fast.py填充zeros），理由是JAX-native且最干净；而非备选方案（在train.py外部重复计算loss或使用全局副作用）。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI方案影响范围超出最小修改原则，但保持了代码一致性和可维护性。</p>
+<h4 id="error-recovery-benchmark的数据验证策略">Error Recovery Benchmark的数据验证策略<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark的数据验证策略">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>思路</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类问&rsquo;现在生成到哪里了&rsquo;，隐含对进度和质量的关注。</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI先查squeue确认job状态，再查文件数量确认完成度，最后通过JSON解析做细粒度统计（按error×degree分类），主动发现并报告D0不足10个和threading阶段标注异常两个问题。</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析:</strong> AI主动发现了超出原始问题范围的两个数据质量问题，体现了主动诊断倾向。</p>
+<h2 id="ai-局限性">AI 局限性<a hidden class="anchor" aria-hidden="true" href="#ai-局限性">#</a></h2>
+<h3 id="重要局限">重要局限<a hidden class="anchor" aria-hidden="true" href="#重要局限">#</a></h3>
+<ul>
+<li>threading阶段标注全为pre_reach的问题：AI能诊断症状（检查NPZ文件和get_task_completion_stages代码），但无法运行robosuite环境实际验证传感器读数，只能推测根因并提供排查方向。</li>
+</ul>
+<h3 id="一般局限">一般局限<a hidden class="anchor" aria-hidden="true" href="#一般局限">#</a></h3>
+<ul>
+<li>AI倾向于先查外部文档/远程资源而非优先利用本地已有信息：LIBERO套件分析时连续启动多个Explore subagent而git status已包含答案；CALVIN数据集问题诊断时首先尝试fetch外部GitHub URL而非读取用户指定的本地代码文件。应优先读取diff/status和本地文件，再决定是否深入探索。</li>
+<li>git远程认证无法代为处理：SSH key、GitHub token、VS Code credential helper均在用户端，AI只能提供命令方案而无法直接执行push；在服务器环境中credential helper不可用时需要用户介入。</li>
+<li>CALVIN转换脚本需要多轮迭代（名称错误→键名错误→目录存在错误）才解决，每次修复后运行才暴露下一个问题，未能一次性通过features.json和完整代码审查预见所有问题。</li>
+</ul>
+<h2 id="今日收获">今日收获<a hidden class="anchor" aria-hidden="true" href="#今日收获">#</a></h2>
+<h3 id="核心收获">核心收获<a hidden class="anchor" aria-hidden="true" href="#核心收获">#</a></h3>
+<ul>
+<li>任务状态机设计原则：完成事件必须同时做两件事——重置触发条件（清空current_prompt）和广播状态变更（_publish_state(&lsquo;idle&rsquo;)）。只做其中一件会留下无限循环或上游感知失效的隐性bug，两者缺一不可。</li>
+<li>JAX has_aux机制：nnx.value_and_grad支持has_aux=True参数，compute_loss可以返回(loss_array, aux_dict)，梯度只对loss_array计算，aux_dict透明携带监控指标；这是JAX函数式设计中携带副信息的标准方式。</li>
+<li>空间数据近邻查询：大规模点云（&gt;10K点）的半径近邻查询应优先KD树（O(N log N)预处理），而非cdist（O(N²)内存）。在HD空间转录组（17K+细胞）场景两者差异可达OOM vs 正常运行。</li>
+<li>GPU进程检测的可靠方法：在Kubernetes PID命名空间隔离环境下nvidia-smi无法显示进程信息；通过扫描/proc/<pid>/fd中的/dev/nvidia* FD是更可靠的检测方式，但必须同时要求FD证据才能避免继承环境变量的误报。</li>
+<li>单一真相来源（Single Source of Truth）原则：需要跨多文件引用的常量集合（如NEEDS_COORDS_FUSIONS）必须从唯一定义处import，手动维护多份副本不可避免产生不一致，且不一致往往在边缘情况才触发（如遗漏的adaln_attention）。</li>
+<li>数据集下载工具的错误信息可能来自多个不同层次（registry未注册 vs 下载链接不存在），需要区分才能正确判断根因；直接检查配置文件（如box_links_ds.json）比分析错误信息更高效，有时能发现根因是上游数据未发布而非本地代码bug。</li>
+<li>Benchmark数据质量：数据分布不均衡（部分error类型D0&lt;10）是系统性问题，需在pipeline设计阶段就加入分布监控和平衡机制；特定任务（如threading穿针）的通用框架适配需要明确的任务级测试验证。</li>
+</ul>
+<h3 id="实践收获">实践收获<a hidden class="anchor" aria-hidden="true" href="#实践收获">#</a></h3>
+<ul>
+<li>RLDS格式的TFRecord数据集观测字段名因数据集而异，必须通过features.json确认实际schema，不能依赖其他数据集的经验或代码模板中的默认键名。</li>
+<li>共享服务器上WANDB_API_KEY环境变量的优先级高于~/.netrc（wandb login存储位置），可作为覆盖全局账号的轻量方案，无需修改wandb配置文件。</li>
+</ul>
+<h2 id="会话摘要">会话摘要<a hidden class="anchor" aria-hidden="true" href="#会话摘要">#</a></h2>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>✅ MIHD项目代码重构（/simplify 9处修复）与文档整理</strong>
+<em>13:54:46.661 | claude_code</em>
+对MIHD空间转录组项目21个修改的Python文件进行三路并行代码审查，修复9处问题（KDTree替换O(N²)cdist防OOM、集中NEEDS_COORDS_FUSIONS常量并补充遗漏的adaln_attention、hoisted device resolution消除8处重复判断等），所有修改通过Python AST语法验证。随后更新CLAUDE.md引用新常量，整理plans.md将散落笔记整合为三层时间优先级未来方向并更新架构路线图。</p>
+<h3 id="robobrain-pi">RoboBrain-Pi<a hidden class="anchor" aria-hidden="true" href="#robobrain-pi">#</a></h3>
+<p><strong>✅ robobrain_pi任务状态bug修复、训练loss分离监控实现与git工作流管理</strong>
+<em>11:09:28.373 | claude_code</em>
+系统性审查vla_infer.py中task_completed数据流（pi0.py→real_policy.py→utils.py→vla_infer.py），发现并修复5个bug（任务完成后未清空current_prompt导致无限循环触发done、None检查顺序错误导致潜在崩溃、idle状态未广播、调试日志阈值不完整、文案错误）。同步实现action_loss/task_loss分离监控：四文件联动修改（model.py返回tuple、pi0.py携带辅助字典、pi0_fast.py填零、train.py用has_aux=True解包），wandb新增三曲线独立显示。期间处理git代理冲突（本地配置覆盖不可达全局代理）、cherry-pick同步dev/mlp_old分支、误merge回退等多个git工作流问题，完成多个commit提交。</p>
+<h3 id="libero-benchmark">LIBERO-Benchmark<a hidden class="anchor" aria-hidden="true" href="#libero-benchmark">#</a></h3>
+<p><strong>✅ LIBERO libero_object_com测试套件集成分析与确认</strong>
+<em>09:16:47.373 | claude_code</em>
+分析添加自定义libero_object_com测试套件所需的文件改动，探索发现大部分工作已完成：libero_suite_task_map.py中已添加10个任务名、<strong>init</strong>.py已注册LIBERO_OBJECT_COM类、bddl_files/libero_object_com/下10个.bddl文件已存在、main.py已更新默认套件名和max_steps=300。唯一未创建的init_files目录因main.py已注释相关代码而不需要，集成完成无需额外修改。</p>
+<h3 id="error-recovery-benchmark">Error-Recovery-Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 Error Recovery Benchmark生成完成统计与问题诊断</strong>
+<em>14:03:00.373 | claude_code</em>
+确认pipeline job已完成，6个任务共生成2920个error scene（coffee最多1076，threading最少150）。统计每task×error类型×D0/D1/D2的分布，发现7个D0子类型&lt;10个（需补充），以及threading所有轨迹phase_labels全为pre_reach（影响其他error类型注入）。深入诊断发现threading任务未被正确phase标注，get_task_completion_stages()实现需要检查，该问题待后续处理。</p>
+<h3 id="calvin-dataset-converter">CALVIN Dataset Converter<a hidden class="anchor" aria-hidden="true" href="#calvin-dataset-converter">#</a></h3>
+<p><strong>✅ 修复CALVIN RLDS→LeRobot转换脚本的多个运行时错误并增加进度条</strong>
+<em>06:51:06.033 | claude_code</em>
+用户chenjunye请求添加进度条并发现数据目录结构与代码配置不一致。通过读取目录结构和features.json逐步修复数据集名称错误（calvin_abc_d→calvin_abc）、观测键名错误（image→rgb_static/rgb_gripper）以及输出目录已存在时的FileExistsError，并添加用户确认覆盖的交互逻辑。脚本可正确运行。</p>
+<h3 id="gpu-monitor-gpumon">GPU Monitor (gpumon)<a hidden class="anchor" aria-hidden="true" href="#gpu-monitor-gpumon">#</a></h3>
+<p><strong>✅ 修复gpumon.py重复进程显示问题并新增键盘交互导航</strong>
+<em>03:01:28.167 | claude_code</em>
+用户chenxingping发现gpumon.py在GPU 6/7上只有一个实际进程但显示多个重复项。通过调试发现两个根因：继承CUDA_VISIBLE_DEVICES的无关进程（bash/claude等）和DDP worker子进程重复计数。修复方案为双重过滤（FD证据要求+父进程链去重），进程数从35降至8。随后按用户要求新增了nvitop风格的上下键选择、左右键命令滚动功能。</p>
+<h3 id="robocasa-mimicgen-数据下载">RoboCasa MimicGen 数据下载<a hidden class="anchor" aria-hidden="true" href="#robocasa-mimicgen-数据下载">#</a></h3>
+<p><strong>✅ 诊断并确认MimicGen预训练数据下载全部失败的上游根因</strong>
+<em>03:38:33.780 | claude_code</em>
+用户chenjunye运行download_datasets &ndash;source mimicgen时所有任务均报错。通过系统性检查（脚本逻辑→dataset_registry.py注册情况→box_links_ds.json内容）发现根因：文件中完全不含MimicGen路径（0/350条），317个任务中仅60个注册了mg_path，属于上游数据链接未发布问题。第二次会话通过grep验证了关键结论，区分了两类错误提示来源（无mg_path注册 vs 有注册但无Box链接）。最终确认无需代码修复。</p>
+<h3 id="chenxingping-工作环境配置">chenxingping 工作环境配置<a hidden class="anchor" aria-hidden="true" href="#chenxingping-工作环境配置">#</a></h3>
+<p><strong>✅ 共享服务器上配置目录级wandb个人账号</strong>
+<em>07:46:38.767 | claude_code</em>
+为用户chenxingping提供在共享服务器上让个人目录下项目使用个人wandb账号的方案，优先推荐direnv（.envrc中设置WANDB_API_KEY）和~/.bashrc导出环境变量，说明WANDB_API_KEY环境变量优先级高于~/.netrc。</p>
+<h2 id="token-用量">Token 用量<a hidden class="anchor" aria-hidden="true" href="#token-用量">#</a></h2>
+<h3 id="总览">总览<a hidden class="anchor" aria-hidden="true" href="#总览">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总 Token</td>
+          <td>19,270,122</td>
+      </tr>
+      <tr>
+          <td>输入 Token</td>
+          <td>9,271</td>
+      </tr>
+      <tr>
+          <td>输出 Token</td>
+          <td>53,817</td>
+      </tr>
+      <tr>
+          <td>Cache 创建</td>
+          <td>1,756,812</td>
+      </tr>
+      <tr>
+          <td>Cache 读取</td>
+          <td>17,450,222</td>
+      </tr>
+      <tr>
+          <td>Cache 命中率</td>
+          <td>90.9%</td>
+      </tr>
+      <tr>
+          <td>总费用 (USD)</td>
+          <td>$14.8924</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型明细">模型明细<a hidden class="anchor" aria-hidden="true" href="#模型明细">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>Cache 创建</th>
+          <th>Cache 读取</th>
+          <th>费用</th>
+          <th>占比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>1,530</td>
+          <td>19,996</td>
+          <td>923,018</td>
+          <td>7,217,146</td>
+          <td>$9.8850</td>
+          <td>66.4%</td>
+      </tr>
+      <tr>
+          <td>claude-sonnet-4-6</td>
+          <td>1,334</td>
+          <td>21,046</td>
+          <td>507,280</td>
+          <td>6,418,277</td>
+          <td>$4.1475</td>
+          <td>27.8%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>6,407</td>
+          <td>12,775</td>
+          <td>326,514</td>
+          <td>3,814,799</td>
+          <td>$0.8599</td>
+          <td>5.8%</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="各设备用量">各设备用量<a hidden class="anchor" aria-hidden="true" href="#各设备用量">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总 Token</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>费用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>5,753,481</td>
+          <td>1,268</td>
+          <td>14,740</td>
+          <td>$7.0047</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>13,516,641</td>
+          <td>8,003</td>
+          <td>39,077</td>
+          <td>$7.8876</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+document.getElementById("lang-toggle").addEventListener("click", function() {
+    var current = this.getAttribute("data-current-lang");
+    var url = this.getAttribute("data-translation-url");
+    var newLang = (current === "en") ? "zh" : "en";
+    localStorage.setItem("pref-lang", newLang);
+    if (url) {
+        window.location.href = url;
+    } else {
+        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+    }
+});
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

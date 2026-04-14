@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>缺陷记录表 2026-03-01 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="在DCC和tianhe这两台服务器上，我们同时推进了四个项目：DCC完成了VisiumHD的三种注释可视化处理以及STAIG融合多模态运行（Silhouette得分0.343），并对MIHD仓库进行了六阶段的大规模清理重构（删除了约250K条代码）；tianhe则完成了Pi0.5基础模型评估（SR率为4.2%），修复了Coffee BC-RNN中对象观测键缺失的问题，开发了BC-RNN Stack_D0错误场景生成流水线（修复了四层图像生成的11个场景问题），并在修复了四个启动错误之后，成功以6×A800 GPU的100%利用率来并行微调Pi0.5 LoRA任务。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-01/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-01/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-01/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    var stored = localStorage.getItem("pref-lang");
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-01/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="缺陷记录表 2026-03-01">
+  <meta property="og:description" content="在DCC和tianhe这两台服务器上，我们同时推进了四个项目：DCC完成了VisiumHD的三种注释可视化处理以及STAIG融合多模态运行（Silhouette得分0.343），并对MIHD仓库进行了六阶段的大规模清理重构（删除了约250K条代码）；tianhe则完成了Pi0.5基础模型评估（SR率为4.2%），修复了Coffee BC-RNN中对象观测键缺失的问题，开发了BC-RNN Stack_D0错误场景生成流水线（修复了四层图像生成的11个场景问题），并在修复了四个启动错误之后，成功以6×A800 GPU的100%利用率来并行微调Pi0.5 LoRA任务。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-01T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-01T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="缺陷记录表 2026-03-01">
+  <meta name="twitter:description" content="在DCC和tianhe这两台服务器上，我们同时推进了四个项目：DCC完成了VisiumHD的三种注释可视化处理以及STAIG融合多模态运行（Silhouette得分0.343），并对MIHD仓库进行了六阶段的大规模清理重构（删除了约250K条代码）；tianhe则完成了Pi0.5基础模型评估（SR率为4.2%），修复了Coffee BC-RNN中对象观测键缺失的问题，开发了BC-RNN Stack_D0错误场景生成流水线（修复了四层图像生成的11个场景问题），并在修复了四个启动错误之后，成功以6×A800 GPU的100%利用率来并行微调Pi0.5 LoRA任务。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Daily Summaries",
+      "item": "https://tzj2006.github.io/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "缺陷记录表 2026-03-01",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-03-01/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "缺陷记录表 2026-03-01",
+  "name": "缺陷记录表 2026-03-01",
+  "description": "在DCC和tianhe这两台服务器上，我们同时推进了四个项目：DCC完成了VisiumHD的三种注释可视化处理以及STAIG融合多模态运行（Silhouette得分0.343），并对MIHD仓库进行了六阶段的大规模清理重构（删除了约250K条代码）；tianhe则完成了Pi0.5基础模型评估（SR率为4.2%），修复了Coffee BC-RNN中对象观测键缺失的问题，开发了BC-RNN Stack_D0错误场景生成流水线（修复了四层图像生成的11个场景问题），并在修复了四个启动错误之后，成功以6×A800 GPU的100%利用率来并行微调Pi0.5 LoRA任务。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-03-01 Today’s Highlights What was done: Across DCC and tianhe servers, we advanced the space transcriptomics toolchain (STHD/MIHD) and robotics learning benchmarks. DCC focused on restructuring VisiumHD’s multimodal data analysis and repository architecture, while tianhe focused on model evaluation, fixing configuration defects, generating error scenarios, and initializing Pi0.5 LoRA fine-tuning. How it was done: DCC used a security refactoring process involving grep dependency analysis, batch migration, and dry-run validation to complete the multimodal pipeline. Tianhe monitored training using TensorBoard API, identified configuration defects by comparing HDF5 dataset structures, iterated to fix image format adaptations, and gradually resolved four training initialization bugs related to JAX environment variables. What’s achieved: The MIHD repository was significantly streamlined (41 files deleted, ~250K code removed), establishing a clear module structure. Coffee BC-RNN defect root causes were identified and fixed. Pi0.5 LoRA 9-task parallel training ran stably on 6×A800. Error Recovery Benchmark provided the first batch of high-success-rate BC-RNN data and Pi0.5 baseline evaluation. The infrastructure documentation system was fully established. DCC What was done: We deepened the STHD CLAUDE.md, implemented three types of annotation visualization for VisiumHD (pathologist/STHD/STAIG), fixed HD adaptation bugs in the MIHD pipeline, completed end-to-end STAIG fusion operations, visualized scGPT 11-slice KMeans results, and re-engineered the MIHD process into six stages. We also added a report from February 28, 2026. How it was done: We gradually debugged HD data paths (discovered a pattern of r_big//4 mapping), fixed four issues in vision encoder/fusion/mclust. The refactoring process followed the sequence of “grep validation → creating new modules → updating references → deleting old files.” Dry-run validation showed 440 experiments passed. Unusable mclust was replaced with KMeans. What’s achieved: For the first time, MIHD successfully performed pca×uni2×staig_fusion multimodal fusion on VisiumHD (Silhouette=0.343 vs PCA 0.086). The repository deleted 41 files (~250K code), 5.3MB images, and fixed the drop_feature bug. scGPT 11-slice visualization was reduced from expected 6+ hours to 2 minutes. Tianhe What was done: We completed the evaluation of Pi0.5’s 9-task basic model (4.2% SR), fixed Coffee BC-RNN object observation key deficiencies, developed a BC-RNN Stack_D0 error scenario generation pipeline (11 scenarios + MP4), cleaned up ~530GB GPU VRAM, monitored BC-RNN 9-task training, organized project files v4.17/v4.18, and successfully initialized Pi0.5 LoRA 9-task parallel fine-tuning (fixed four bugs). How it was done: We executed GPU tasks on an49 nodes using SLURM srun –overlap. We identified Coffee configuration defects by comparing HDF5 dataset structures and iteratively fixed four issues in robomimic BC-RNN image observation. We also fixed four initialization bugs related to JAX_PLATFORMS/norm_stats path/boolean parameters/W\u0026B. Using CPU + sub-sampling, we reduced the norm_stats calculation time from 10+ minutes to 2.5 minutes. What’s achieved: BC-RNN Stack tasks reached 64% SR by epoch 22, verifying data quality. Coffee defect fixes laid the foundation for retraining complex tasks. Pi0.5 LoRA ran stably on 6×A800 (77.7GB per card, with 100% utilization), and the 9-task fine-tuning infrastructure was fully established. Across DCC and tianhe servers, we advanced four projects in parallel: DCC completed VisiumHD’s three types of annotation visualization and STAIG fusion multimodal operations (Silhouette 0.343), and carried out a six-stage large-scale cleanup and restructuring of the MIHD repository (deleting ~250K code). Tianhe completed Pi0.5’s 9-task basic model evaluation (4.2% SR), identified and fixed Coffee BC-RNN object observation key deficiencies, developed a BC-RNN Stack_D0 error scenario generation pipeline (fixed four image bugs to generate 11 scenarios), and successfully initialized Pi0.5 LoRA 9-task parallel fine-tuning with 100% GPU utilization on 6×A800.\nToday’s Tasks Architecture and Strategy ✅ VisiumHD barcode mapping discovery and three types of annotation visualization — Discovered a pattern of r_big//4 mapping (17502/17502 complete matches), generated pathologist annotations for four tissue types: Neoplasm 48.6%, Connective 29.5%, etc., STHD cell type visualizations with 85 categories reduced to 11 coarse categories by majority vote, achieving 96.3% match rate. We established a baseline for VisiumHD data analysis. ✅ MIHD pipeline HD dataset adaptation and end-to-end STAIG fusion — Fixed four HD path adaptation bugs (adding cropped_fullres.tif mode in find_spatial_image, passing vision encoder data_root, loading spatial coords during fusion phase, mclust→KMeans fallback). We completed the pca×uni2×staig_fusion process for VisiumHD crop10large (5.5 minutes for patch extraction, 5 minutes for UNI2 GPU inference, 6 minutes for STAIG training, with Silhouette of 0.343). ✅ MIHD repository six-stage cleanup and restructuring (deleting ~250K code) — Phase1 deleted 41 dead files (~250K code + 5.3MB images); Phase2 moved run_benchmark.py functions to six modules (staig_utils, vision_extractors, Fusion, clustering, etc.), updated all pipeline/imports; Phase3 removed run_benchmark.py and five dependent models; Phase4 extracted STAIG common code and fixed the drop_feature logic reversal bug in BasicContrastive (\u003e= replaced with \u003c); Phase5 updated all documentation; Phase6 dry-run validation showed 440 experiments passed. ✅ Coffee BC-RNN configuration defect identification and repair (object observation keys) — By comparing actual HDF5 dataset observation key structures, AI independently identified missing object observation keys in Coffee’s configuration template (Coffee requires 57-dimensional object states: Pod/Machine/Holder position + relative orientation + hinge angle). We added extra_low_dim=[‘object’] to all nine tasks, re-generated and validated all configuration files, fixing the root cause of Coffee’s 0% SR failure. ✅ BC-RNN Stack_D0 error scenario generation pipeline development — Fixed four consecutive bugs in robomimic BC-RNN image observation (enable_camera detection, json.loads parsing checkpoint config, automatic detection of 84×84 resolution, HWC→CHW transformation + float32 normalization). We created configs/benchmark_v4_stack.yaml and scripts/batch_visualize_policy_scenes.py, resulting in 11 tip_over error scenarios and 11 MP4 visualization videos. ✅ Pi0.5 LoRA 9-task fine-tuning pipeline setup and successful initialization — Created train_pi05_benchmark.py (five sub-routines), registered 18 configurations to openpi/config.py (nine for fine-tuning, nine for inference), fixed vla_server.py’s IMAGE_KEY_MAP prefix matching defects. We completed HDF5→LeRobot data conversion for nine tasks (avoiding OOM segfault per task), and completed all norm_stats calculations in 2.5 minutes using CPU parallelization + sub-sampling. Fixed four initialization bugs (JAX_PLATFORMS=cpu, assets path, –no-overwrite, WANDB_MODE=disabled). We successfully initialized six tasks with 100% GPU utilization (GPU usage: 77.7GB per card). ✅ Pi0.5 Phoenix 9-task basic model evaluation — Monitored nine MimicGen tasks for 50 rollouts each, achieving total SR of 4.2% (19/450), with Stack_D0 (24%) and Stack_D1 (12%) showing substantial success. The remaining seven tasks had 0-2% success rates. We confirmed that the third training phase reached step 99999 (the previous two failed due to SLURM time limit conflicts). 🔄 Coffee BC-RNN rollout visualization and environment initialization issues troubleshooting — Generated coffee_d0 rollout videos (742KB). Users reported issues with object misregistration or freezing during environment initialization (simulator bugs, not model problems). We began investigating Coffee env kwargs but session truncation prevented further investigation. Implementation and Fixes ✅ GPU VRAM cleanup and BC-RNN 9-task training monitoring — Found and cleaned up about 530GB of idle VRAM on an49 nodes (zhaoganlong Phoenix serve_policy 407GB + two old VLA servers, each with 61GB). Monitored nine BC-RNN tasks: stack_d0 (64%@epoch22), stack_d1 (44%), coffee (0%), stack_three/threading/three_piece_assembly all achieved 58-96%@epoch300-420. ✅ Infrastructure reference documentation creation and project file organization v4.17/v4.18 — Created docs/infrastructure_reference.md (649 scenarios/9 types of errors/6 detectors/4 injectors/full pipeline diagrams, 13 chapters). In v4.17, archived old files in the four-layer directory structure, merged VLM tutorials, and created EXTERNAL_DEPENDENCIES.md. In v4.18, extracted create_env()/load_task_registry() to script_utils.py (eliminating ~210 lines of duplicate code), updated CLAUDE.md with instructions for M14 evaluation commands. ✅ scGPT 11-slice KMeans visualization — Terminated the time-consuming mclust task (completed 2/11 in 2 hours), and used KMeans to complete all 11 DLPFC slices in 2 minutes, with an average ARI of 0.1695 and NMI of 0.2772. ✅ STHD CLAUDE.md deep improvement — Analyzed all core modules of STHD, added descriptions for six previously omitted modules (frontline.py, qcmask.py, etc.), optimized probability models, detailed Numba JIT operations, and processed patch overlap logic in pdata TSV format. ✅ Supplementary report from February 28, 2026 (MIHD experimental metrics and visualization) — Added a summary of Chapter 5 results and a list of output files for Chapter 6, including 151673 multi-modal benchmark tables, comparisons between Vision Refinement before and after, and over 60 visualizations. Issues and Solutions Key Issues 1. VisiumHD HD dataset path adaptation: vision encoder image paths, spatial coords loading, and multiple failures during fusion due to assuming a DLPFC directory structure. Solution: Three fixes were made: add cropped_fullres.tif mode recognition in find_spatial_image(); pass crop_dir.parent as data_root when calling vision encoder; load coordinates directly from adata.obsm[‘spatial’] during fusion phase, bypassing path lookup.\nKey insight: The pipeline design assumes a flat DLPFC directory structure (data_root/section_id/), but HD data needs to be mapped at the call level rather than modifying the encoder’s internal logic. The path abstraction layer should provide interfaces for adapting to different dataset structures.\n2. Invisibility of long-term task progress: GPU utilization was 0%, but VRAM was fully loaded, making it impossible to determine if it was a CPU bottleneck or model eager loading causing wasted time. Solution: Set PYTHONUNBUFFERED=1 and add tqdm for critical loops; set compute_norm_stats.py to require CUDA_VISIBLE_DEVICES=\"\" + JAX_PLATFORMS=cpu (root cause: PaligemmaTokenizer is eagerly loaded into all visible GPUs during get_config().model call, but norm_stats only requires dataset transforms).\nKey insight: GPU utilization of 0% could indicate a CPU preprocessing bottleneck or eager loading without inference calculations. The difference between the two can be distinguished by monitoring VRAM usage with nvidia-smi. Norm stats doesn’t require model inference and should run in CPU mode by default.\n3. Coffee BC-RNN loss converged normally (-7.66→-15.4), but SR was always 0%, while Stack achieved 64% at epoch 20 on equivalent configurations. Solution: By comparing actual HDF5 dataset observation key structures, we found that Coffee requires 57-dimensional object states (multi-step precise operations: Pod/Machine/Holder position + relative orientation + hinge angle). The configuration template was missing this information. We added extra_low_dim=[‘object’] to all nine tasks and re-generated the configuration.\nKey insight: BC-RNN’s observation keys must match task complexity. Coffee requires multi-step precision operations, and 84×84 images don’t provide enough spatial accuracy information. The performance of configuration bugs (normal loss but SR=0) is highly similar to insufficient model capabilities. This can only be distinguished by comparing dataset structures.\n4. Robomimic BC-RNN image observation integration failure: four consecutive bugs (enable camera, checkpoint config format, resolution, image format). Solution: ① Detect rgb modality automatic activation from checkpoint config fields (JSON strings, not dict access); ② Read actual image size (84×84) from shape_metadata and pass it to create_env; ③ Manually perform HWC→CHW transformation and uint8→float32/255 normalization in _prepare_image_obs().\nKey insight: Robomimic checkpoint config is stored as a JSON string, which doesn’t follow intuition. When bypassing the standard rollout process, the format conversion automatically completed by ObsUtils.process_obs needs manual supplementation.\n5. Pi0.5 LoRA training had four consecutive obstruction bugs: JAX CPU forced failure, norm_stats path error, boolean parameter format issues, and W\u0026B proxy blocking. Solution: ① Set CUDA_VISIBLE_DEVICES=\"\" + JAX_PLATFORMS=cpu for JAX CPU mode (the latter cannot be omitted); ② Output norm stats to assets//benchmark//norm_stats.json, not checkpoints/; ③ Use –no-overwrite for argparse boolean flags, not –overwrite=False; ④ HPC nodes have no outbound network, so set WANDB_MODE=disabled.\nKey insight: JAX XLA backend detects independently of CUDA environment variables. Openpi norm stats path is strongly bound to dataset_name and written to assets/. HPC nodes should disable all log systems that rely on external networks by default.\n6. MIHD run_benchmark.py was heavily imported by pipeline, making it impossible to delete directly; BasicContrastive.py had reversed drop_feature logic.Solution: Conduct a systematic grep to identify all reference points and migrate in the order of “create new modules → update references → delete old files.” Fix the issue with drop_feature: change \u003e= drop_prob to \u003c drop_prob, and import the corrected version from staig_utils. Key insights: The order of large-scale refactoring migrations is crucial. Functions with the same name may have three variants in three different files. Careful comparison of semantics before merging is necessary (differences in \u003e / \u003e= / \u003c boundary conditions can lead to completely opposite functionality).\nGeneral Issues 7. SLURM srun commands hang on nodes with interactive sessions; orbax checkpoint resume conflicts (Destination …/5000 already exists) Solution: Add –overlap to srun to allow shared execution. For orbax resume, set overwrite=True explicitly or clear the existing step directory in advance.\nKey insights: SLURM interactive jobs are assigned exclusively by default. Orbax resume=True does not automatically overwrite existing step directories, which is a common pitfall in JAX training frameworks.\n8. Bash tools fail multiple times on tianhe nodes (all echo/true/pwd have exit code 1), making it impossible to execute any shell commands. Solution: Use Read/Write/Edit/Glob tools to perform all file operations. For tasks that require a shell, clearly mark them as tasks for user execution.\nKey insights: Claude Code toolset can replace most Bash file operations. When Bash fails, switch strategies proactively and inform users instead of waiting in vain.\nHuman Thinking vs AI Thinking Strategic Level Active discovery and optimization decisions regarding GPU resources Role Thoughts Humans Actively discover anomalies where GPU util=0 but VRAM is fully utilized (VisiumHD patch causes issues with CPU, norm_stats loads the full model, an49 leaves 530GB VRAM idle). Proactively stop and investigate root causes. Based on knowledge of JAX memory mechanisms, request XLA_PYTHON_CLIENT_MEM_FRACTION=0.95, and expand training GPUs from 1-4 to 1-6 (considering global cluster resources). AI Tend to wait for tasks to complete without actively auditing resources. Passively respond to GPU anomalies. In the norm_stats scenario, provide precise root cause analysis through agent-tracking of source code (PaligemmaTokenizer eager loading). Analyze the advantages and disadvantages of memory optimization passively, but do not proactively suggest solutions.** Difference analysis: Humans actively discover system-level anomalies using nvidia-smi and prior knowledge to provide optimization directions. AI has an advantage in root cause analysis depth but lacks proactive monitoring awareness. It fails to detect GPU resources available from 5-6.\nExecution permissions and rhythm control (multiple times rejected ExitPlanMode) Role Thoughts Humans Reject AI’s automatic execution requests for irreversible operations such as large-scale file operations, batch submissions of GPU cluster tasks, and training submissions. Require reviewing the plan or starting with a single task for gradual verification.** AI Tend to request execution authorization immediately after planning. Expect to complete all work at once, maximizing parallelism and automation.** Difference analysis: Humans maintain strict review rhythm for irreversible operations. Gradual verification (running a single task first and then batching) is more reasonable in HPC resource-constrained environments. AI systematically underestimates the need for review and gradual verification.\nIndependent discovery of BC-RNN defects Role Thoughts Humans Discover anomalies where Coffee loss is normal but SR=0%. Submit a diagnostic request without providing specific hypotheses.** AI Systematically compare Coffee/Stack configuration files. Check the actual obs key structure in HDF5 datasets (find object: 57-dimensional). Analyze differences in task complexity and independently conclude that “object keys are missing” (without any human guidance).** Difference analysis: AI has a stronger ability to identify root causes through systematic data/code comparisons compared to human intuition. Humans discover problems based on anomalies, while AI discovers root causes through structured exploration.\nCoffee simulator bug vs identification of model learning failures Role Thoughts Humans Immediately recognize that the problem was an object misalignment or freezing issue during rollout video playback, rather than a model problem.** AI Initially attribute the 0% SR to model failure. Tend to attribute problems from data/parameters/task complexity perspectives.** Difference analysis: Human intuition and simulator experience allow humans to quickly distinguish between physical errors and learning failures. AI lacks direct perception of simulator visual anomalies and tends to attribute simulator bugs to model capabilities.\nPragmatic engineering decisions (tool replacement and diagnostic scope) Role Thoughts Humans Directly decide to replace mclust with KMeans under environmental constraints, as it is more efficient than fixing dependencies. For Pi0.5 training failures, choose “only diagnosing without repairing” (since the third attempt has reached 99999 steps). First, evaluate the results before deciding whether to retrain.** AI Tend to repair existing tools (install rpy2) or provide complete diagnostic and repair solutions. Do not prioritize the key constraint of “existing checkpoints are evaluable”.** Difference analysis: Humans make more pragmatic resource prioritization decisions. AI tends to focus on completeness and repair, sometimes ignoring key constraints like “third attempt has been successful.”\nAI Limitations Major limitations Lack of active long-term task health checks: Relying on users to discover anomalies such as GPU idling or process freezing instead of regular checks. Set up active monitoring mechanisms for tasks that take more than 5 minutes, rather than waiting for output or responding passively. -Lack of preventive verification before integrating external tools/libraries: No pre-checking the availability of mclust/rpy2, external script CLI interfaces (compute_norm_stats.py parameter format), memory consumption during large-scale operations (LeRobot handling segfaults), or image format conventions (robosuite HWC vs robomimic CHW). This led to multiple failures before fixing problems. The bug in the 4th layer of image observation is a concentrated example of systematic lack of foresight. -Lack of specificity in path and environment assumptions: MIHD pipeline hard-codes the DLPFC directory structure. Script errors assume norm_stats output goes to checkpoints/. JAX CPU forcibly omits JAX_PLATFORMS=cpu. H5 does not actively anticipate that HPC nodes have no outbound network (W\u0026B), both of which led to failures during initial execution before fixing problems. -Assumption bias: Misjudge the Coffee simulator environment initialization bug (object misalignment/freezing) as a lack of model learning ability until users watch videos. Lack of means to perceive simulator visual anomalies. -Tendency to automate batch executions: In large pipelines, do not actively ask if users need gradual verification. Users need multiple interventions to control execution粒度。Killing old processes without realizing that the launcher has restarted child processes with a new PID requires 3 rounds of killing operations. General limitations -Lack of ability to diagnose root causes when Bash tools fail. Can only bypass them passively. SubAgent exploration reports sometimes rely on document inferences rather than actual file system scans, resulting in inferred conclusions that do not match the actual directory structure.\nToday’s Takeaways Key takeaways VisiumHD coordinate mapping: 2um bin r_big//4 yields an 8um grid row (similar for col). Annotation barcode format is s_008um_{row:05d}_{col:05d}-1. MIHD on VisiumHD has pca×uni2×staig_fusion Silhouette=0.343, which is significantly better than pure PCA’s 0.086. This verifies the effectiveness of multimodal fusion for HD data. Key configuration for robomimic BC-RNN inference: Checkpoint config stored as a JSON string (needs json.loads, not direct dict access). shape_metadata records actual image sizes. When bypassing standard rollout, manual HWC→CHW transformation and uint8→float32/255 normalization are required (robomimic’s standard rollout automatically handles ObsUtils.process_obs). Key configuration for JAX/Pi0.5 training: ① Force CPU to set CUDA_VISIBLE_DEVICES=\"\" + JAX_PLATFORMS=cpu simultaneously; ② XLA_PYTHON_CLIENT_MEM_FRACTION=0.95 is effective for A800 with 80GB (from 61 to 77.7GB); ③ HPC nodes must preset WANDB_MODE=disabled; ④ argparse boolean flag should use –no-overwrite, not –flag=False; ⑤ openpi norm_stats path is assets//benchmark//norm_stats.json (not checkpoints/). BC-RNN configuration matches task complexity: Coffee requires a 57-dimensional object state (multi-stage precise operations are necessary); Stack only requires simple stacking of images. Orbax resume=True does not automatically overwrite existing step directories; explicit overwrite=True is required (a common JAX ecosystem trap). -Methodology for large repository refactoring: Systematically use grep to verify all imported dependencies, then execute in the order of “create new → update references → delete old”. Carefully compare boundary conditions before merging variants with the same name (\u003e vs \u003e= vs \u003c can lead to completely opposite functionality). -Comparison of BC-RNN and Pi0.5 capabilities: BC-RNN achieves 64-100% SR after 22 epochs for simple tasks (Stack D0/D1, Threading D0); complex multi-step tasks (Coffee, ThreePieceAssembly D1) have clear capacity limits (600 epochs still close to 0%); Pi0.5 base model has a SR of 4.2%, and the effectiveness of LoRA fine-tuning remains to be verified. -Accelerating norm_stats calculations: Only dataset transforms are needed; no model inference required. In CPU mode, with –max-frames set to 10000 and 9 tasks in parallel, execution time is reduced from 10+ minutes to 2.5 minutes (156 batches are sufficient for stable statistics). Practical takeaways -Tips for SLURM HPC debugging: srun –overlap allows additional commands to be executed on nodes with interactive sessions (direct SSH is blocked by pam_slurm_adopt). Nohup bash script child processes do not exit with the parent process. When killing old processes, ensure that the launcher and child processes are handled separately.\nSession Summary STHD ✅ Analysis of STHD code library and in-depth improvement of CLAUDE.md 00:06:57.489 | claude_code Read all core modules of STHD, adding explanations for 6 previously omitted modules (frontline.py, qcmask.py, roi.py, sim.py, etc.), probability model optimization objectives, details on Numba JIT parallelization, pdata TSV format, and patch overlap processing logic. Explored the VisiumHD shared data directory and confirmed that both crop10/crop10large have STHD prediction results.\nMIHD ✅ Visualization of three types of annotations for VisiumHD + end-to-end STAIG fusion + visualization of scGPT KMeans 00:06:22.389 | claude_code Discovered a 100% match between the r_big//4 barcode mapping rule, generated comparative visualizations for pathologist/STHD/STAIG fusion. After fixing 4 HD path adaptation bugs, completed the entire pca×uni2×staig_fusion process (Silhouette=0.343 vs PCA 0.086). Terminated the mclust task and replaced it with KMeans. The visualization of 11 slices was compressed from 6+ hours to 2 minutes (ARI=0.1695).\n✅ 6-stage cleanup and refactoring of MIHD repository + filling in the daily report for February 28, 2026 02:46:18.544 | claude_code Executed according to the 6-stage refactoring plan provided by users: removed 41 dead files (~250K code), moved shared functions of run_benchmark.py to 6 modules, removed monolithic structures and 5 dependent models, extracted common STAIG code and fixed the logical reversal bug in drop_feature. Updated all documents and verified that 440 experiments passed during dry-run. At the same time, filled in the daily report for February 28, 2026, including 151673 multi-modal benchmark tables and over 60 visualization hyperlinks.\nError Recovery Benchmark 🔄 Completion of evaluation for 9 tasks on Pi0.5 + fixing BC-RNN configuration issues + organizing v4.17 files + preparing LoRA data for Pi0.5 00:09:05.761 | claude_code Obtained Pi0.5 evaluation results (total SR=4.2%, with Stack having the highest SR of 24%). Diagnosed two failures in Pi0.5’s first two training attempts (SLURM time limit + orbax conflict), and confirmed that the third attempt has reached 99999 steps. AI independently identified the root cause of Coffee’s 0% SR (missing 57-dimensional object observation keys), fixed it, and verified 9 configuration files. Completed the organization of v4.17 files (archive/four-layer directory, VLM tutorial integration, EXTERNAL_DEPENDENCIES.md). Completed the data conversion for 8/9 tasks using LeRobot, wrote training startup scripts, and ExitPlanMode was rejected.\n🔄 BC-RNN Stack_D0 error scenario generation pipeline (fixed 4 bugs) + infrastructure documentation + GPU cleanup + training monitoring 01:10:59.841 | claude_code Iteratively fixed 4 image observation bugs (detecting enable_camera, parsing with json.loads, automatic detection of 84×84 resolution, HWC→CHW transformation). Successfully generated 11 tip_over error scenarios and MP4 videos. Cleaned an49’s idle 530GB VRAM. Created docs/infrastructure_reference.md (649 scenarios/9 types of errors/complete component documentation, 13 chapters). Monitored 7 BC-RNN tasks (Stack was nearly满分, Coffee completely failed). Discovered a simulator bug in coffee rollout video and fixed it before completion.\n✅ Initial evaluation of BC-RNN + organization of v4.18 code + verification and successful startup of Pi0.5 LoRA pipeline with 4 bugs fixed 21:48:48.390 | claude_code Obtained first evaluation results through TensorBoard API (Stack_D0=64%@epoch22, Coffee=0%). Implemented v4.18 organization (extracted script_utils.py to eliminate ~210 duplicate lines, updated CLAUDE.md). Verified the complete link for coffee_d0 (1000 demos/2.4GB). Completed task-by-task conversion of 9 datasets (changed to task-by-task after segfault in batch processing). Fixed 4 Pi0.5 training startup bugs (JAX_PLATFORMS/assets path/–no-overwrite/W\u0026B), expanded to GPU 1-6+XLA_MEM=0.95, and finally achieved stable operation with 6 A800 GPUs and 77.7GB per card at 100% utilization for 9 tasks in parallel LoRA fine-tuning.\nToken Usage Overview Metric Value Total Tokens 89,955,645 Input Tokens 145,331 Output Tokens 187,297 Cache Creation 3,559,531 Cache Reading 86,063,486 Cache Hit Rate 96.0% Total Cost (USD) $54.9985 Model Details| Model | Input | Output | Cache Creation | Cache Reading | Cost | Percentage | |——|——|——|————|————|——|———-| | Claude-opus-4-6 | 23,709 | 111,184 | 2,047,068 | 70,767,659 | $51.0761 | 92.9% | | Claude-haiku-4-5-20251001 | 121,622 | 76,113 | 1,512,463 | 15,295,827 | $3.9223 | 7.1% |\nUsage by Device Device Total Tokens Input Output Cost DCC 8,323,086 4,161 22,420 $6.0188 Tianhe 81,632,559 141,170 164,877 $48.9797 ",
+  "wordCount" : "3940",
+  "inLanguage": "en",
+  "datePublished": "2026-03-01T00:00:00-05:00",
+  "dateModified": "2026-03-01T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-03-01/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-01/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/daily/">Daily Summaries</a></div>
+    <h1 class="post-title entry-hint-parent">
+      缺陷记录表 2026-03-01
+    </h1>
+    <div class="post-meta"><span title='2026-03-01 00:00:00 -0500 EST'>March 1, 2026</span>&nbsp;·&nbsp;<span>19 min</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="daily-report--2026-03-01">Daily Report — 2026-03-01<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-03-01">#</a></h1>
+<h2 id="todays-highlights">Today’s Highlights<a hidden class="anchor" aria-hidden="true" href="#todays-highlights">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Across DCC and tianhe servers, we advanced the space transcriptomics toolchain (STHD/MIHD) and robotics learning benchmarks. DCC focused on restructuring VisiumHD’s multimodal data analysis and repository architecture, while tianhe focused on model evaluation, fixing configuration defects, generating error scenarios, and initializing Pi0.5 LoRA fine-tuning.</li>
+<li><strong>How it was done:</strong> DCC used a security refactoring process involving grep dependency analysis, batch migration, and dry-run validation to complete the multimodal pipeline. Tianhe monitored training using TensorBoard API, identified configuration defects by comparing HDF5 dataset structures, iterated to fix image format adaptations, and gradually resolved four training initialization bugs related to JAX environment variables.</li>
+<li><strong>What’s achieved:</strong> The MIHD repository was significantly streamlined (41 files deleted, ~250K code removed), establishing a clear module structure. Coffee BC-RNN defect root causes were identified and fixed. Pi0.5 LoRA 9-task parallel training ran stably on 6×A800. Error Recovery Benchmark provided the first batch of high-success-rate BC-RNN data and Pi0.5 baseline evaluation. The infrastructure documentation system was fully established.</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> We deepened the STHD CLAUDE.md, implemented three types of annotation visualization for VisiumHD (pathologist/STHD/STAIG), fixed HD adaptation bugs in the MIHD pipeline, completed end-to-end STAIG fusion operations, visualized scGPT 11-slice KMeans results, and re-engineered the MIHD process into six stages. We also added a report from February 28, 2026.</li>
+<li><strong>How it was done:</strong> We gradually debugged HD data paths (discovered a pattern of r_big//4 mapping), fixed four issues in vision encoder/fusion/mclust. The refactoring process followed the sequence of &ldquo;grep validation → creating new modules → updating references → deleting old files.&rdquo; Dry-run validation showed 440 experiments passed. Unusable mclust was replaced with KMeans.</li>
+<li><strong>What’s achieved:</strong> For the first time, MIHD successfully performed pca×uni2×staig_fusion multimodal fusion on VisiumHD (Silhouette=0.343 vs PCA 0.086). The repository deleted 41 files (~250K code), 5.3MB images, and fixed the drop_feature bug. scGPT 11-slice visualization was reduced from expected 6+ hours to 2 minutes.</li>
+</ul>
+<h3 id="tianhe">Tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> We completed the evaluation of Pi0.5’s 9-task basic model (4.2% SR), fixed Coffee BC-RNN object observation key deficiencies, developed a BC-RNN Stack_D0 error scenario generation pipeline (11 scenarios + MP4), cleaned up ~530GB GPU VRAM, monitored BC-RNN 9-task training, organized project files v4.17/v4.18, and successfully initialized Pi0.5 LoRA 9-task parallel fine-tuning (fixed four bugs).</li>
+<li><strong>How it was done:</strong> We executed GPU tasks on an49 nodes using SLURM srun &ndash;overlap. We identified Coffee configuration defects by comparing HDF5 dataset structures and iteratively fixed four issues in robomimic BC-RNN image observation. We also fixed four initialization bugs related to JAX_PLATFORMS/norm_stats path/boolean parameters/W&amp;B. Using CPU + sub-sampling, we reduced the norm_stats calculation time from 10+ minutes to 2.5 minutes.</li>
+<li><strong>What’s achieved:</strong> BC-RNN Stack tasks reached 64% SR by epoch 22, verifying data quality. Coffee defect fixes laid the foundation for retraining complex tasks. Pi0.5 LoRA ran stably on 6×A800 (77.7GB per card, with 100% utilization), and the 9-task fine-tuning infrastructure was fully established.</li>
+</ul>
+<blockquote>
+<p>Across DCC and tianhe servers, we advanced four projects in parallel: DCC completed VisiumHD’s three types of annotation visualization and STAIG fusion multimodal operations (Silhouette 0.343), and carried out a six-stage large-scale cleanup and restructuring of the MIHD repository (deleting ~250K code). Tianhe completed Pi0.5’s 9-task basic model evaluation (4.2% SR), identified and fixed Coffee BC-RNN object observation key deficiencies, developed a BC-RNN Stack_D0 error scenario generation pipeline (fixed four image bugs to generate 11 scenarios), and successfully initialized Pi0.5 LoRA 9-task parallel fine-tuning with 100% GPU utilization on 6×A800.</p>
+</blockquote>
+<h2 id="todays-tasks">Today’s Tasks<a hidden class="anchor" aria-hidden="true" href="#todays-tasks">#</a></h2>
+<h3 id="architecture-and-strategy">Architecture and Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture-and-strategy">#</a></h3>
+<ul>
+<li>✅ <strong>VisiumHD barcode mapping discovery and three types of annotation visualization</strong> — Discovered a pattern of r_big//4 mapping (17502/17502 complete matches), generated pathologist annotations for four tissue types: Neoplasm 48.6%, Connective 29.5%, etc., STHD cell type visualizations with 85 categories reduced to 11 coarse categories by majority vote, achieving 96.3% match rate. We established a baseline for VisiumHD data analysis.</li>
+<li>✅ <strong>MIHD pipeline HD dataset adaptation and end-to-end STAIG fusion</strong> — Fixed four HD path adaptation bugs (adding cropped_fullres.tif mode in find_spatial_image, passing vision encoder data_root, loading spatial coords during fusion phase, mclust→KMeans fallback). We completed the pca×uni2×staig_fusion process for VisiumHD crop10large (5.5 minutes for patch extraction, 5 minutes for UNI2 GPU inference, 6 minutes for STAIG training, with Silhouette of 0.343).</li>
+<li>✅ <strong>MIHD repository six-stage cleanup and restructuring (deleting ~250K code)</strong> — Phase1 deleted 41 dead files (~250K code + 5.3MB images); Phase2 moved run_benchmark.py functions to six modules (staig_utils, vision_extractors, Fusion, clustering, etc.), updated all pipeline/imports; Phase3 removed run_benchmark.py and five dependent models; Phase4 extracted STAIG common code and fixed the drop_feature logic reversal bug in BasicContrastive (&gt;= replaced with &lt;); Phase5 updated all documentation; Phase6 dry-run validation showed 440 experiments passed.</li>
+<li>✅ <strong>Coffee BC-RNN configuration defect identification and repair (object observation keys)</strong> — By comparing actual HDF5 dataset observation key structures, AI independently identified missing object observation keys in Coffee’s configuration template (Coffee requires 57-dimensional object states: Pod/Machine/Holder position + relative orientation + hinge angle). We added extra_low_dim=[&lsquo;object&rsquo;] to all nine tasks, re-generated and validated all configuration files, fixing the root cause of Coffee’s 0% SR failure.</li>
+<li>✅ <strong>BC-RNN Stack_D0 error scenario generation pipeline development</strong> — Fixed four consecutive bugs in robomimic BC-RNN image observation (enable_camera detection, json.loads parsing checkpoint config, automatic detection of 84×84 resolution, HWC→CHW transformation + float32 normalization). We created configs/benchmark_v4_stack.yaml and scripts/batch_visualize_policy_scenes.py, resulting in 11 tip_over error scenarios and 11 MP4 visualization videos.</li>
+<li>✅ <strong>Pi0.5 LoRA 9-task fine-tuning pipeline setup and successful initialization</strong> — Created train_pi05_benchmark.py (five sub-routines), registered 18 configurations to openpi/config.py (nine for fine-tuning, nine for inference), fixed vla_server.py’s IMAGE_KEY_MAP prefix matching defects. We completed HDF5→LeRobot data conversion for nine tasks (avoiding OOM segfault per task), and completed all norm_stats calculations in 2.5 minutes using CPU parallelization + sub-sampling. Fixed four initialization bugs (JAX_PLATFORMS=cpu, assets path, &ndash;no-overwrite, WANDB_MODE=disabled). We successfully initialized six tasks with 100% GPU utilization (GPU usage: 77.7GB per card).</li>
+<li>✅ <strong>Pi0.5 Phoenix 9-task basic model evaluation</strong> — Monitored nine MimicGen tasks for 50 rollouts each, achieving total SR of 4.2% (19/450), with Stack_D0 (24%) and Stack_D1 (12%) showing substantial success. The remaining seven tasks had 0-2% success rates. We confirmed that the third training phase reached step 99999 (the previous two failed due to SLURM time limit conflicts).</li>
+<li>🔄 <strong>Coffee BC-RNN rollout visualization and environment initialization issues troubleshooting</strong> — Generated coffee_d0 rollout videos (742KB). Users reported issues with object misregistration or freezing during environment initialization (simulator bugs, not model problems). We began investigating Coffee env kwargs but session truncation prevented further investigation.</li>
+</ul>
+<h3 id="implementation-and-fixes">Implementation and Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation-and-fixes">#</a></h3>
+<ul>
+<li>✅ <strong>GPU VRAM cleanup and BC-RNN 9-task training monitoring</strong> — Found and cleaned up about 530GB of idle VRAM on an49 nodes (zhaoganlong Phoenix serve_policy 407GB + two old VLA servers, each with 61GB). Monitored nine BC-RNN tasks: stack_d0 (64%@epoch22), stack_d1 (44%), coffee (0%), stack_three/threading/three_piece_assembly all achieved 58-96%@epoch300-420.</li>
+<li>✅ <strong>Infrastructure reference documentation creation and project file organization v4.17/v4.18</strong> — Created docs/infrastructure_reference.md (649 scenarios/9 types of errors/6 detectors/4 injectors/full pipeline diagrams, 13 chapters). In v4.17, archived old files in the four-layer directory structure, merged VLM tutorials, and created EXTERNAL_DEPENDENCIES.md. In v4.18, extracted create_env()/load_task_registry() to script_utils.py (eliminating ~210 lines of duplicate code), updated CLAUDE.md with instructions for M14 evaluation commands.</li>
+<li>✅ <strong>scGPT 11-slice KMeans visualization</strong> — Terminated the time-consuming mclust task (completed 2/11 in 2 hours), and used KMeans to complete all 11 DLPFC slices in 2 minutes, with an average ARI of 0.1695 and NMI of 0.2772.</li>
+<li>✅ <strong>STHD CLAUDE.md deep improvement</strong> — Analyzed all core modules of STHD, added descriptions for six previously omitted modules (frontline.py, qcmask.py, etc.), optimized probability models, detailed Numba JIT operations, and processed patch overlap logic in pdata TSV format.</li>
+<li>✅ <strong>Supplementary report from February 28, 2026 (MIHD experimental metrics and visualization)</strong> — Added a summary of Chapter 5 results and a list of output files for Chapter 6, including 151673 multi-modal benchmark tables, comparisons between Vision Refinement before and after, and over 60 visualizations.</li>
+</ul>
+<h2 id="issues-and-solutions">Issues and Solutions<a hidden class="anchor" aria-hidden="true" href="#issues-and-solutions">#</a></h2>
+<h3 id="key-issues">Key Issues<a hidden class="anchor" aria-hidden="true" href="#key-issues">#</a></h3>
+<h4 id="1-visiumhd-hd-dataset-path-adaptation-vision-encoder-image-paths-spatial-coords-loading-and-multiple-failures-during-fusion-due-to-assuming-a-dlpfc-directory-structure">1. VisiumHD HD dataset path adaptation: vision encoder image paths, spatial coords loading, and multiple failures during fusion due to assuming a DLPFC directory structure.<a hidden class="anchor" aria-hidden="true" href="#1-visiumhd-hd-dataset-path-adaptation-vision-encoder-image-paths-spatial-coords-loading-and-multiple-failures-during-fusion-due-to-assuming-a-dlpfc-directory-structure">#</a></h4>
+<p><strong>Solution:</strong> Three fixes were made: add cropped_fullres.tif mode recognition in find_spatial_image(); pass crop_dir.parent as data_root when calling vision encoder; load coordinates directly from adata.obsm[&lsquo;spatial&rsquo;] during fusion phase, bypassing path lookup.</p>
+<p><strong>Key insight:</strong> The pipeline design assumes a flat DLPFC directory structure (data_root/section_id/), but HD data needs to be mapped at the call level rather than modifying the encoder&rsquo;s internal logic. The path abstraction layer should provide interfaces for adapting to different dataset structures.</p>
+<h4 id="2-invisibility-of-long-term-task-progress-gpu-utilization-was-0-but-vram-was-fully-loaded-making-it-impossible-to-determine-if-it-was-a-cpu-bottleneck-or-model-eager-loading-causing-wasted-time">2. Invisibility of long-term task progress: GPU utilization was 0%, but VRAM was fully loaded, making it impossible to determine if it was a CPU bottleneck or model eager loading causing wasted time.<a hidden class="anchor" aria-hidden="true" href="#2-invisibility-of-long-term-task-progress-gpu-utilization-was-0-but-vram-was-fully-loaded-making-it-impossible-to-determine-if-it-was-a-cpu-bottleneck-or-model-eager-loading-causing-wasted-time">#</a></h4>
+<p><strong>Solution:</strong> Set PYTHONUNBUFFERED=1 and add tqdm for critical loops; set compute_norm_stats.py to require CUDA_VISIBLE_DEVICES=&quot;&quot; + JAX_PLATFORMS=cpu (root cause: PaligemmaTokenizer is eagerly loaded into all visible GPUs during get_config().model call, but norm_stats only requires dataset transforms).</p>
+<p><strong>Key insight:</strong> GPU utilization of 0% could indicate a CPU preprocessing bottleneck or eager loading without inference calculations. The difference between the two can be distinguished by monitoring VRAM usage with nvidia-smi. Norm stats doesn&rsquo;t require model inference and should run in CPU mode by default.</p>
+<h4 id="3-coffee-bc-rnn-loss-converged-normally--766-154-but-sr-was-always-0-while-stack-achieved-64-at-epoch-20-on-equivalent-configurations">3. Coffee BC-RNN loss converged normally (-7.66→-15.4), but SR was always 0%, while Stack achieved 64% at epoch 20 on equivalent configurations.<a hidden class="anchor" aria-hidden="true" href="#3-coffee-bc-rnn-loss-converged-normally--766-154-but-sr-was-always-0-while-stack-achieved-64-at-epoch-20-on-equivalent-configurations">#</a></h4>
+<p><strong>Solution:</strong> By comparing actual HDF5 dataset observation key structures, we found that Coffee requires 57-dimensional object states (multi-step precise operations: Pod/Machine/Holder position + relative orientation + hinge angle). The configuration template was missing this information. We added extra_low_dim=[&lsquo;object&rsquo;] to all nine tasks and re-generated the configuration.</p>
+<p><strong>Key insight:</strong> BC-RNN&rsquo;s observation keys must match task complexity. Coffee requires multi-step precision operations, and 84×84 images don&rsquo;t provide enough spatial accuracy information. The performance of configuration bugs (normal loss but SR=0) is highly similar to insufficient model capabilities. This can only be distinguished by comparing dataset structures.</p>
+<h4 id="4-robomimic-bc-rnn-image-observation-integration-failure-four-consecutive-bugs-enable-camera-checkpoint-config-format-resolution-image-format">4. Robomimic BC-RNN image observation integration failure: four consecutive bugs (enable camera, checkpoint config format, resolution, image format).<a hidden class="anchor" aria-hidden="true" href="#4-robomimic-bc-rnn-image-observation-integration-failure-four-consecutive-bugs-enable-camera-checkpoint-config-format-resolution-image-format">#</a></h4>
+<p><strong>Solution:</strong> ① Detect rgb modality automatic activation from checkpoint config fields (JSON strings, not dict access); ② Read actual image size (84×84) from shape_metadata and pass it to create_env; ③ Manually perform HWC→CHW transformation and uint8→float32/255 normalization in _prepare_image_obs().</p>
+<p><strong>Key insight:</strong> Robomimic checkpoint config is stored as a JSON string, which doesn&rsquo;t follow intuition. When bypassing the standard rollout process, the format conversion automatically completed by ObsUtils.process_obs needs manual supplementation.</p>
+<h4 id="5-pi05-lora-training-had-four-consecutive-obstruction-bugs-jax-cpu-forced-failure-norm_stats-path-error-boolean-parameter-format-issues-and-wb-proxy-blocking">5. Pi0.5 LoRA training had four consecutive obstruction bugs: JAX CPU forced failure, norm_stats path error, boolean parameter format issues, and W&amp;B proxy blocking.<a hidden class="anchor" aria-hidden="true" href="#5-pi05-lora-training-had-four-consecutive-obstruction-bugs-jax-cpu-forced-failure-norm_stats-path-error-boolean-parameter-format-issues-and-wb-proxy-blocking">#</a></h4>
+<p><strong>Solution:</strong> ① Set CUDA_VISIBLE_DEVICES=&quot;&quot; + JAX_PLATFORMS=cpu for JAX CPU mode (the latter cannot be omitted); ② Output norm stats to assets/<config>/benchmark/<dataset>/norm_stats.json, not checkpoints/; ③ Use &ndash;no-overwrite for argparse boolean flags, not &ndash;overwrite=False; ④ HPC nodes have no outbound network, so set WANDB_MODE=disabled.</p>
+<p><strong>Key insight:</strong> JAX XLA backend detects independently of CUDA environment variables. Openpi norm stats path is strongly bound to dataset_name and written to assets/. HPC nodes should disable all log systems that rely on external networks by default.</p>
+<h4 id="6-mihd-run_benchmarkpy-was-heavily-imported-by-pipeline-making-it-impossible-to-delete-directly-basiccontrastivepy-had-reversed-drop_feature-logicsolution-conduct-a-systematic-grep-to-identify-all-reference-points-and-migrate-in-the-order-of-create-new-modules--update-references--delete-old-files-fix-the-issue-with-drop_feature-change--drop_prob-to--drop_prob-and-import-the-corrected-version-from-staig_utils">6. MIHD run_benchmark.py was heavily imported by pipeline, making it impossible to delete directly; BasicContrastive.py had reversed drop_feature logic.<strong>Solution:</strong> Conduct a systematic grep to identify all reference points and migrate in the order of &ldquo;create new modules → update references → delete old files.&rdquo; Fix the issue with drop_feature: change &gt;= drop_prob to &lt; drop_prob, and import the corrected version from staig_utils.<a hidden class="anchor" aria-hidden="true" href="#6-mihd-run_benchmarkpy-was-heavily-imported-by-pipeline-making-it-impossible-to-delete-directly-basiccontrastivepy-had-reversed-drop_feature-logicsolution-conduct-a-systematic-grep-to-identify-all-reference-points-and-migrate-in-the-order-of-create-new-modules--update-references--delete-old-files-fix-the-issue-with-drop_feature-change--drop_prob-to--drop_prob-and-import-the-corrected-version-from-staig_utils">#</a></h4>
+<p><strong>Key insights:</strong> The order of large-scale refactoring migrations is crucial. Functions with the same name may have three variants in three different files. Careful comparison of semantics before merging is necessary (differences in &gt; / &gt;= / &lt; boundary conditions can lead to completely opposite functionality).</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="7-slurm-srun-commands-hang-on-nodes-with-interactive-sessions-orbax-checkpoint-resume-conflicts-destination-5000-already-exists">7. SLURM srun commands hang on nodes with interactive sessions; orbax checkpoint resume conflicts (Destination &hellip;/5000 already exists)<a hidden class="anchor" aria-hidden="true" href="#7-slurm-srun-commands-hang-on-nodes-with-interactive-sessions-orbax-checkpoint-resume-conflicts-destination-5000-already-exists">#</a></h4>
+<p><strong>Solution:</strong> Add &ndash;overlap to srun to allow shared execution. For orbax resume, set overwrite=True explicitly or clear the existing step directory in advance.</p>
+<p><strong>Key insights:</strong> SLURM interactive jobs are assigned exclusively by default. Orbax resume=True does not automatically overwrite existing step directories, which is a common pitfall in JAX training frameworks.</p>
+<h4 id="8-bash-tools-fail-multiple-times-on-tianhe-nodes-all-echotruepwd-have-exit-code-1-making-it-impossible-to-execute-any-shell-commands">8. Bash tools fail multiple times on tianhe nodes (all echo/true/pwd have exit code 1), making it impossible to execute any shell commands.<a hidden class="anchor" aria-hidden="true" href="#8-bash-tools-fail-multiple-times-on-tianhe-nodes-all-echotruepwd-have-exit-code-1-making-it-impossible-to-execute-any-shell-commands">#</a></h4>
+<p><strong>Solution:</strong> Use Read/Write/Edit/Glob tools to perform all file operations. For tasks that require a shell, clearly mark them as tasks for user execution.</p>
+<p><strong>Key insights:</strong> Claude Code toolset can replace most Bash file operations. When Bash fails, switch strategies proactively and inform users instead of waiting in vain.</p>
+<h2 id="human-thinking-vs-ai-thinking">Human Thinking vs AI Thinking<a hidden class="anchor" aria-hidden="true" href="#human-thinking-vs-ai-thinking">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="active-discovery-and-optimization-decisions-regarding-gpu-resources">Active discovery and optimization decisions regarding GPU resources<a hidden class="anchor" aria-hidden="true" href="#active-discovery-and-optimization-decisions-regarding-gpu-resources">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Thoughts</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Humans</td>
+          <td>Actively discover anomalies where GPU util=0 but VRAM is fully utilized (VisiumHD patch causes issues with CPU, norm_stats loads the full model, an49 leaves 530GB VRAM idle). Proactively stop and investigate root causes. Based on knowledge of JAX memory mechanisms, request XLA_PYTHON_CLIENT_MEM_FRACTION=0.95, and expand training GPUs from 1-4 to 1-6 (considering global cluster resources).</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Tend to wait for tasks to complete without actively auditing resources. Passively respond to GPU anomalies. In the norm_stats scenario, provide precise root cause analysis through agent-tracking of source code (PaligemmaTokenizer eager loading). Analyze the advantages and disadvantages of memory optimization passively, but do not proactively suggest solutions.**</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference analysis:</strong> Humans actively discover system-level anomalies using nvidia-smi and prior knowledge to provide optimization directions. AI has an advantage in root cause analysis depth but lacks proactive monitoring awareness. It fails to detect GPU resources available from 5-6.</p>
+<h4 id="execution-permissions-and-rhythm-control-multiple-times-rejected-exitplanmode">Execution permissions and rhythm control (multiple times rejected ExitPlanMode)<a hidden class="anchor" aria-hidden="true" href="#execution-permissions-and-rhythm-control-multiple-times-rejected-exitplanmode">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Thoughts</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Humans</td>
+          <td>Reject AI&rsquo;s automatic execution requests for irreversible operations such as large-scale file operations, batch submissions of GPU cluster tasks, and training submissions. Require reviewing the plan or starting with a single task for gradual verification.**</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Tend to request execution authorization immediately after planning. Expect to complete all work at once, maximizing parallelism and automation.**</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference analysis:</strong> Humans maintain strict review rhythm for irreversible operations. Gradual verification (running a single task first and then batching) is more reasonable in HPC resource-constrained environments. AI systematically underestimates the need for review and gradual verification.</p>
+<h4 id="independent-discovery-of-bc-rnn-defects">Independent discovery of BC-RNN defects<a hidden class="anchor" aria-hidden="true" href="#independent-discovery-of-bc-rnn-defects">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Thoughts</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Humans</td>
+          <td>Discover anomalies where Coffee loss is normal but SR=0%. Submit a diagnostic request without providing specific hypotheses.**</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Systematically compare Coffee/Stack configuration files. Check the actual obs key structure in HDF5 datasets (find object: 57-dimensional). Analyze differences in task complexity and independently conclude that &ldquo;object keys are missing&rdquo; (without any human guidance).**</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference analysis:</strong> AI has a stronger ability to identify root causes through systematic data/code comparisons compared to human intuition. Humans discover problems based on anomalies, while AI discovers root causes through structured exploration.</p>
+<h4 id="coffee-simulator-bug-vs-identification-of-model-learning-failures">Coffee simulator bug vs identification of model learning failures<a hidden class="anchor" aria-hidden="true" href="#coffee-simulator-bug-vs-identification-of-model-learning-failures">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Thoughts</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Humans</td>
+          <td>Immediately recognize that the problem was an object misalignment or freezing issue during rollout video playback, rather than a model problem.**</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Initially attribute the 0% SR to model failure. Tend to attribute problems from data/parameters/task complexity perspectives.**</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference analysis:</strong> Human intuition and simulator experience allow humans to quickly distinguish between physical errors and learning failures. AI lacks direct perception of simulator visual anomalies and tends to attribute simulator bugs to model capabilities.</p>
+<h4 id="pragmatic-engineering-decisions-tool-replacement-and-diagnostic-scope">Pragmatic engineering decisions (tool replacement and diagnostic scope)<a hidden class="anchor" aria-hidden="true" href="#pragmatic-engineering-decisions-tool-replacement-and-diagnostic-scope">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Thoughts</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Humans</td>
+          <td>Directly decide to replace mclust with KMeans under environmental constraints, as it is more efficient than fixing dependencies. For Pi0.5 training failures, choose &ldquo;only diagnosing without repairing&rdquo; (since the third attempt has reached 99999 steps). First, evaluate the results before deciding whether to retrain.**</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Tend to repair existing tools (install rpy2) or provide complete diagnostic and repair solutions. Do not prioritize the key constraint of &ldquo;existing checkpoints are evaluable&rdquo;.**</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference analysis:</strong> Humans make more pragmatic resource prioritization decisions. AI tends to focus on completeness and repair, sometimes ignoring key constraints like &ldquo;third attempt has been successful.&rdquo;</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="major-limitations">Major limitations<a hidden class="anchor" aria-hidden="true" href="#major-limitations">#</a></h3>
+<ul>
+<li>Lack of active long-term task health checks: Relying on users to discover anomalies such as GPU idling or process freezing instead of regular checks. Set up active monitoring mechanisms for tasks that take more than 5 minutes, rather than waiting for output or responding passively.
+-Lack of preventive verification before integrating external tools/libraries: No pre-checking the availability of mclust/rpy2, external script CLI interfaces (compute_norm_stats.py parameter format), memory consumption during large-scale operations (LeRobot handling segfaults), or image format conventions (robosuite HWC vs robomimic CHW). This led to multiple failures before fixing problems. The bug in the 4th layer of image observation is a concentrated example of systematic lack of foresight.
+-Lack of specificity in path and environment assumptions: MIHD pipeline hard-codes the DLPFC directory structure. Script errors assume norm_stats output goes to checkpoints/. JAX CPU forcibly omits JAX_PLATFORMS=cpu. H5 does not actively anticipate that HPC nodes have no outbound network (W&amp;B), both of which led to failures during initial execution before fixing problems.
+-Assumption bias: Misjudge the Coffee simulator environment initialization bug (object misalignment/freezing) as a lack of model learning ability until users watch videos. Lack of means to perceive simulator visual anomalies.
+-Tendency to automate batch executions: In large pipelines, do not actively ask if users need gradual verification. Users need multiple interventions to control execution粒度。Killing old processes without realizing that the launcher has restarted child processes with a new PID requires 3 rounds of killing operations.</li>
+</ul>
+<h3 id="general-limitations">General limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<p>-Lack of ability to diagnose root causes when Bash tools fail. Can only bypass them passively. SubAgent exploration reports sometimes rely on document inferences rather than actual file system scans, resulting in inferred conclusions that do not match the actual directory structure.</p>
+<h2 id="todays-takeaways">Today&rsquo;s Takeaways<a hidden class="anchor" aria-hidden="true" href="#todays-takeaways">#</a></h2>
+<h3 id="key-takeaways">Key takeaways<a hidden class="anchor" aria-hidden="true" href="#key-takeaways">#</a></h3>
+<ul>
+<li>VisiumHD coordinate mapping: 2um bin r_big//4 yields an 8um grid row (similar for col). Annotation barcode format is s_008um_{row:05d}_{col:05d}-1. MIHD on VisiumHD has pca×uni2×staig_fusion Silhouette=0.343, which is significantly better than pure PCA&rsquo;s 0.086. This verifies the effectiveness of multimodal fusion for HD data.</li>
+<li>Key configuration for robomimic BC-RNN inference: Checkpoint config stored as a JSON string (needs json.loads, not direct dict access). shape_metadata records actual image sizes. When bypassing standard rollout, manual HWC→CHW transformation and uint8→float32/255 normalization are required (robomimic&rsquo;s standard rollout automatically handles ObsUtils.process_obs).</li>
+<li>Key configuration for JAX/Pi0.5 training: ① Force CPU to set CUDA_VISIBLE_DEVICES=&quot;&quot; + JAX_PLATFORMS=cpu simultaneously; ② XLA_PYTHON_CLIENT_MEM_FRACTION=0.95 is effective for A800 with 80GB (from 61 to 77.7GB); ③ HPC nodes must preset WANDB_MODE=disabled; ④ argparse boolean flag should use &ndash;no-overwrite, not &ndash;flag=False; ⑤ openpi norm_stats path is assets/<config>/benchmark/<dataset>/norm_stats.json (not checkpoints/).</li>
+<li>BC-RNN configuration matches task complexity: Coffee requires a 57-dimensional object state (multi-stage precise operations are necessary); Stack only requires simple stacking of images. Orbax resume=True does not automatically overwrite existing step directories; explicit overwrite=True is required (a common JAX ecosystem trap).
+-Methodology for large repository refactoring: Systematically use grep to verify all imported dependencies, then execute in the order of &ldquo;create new → update references → delete old&rdquo;. Carefully compare boundary conditions before merging variants with the same name (&gt; vs &gt;= vs &lt; can lead to completely opposite functionality).
+-Comparison of BC-RNN and Pi0.5 capabilities: BC-RNN achieves 64-100% SR after 22 epochs for simple tasks (Stack D0/D1, Threading D0); complex multi-step tasks (Coffee, ThreePieceAssembly D1) have clear capacity limits (600 epochs still close to 0%); Pi0.5 base model has a SR of 4.2%, and the effectiveness of LoRA fine-tuning remains to be verified.
+-Accelerating norm_stats calculations: Only dataset transforms are needed; no model inference required. In CPU mode, with &ndash;max-frames set to 10000 and 9 tasks in parallel, execution time is reduced from 10+ minutes to 2.5 minutes (156 batches are sufficient for stable statistics).</li>
+</ul>
+<h3 id="practical-takeaways">Practical takeaways<a hidden class="anchor" aria-hidden="true" href="#practical-takeaways">#</a></h3>
+<p>-Tips for SLURM HPC debugging: srun &ndash;overlap allows additional commands to be executed on nodes with interactive sessions (direct SSH is blocked by pam_slurm_adopt). Nohup bash script child processes do not exit with the parent process. When killing old processes, ensure that the launcher and child processes are handled separately.</p>
+<h2 id="session-summary">Session Summary<a hidden class="anchor" aria-hidden="true" href="#session-summary">#</a></h2>
+<h3 id="sthd">STHD<a hidden class="anchor" aria-hidden="true" href="#sthd">#</a></h3>
+<p><strong>✅ Analysis of STHD code library and in-depth improvement of CLAUDE.md</strong>
+<em>00:06:57.489 | claude_code</em>
+Read all core modules of STHD, adding explanations for 6 previously omitted modules (frontline.py, qcmask.py, roi.py, sim.py, etc.), probability model optimization objectives, details on Numba JIT parallelization, pdata TSV format, and patch overlap processing logic. Explored the VisiumHD shared data directory and confirmed that both crop10/crop10large have STHD prediction results.</p>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>✅ Visualization of three types of annotations for VisiumHD + end-to-end STAIG fusion + visualization of scGPT KMeans</strong>
+<em>00:06:22.389 | claude_code</em>
+Discovered a 100% match between the r_big//4 barcode mapping rule, generated comparative visualizations for pathologist/STHD/STAIG fusion. After fixing 4 HD path adaptation bugs, completed the entire pca×uni2×staig_fusion process (Silhouette=0.343 vs PCA 0.086). Terminated the mclust task and replaced it with KMeans. The visualization of 11 slices was compressed from 6+ hours to 2 minutes (ARI=0.1695).</p>
+<p><strong>✅ 6-stage cleanup and refactoring of MIHD repository + filling in the daily report for February 28, 2026</strong>
+<em>02:46:18.544 | claude_code</em>
+Executed according to the 6-stage refactoring plan provided by users: removed 41 dead files (~250K code), moved shared functions of run_benchmark.py to 6 modules, removed monolithic structures and 5 dependent models, extracted common STAIG code and fixed the logical reversal bug in drop_feature. Updated all documents and verified that 440 experiments passed during dry-run. At the same time, filled in the daily report for February 28, 2026, including 151673 multi-modal benchmark tables and over 60 visualization hyperlinks.</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 Completion of evaluation for 9 tasks on Pi0.5 + fixing BC-RNN configuration issues + organizing v4.17 files + preparing LoRA data for Pi0.5</strong>
+<em>00:09:05.761 | claude_code</em>
+Obtained Pi0.5 evaluation results (total SR=4.2%, with Stack having the highest SR of 24%). Diagnosed two failures in Pi0.5&rsquo;s first two training attempts (SLURM time limit + orbax conflict), and confirmed that the third attempt has reached 99999 steps. AI independently identified the root cause of Coffee&rsquo;s 0% SR (missing 57-dimensional object observation keys), fixed it, and verified 9 configuration files. Completed the organization of v4.17 files (archive/four-layer directory, VLM tutorial integration, EXTERNAL_DEPENDENCIES.md). Completed the data conversion for 8/9 tasks using LeRobot, wrote training startup scripts, and ExitPlanMode was rejected.</p>
+<p><strong>🔄 BC-RNN Stack_D0 error scenario generation pipeline (fixed 4 bugs) + infrastructure documentation + GPU cleanup + training monitoring</strong>
+<em>01:10:59.841 | claude_code</em>
+Iteratively fixed 4 image observation bugs (detecting enable_camera, parsing with json.loads, automatic detection of 84×84 resolution, HWC→CHW transformation). Successfully generated 11 tip_over error scenarios and MP4 videos. Cleaned an49&rsquo;s idle 530GB VRAM. Created docs/infrastructure_reference.md (649 scenarios/9 types of errors/complete component documentation, 13 chapters). Monitored 7 BC-RNN tasks (Stack was nearly满分, Coffee completely failed). Discovered a simulator bug in coffee rollout video and fixed it before completion.</p>
+<p><strong>✅ Initial evaluation of BC-RNN + organization of v4.18 code + verification and successful startup of Pi0.5 LoRA pipeline with 4 bugs fixed</strong>
+<em>21:48:48.390 | claude_code</em>
+Obtained first evaluation results through TensorBoard API (Stack_D0=64%@epoch22, Coffee=0%). Implemented v4.18 organization (extracted script_utils.py to eliminate ~210 duplicate lines, updated CLAUDE.md). Verified the complete link for coffee_d0 (1000 demos/2.4GB). Completed task-by-task conversion of 9 datasets (changed to task-by-task after segfault in batch processing). Fixed 4 Pi0.5 training startup bugs (JAX_PLATFORMS/assets path/&ndash;no-overwrite/W&amp;B), expanded to GPU 1-6+XLA_MEM=0.95, and finally achieved stable operation with 6 A800 GPUs and 77.7GB per card at 100% utilization for 9 tasks in parallel LoRA fine-tuning.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<h3 id="overview">Overview<a hidden class="anchor" aria-hidden="true" href="#overview">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Metric</th>
+          <th>Value</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Total Tokens</td>
+          <td>89,955,645</td>
+      </tr>
+      <tr>
+          <td>Input Tokens</td>
+          <td>145,331</td>
+      </tr>
+      <tr>
+          <td>Output Tokens</td>
+          <td>187,297</td>
+      </tr>
+      <tr>
+          <td>Cache Creation</td>
+          <td>3,559,531</td>
+      </tr>
+      <tr>
+          <td>Cache Reading</td>
+          <td>86,063,486</td>
+      </tr>
+      <tr>
+          <td>Cache Hit Rate</td>
+          <td>96.0%</td>
+      </tr>
+      <tr>
+          <td>Total Cost (USD)</td>
+          <td>$54.9985</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="model-details-model--input--output--cache-creation--cache-reading--cost--percentage-">Model Details| Model | Input | Output | Cache Creation | Cache Reading | Cost | Percentage |<a hidden class="anchor" aria-hidden="true" href="#model-details-model--input--output--cache-creation--cache-reading--cost--percentage-">#</a></h3>
+<p>|&mdash;&mdash;|&mdash;&mdash;|&mdash;&mdash;|&mdash;&mdash;&mdash;&mdash;|&mdash;&mdash;&mdash;&mdash;|&mdash;&mdash;|&mdash;&mdash;&mdash;-|
+| Claude-opus-4-6 | 23,709 | 111,184 | 2,047,068 | 70,767,659 | $51.0761 | 92.9% |
+| Claude-haiku-4-5-20251001 | 121,622 | 76,113 | 1,512,463 | 15,295,827 | $3.9223 | 7.1% |</p>
+<h3 id="usage-by-device">Usage by Device<a hidden class="anchor" aria-hidden="true" href="#usage-by-device">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Device</th>
+          <th>Total Tokens</th>
+          <th>Input</th>
+          <th>Output</th>
+          <th>Cost</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>DCC</td>
+          <td>8,323,086</td>
+          <td>4,161</td>
+          <td>22,420</td>
+          <td>$6.0188</td>
+      </tr>
+      <tr>
+          <td>Tianhe</td>
+          <td>81,632,559</td>
+          <td>141,170</td>
+          <td>164,877</td>
+          <td>$48.9797</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+document.getElementById("lang-toggle").addEventListener("click", function() {
+    var current = this.getAttribute("data-current-lang");
+    var url = this.getAttribute("data-translation-url");
+    var newLang = (current === "en") ? "zh" : "en";
+    localStorage.setItem("pref-lang", newLang);
+    if (url) {
+        window.location.href = url;
+    } else {
+        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+    }
+});
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
