@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-05 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="On the DCC cluster, we fixed four critical differences between STAIG implementation and the original paper, fully implemented and fixed the end-to-end GCN&#43;STAIG fusion module (including **kwargs bugs and flexible gene preprocessing support). We also quantified the root cause of performance differences between MIHD and the original STAIG through parameter comparison.">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-02-05/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-02-05/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-05/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    var stored = localStorage.getItem("pref-lang");
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-02-05/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-05">
+  <meta property="og:description" content="On the DCC cluster, we fixed four critical differences between STAIG implementation and the original paper, fully implemented and fixed the end-to-end GCN&#43;STAIG fusion module (including **kwargs bugs and flexible gene preprocessing support). We also quantified the root cause of performance differences between MIHD and the original STAIG through parameter comparison.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-05T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-05T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-05">
+  <meta name="twitter:description" content="On the DCC cluster, we fixed four critical differences between STAIG implementation and the original paper, fully implemented and fixed the end-to-end GCN&#43;STAIG fusion module (including **kwargs bugs and flexible gene preprocessing support). We also quantified the root cause of performance differences between MIHD and the original STAIG through parameter comparison.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Daily Summaries",
+      "item": "https://tzj2006.github.io/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-02-05",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-02-05/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-05",
+  "name": "Bug Journal 2026-02-05",
+  "description": "On the DCC cluster, we fixed four critical differences between STAIG implementation and the original paper, fully implemented and fixed the end-to-end GCN+STAIG fusion module (including **kwargs bugs and flexible gene preprocessing support). We also quantified the root cause of performance differences between MIHD and the original STAIG through parameter comparison.",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-02-05 Today’s Overview What was done: Completed two key tasks for the MIHD spatial transcriptomics project: fixed four critical implementation differences between STAIGTrainer and the original STAIG paper (adaptive edge dropout, gene clipping, edge weight direction, tau decay), as well as fully implemented and fixed the end-to-end GCN+STAIG fusion module (**kwargs bug fixes, flexible gene preprocessing support). Additionally, we identified the root cause of performance differences through parameter comparison and designed a new end-to-end GCN training architecture. How it was done: Identified implementation differences by comparing lines of original STAIG code (net.py/staig.py/example.py), then fixed them accordingly. This was confirmed through 10 integrated verification tests. We also read the original STAIG configuration files to quantify parameter differences. Finally, we successfully ran the entire end-to-end pipeline (PCA+UNI2+staig_fusion_e2e, ARI=0.05, 14 seconds). What’s achieved: Eliminated fundamental implementation defects and runtime crashes that affected the performance of GCN+STAIG. We confirmed that hyperparameters were the main source of performance differences rather than algorithmic errors. This laid a solid foundation for improving ARI from 0.16 to the original STAIG level (0.45+, even up to 0.68). On the DCC cluster, we fixed four critical differences between STAIG implementation and the original paper, fully implemented and fixed the end-to-end GCN+STAIG fusion module (including **kwargs bugs and flexible gene preprocessing support). We also quantified the root cause of performance differences between MIHD and the original STAIG through parameter comparison.\nToday’s Tasks Architecture and Strategy ✅ Fully implemented and improved the end-to-end GCN+STAIG fusion module — Created STAIGTrainerE2E.py, fixed the fatal bug in apply_fusion() that lacked **kwargs parameters. Added support for gene preprocessing parameters in four modes (auto/standard/clip/none), allowing any gene encoder input (original 3000-dimensional expression or PCA/GCN/MLP encoded embeddings). Updated run_benchmark.py to support the staig_fusion_e2e strategy. The entire pipeline was successfully executed, and all 10 integration tests passed. ✅ Identified four critical implementation differences between the original STAIG — By comparing lines of original STAIG code, we fixed four issues in STAIGTrainer.py: ① Adaptive edge dropout (adaptive_dropout_adj, based on edge probability rather than uniform random); ② Gene feature np.clip(-10,10); ③ Edge weight direction changed from softmax_neglog to softmax_log; ④ Added a tau decay mechanism. All 10 verification tests passed. ✅ Analyzed the training results of GCN+STAIG+UNI2 and identified the root cause of performance differences — Analysis of experimental data revealed that ARI of GCN+STAIG (0.0009-0.3679, average ≈0.16) was much lower than that of PCA+STAIG (0.45+) and extremely unstable (CV ≈106%). By reading the original STAIG configuration file, we found that MIHD learning rate (0.001 vs 0.0005), number of GCN layers (2 vs 1), number of training iterations (550 vs 300), and weight decay (1e-4 vs 1e-5) were inconsistent with the original configuration. Hyperparameter differences were the main source of performance differences. 🔄 Designed a new end-to-end GCN training architecture — Referring to the train() process in STAIG example.py, we designed a new architecture where feat=concat(gene_expr, img_emb) is directly input into GCN for end-to-end optimization. The design has been formulated, but implementation has not yet begun. Implementation and Fixes ✅ Improved the benchmark CLI (support for GCN gene encoders and GPU verification) — Added ‘gcn’ to the argparse gene_encoder option and added corresponding processing logic (k-NN space graph construction, embed_dim=50). The default benchmark device is set to ‘auto’, automatically detecting CUDA availability. ✅ Fixed General environment dependencies and deterministic training configurations — Iteratively installed missing dependencies such as python_dateutil, pyarrow, packaging, psutil, scikit-learn, pillow, ensuring the General environment could load the benchmark script. Added the CUBLAS_WORKSPACE_CONFIG environment variable at the top of core modules to ensure GPU operations were deterministic. Problems and Solutions Key Issues 1. GCN+STAIG performance is extremely poor and unstable (ARI average ≈0.16, CV ≈106%). The root cause is four critical differences between the implementation and the original STAIG paper. Solution: By comparing lines of the original STAIG’s net.py and staig.py, we identified four differences: missing adaptive edge dropout, gene clipping, incorrect edge weight direction, and missing tau decay. All verification tests passed.\nKey insight: The original STAIG’s adaptive edge dropout (rand() \u003e= edge_prob, where higher similarity edges were more likely to be dropped) was contrary to intuition. However, this mechanism prevented overfitting within the domain. Multiple deviations could lead to performance crashes, and the impact of each fix cannot be evaluated separately.\n2. There are two key defects in the end-to-end fusion module: ① Misunderstanding of the gene encoder architecture (AI misinterpreted E2E as “no need for a gene encoder” and designed a gene_encoder=none interface); ② The apply_fusion() function signature lacked **kwargs, causing a runtime NameError crash. Solution: After the user corrected the misunderstanding about the architecture, AI redesigned the gene preprocessing parameters to support any input dimension. At the same time, **kwargs was added to the end of the apply_fusion() signature, ensuring that the fusion_kwargs dictionary could be passed correctly. Both defects were fully fixed in the second round of testing, and the end-to-end pipeline passed verification.\nKey insight: The core of end-to-end training is the joint optimization of GCN and STAIG, not skipping gene encoding. Mismatches between function signatures and parameters are exposed during runtime. Uniform checks should be performed at the design stage to ensure consistency in interfaces.\n3. MIHD’s STAIG fusion ARI (0.452) is lower than that of the original STAIG, but the reason is unknown. Solution: By comparing train_img_config.yaml and default parameters in run_benchmark.py, we found four parameter differences: learning rate was twice as high, one more layer in GCN, 250 more epochs, and weight decay was 10 times higher. Performance differences were caused by hyperparameters rather than algorithmic logic.\nKey insight: Comparative learning models are highly sensitive to hyperparameters. Smaller learning rates and fewer layers may actually improve performance in STAIG, indicating a high risk of overfitting. When evaluating performance differences, hyperparameters should be checked first, rather than suspecting algorithmic errors.\n4. The UNI2 model throws a shape invalid error when timm_kwargs is not provided (shape invalid for size 391680). Solution: It is necessary to provide all of timmkwargs (img_size, patch_size, depth, etc.) so that timm can correctly calculate the position encoding grid size.\nKey insight: The size of the pre-trained weight position encoding table on HuggingFace Hub does not match timm’s default inference. Accurate architecture parameters must be provided when loading this data.\nGeneral Issues 5. Missing conda environment dependencies: AI environment lacked torch_geometric, and the General environment lacked pandas and other dependencies. Solution: The problem with torch_geometric was solved by switching to the General environment. The General environment was fixed by iteratively installing missing dependencies using pip/conda. Condos were prioritized for fixing underlying dependencies with inconsistent metadata.\nKey insight: The project uses two conda environments (scgpt_3 and General), which must be switched based on tasks. Using both pip and conda in the same environment can lead to inconsistent metadata. It’s better to use condos for fixing underlying dependencies more reliably.\nHuman Thinking vs AI Thinking Strategic Level Understanding of E2E GCN training architecture and research direction Role Thoughts Human The user pointed out that the design with gene_encoder=none was incorrect (E2E should support any gene encoder). After reviewing STAIG example.py, they proposed a research direction for end-to-end GCN training in MIHD, with clear goals. AI AI misinterpreted E2E as “no need for a gene encoder” and simply using the original expression input to GCN. After being corrected, AI redesigned the gene preprocessing parameters and designed the implementation by exploring existing GCN architectures and referring to STAIG’s train() process. Difference analysis: The user has a deeper understanding of the original STAIG architecture (GCN itself is a gene encoder, and E2E focuses on joint optimization). They led the research direction. AI was responsible for designing the implementation and implementing the plan.\nIdentifying differences in STAIG implementation and the root cause of performance differences Role Thoughts Human The user actively proposed comparing the original STAIG code (provided with specific paths) and, based on experience, pointed out that MIHD’s results were inferior to those of the original project. This directly led to the direction of the problem. AI AI identified five specific implementation differences by comparing lines of code. By reading the configuration file, it quantified the parameter differences, providing specific values and root cause analysis. Difference analysis: The user is better at identifying directional problems (“not performing well compared to the original code”). AI is good at turning intuition into a list of quantitative differences and root cause analysis.\nImplementation Level Environment repair strategy Role Thoughts Human The user adopted a practical approach of “just running things and fixing what’s missing” first, using pip before considering conda. AI AI initially tended to perform a comprehensive environment check but was corrected by the user to an iterative repair method. Difference analysis: The user’s direct approach is more efficient in scenarios where dependencies need to be fixed. AI’s systematic inspection approach is too cumbersome in this scenario.\nAI Limitations Important Limitations There were two design flaws in the implementation of the E2E module: misunderstanding “end-to-end training” as “skipping gene encoding steps” (not understanding that GCN itself was a gene encoder in the original STAIG), and failing to check the consistency of **kwargs parameters in the apply_fusion() function signature, resulting in a runtime crash. Both needed to be fixed after being discovered by the user. General Limitations There was a deviation in identifying the root cause of UNI2’s error (mistakenly judged as GPU incompatibility, actually due to missing timmkwargs). The dependency installation efficiency was low (no pre-analysis of the complete dependency graph, multiple failed retries), and too many redundant documentation files were generated (multiple IMPLEMENTATION_SUMMARY class documents, which is more work than actual code). Today’s Achievements Core Achievements The original STAIG’s adaptive edge dropout (rand() \u003e= edge_prob, where higher similarity edges were more likely to be dropped) was contrary to intuition. However, this mechanism prevented overfitting within the domain and enhanced cross-domain learning. Compared to uniform random dropout, this difference had a fundamental impact on GCN message passing quality. The performance ceiling of end-to-end training (GCN embedded within STAIG for joint optimization with multi-modal comparison) was much higher than that of two-stage separation (first extracting fixed GCN embeddings and then training STAIG). The original STAIG could achieve an ARI of 0.68, while the two-stage separation was only approximately 0.16. The difference stemmed from whether the GCN embedding contained cross-modal supervision signals. The configuration of STAIG hyperparameters was counterintuitive: smaller learning rates (0.0005), fewer GCN layers (1 layer), shorter training duration (300 epochs), and smaller weight decay (1e-5) actually led to better performance. This indicates that comparative learning models have a high risk of overfitting, and performance differences should be prioritized by checking hyperparameters rather than suspecting algorithmic logic. The ‘auto’ strategy for gene preprocessing (StandardScaler+Clip when dim\u003e100, otherwise just Clip) is a simple and universal solution for handling genes from different sources. This avoids repeated normalization of standardized embeddings. Practical Achievements Two key points in project environment management: ① Use two conda environments (scgpt_3 for scGPT/gene analysis, General for image embedding/PCA). Switch between them based on tasks. ② CUBLAS_WORKSPACE_CONFIG must be set at the top of the program (before all imports), otherwise CUDA operators will choose an uncertain path during initialization, and setting it later will be ineffective. Session Summary 🔄 GCN+STAIG fusion training work throughout the day: Fixed implementation differences, improved end-to-end modules, analyzed performance, and designed a new architecture 22:20:54.558 | claude_code Throughout the day, five core tasks were carried out related to MIHD’s GCN+STAIG fusion training: ① Identified and fixed four critical implementation differences by comparing original STAIG code (adaptive edge dropout, gene clipping, edge weight direction, tau decay). All 10 verification tests passed. ② Analysis of GCN+STAIG+UNI2 experimental data revealed extremely unstable ARI values (average ≈0.16). By reading the original STAIG configuration file, we quantified the difference in hyperparameters (lr/number of layers/epochs/weight decay) as the main source of performance differences. ③ Fixed the fatal bug in apply_fusion() that lacked **kwargs parameters. Reorganized STAIGTrainerE2E to support four gene preprocessing modes (auto/standard/clip/none). The end-to-end pipeline ran successfully with ARI=0.05, 14 seconds, and all 10 tests passed. ④ Fixed General environment dependencies and improved the benchmark CLI’s GCN support. ⑤ The user proposed a new direction for end-to-end GCN training (directly inputting feat=concat into GCN for joint optimization). The design has been formulated, but implementation has not yet begun.\nToken Usage Overview Metric Value Total Tokens 26,444,607 Input Tokens 45,934 Output Tokens 8,203 Cache Creation 1,813,267 Cache Reading 24,577,203 Cache Hit Rate 93.1% Total Cost (USD) $8.9866 Model Details Model Input Output Cache Creation Cache Reading Cost Percentage claude-sonnet-4-5-20250929 35,894 222 899,832 6,251,801 $5.3609 59.7% claude-haiku-4-5-20251001 2,022 7,957 829,769 17,949,149 $2.8739 32.0% claude-opus-4-5-20251101 8,018 24 83,666 376,253 $0.7517 8.4% ",
+  "wordCount" : "2098",
+  "inLanguage": "en",
+  "datePublished": "2026-02-05T00:00:00-05:00",
+  "dateModified": "2026-02-05T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-02-05/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-05/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/daily/">Daily Summaries</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-05
+    </h1>
+    <div class="post-meta"><span title='2026-02-05 00:00:00 -0500 EST'>February 5, 2026</span>&nbsp;·&nbsp;<span>10 min</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="daily-report--2026-02-05">Daily Report — 2026-02-05<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-02-05">#</a></h1>
+<h2 id="todays-overview">Today’s Overview<a hidden class="anchor" aria-hidden="true" href="#todays-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Completed two key tasks for the MIHD spatial transcriptomics project: fixed four critical implementation differences between STAIGTrainer and the original STAIG paper (adaptive edge dropout, gene clipping, edge weight direction, tau decay), as well as fully implemented and fixed the end-to-end GCN+STAIG fusion module (**kwargs bug fixes, flexible gene preprocessing support). Additionally, we identified the root cause of performance differences through parameter comparison and designed a new end-to-end GCN training architecture.</li>
+<li><strong>How it was done:</strong> Identified implementation differences by comparing lines of original STAIG code (net.py/staig.py/example.py), then fixed them accordingly. This was confirmed through 10 integrated verification tests. We also read the original STAIG configuration files to quantify parameter differences. Finally, we successfully ran the entire end-to-end pipeline (PCA+UNI2+staig_fusion_e2e, ARI=0.05, 14 seconds).</li>
+<li><strong>What’s achieved:</strong> Eliminated fundamental implementation defects and runtime crashes that affected the performance of GCN+STAIG. We confirmed that hyperparameters were the main source of performance differences rather than algorithmic errors. This laid a solid foundation for improving ARI from 0.16 to the original STAIG level (0.45+, even up to 0.68).</li>
+</ul>
+<blockquote>
+<p>On the DCC cluster, we fixed four critical differences between STAIG implementation and the original paper, fully implemented and fixed the end-to-end GCN+STAIG fusion module (including **kwargs bugs and flexible gene preprocessing support). We also quantified the root cause of performance differences between MIHD and the original STAIG through parameter comparison.</p>
+</blockquote>
+<h2 id="todays-tasks">Today’s Tasks<a hidden class="anchor" aria-hidden="true" href="#todays-tasks">#</a></h2>
+<h3 id="architecture-and-strategy">Architecture and Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture-and-strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Fully implemented and improved the end-to-end GCN+STAIG fusion module</strong> — Created STAIGTrainerE2E.py, fixed the fatal bug in apply_fusion() that lacked **kwargs parameters. Added support for gene preprocessing parameters in four modes (auto/standard/clip/none), allowing any gene encoder input (original 3000-dimensional expression or PCA/GCN/MLP encoded embeddings). Updated run_benchmark.py to support the staig_fusion_e2e strategy. The entire pipeline was successfully executed, and all 10 integration tests passed.</li>
+<li>✅ <strong>Identified four critical implementation differences between the original STAIG</strong> — By comparing lines of original STAIG code, we fixed four issues in STAIGTrainer.py: ① Adaptive edge dropout (adaptive_dropout_adj, based on edge probability rather than uniform random); ② Gene feature np.clip(-10,10); ③ Edge weight direction changed from softmax_neglog to softmax_log; ④ Added a tau decay mechanism. All 10 verification tests passed.</li>
+<li>✅ <strong>Analyzed the training results of GCN+STAIG+UNI2 and identified the root cause of performance differences</strong> — Analysis of experimental data revealed that ARI of GCN+STAIG (0.0009-0.3679, average ≈0.16) was much lower than that of PCA+STAIG (0.45+) and extremely unstable (CV ≈106%). By reading the original STAIG configuration file, we found that MIHD learning rate (0.001 vs 0.0005), number of GCN layers (2 vs 1), number of training iterations (550 vs 300), and weight decay (1e-4 vs 1e-5) were inconsistent with the original configuration. Hyperparameter differences were the main source of performance differences.</li>
+<li>🔄 <strong>Designed a new end-to-end GCN training architecture</strong> — Referring to the train() process in STAIG example.py, we designed a new architecture where feat=concat(gene_expr, img_emb) is directly input into GCN for end-to-end optimization. The design has been formulated, but implementation has not yet begun.</li>
+</ul>
+<h3 id="implementation-and-fixes">Implementation and Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation-and-fixes">#</a></h3>
+<ul>
+<li>✅ <strong>Improved the benchmark CLI (support for GCN gene encoders and GPU verification)</strong> — Added ‘gcn’ to the argparse gene_encoder option and added corresponding processing logic (k-NN space graph construction, embed_dim=50). The default benchmark device is set to ‘auto’, automatically detecting CUDA availability.</li>
+<li>✅ <strong>Fixed General environment dependencies and deterministic training configurations</strong> — Iteratively installed missing dependencies such as python_dateutil, pyarrow, packaging, psutil, scikit-learn, pillow, ensuring the General environment could load the benchmark script. Added the CUBLAS_WORKSPACE_CONFIG environment variable at the top of core modules to ensure GPU operations were deterministic.</li>
+</ul>
+<h2 id="problems-and-solutions">Problems and Solutions<a hidden class="anchor" aria-hidden="true" href="#problems-and-solutions">#</a></h2>
+<h3 id="key-issues">Key Issues<a hidden class="anchor" aria-hidden="true" href="#key-issues">#</a></h3>
+<h4 id="1-gcnstaig-performance-is-extremely-poor-and-unstable-ari-average-016-cv-106-the-root-cause-is-four-critical-differences-between-the-implementation-and-the-original-staig-paper">1. GCN+STAIG performance is extremely poor and unstable (ARI average ≈0.16, CV ≈106%). The root cause is four critical differences between the implementation and the original STAIG paper.<a hidden class="anchor" aria-hidden="true" href="#1-gcnstaig-performance-is-extremely-poor-and-unstable-ari-average-016-cv-106-the-root-cause-is-four-critical-differences-between-the-implementation-and-the-original-staig-paper">#</a></h4>
+<p><strong>Solution:</strong> By comparing lines of the original STAIG’s net.py and staig.py, we identified four differences: missing adaptive edge dropout, gene clipping, incorrect edge weight direction, and missing tau decay. All verification tests passed.</p>
+<p><strong>Key insight:</strong> The original STAIG’s adaptive edge dropout (rand() &gt;= edge_prob, where higher similarity edges were more likely to be dropped) was contrary to intuition. However, this mechanism prevented overfitting within the domain. Multiple deviations could lead to performance crashes, and the impact of each fix cannot be evaluated separately.</p>
+<h4 id="2-there-are-two-key-defects-in-the-end-to-end-fusion-module--misunderstanding-of-the-gene-encoder-architecture-ai-misinterpreted-e2e-as-no-need-for-a-gene-encoder-and-designed-a-gene_encodernone-interface--the-apply_fusion-function-signature-lacked-kwargs-causing-a-runtime-nameerror-crash">2. There are two key defects in the end-to-end fusion module: ① Misunderstanding of the gene encoder architecture (AI misinterpreted E2E as “no need for a gene encoder” and designed a gene_encoder=none interface); ② The apply_fusion() function signature lacked **kwargs, causing a runtime NameError crash.<a hidden class="anchor" aria-hidden="true" href="#2-there-are-two-key-defects-in-the-end-to-end-fusion-module--misunderstanding-of-the-gene-encoder-architecture-ai-misinterpreted-e2e-as-no-need-for-a-gene-encoder-and-designed-a-gene_encodernone-interface--the-apply_fusion-function-signature-lacked-kwargs-causing-a-runtime-nameerror-crash">#</a></h4>
+<p><strong>Solution:</strong> After the user corrected the misunderstanding about the architecture, AI redesigned the gene preprocessing parameters to support any input dimension. At the same time, **kwargs was added to the end of the apply_fusion() signature, ensuring that the fusion_kwargs dictionary could be passed correctly. Both defects were fully fixed in the second round of testing, and the end-to-end pipeline passed verification.</p>
+<p><strong>Key insight:</strong> The core of end-to-end training is the joint optimization of GCN and STAIG, not skipping gene encoding. Mismatches between function signatures and parameters are exposed during runtime. Uniform checks should be performed at the design stage to ensure consistency in interfaces.</p>
+<h4 id="3-mihds-staig-fusion-ari-0452-is-lower-than-that-of-the-original-staig-but-the-reason-is-unknown">3. MIHD’s STAIG fusion ARI (0.452) is lower than that of the original STAIG, but the reason is unknown.<a hidden class="anchor" aria-hidden="true" href="#3-mihds-staig-fusion-ari-0452-is-lower-than-that-of-the-original-staig-but-the-reason-is-unknown">#</a></h4>
+<p><strong>Solution:</strong> By comparing train_img_config.yaml and default parameters in run_benchmark.py, we found four parameter differences: learning rate was twice as high, one more layer in GCN, 250 more epochs, and weight decay was 10 times higher. Performance differences were caused by hyperparameters rather than algorithmic logic.</p>
+<p><strong>Key insight:</strong> Comparative learning models are highly sensitive to hyperparameters. Smaller learning rates and fewer layers may actually improve performance in STAIG, indicating a high risk of overfitting. When evaluating performance differences, hyperparameters should be checked first, rather than suspecting algorithmic errors.</p>
+<h4 id="4-the-uni2-model-throws-a-shape-invalid-error-when-timm_-is-not-provided-shape-invalid-for-size-391680">4. The UNI2 model throws a shape invalid error when <strong>timm_kwargs</strong> is not provided (shape invalid for size 391680).<a hidden class="anchor" aria-hidden="true" href="#4-the-uni2-model-throws-a-shape-invalid-error-when-timm_-is-not-provided-shape-invalid-for-size-391680">#</a></h4>
+<p><strong>Solution:</strong> It is necessary to provide all of <strong>timmkwargs</strong> (img_size, patch_size, depth, etc.) so that timm can correctly calculate the position encoding grid size.</p>
+<p><strong>Key insight:</strong> The size of the pre-trained weight position encoding table on HuggingFace Hub does not match timm’s default inference. Accurate architecture parameters must be provided when loading this data.</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="5-missing-conda-environment-dependencies-ai-environment-lacked-torch_geometric-and-the-general-environment-lacked-pandas-and-other-dependencies">5. Missing conda environment dependencies: AI environment lacked torch_geometric, and the General environment lacked pandas and other dependencies.<a hidden class="anchor" aria-hidden="true" href="#5-missing-conda-environment-dependencies-ai-environment-lacked-torch_geometric-and-the-general-environment-lacked-pandas-and-other-dependencies">#</a></h4>
+<p><strong>Solution:</strong> The problem with torch_geometric was solved by switching to the General environment. The General environment was fixed by iteratively installing missing dependencies using pip/conda. Condos were prioritized for fixing underlying dependencies with inconsistent metadata.</p>
+<p><strong>Key insight:</strong> The project uses two conda environments (scgpt_3 and General), which must be switched based on tasks. Using both pip and conda in the same environment can lead to inconsistent metadata. It’s better to use condos for fixing underlying dependencies more reliably.</p>
+<h2 id="human-thinking-vs-ai-thinking">Human Thinking vs AI Thinking<a hidden class="anchor" aria-hidden="true" href="#human-thinking-vs-ai-thinking">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="understanding-of-e2e-gcn-training-architecture-and-research-direction">Understanding of E2E GCN training architecture and research direction<a hidden class="anchor" aria-hidden="true" href="#understanding-of-e2e-gcn-training-architecture-and-research-direction">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Thoughts</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>The user pointed out that the design with gene_encoder=none was incorrect (E2E should support any gene encoder). After reviewing STAIG example.py, they proposed a research direction for end-to-end GCN training in MIHD, with clear goals.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI misinterpreted E2E as “no need for a gene encoder” and simply using the original expression input to GCN. After being corrected, AI redesigned the gene preprocessing parameters and designed the implementation by exploring existing GCN architectures and referring to STAIG’s train() process.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference analysis:</strong> The user has a deeper understanding of the original STAIG architecture (GCN itself is a gene encoder, and E2E focuses on joint optimization). They led the research direction. AI was responsible for designing the implementation and implementing the plan.</p>
+<h4 id="identifying-differences-in-staig-implementation-and-the-root-cause-of-performance-differences">Identifying differences in STAIG implementation and the root cause of performance differences<a hidden class="anchor" aria-hidden="true" href="#identifying-differences-in-staig-implementation-and-the-root-cause-of-performance-differences">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Thoughts</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>The user actively proposed comparing the original STAIG code (provided with specific paths) and, based on experience, pointed out that MIHD’s results were inferior to those of the original project. This directly led to the direction of the problem.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI identified five specific implementation differences by comparing lines of code. By reading the configuration file, it quantified the parameter differences, providing specific values and root cause analysis.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference analysis:</strong> The user is better at identifying directional problems (“not performing well compared to the original code”). AI is good at turning intuition into a list of quantitative differences and root cause analysis.</p>
+<h3 id="implementation-level">Implementation Level<a hidden class="anchor" aria-hidden="true" href="#implementation-level">#</a></h3>
+<h4 id="environment-repair-strategy">Environment repair strategy<a hidden class="anchor" aria-hidden="true" href="#environment-repair-strategy">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Thoughts</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>The user adopted a practical approach of “just running things and fixing what’s missing” first, using pip before considering conda.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI initially tended to perform a comprehensive environment check but was corrected by the user to an iterative repair method.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference analysis:</strong> The user’s direct approach is more efficient in scenarios where dependencies need to be fixed. AI’s systematic inspection approach is too cumbersome in this scenario.</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="important-limitations">Important Limitations<a hidden class="anchor" aria-hidden="true" href="#important-limitations">#</a></h3>
+<ul>
+<li>There were two design flaws in the implementation of the E2E module: misunderstanding “end-to-end training” as “skipping gene encoding steps” (not understanding that GCN itself was a gene encoder in the original STAIG), and failing to check the consistency of **kwargs parameters in the apply_fusion() function signature, resulting in a runtime crash. Both needed to be fixed after being discovered by the user.</li>
+</ul>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>There was a deviation in identifying the root cause of UNI2’s error (mistakenly judged as GPU incompatibility, actually due to missing timmkwargs). The dependency installation efficiency was low (no pre-analysis of the complete dependency graph, multiple failed retries), and too many redundant documentation files were generated (multiple IMPLEMENTATION_SUMMARY class documents, which is more work than actual code).</li>
+</ul>
+<h3 id="todays-achievements">Today’s Achievements<a hidden class="anchor" aria-hidden="true" href="#todays-achievements">#</a></h3>
+<h3 id="core-achievements">Core Achievements<a hidden class="anchor" aria-hidden="true" href="#core-achievements">#</a></h3>
+<ul>
+<li>The original STAIG’s adaptive edge dropout (rand() &gt;= edge_prob, where higher similarity edges were more likely to be dropped) was contrary to intuition. However, this mechanism prevented overfitting within the domain and enhanced cross-domain learning. Compared to uniform random dropout, this difference had a fundamental impact on GCN message passing quality.</li>
+<li>The performance ceiling of end-to-end training (GCN embedded within STAIG for joint optimization with multi-modal comparison) was much higher than that of two-stage separation (first extracting fixed GCN embeddings and then training STAIG). The original STAIG could achieve an ARI of 0.68, while the two-stage separation was only approximately 0.16. The difference stemmed from whether the GCN embedding contained cross-modal supervision signals.</li>
+<li>The configuration of STAIG hyperparameters was counterintuitive: smaller learning rates (0.0005), fewer GCN layers (1 layer), shorter training duration (300 epochs), and smaller weight decay (1e-5) actually led to better performance. This indicates that comparative learning models have a high risk of overfitting, and performance differences should be prioritized by checking hyperparameters rather than suspecting algorithmic logic.</li>
+<li>The ‘auto’ strategy for gene preprocessing (StandardScaler+Clip when dim&gt;100, otherwise just Clip) is a simple and universal solution for handling genes from different sources. This avoids repeated normalization of standardized embeddings.</li>
+</ul>
+<h3 id="practical-achievements">Practical Achievements<a hidden class="anchor" aria-hidden="true" href="#practical-achievements">#</a></h3>
+<ul>
+<li>Two key points in project environment management: ① Use two conda environments (scgpt_3 for scGPT/gene analysis, General for image embedding/PCA). Switch between them based on tasks. ② CUBLAS_WORKSPACE_CONFIG must be set at the top of the program (before all imports), otherwise CUDA operators will choose an uncertain path during initialization, and setting it later will be ineffective.</li>
+</ul>
+<h3 id="session-summary">Session Summary<a hidden class="anchor" aria-hidden="true" href="#session-summary">#</a></h3>
+<p><strong>🔄 GCN+STAIG fusion training work throughout the day: Fixed implementation differences, improved end-to-end modules, analyzed performance, and designed a new architecture</strong>
+<em>22:20:54.558 | claude_code</em>
+Throughout the day, five core tasks were carried out related to MIHD’s GCN+STAIG fusion training: ① Identified and fixed four critical implementation differences by comparing original STAIG code (adaptive edge dropout, gene clipping, edge weight direction, tau decay). All 10 verification tests passed. ② Analysis of GCN+STAIG+UNI2 experimental data revealed extremely unstable ARI values (average ≈0.16). By reading the original STAIG configuration file, we quantified the difference in hyperparameters (lr/number of layers/epochs/weight decay) as the main source of performance differences. ③ Fixed the fatal bug in apply_fusion() that lacked **kwargs parameters. Reorganized STAIGTrainerE2E to support four gene preprocessing modes (auto/standard/clip/none). The end-to-end pipeline ran successfully with ARI=0.05, 14 seconds, and all 10 tests passed. ④ Fixed General environment dependencies and improved the benchmark CLI’s GCN support. ⑤ The user proposed a new direction for end-to-end GCN training (directly inputting feat=concat into GCN for joint optimization). The design has been formulated, but implementation has not yet begun.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<h3 id="overview">Overview<a hidden class="anchor" aria-hidden="true" href="#overview">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Metric</th>
+          <th>Value</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Total Tokens</td>
+          <td>26,444,607</td>
+      </tr>
+      <tr>
+          <td>Input Tokens</td>
+          <td>45,934</td>
+      </tr>
+      <tr>
+          <td>Output Tokens</td>
+          <td>8,203</td>
+      </tr>
+      <tr>
+          <td>Cache Creation</td>
+          <td>1,813,267</td>
+      </tr>
+      <tr>
+          <td>Cache Reading</td>
+          <td>24,577,203</td>
+      </tr>
+      <tr>
+          <td>Cache Hit Rate</td>
+          <td>93.1%</td>
+      </tr>
+      <tr>
+          <td>Total Cost (USD)</td>
+          <td>$8.9866</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="model-details">Model Details<a hidden class="anchor" aria-hidden="true" href="#model-details">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Model</th>
+          <th>Input</th>
+          <th>Output</th>
+          <th>Cache Creation</th>
+          <th>Cache Reading</th>
+          <th>Cost</th>
+          <th>Percentage</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-sonnet-4-5-20250929</td>
+          <td>35,894</td>
+          <td>222</td>
+          <td>899,832</td>
+          <td>6,251,801</td>
+          <td>$5.3609</td>
+          <td>59.7%</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>2,022</td>
+          <td>7,957</td>
+          <td>829,769</td>
+          <td>17,949,149</td>
+          <td>$2.8739</td>
+          <td>32.0%</td>
+      </tr>
+      <tr>
+          <td>claude-opus-4-5-20251101</td>
+          <td>8,018</td>
+          <td>24</td>
+          <td>83,666</td>
+          <td>376,253</td>
+          <td>$0.7517</td>
+          <td>8.4%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+document.getElementById("lang-toggle").addEventListener("click", function() {
+    var current = this.getAttribute("data-current-lang");
+    var url = this.getAttribute("data-translation-url");
+    var newLang = (current === "en") ? "zh" : "en";
+    localStorage.setItem("pref-lang", newLang);
+    if (url) {
+        window.location.href = url;
+    } else {
+        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+    }
+});
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
