@@ -10,7 +10,7 @@
 <meta name="description" content="DCC端完成了Leiden全量对比实验（核心结论：高质量的嵌入方式优于聚类方法的选择），并创建了HD niche query可视化界面；DesktopLinux端则负责新Linux工作站的初始化设置，以及TokenMonitor Tauri的构建工作。此外，通过两轮迭代修复，解决了悬浮球在Linux上的位置变化问题，以及收起残影时的跨平台兼容性问题。">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-04-01/">
-<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
 <link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
@@ -74,12 +74,12 @@
 </script>
 <script>
 (function() {
-    var stored = localStorage.getItem("pref-lang");
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
     if (!stored) return;
     var current = document.documentElement.lang.split("-")[0];
     if (stored === current) return;
     var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
-    if (alt && alt.href) window.location.replace(alt.href);
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
 })();
 </script>
 <meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-04-01/">
@@ -155,7 +155,7 @@
 </head>
 <body id="top">
     <header class="header">
-    <nav class="nav">
+    <nav class="header-nav">
         <div class="logo">
             <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
             <div class="logo-switches">
@@ -447,17 +447,21 @@ Completed environment initialization for the newly installed Ubuntu 26.04 workst
     </svg>
 </a>
 <script>
-document.getElementById("lang-toggle").addEventListener("click", function() {
-    var current = this.getAttribute("data-current-lang");
-    var url = this.getAttribute("data-translation-url");
-    var newLang = (current === "en") ? "zh" : "en";
-    localStorage.setItem("pref-lang", newLang);
-    if (url) {
-        window.location.href = url;
-    } else {
-        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
-    }
-});
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
 </script>
 
 

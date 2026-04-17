@@ -10,7 +10,7 @@
 <meta name="description" content="在DCC和tianhe这两台HPC设备上，我们同步推进了四条主要任务：首先，修复error recovery benchmark中的drop_in_transit假阳性问题；其次，通过32个worker并行处理，生成了6个任务的973个训练场景（耗时41分钟）；第三，构建Pi0.5-base LoRA六任务合并数据集的微调流水线（数据转换和normalization已完成，训练因Slurm job到期而中断）；第四，修复STAIG超参数扫描的不公平问题，并建立了PCA&#43;UNI/UNI2基准测试（AUC 0.47）；最后，开发了10x Visium空间转录组数据的scanpy分析脚本。">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-20/">
-<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
 <link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
@@ -74,12 +74,12 @@
 </script>
 <script>
 (function() {
-    var stored = localStorage.getItem("pref-lang");
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
     if (!stored) return;
     var current = document.documentElement.lang.split("-")[0];
     if (stored === current) return;
     var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
-    if (alt && alt.href) window.location.replace(alt.href);
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
 })();
 </script>
 <meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-20/">
@@ -155,7 +155,7 @@
 </head>
 <body id="top">
     <header class="header">
-    <nav class="nav">
+    <nav class="header-nav">
         <div class="logo">
             <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
             <div class="logo-switches">
@@ -569,17 +569,21 @@ The documentation in <code>openpi/docs/docker.md</code>, <code>serve_policy.Dock
     </svg>
 </a>
 <script>
-document.getElementById("lang-toggle").addEventListener("click", function() {
-    var current = this.getAttribute("data-current-lang");
-    var url = this.getAttribute("data-translation-url");
-    var newLang = (current === "en") ? "zh" : "en";
-    localStorage.setItem("pref-lang", newLang);
-    if (url) {
-        window.location.href = url;
-    } else {
-        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
-    }
-});
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
 </script>
 
 

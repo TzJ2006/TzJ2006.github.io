@@ -10,7 +10,7 @@
 <meta name="description" content="This week, we conducted parallel efforts across three devices: DCC, Tianhe Supercomputer, and TzJsDesktop. The main projects include space transcriptomics research, robot operation training/ evaluation, AI personal assistants, and paper management tools. The MIHD project completed the full set of scGPT&#43;UNI2 integration experiments (QFormer avg ARI=0.370, &#43;117% compared to scGPT-only), and established a zero-shot cross-sample evaluation framework. Pi0.5 LoRA fine-tuning achieved an overall success rate of 58.9%, significantly outperforming BC-RNN (0%). The VLA model was quantitatively validated to demonstrate its advantages. CalendarPro made a significant leap from passive response to active decision-making, achieving perfect results in 321 tests. Additionally, BackgroundCoordinator’s critical integration defects were identified and fixed. Gadget Research Scout went from zero build to production-ready status within a single day, completing two-stage LLM paper evaluation pipelines and providing three research directions for further exploration. Error_recovery_benchmark completed the cleanup of all 65 symlinks and established infrastructure for visualizing error scenarios in MP4 format. The most important engineering lessons learned this week are: successful testing does not mean system availability (integration layers must be verified independently), and it is essential to study the architecture of mature projects before designing Agent-based systems.">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/weekly/2026-w10-weekly/">
-<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
 <link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
@@ -74,12 +74,12 @@
 </script>
 <script>
 (function() {
-    var stored = localStorage.getItem("pref-lang");
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
     if (!stored) return;
     var current = document.documentElement.lang.split("-")[0];
     if (stored === current) return;
     var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
-    if (alt && alt.href) window.location.replace(alt.href);
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
 })();
 </script>
 <meta property="og:url" content="https://tzj2006.github.io/bugjournal/weekly/2026-w10-weekly/">
@@ -155,7 +155,7 @@
 </head>
 <body id="top">
     <header class="header">
-    <nav class="nav">
+    <nav class="header-nav">
         <div class="logo">
             <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
             <div class="logo-switches">
@@ -679,17 +679,21 @@
     </svg>
 </a>
 <script>
-document.getElementById("lang-toggle").addEventListener("click", function() {
-    var current = this.getAttribute("data-current-lang");
-    var url = this.getAttribute("data-translation-url");
-    var newLang = (current === "en") ? "zh" : "en";
-    localStorage.setItem("pref-lang", newLang);
-    if (url) {
-        window.location.href = url;
-    } else {
-        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
-    }
-});
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
 </script>
 
 

@@ -10,7 +10,7 @@
 <meta name="description" content="TzJsDesktop完成了gadget summarize模块的重构工作（将2930行代码整合到8个模块以及72个测试中），同时实现了summarize skill功能的升级，使其更加符合论文中的六章结构描述。此外，ccplan工具链也得到了全面修复。另外，TokenMonitor的架构规划也已完成，它从原本仅适用于macOS的平台扩展到了跨平台环境，并且已经启动了Phase A/E阶段的实现工作。tianhe则负责创建BOSS基准代码库CLAUDE.md文件，并解决了LiPM训练器中的5个bug问题。不过，由于API连接出现故障，他们的工作在上午中断了大约6小时。">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-24/">
-<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
 <link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
@@ -74,12 +74,12 @@
 </script>
 <script>
 (function() {
-    var stored = localStorage.getItem("pref-lang");
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
     if (!stored) return;
     var current = document.documentElement.lang.split("-")[0];
     if (stored === current) return;
     var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
-    if (alt && alt.href) window.location.replace(alt.href);
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
 })();
 </script>
 <meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-24/">
@@ -155,7 +155,7 @@
 </head>
 <body id="top">
     <header class="header">
-    <nav class="nav">
+    <nav class="header-nav">
         <div class="logo">
             <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
             <div class="logo-switches">
@@ -547,17 +547,21 @@ Executed sync.py to push research cache/projects/reports and configuration files
     </svg>
 </a>
 <script>
-document.getElementById("lang-toggle").addEventListener("click", function() {
-    var current = this.getAttribute("data-current-lang");
-    var url = this.getAttribute("data-translation-url");
-    var newLang = (current === "en") ? "zh" : "en";
-    localStorage.setItem("pref-lang", newLang);
-    if (url) {
-        window.location.href = url;
-    } else {
-        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
-    }
-});
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
 </script>
 
 

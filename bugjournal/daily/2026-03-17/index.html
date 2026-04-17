@@ -10,7 +10,7 @@
 <meta name="description" content="在DCC端，我们对MIHD多模态空间转录组项目进行了代码重构，解决了9个相关问题，并更新了相关文档。在tianhe端，多位研究员同时完成了robobrain_pi任务状态机的修复工作，以及训练损失值的分离监控、LIBERO测试套件的集成验证、error recovery benchmark 2920场景数据的质量检查、CALVIN格式转换脚本的修复、GPU监控工具的去重处理以及键盘导航功能的新增。此外，还确认了RoboCasa MimicGen预训练数据下载的上游原因。">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-17/">
-<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.fb7c4a6c522c1461577e313d62ce9e6919735096e1cebd0bac0711a6339711be.css" integrity="sha256-&#43;3xKbFIsFGFXfjE9Ys6eaRlzUJbhzr0LrAcRpjOXEb4=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
 <link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
@@ -74,12 +74,12 @@
 </script>
 <script>
 (function() {
-    var stored = localStorage.getItem("pref-lang");
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
     if (!stored) return;
     var current = document.documentElement.lang.split("-")[0];
     if (stored === current) return;
     var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
-    if (alt && alt.href) window.location.replace(alt.href);
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
 })();
 </script>
 <meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-17/">
@@ -155,7 +155,7 @@
 </head>
 <body id="top">
     <header class="header">
-    <nav class="nav">
+    <nav class="header-nav">
         <div class="logo">
             <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
             <div class="logo-switches">
@@ -526,17 +526,21 @@ A solution was provided for user chenxingping to use a personal wandb account in
     </svg>
 </a>
 <script>
-document.getElementById("lang-toggle").addEventListener("click", function() {
-    var current = this.getAttribute("data-current-lang");
-    var url = this.getAttribute("data-translation-url");
-    var newLang = (current === "en") ? "zh" : "en";
-    localStorage.setItem("pref-lang", newLang);
-    if (url) {
-        window.location.href = url;
-    } else {
-        window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
-    }
-});
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
 </script>
 
 
