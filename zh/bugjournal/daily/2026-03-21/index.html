@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-21 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="开发环境已经配置完成。摘要生成过程中的关键漏洞已得到修复。同时，也实现了对Codex的支持功能；所有AI代理程序均已升级到Opus 4.6版本。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-21/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-21/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-21/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-21/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-21">
+  <meta property="og:description" content="开发环境已经配置完成。摘要生成过程中的关键漏洞已得到修复。同时，也实现了对Codex的支持功能；所有AI代理程序均已升级到Opus 4.6版本。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-21T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-21T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-21">
+  <meta name="twitter:description" content="开发环境已经配置完成。摘要生成过程中的关键漏洞已得到修复。同时，也实现了对Codex的支持功能；所有AI代理程序均已升级到Opus 4.6版本。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Daily Summary",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-03-21",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/2026-03-21/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-21",
+  "name": "Bug Journal 2026-03-21",
+  "description": "开发环境已经配置完成。摘要生成过程中的关键漏洞已得到修复。同时，也实现了对Codex的支持功能；所有AI代理程序均已升级到Opus 4.6版本。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "每日报告 — 2026-03-21 每日概述 **已完成工作：**通过git和rclone同步仓库状态，修复了摘要工具中的子进程漏洞，将Codex使用跟踪功能集成到月度报告中，升级ECC插件以在所有代理上使用Opus 4.6版本，并创建了详细的文档。 **实施方法：**使用了带有远程优先级的分支解决机制，修复了使用Path.as_posix()处理Windows路径的问题，为npx子进程调用添加了–yes标志，修改了monthly_summary.py文件以分别汇总codex_token_usage数据，使用sed批量编辑28个代理的YAML文件，创建了教程和贡献者文档。 **影响：**建立了设备与云存储之间可靠的数据同步工作流程，消除了阻碍每日摘要生成的暂停子进程调用，使得月度报告能够完全跟踪Codex的使用情况，通过Opus 4.6和effortLevel max最大化了AI推理的质量，并为ECC插件系统提供了清晰的入门材料。 配置了开发环境，修复了摘要过程中的关键漏洞，集成了Codex支持，并将所有AI代理升级到Opus 4.6版本\n任务 架构与策略 ✅ ECC插件探索与配置 — 探索了Everything Claude Code插件（28个代理，超过47种技能），将所有代理从sonnet/haiku升级到opus，将effortLevel从’high’改为’max’，创建了详细的ECC_TUTORIAL.md文档。 ✅ 解决npx子进程暂停问题 — 发现如果没有–yes标志，npx会在sub.process.run(capture_output=True)期间产生交互式提示，从而阻止了token使用数据的收集。在daily_summary.py中的三个npx调用中都添加了–yes标志。 ✅ 将Codex集成到月度摘要流程中 — 修改monthly_summary.py文件，将codex_token_usage与token_usage分离，为图表创建了combined_token_usage_summaries，更新了format_monthly_markdown以包含Codex部分，并更新了所有文档（README.md、summarize/README.md、AGENTS.md）以提及Codex支持。 实施与修复 “✅ Rclone数据同步设置 — 创建了~/.config/gadget/sync.json配置文件，从gdrive:gadget()中提取个人数据（12个目录），使用Path.as_posix()修复了sync.py中的Windows路径问题。” ✅ Git仓库同步和合并冲突解决 — 从origin/main拉取最新更改，通过接受远程版本解决了13个合并冲突，根据用户偏好丢弃本地更改。 ✅ 文档更新（CLAUDE.md、AGENTS.md） — 在research/CLAUDE.md中添加了缺失的CLI参数（–paper、–author_id、–homepage、–deploy）；创建了包含项目结构、命令和惯例的395字的根AGENTS.md指南。 ✅ PowerShell执行策略诊断 — 发现PowerShell执行策略阻止了npx/codex.ps1包装器，使用cmd包装器和Set-ExecutionPolicy提供了解决方案。 问题与解决方案 关键问题 1. 从Python子进程调用npx @ccusage/codex@latest时出现无限暂停 **解决方案：**在npx调用中添加了–yes标志，以跳过“确定继续？”的交互式提示，因为subprocess.run(capture_output=True)在没有stdin的情况下无法回答这个问题。\n**关键洞察：**带有capture_output=True的subprocess.run没有stdin，因此任何交互式提示都会导致无限暂停；在自动化脚本中管理包时始终使用–yes或-y标志。\n2. 每日导出数据收集了Codex token使用情况，但月度摘要未汇总或显示此使用情况 **解决方案：**在aggregate_token_usage()中添加了一个单独的codex_token_usage摘要路径，为组合大纲创建了combined_usage_summaries，更新了format_monthly_markdown以显示Codex部分，并更新了所有文档（README.md、summarize/README.md、AGENTS.md）以提及Codex支持。\n**关键洞察：**在聚合过程中添加新的数据源需要更新输入解析、聚合逻辑、LLM输入净化（删除机械字段）和输出格式。\n一般问题 3. Windows Path().parent生成反斜杠，导致rclone远程路径问题（例如，‘gdrive:gadget/website\\personal’） **解决方案：**使用Path.as_posix()将Windows路径转换为正斜杠，以构建rclone远程路径。\n**关键洞察：**即使在Windows上，rclone远程路径也必须使用正斜杠；在构建远程URI时，路径操作需要显式的.as_posix()转换。\n4. PowerShell执行策略阻止npx和codex command.ps1包装器 **解决方案：**建议立即使用cmd包装器（npx.cmd、codex.cmd）作为临时解决方案，并使用Set-ExecutionPolicy -Scope CurrentUser RemoteSigned进行永久修复。\n**关键洞察：**在Windows上，npm安装会创建.cmd和.ps1包装器；当PowerShell执行策略受到限制时，通常可以使用.cmd，而.ps1则需要更改策略。\n5. 从本地更改后从远程拉取数据时出现Git合并冲突 **解决方案：**使用git stash，然后执行git pull，最后接受上游版本（–theirs）并丢弃stash以解决剩余冲突。\n**关键洞察：**在本地清理之后，使用–theirs来完全接受远程版本比手动解决冲突更为简洁，尤其是当本地更改打算被丢弃时。\n人工与人工智能方法 战略层面 学习ECC插件的方法 角色 方法 人类 用户更喜欢通过逐步说明预期结果的实践教程来学习 人工智能 人工智能最初尝试自动化探索和报告生成，然后转向为结构化方法规划模式 **差异分析：**人类更喜欢具有明确检查点的自主学习；人工智能默认采用自动化和委托给子代理的方式。用户方法更适合于记忆建立和理解。\nECC代理模型选择策略 角色 方法 人类 用户希望所有代理都升级到Opus 4.6以获得最佳质量，愿意接受更高的成本 人工智能 人工智能建议采用分层方法（核心代理使用Opus，日常任务使用Sonnet，轻量级任务使用Haiku）来平衡成本和质量 **差异分析：**人类优先考虑一致性和最大能力；人工智能优先考虑成本优化。在这个个人项目中，用户选择反映了对质量的重视超过成本。\nGit冲突解决方法 角色 方法 人类 用户知道他们应该丢弃本地更改并完全匹配远程更改，因为他们已经在GitHub上清理了个人数据 人工智能 最初尝试通过弹出stash来合并两个版本 人工智能的局限性 主要限制 - 人工智能最初没有理解用户希望得到一个自我指导的教程。当被问到“通过我的当前项目熟悉这个插件”时，人工智能反而启动了一个自动化的子代理程序。 一般限制 人工智能建议了一个针对成本优化的代理模型层，而用户显然希望获得高质量的服务（在所有情况下都使用Opus），但人工智能没有正确解读用户的偏好。 在创建文档时，人工智能最初的AGENTS.md文件有402个字（超过了400字的目标），需要反复调整内容，尽管这一限制已经明确说明。 学习成果 主要要点 使用带有capture_output=True的subprocess.run方法会导致没有stdin输入——任何交互式提示都会导致无限挂断；在自动化过程中，始终应使用–yes/–non-interactive标志来管理包管理和CLI工具。 在向聚合管道添加新的数据源时，需要进行更新：(1)输入收集，(2)聚合逻辑，(3)LLM输入清理（从提示中删除新字段），(4)输出渲染——缺少任何这些步骤都会导致数据丢失。 Windows路径对象会生成反斜杠；在构建需要正斜杠的URI或远程路径时（例如rclone、URL、Unix路径），必须使用Path.as_posix()来避免跨平台兼容性问题。 Claude Code (ECC)插件架构由5层组成，形成一个闭环——技能（被动知识）→代理（专业推理）→命令（面向用户）→钩子（自动化触发）→持续学习（反馈捕获）→技能。 实际要点 在Windows系统中，由于PowerShell执行策略的限制，npm安装既有.ps1（被阻止）也有.cmd（可运行）包装文件；cmd是一般的替代方案。 ECC的工作级别有4个层次：低/中/高/最高级；“最高级”包括最新的功能，允许使用最多的标记（39,199个）和最深入的推理。 对话总结 GitHub父目录 ✅插件安装命令 19:19:43.111 | claude_code 用户执行了本地命令来添加并安装’everything-claude-code’插件市场及插件，然后重新加载了插件。除了命令确认之外，没有与人工智能的交互。\n小工具 ✅Git同步和Rclone数据拉取 02:35:05.863 | claude_code 触发从远程获取最新更改的操作，在过程中遇到了13个合并冲突。人工智能最初试图保留本地更改，但用户明确表示他们希望与远程完全匹配（远程已经清理了个人数据）。通过使用git reset –hard origin/main解决了这个问题。然后设置了rclone sync.py，修复了Windows路径错误（将反斜杠替换为正斜杠），并从gdrive:gadget/拉取了所有个人数据：已提交的路径修正。\n✅解决了npx codex挂起问题 19:15:43.784 | claude_code 用户报告说’npm exec @ccusage/codex@latest –json –breakdown’无限期地挂起了。人工智能诊断出，如果没有–yes标志，npx会触发类似“继续？”的交互式提示，但由于subprocess.run(capture_output=True)没有stdin输入，导致挂起。通过在dailySummary.py中添加–yes解决了这个问题，应用于所有3个npx调用（fetch_codex_usage_full和fetch_ccusage_full）。\n✅在月度总结中增加了Codex支持 19:09:16.955 | codex 用户希望包含Codex输出，并且ccusage来跟踪Codex的使用情况。人工智能发现每日导出已经支持Codex，但月度聚合则不支持。更新了monthlySummary.py：从LLM输入中移除了codex_token_usage（就像token_usage一样），添加了aggregate_token_usage()来单独总结Claude和Codex数据，创建了combine_usage_summaries()来生成合并的概述/图表，更新了format_monthly_markdown()以渲染Codex部分。同时更新了文档（README.md、summarize/README.md、AGENTS.md）以提及Codex支持。通过语法检查和冒烟测试进行了验证。\n✅创建了AGENTS.md贡献者指南 18:50:04.708 | codex 用户请求了一个仓库贡献者指南。人工智能扫描了项目结构，阅读了现有的summarize/AGENTS.md和test/AGENTS.md，检查了git历史记录中的提交约定。创建了一个包含397个单词的根AGENTS.md文件，涵盖了单一单元仓库结构、工具命令（summarize/research/test/website）、Python风格（PEP 8、Black、Ruff）、测试方法（没有集中的测试套件，特定于工具）、提交约定（定期提交，不使用Co-Authored-By字段）以及安全注意事项。\n✅诊断了npx/codex PowerShell阻塞问题 19:09:16.955 | codex 用户报告说在当前环境中’npx codex’无法正常工作。人工智能检查了路径，发现了npx.ps1和codex.ps1脚本，但PowerShell执行策略阻止了这些脚本的运行。解释说使用cmd包装文件（npx.cmd、codex.cmd）作为即时解决方案，而Set-ExecutionPolicy -Scope CurrentUser RemoteSigned则作为永久解决方案。\n🔍插件列表状态检查 19:24:26.931 | claude_code 用户运行了本地命令/插件列表，/cost, /status——不需要人工智能进行处理。\n小工具研究 ✅ECC插件探索与配置 21:18:16.758 | claude_code 用户运行/init以查看已经非常全面的CLAUDE.md文件。人工智能添加了2个缺失的配置文件参数（–paper, –author_id）。然后用户希望学习如何使用ECC插件。人工智能探讨了插件结构（28个代理，超过47种技能，59个命令），制定了详细的教程计划，阅读了内部代理定义和技能描述。用户明确表示他们希望有一个实践性的教程。人工智能创建了一个包含6步指导练习的ECC_TUTORIAL.md文件。然后用户要求所有代理使用Opus 4.6 + effortLevel最高级。人工智能更新了settings.json，将effortLevel设置为最大值，批量编辑了28个代理文件，并根据用户的请求将模型设置为opus（只有一个文档更新器保持为sonnet）。\n✅CLAUDE.md文档审计 20:37:15.819 | claude_code 用户运行/init。人工智能发现CLAUDE.md已经非常准确且最新，只增加了2个缺失的CLI参数（配置文件的–paper, –author_id）。\n令牌使用 Claude Code 概述 指标 数值 总令牌数 39,706,094 输入令牌数 47,162 输出令牌数 108,045 缓存创建量 2,303,350 缓存读取次数 37,247,537 缓存命中率 94.2% 总成本（美元） $26.1171 模型细分| 模型 | 输入 | 输出 | 缓存创建时间 | 缓存读取量 | 成本 | 百分比 | |——|——|——|————|————|——|————-| | Claude-opus-4-6 | 21,301 | 43,156 | 1,138,906 | 29,102,427 | $22.8548 | 87.5% | | Claude-haiku-4-5-20251001 | 23,791 | 58,982 | 963,158 | 7,767,682 | $2.2994 | 8.8% | | Claude-sonnet-4-6 | 2,070 | 5,907 | 201,286 | 377,428 | $0.9629 | 3.7% |\n设备使用情况 设备 总代币数 输入 输出 成本 TzJsDesktop 7,213,196 3,238 30,159 $4.0730 tianhe 32,492,898 43,924 77,886 $22.0441 代码文档 概述 指标 数值 总代币数 9,917,937 输入代币数 9,827,688 输出代币数 90,249 推理代币数 43,171 缓存读取量 8,714,880 总成本（美元） $6.3145 模型详情 模型 输入 输出 推理过程 缓存读取量 成本 百分比 gpt-5.4 9,827,688 90,249 43,171 8,714,880 $6.3145 100.0% ",
+  "wordCount" : "319",
+  "inLanguage": "zh",
+  "datePublished": "2026-03-21T00:00:00-05:00",
+  "dateModified": "2026-03-21T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/daily/2026-03-21/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="zh"
+                        data-translation-url="https://tzj2006.github.io/bugjournal/daily/2026-03-21/">EN
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/zh/">主页</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/">Bug Journal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/daily/">Daily Summary</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-21
+    </h1>
+    <div class="post-meta"><span title='2026-03-21 00:00:00 -0500 -0500'>2026年3月21日</span>&nbsp;·&nbsp;<span>2 分钟</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="每日报告--2026-03-21">每日报告 — 2026-03-21<a hidden class="anchor" aria-hidden="true" href="#每日报告--2026-03-21">#</a></h1>
+<h2 id="每日概述">每日概述<a hidden class="anchor" aria-hidden="true" href="#每日概述">#</a></h2>
+<ul>
+<li>**已完成工作：**通过git和rclone同步仓库状态，修复了摘要工具中的子进程漏洞，将Codex使用跟踪功能集成到月度报告中，升级ECC插件以在所有代理上使用Opus 4.6版本，并创建了详细的文档。</li>
+<li>**实施方法：**使用了带有远程优先级的分支解决机制，修复了使用Path.as_posix()处理Windows路径的问题，为npx子进程调用添加了&ndash;yes标志，修改了monthly_summary.py文件以分别汇总codex_token_usage数据，使用sed批量编辑28个代理的YAML文件，创建了教程和贡献者文档。</li>
+<li>**影响：**建立了设备与云存储之间可靠的数据同步工作流程，消除了阻碍每日摘要生成的暂停子进程调用，使得月度报告能够完全跟踪Codex的使用情况，通过Opus 4.6和effortLevel max最大化了AI推理的质量，并为ECC插件系统提供了清晰的入门材料。</li>
+</ul>
+<blockquote>
+<p>配置了开发环境，修复了摘要过程中的关键漏洞，集成了Codex支持，并将所有AI代理升级到Opus 4.6版本</p>
+</blockquote>
+<h2 id="任务">任务<a hidden class="anchor" aria-hidden="true" href="#任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>ECC插件探索与配置</strong> — 探索了Everything Claude Code插件（28个代理，超过47种技能），将所有代理从sonnet/haiku升级到opus，将effortLevel从&rsquo;high&rsquo;改为&rsquo;max&rsquo;，创建了详细的ECC_TUTORIAL.md文档。</li>
+<li>✅ <strong>解决npx子进程暂停问题</strong> — 发现如果没有&ndash;yes标志，npx会在sub.process.run(capture_output=True)期间产生交互式提示，从而阻止了token使用数据的收集。在daily_summary.py中的三个npx调用中都添加了&ndash;yes标志。</li>
+<li>✅ <strong>将Codex集成到月度摘要流程中</strong> — 修改monthly_summary.py文件，将codex_token_usage与token_usage分离，为图表创建了combined_token_usage_summaries，更新了format_monthly_markdown以包含Codex部分，并更新了所有文档（README.md、summarize/README.md、AGENTS.md）以提及Codex支持。</li>
+</ul>
+<h3 id="实施与修复">实施与修复<a hidden class="anchor" aria-hidden="true" href="#实施与修复">#</a></h3>
+<ul>
+<li>&ldquo;✅ <strong>Rclone数据同步设置</strong> — 创建了~/.config/gadget/sync.json配置文件，从gdrive:gadget()中提取个人数据（12个目录），使用Path.as_posix()修复了sync.py中的Windows路径问题。&rdquo;</li>
+<li>✅ <strong>Git仓库同步和合并冲突解决</strong> — 从origin/main拉取最新更改，通过接受远程版本解决了13个合并冲突，根据用户偏好丢弃本地更改。</li>
+<li>✅ <strong>文档更新（CLAUDE.md、AGENTS.md）</strong> — 在research/CLAUDE.md中添加了缺失的CLI参数（&ndash;paper、&ndash;author_id、&ndash;homepage、&ndash;deploy）；创建了包含项目结构、命令和惯例的395字的根AGENTS.md指南。</li>
+<li>✅ <strong>PowerShell执行策略诊断</strong> — 发现PowerShell执行策略阻止了npx/codex.ps1包装器，使用cmd包装器和Set-ExecutionPolicy提供了解决方案。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-从python子进程调用npx-ccusagecodexlatest时出现无限暂停">1. 从Python子进程调用npx @ccusage/codex@latest时出现无限暂停<a hidden class="anchor" aria-hidden="true" href="#1-从python子进程调用npx-ccusagecodexlatest时出现无限暂停">#</a></h4>
+<p>**解决方案：**在npx调用中添加了&ndash;yes标志，以跳过“确定继续？”的交互式提示，因为subprocess.run(capture_output=True)在没有stdin的情况下无法回答这个问题。</p>
+<p>**关键洞察：**带有capture_output=True的subprocess.run没有stdin，因此任何交互式提示都会导致无限暂停；在自动化脚本中管理包时始终使用&ndash;yes或-y标志。</p>
+<h4 id="2-每日导出数据收集了codex-token使用情况但月度摘要未汇总或显示此使用情况">2. 每日导出数据收集了Codex token使用情况，但月度摘要未汇总或显示此使用情况<a hidden class="anchor" aria-hidden="true" href="#2-每日导出数据收集了codex-token使用情况但月度摘要未汇总或显示此使用情况">#</a></h4>
+<p>**解决方案：**在aggregate_token_usage()中添加了一个单独的codex_token_usage摘要路径，为组合大纲创建了combined_usage_summaries，更新了format_monthly_markdown以显示Codex部分，并更新了所有文档（README.md、summarize/README.md、AGENTS.md）以提及Codex支持。</p>
+<p>**关键洞察：**在聚合过程中添加新的数据源需要更新输入解析、聚合逻辑、LLM输入净化（删除机械字段）和输出格式。</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="3-windows-pathparent生成反斜杠导致rclone远程路径问题例如gdrivegadgetwebsitepersonal">3. Windows Path().parent生成反斜杠，导致rclone远程路径问题（例如，&lsquo;gdrive:gadget/website\personal&rsquo;）<a hidden class="anchor" aria-hidden="true" href="#3-windows-pathparent生成反斜杠导致rclone远程路径问题例如gdrivegadgetwebsitepersonal">#</a></h4>
+<p>**解决方案：**使用Path.as_posix()将Windows路径转换为正斜杠，以构建rclone远程路径。</p>
+<p>**关键洞察：**即使在Windows上，rclone远程路径也必须使用正斜杠；在构建远程URI时，路径操作需要显式的.as_posix()转换。</p>
+<h4 id="4-powershell执行策略阻止npx和codex-commandps1包装器">4. PowerShell执行策略阻止npx和codex command.ps1包装器<a hidden class="anchor" aria-hidden="true" href="#4-powershell执行策略阻止npx和codex-commandps1包装器">#</a></h4>
+<p>**解决方案：**建议立即使用cmd包装器（npx.cmd、codex.cmd）作为临时解决方案，并使用Set-ExecutionPolicy -Scope CurrentUser RemoteSigned进行永久修复。</p>
+<p>**关键洞察：**在Windows上，npm安装会创建.cmd和.ps1包装器；当PowerShell执行策略受到限制时，通常可以使用.cmd，而.ps1则需要更改策略。</p>
+<h4 id="5-从本地更改后从远程拉取数据时出现git合并冲突">5. 从本地更改后从远程拉取数据时出现Git合并冲突<a hidden class="anchor" aria-hidden="true" href="#5-从本地更改后从远程拉取数据时出现git合并冲突">#</a></h4>
+<p>**解决方案：**使用git stash，然后执行git pull，最后接受上游版本（&ndash;theirs）并丢弃stash以解决剩余冲突。</p>
+<p>**关键洞察：**在本地清理之后，使用&ndash;theirs来完全接受远程版本比手动解决冲突更为简洁，尤其是当本地更改打算被丢弃时。</p>
+<h2 id="人工与人工智能方法">人工与人工智能方法<a hidden class="anchor" aria-hidden="true" href="#人工与人工智能方法">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="学习ecc插件的方法">学习ECC插件的方法<a hidden class="anchor" aria-hidden="true" href="#学习ecc插件的方法">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户更喜欢通过逐步说明预期结果的实践教程来学习</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>人工智能最初尝试自动化探索和报告生成，然后转向为结构化方法规划模式</td>
+      </tr>
+  </tbody>
+</table>
+<p>**差异分析：**人类更喜欢具有明确检查点的自主学习；人工智能默认采用自动化和委托给子代理的方式。用户方法更适合于记忆建立和理解。</p>
+<h4 id="ecc代理模型选择策略">ECC代理模型选择策略<a hidden class="anchor" aria-hidden="true" href="#ecc代理模型选择策略">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户希望所有代理都升级到Opus 4.6以获得最佳质量，愿意接受更高的成本</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>人工智能建议采用分层方法（核心代理使用Opus，日常任务使用Sonnet，轻量级任务使用Haiku）来平衡成本和质量</td>
+      </tr>
+  </tbody>
+</table>
+<p>**差异分析：**人类优先考虑一致性和最大能力；人工智能优先考虑成本优化。在这个个人项目中，用户选择反映了对质量的重视超过成本。</p>
+<h4 id="git冲突解决方法">Git冲突解决方法<a hidden class="anchor" aria-hidden="true" href="#git冲突解决方法">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户知道他们应该丢弃本地更改并完全匹配远程更改，因为他们已经在GitHub上清理了个人数据</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>最初尝试通过弹出stash来合并两个版本</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="人工智能的局限性">人工智能的局限性<a hidden class="anchor" aria-hidden="true" href="#人工智能的局限性">#</a></h2>
+<h3 id="主要限制---人工智能最初没有理解用户希望得到一个自我指导的教程当被问到通过我的当前项目熟悉这个插件时人工智能反而启动了一个自动化的子代理程序">主要限制 - 人工智能最初没有理解用户希望得到一个自我指导的教程。当被问到“通过我的当前项目熟悉这个插件”时，人工智能反而启动了一个自动化的子代理程序。<a hidden class="anchor" aria-hidden="true" href="#主要限制---人工智能最初没有理解用户希望得到一个自我指导的教程当被问到通过我的当前项目熟悉这个插件时人工智能反而启动了一个自动化的子代理程序">#</a></h3>
+<h3 id="一般限制">一般限制<a hidden class="anchor" aria-hidden="true" href="#一般限制">#</a></h3>
+<ul>
+<li>人工智能建议了一个针对成本优化的代理模型层，而用户显然希望获得高质量的服务（在所有情况下都使用Opus），但人工智能没有正确解读用户的偏好。</li>
+<li>在创建文档时，人工智能最初的AGENTS.md文件有402个字（超过了400字的目标），需要反复调整内容，尽管这一限制已经明确说明。</li>
+</ul>
+<h2 id="学习成果">学习成果<a hidden class="anchor" aria-hidden="true" href="#学习成果">#</a></h2>
+<h3 id="主要要点">主要要点<a hidden class="anchor" aria-hidden="true" href="#主要要点">#</a></h3>
+<ul>
+<li>使用带有capture_output=True的subprocess.run方法会导致没有stdin输入——任何交互式提示都会导致无限挂断；在自动化过程中，始终应使用&ndash;yes/&ndash;non-interactive标志来管理包管理和CLI工具。</li>
+<li>在向聚合管道添加新的数据源时，需要进行更新：(1)输入收集，(2)聚合逻辑，(3)LLM输入清理（从提示中删除新字段），(4)输出渲染——缺少任何这些步骤都会导致数据丢失。</li>
+<li>Windows路径对象会生成反斜杠；在构建需要正斜杠的URI或远程路径时（例如rclone、URL、Unix路径），必须使用Path.as_posix()来避免跨平台兼容性问题。</li>
+<li>Claude Code (ECC)插件架构由5层组成，形成一个闭环——技能（被动知识）→代理（专业推理）→命令（面向用户）→钩子（自动化触发）→持续学习（反馈捕获）→技能。</li>
+</ul>
+<h3 id="实际要点">实际要点<a hidden class="anchor" aria-hidden="true" href="#实际要点">#</a></h3>
+<ul>
+<li>在Windows系统中，由于PowerShell执行策略的限制，npm安装既有.ps1（被阻止）也有.cmd（可运行）包装文件；cmd是一般的替代方案。</li>
+<li>ECC的工作级别有4个层次：低/中/高/最高级；“最高级”包括最新的功能，允许使用最多的标记（39,199个）和最深入的推理。</li>
+</ul>
+<h2 id="对话总结">对话总结<a hidden class="anchor" aria-hidden="true" href="#对话总结">#</a></h2>
+<h3 id="github父目录">GitHub父目录<a hidden class="anchor" aria-hidden="true" href="#github父目录">#</a></h3>
+<p><strong>✅插件安装命令</strong>
+<em>19:19:43.111 | claude_code</em>
+用户执行了本地命令来添加并安装&rsquo;everything-claude-code&rsquo;插件市场及插件，然后重新加载了插件。除了命令确认之外，没有与人工智能的交互。</p>
+<h3 id="小工具">小工具<a hidden class="anchor" aria-hidden="true" href="#小工具">#</a></h3>
+<p><strong>✅Git同步和Rclone数据拉取</strong>
+<em>02:35:05.863 | claude_code</em>
+触发从远程获取最新更改的操作，在过程中遇到了13个合并冲突。人工智能最初试图保留本地更改，但用户明确表示他们希望与远程完全匹配（远程已经清理了个人数据）。通过使用git reset &ndash;hard origin/main解决了这个问题。然后设置了rclone sync.py，修复了Windows路径错误（将反斜杠替换为正斜杠），并从gdrive:gadget/拉取了所有个人数据：已提交的路径修正。</p>
+<p><strong>✅解决了npx codex挂起问题</strong>
+<em>19:15:43.784 | claude_code</em>
+用户报告说&rsquo;npm exec @ccusage/codex@latest &ndash;json &ndash;breakdown&rsquo;无限期地挂起了。人工智能诊断出，如果没有&ndash;yes标志，npx会触发类似“继续？”的交互式提示，但由于subprocess.run(capture_output=True)没有stdin输入，导致挂起。通过在dailySummary.py中添加&ndash;yes解决了这个问题，应用于所有3个npx调用（fetch_codex_usage_full和fetch_ccusage_full）。</p>
+<p><strong>✅在月度总结中增加了Codex支持</strong>
+<em>19:09:16.955 | codex</em>
+用户希望包含Codex输出，并且ccusage来跟踪Codex的使用情况。人工智能发现每日导出已经支持Codex，但月度聚合则不支持。更新了monthlySummary.py：从LLM输入中移除了codex_token_usage（就像token_usage一样），添加了aggregate_token_usage()来单独总结Claude和Codex数据，创建了combine_usage_summaries()来生成合并的概述/图表，更新了format_monthly_markdown()以渲染Codex部分。同时更新了文档（README.md、summarize/README.md、AGENTS.md）以提及Codex支持。通过语法检查和冒烟测试进行了验证。</p>
+<p><strong>✅创建了AGENTS.md贡献者指南</strong>
+<em>18:50:04.708 | codex</em>
+用户请求了一个仓库贡献者指南。人工智能扫描了项目结构，阅读了现有的summarize/AGENTS.md和test/AGENTS.md，检查了git历史记录中的提交约定。创建了一个包含397个单词的根AGENTS.md文件，涵盖了单一单元仓库结构、工具命令（summarize/research/test/website）、Python风格（PEP 8、Black、Ruff）、测试方法（没有集中的测试套件，特定于工具）、提交约定（定期提交，不使用Co-Authored-By字段）以及安全注意事项。</p>
+<p><strong>✅诊断了npx/codex PowerShell阻塞问题</strong>
+<em>19:09:16.955 | codex</em>
+用户报告说在当前环境中&rsquo;npx codex&rsquo;无法正常工作。人工智能检查了路径，发现了npx.ps1和codex.ps1脚本，但PowerShell执行策略阻止了这些脚本的运行。解释说使用cmd包装文件（npx.cmd、codex.cmd）作为即时解决方案，而Set-ExecutionPolicy -Scope CurrentUser RemoteSigned则作为永久解决方案。</p>
+<p><strong>🔍插件列表状态检查</strong>
+<em>19:24:26.931 | claude_code</em>
+用户运行了本地命令/插件列表，/cost, /status——不需要人工智能进行处理。</p>
+<h3 id="小工具研究">小工具研究<a hidden class="anchor" aria-hidden="true" href="#小工具研究">#</a></h3>
+<p><strong>✅ECC插件探索与配置</strong>
+<em>21:18:16.758 | claude_code</em>
+用户运行/init以查看已经非常全面的CLAUDE.md文件。人工智能添加了2个缺失的配置文件参数（&ndash;paper, &ndash;author_id）。然后用户希望学习如何使用ECC插件。人工智能探讨了插件结构（28个代理，超过47种技能，59个命令），制定了详细的教程计划，阅读了内部代理定义和技能描述。用户明确表示他们希望有一个实践性的教程。人工智能创建了一个包含6步指导练习的ECC_TUTORIAL.md文件。然后用户要求所有代理使用Opus 4.6 + effortLevel最高级。人工智能更新了settings.json，将effortLevel设置为最大值，批量编辑了28个代理文件，并根据用户的请求将模型设置为opus（只有一个文档更新器保持为sonnet）。</p>
+<p><strong>✅CLAUDE.md文档审计</strong>
+<em>20:37:15.819 | claude_code</em>
+用户运行/init。人工智能发现CLAUDE.md已经非常准确且最新，只增加了2个缺失的CLI参数（配置文件的&ndash;paper, &ndash;author_id）。</p>
+<h2 id="令牌使用">令牌使用<a hidden class="anchor" aria-hidden="true" href="#令牌使用">#</a></h2>
+<h3 id="claude-code">Claude Code<a hidden class="anchor" aria-hidden="true" href="#claude-code">#</a></h3>
+<h4 id="概述">概述<a hidden class="anchor" aria-hidden="true" href="#概述">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总令牌数</td>
+          <td>39,706,094</td>
+      </tr>
+      <tr>
+          <td>输入令牌数</td>
+          <td>47,162</td>
+      </tr>
+      <tr>
+          <td>输出令牌数</td>
+          <td>108,045</td>
+      </tr>
+      <tr>
+          <td>缓存创建量</td>
+          <td>2,303,350</td>
+      </tr>
+      <tr>
+          <td>缓存读取次数</td>
+          <td>37,247,537</td>
+      </tr>
+      <tr>
+          <td>缓存命中率</td>
+          <td>94.2%</td>
+      </tr>
+      <tr>
+          <td>总成本（美元）</td>
+          <td>$26.1171</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="模型细分-模型--输入--输出--缓存创建时间--缓存读取量--成本--百分比-">模型细分| 模型 | 输入 | 输出 | 缓存创建时间 | 缓存读取量 | 成本 | 百分比 |<a hidden class="anchor" aria-hidden="true" href="#模型细分-模型--输入--输出--缓存创建时间--缓存读取量--成本--百分比-">#</a></h4>
+<p>|&mdash;&mdash;|&mdash;&mdash;|&mdash;&mdash;|&mdash;&mdash;&mdash;&mdash;|&mdash;&mdash;&mdash;&mdash;|&mdash;&mdash;|&mdash;&mdash;&mdash;&mdash;-|
+| Claude-opus-4-6 | 21,301 | 43,156 | 1,138,906 | 29,102,427 | $22.8548 | 87.5% |
+| Claude-haiku-4-5-20251001 | 23,791 | 58,982 | 963,158 | 7,767,682 | $2.2994 | 8.8% |
+| Claude-sonnet-4-6 | 2,070 | 5,907 | 201,286 | 377,428 | $0.9629 | 3.7% |</p>
+<h4 id="设备使用情况">设备使用情况<a hidden class="anchor" aria-hidden="true" href="#设备使用情况">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总代币数</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>成本</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>TzJsDesktop</td>
+          <td>7,213,196</td>
+          <td>3,238</td>
+          <td>30,159</td>
+          <td>$4.0730</td>
+      </tr>
+      <tr>
+          <td>tianhe</td>
+          <td>32,492,898</td>
+          <td>43,924</td>
+          <td>77,886</td>
+          <td>$22.0441</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="代码文档">代码文档<a hidden class="anchor" aria-hidden="true" href="#代码文档">#</a></h3>
+<h4 id="概述-1">概述<a hidden class="anchor" aria-hidden="true" href="#概述-1">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总代币数</td>
+          <td>9,917,937</td>
+      </tr>
+      <tr>
+          <td>输入代币数</td>
+          <td>9,827,688</td>
+      </tr>
+      <tr>
+          <td>输出代币数</td>
+          <td>90,249</td>
+      </tr>
+      <tr>
+          <td>推理代币数</td>
+          <td>43,171</td>
+      </tr>
+      <tr>
+          <td>缓存读取量</td>
+          <td>8,714,880</td>
+      </tr>
+      <tr>
+          <td>总成本（美元）</td>
+          <td>$6.3145</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="模型详情">模型详情<a hidden class="anchor" aria-hidden="true" href="#模型详情">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>模型</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>推理过程</th>
+          <th>缓存读取量</th>
+          <th>成本</th>
+          <th>百分比</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>gpt-5.4</td>
+          <td>9,827,688</td>
+          <td>90,249</td>
+          <td>43,171</td>
+          <td>8,714,880</td>
+          <td>$6.3145</td>
+          <td>100.0%</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
