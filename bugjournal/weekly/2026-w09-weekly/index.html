@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>每周总结 2026-W09 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal, Weekly Summary">
+<meta name="description" content="This week, we have been working concurrently on two projects within the DCC and Tianhe clusters: Space Transcriptomics (MIHD) and the Error Recovery Benchmark. On the DCC side, we fixed a critical weight loading bug in scGPT, resulting in an average improvement of 44.4% for ARI tasks. We also extended the MIHD benchmark to the Visium HD dataset and completed a major refactoring of the code involving approximately 250,000 lines of code. On Tianhe, we established a new BC-RNN Phoenix training pipeline with 9 parallel tasks. We identified and fixed the root cause of the task distribution mismatch that led to zero success rates in the Pi0.5 evaluation. This led to key conclusions from the M14 baseline evaluation: the learning strategy achieved SR≈0% in error scenarios, proving the necessity of M15 LoRA fine-tuning. Additionally, we successfully stabilized the parallel fine-tuning of Pi0.5 LoRA on 6×A800 hardware.">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/weekly/2026-w09-weekly/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/weekly/2026-w09-weekly/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/weekly/2026-w09-weekly/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/weekly/2026-w09-weekly/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="每周总结 2026-W09">
+  <meta property="og:description" content="This week, we have been working concurrently on two projects within the DCC and Tianhe clusters: Space Transcriptomics (MIHD) and the Error Recovery Benchmark. On the DCC side, we fixed a critical weight loading bug in scGPT, resulting in an average improvement of 44.4% for ARI tasks. We also extended the MIHD benchmark to the Visium HD dataset and completed a major refactoring of the code involving approximately 250,000 lines of code. On Tianhe, we established a new BC-RNN Phoenix training pipeline with 9 parallel tasks. We identified and fixed the root cause of the task distribution mismatch that led to zero success rates in the Pi0.5 evaluation. This led to key conclusions from the M14 baseline evaluation: the learning strategy achieved SR≈0% in error scenarios, proving the necessity of M15 LoRA fine-tuning. Additionally, we successfully stabilized the parallel fine-tuning of Pi0.5 LoRA on 6×A800 hardware.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-01T23:59:00-05:00">
+    <meta property="article:modified_time" content="2026-03-01T23:59:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="每周总结 2026-W09">
+  <meta name="twitter:description" content="This week, we have been working concurrently on two projects within the DCC and Tianhe clusters: Space Transcriptomics (MIHD) and the Error Recovery Benchmark. On the DCC side, we fixed a critical weight loading bug in scGPT, resulting in an average improvement of 44.4% for ARI tasks. We also extended the MIHD benchmark to the Visium HD dataset and completed a major refactoring of the code involving approximately 250,000 lines of code. On Tianhe, we established a new BC-RNN Phoenix training pipeline with 9 parallel tasks. We identified and fixed the root cause of the task distribution mismatch that led to zero success rates in the Pi0.5 evaluation. This led to key conclusions from the M14 baseline evaluation: the learning strategy achieved SR≈0% in error scenarios, proving the necessity of M15 LoRA fine-tuning. Additionally, we successfully stabilized the parallel fine-tuning of Pi0.5 LoRA on 6×A800 hardware.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Weekly summary:",
+      "item": "https://tzj2006.github.io/bugjournal/weekly/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "每周总结 2026-W09",
+      "item": "https://tzj2006.github.io/bugjournal/weekly/2026-w09-weekly/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "每周总结 2026-W09",
+  "name": "每周总结 2026-W09",
+  "description": "This week, we have been working concurrently on two projects within the DCC and Tianhe clusters: Space Transcriptomics (MIHD) and the Error Recovery Benchmark. On the DCC side, we fixed a critical weight loading bug in scGPT, resulting in an average improvement of 44.4% for ARI tasks. We also extended the MIHD benchmark to the Visium HD dataset and completed a major refactoring of the code involving approximately 250,000 lines of code. On Tianhe, we established a new BC-RNN Phoenix training pipeline with 9 parallel tasks. We identified and fixed the root cause of the task distribution mismatch that led to zero success rates in the Pi0.5 evaluation. This led to key conclusions from the M14 baseline evaluation: the learning strategy achieved SR≈0% in error scenarios, proving the necessity of M15 LoRA fine-tuning. Additionally, we successfully stabilized the parallel fine-tuning of Pi0.5 LoRA on 6×A800 hardware.",
+  "keywords": [
+    "Bug Journal", "Weekly Summary"
+  ],
+  "articleBody": "Weekly Report — 2026-W09 (2026-02-23 ~ 2026-03-01) This week, we continued to work on two main tasks: space transcriptomics (MIHD) and the Error Recovery Benchmark on both DCC and Tianhe clusters. On DCC, we fixed a critical weight loading bug in scGPT, which improved ARI by 44.4%. We also extended the MIHD benchmark to the Visium HD dataset and completed a large-scale code refactoring involving approximately 250K lines of code. On Tianhe, we established the BC-RNN Phoenix baseline training pipeline with 9 tasks running in parallel. We identified and fixed the root cause of the 0% success rate in the Pi0.5 evaluation task, and obtained key conclusions from the M14 baseline evaluation (the learning strategy had an SR of approximately 0% under error scenarios, proving the necessity of M15 LoRA fine-tuning). Additionally, we successfully launched the parallel fine-tuning of Pi0.5 LoRA on 6×A800 with stable performance.\nWeek Overview Metric Value Date Range 2026-02-23 ~ 2026-03-01 Active Days 5 / 7 Total Conversations 19 Projects Involved 5 Tasks Completed 35 Ongoing Tasks 6 Total Tokens 177,973,151 Total Cost $105.52 Average Cost per Day $21.10 Project Progress Error Recovery Benchmark (Error Recovery Benchmark) (Active for 5 days) — 🔄 active Completed:\nM14 three-way evaluation (Pi0/Pi0.5/BC-RNN) completed: BC-RNN SR=0.28%, Pi0/Pi0.5 SR=0%. The Recovery Progress of Random was the highest, indicating that the learning strategy failed to generalize well under error injection scenarios. This directly proved the necessity of M15 LoRA fine-tuning. Identified and fixed the root cause of the 0% success rate in Pi0.5 evaluation: The training task (MimicGen 5 tasks) did not overlap with the evaluation task (PickPlace). Instead, it was evaluated on the training task. Complete implementation of BC-RNN Phoenix baseline: Image mode configuration rewritten to match the MimicGen paper. 9 tasks ran in parallel smoothly, and the Stack D0 achieved an SR of 64% after 22 epochs. Fixed defects in Coffee BC-RNN configuration: Added a missing 57-dimensional object observation key, fixing the root cause of Coffee’s 0% SR. Completed the BC-RNN Stack_D0 error scenario generation pipeline: Fixed a bug in the 4-layer continuous image format, generated 11 tip_over scenarios and MP4 visualizations. Successful launch of Pi0.5 LoRA with 9 tasks running in parallel (6×A800, GPU utilization 100%, 77.7GB per card). The evaluation framework was extended to include 5 MimicGen tasks, with a new task registry and unified management of the –task parameter. Evaluation of the Pi0.5 Phoenix 9-task base model: Total SR=4.2% (Stack D0 24%, others ≤2%). Discovery of a database containing 649 scenarios: ~519 compatible scenarios + ~130 natural_* incompatible scenarios. The actual effective evaluation target was ~519. Blocked Items:\n⚠️ Initialization issues in the Coffee environment caused objects to be distorted or stuck (simulator bug). This issue was found after visualization of the BC-RNN rollout and remains unfixed. ⚠️ The effect of Pi0.5 LoRA fine-tuning (compared to the 4.2% baseline) needs verification after training is completed. MIHD (Multimodal Space Transcriptomics Fusion) (Active for 3 days) — 🔄 active Completed:\nFixed the critical weight loading bug in scGPT: The omission of self.use_fast_transformer in TransformerModel.init caused key remapping to never execute in load_pretrained(). After fixing this, ARI improved by 44.4%, and NMI improved by 33.3%. STAIG fusion RM-IDEAL evaluation led the competition (average r=0.396 for 151673, peak r=0.644 for Layer_3). This proves that multimodal fusion is much more effective than single-modal baseline in capturing spatial niches (avg r≈0.06-0.12). Full support for Visium HD crop10large: 8 files were modified, and 4 path adaptation bugs were fixed. Silhouette=0.343 was achieved end-to-end (vs PCA 0.086). Discovery of VisiumHD barcode mapping (r_big//4 pattern), and comparative visualizations of pathologist annotation, STHD cell type, and STAIG fusion clustering. Comparison experiment between Vision Refine: It was found that scan_cluster refine is beneficial for weak fusion but harmful for strong fusion. qformer+no-refine was the best option (ARI=0.4832). Large-scale refactoring of the repository in 6 phases: 41 files/~250K code and 5.3MB images were removed. 6 functional modules were extracted, and 440 experiments passed after dry-run verification. The bug causing logic reversal in BasicContrastive drop_feature was fixed. Three CPU acceleration implementations for STAIG fusion (vectorization of cdist + GPU-based random number generation + batch forward. Expectation is a 20-50x improvement). Blocked Items:\n⚠️ There were issues with objects being distorted or stuck during the initialization of the Coffee environment (simulator bug). This issue was found after visualization of the BC-RNN rollout and remains unfixed. ⚠️ The effect of Pi0.5 LoRA fine-tuning (compared to the 4.2% baseline) needs verification after training is completed. Key Tasks ✅ Fixed the scGPT use_fast_transformer weight loading bug and re-extracted all embeddings (2026-02-28) — The omission of self.use_fast_transformer in TransformerModel.init caused key remapping to never execute in load_pretrained(). All 17.7% attention weight parameters were randomly initialized. After fixing this, ARI improved by 44.4%, and all 186/186 parameters matched. ✅ Identified the root cause of OOM in Pi0.5 full fine-tuning and switched to LoRA architecture (2026-02-23) — It was confirmed that JAX FSDP only divides parameter storage but does not reduce activation memory. The complete training state of Pi0.5 requires ~62GB/GPU on A800 or higher. Switching to gemma_2b_lora+gemma_300m_lora reduced memory to ~22.5GB. Job 46553 ran smoothly at 2.0s/step. ✅ Completed the three-way evaluation of M14 and confirmed key conclusions (2026-02-27) — BC-RNN SR=0.28%, Pi0/Pi0.5 SR=0%. The Recovery Progress of Random (0.0199) was actually higher than all learning strategies. This proves that the learning strategy failed to generalize well under error injection scenarios, directly supporting the necessity of M15 LoRA fine-tuning. ✅ Cleaned and refactored the MIHD repository in 6 phases (2026-03-01) — In Phase1, 41 dead files (~250K code + 5.3MB images) were removed. In Phases 2-4, the run_benchmark.py shared functions were moved to 6 modules and the bug causing logic reversal in BasicContrastive drop_feature was fixed (\u003e= replaced with \u003c). 440 experiments passed after dry-run verification. ✅ Full support for Visium HD crop10large (8 files modified) (2026-02-28) — The data_loader/clustering/run_benchmark/pipeline modules were modified. Automatic clustering without annotations for HD was added, and HD-specific visualization logic and hd_global configuration sections were added. The coordinate space alignment and double preprocessing issues were fixed. Silhouette=0.343 was achieved end-to-end. ✅ Discovered and fixed compatibility issues with M14 scenarios (2026-02-23) — All three-way evaluations crashed on scene 122. AI analysis using EnvironmentMismatchError found that the 649 scenario database contained two types of environments (~519 compatible + ~130 natural_* incompatible). The collector.py added a try-except for scene-level to fix this issue. There were approximately 519 actual effective evaluation scenarios. 🔄 Launched the parallel fine-tuning pipeline for Pi0.5 LoRA with 9 tasks (2026-03-01) — The train_pi05_benchmark.py was created (5 subcommands). 18 configurations were registered to openpi/config.py. Four launch bugs were fixed (JAX_PLATFORMS, norm_stats path, boolean parameters, W\u0026B proxy). It successfully launched on 6×A800 with 100% GPU utilization and 77.7GB per card. 🔄 Completed the script implementation of BC-RNN Phoenix baseline and launched 9 tasks in parallel (2026-02-28) — The train_bc_rnn_benchmark.py was implemented based on the hyperparameters from the MimicGen paper. Three library-level bugs were fixed (mujoco_py import, MimicGen environment registration, get_bounding_box_half_size inheritance chain). 9 tasks ran in parallel on a single GPU (~2.2GB VRAM per task), with 50 rollouts evaluated every 20 epochs. ✅ Located and fixed the missing object observation keys in Coffee BC-RNN (2026-03-01) — By comparing the actual obs key structure of the HDF5 dataset, it was found that Coffee lacked a missing 57-dimensional object state (Pod/Machine/Holder position + relative pose + hinge angle). Extra_low_dim=[‘object’] was added for all 9 tasks. This fixed the root cause of Coffee’s 0% SR. ✅ Identified and fixed the root cause of the 0% success rate in Pi0.5 evaluation (2026-02-26) — It was confirmed that the training task (MimicGen 5 tasks) did not overlap with the evaluation task (PickPlace). Instead, it was evaluated on the training task. Humans could directly identify this obvious issue through a single question, while AI analysis failed to detect it immediately. ✅ Rewritten BC-RNN image mode configuration (5 tasks, consistent with MimicGen paper) (2026-02-26) — The bc_rnn_configs were rewritten from all low_dim to image mode: ResNet18+SpatialSoftmax encoder, CropRandomizer 76×76, RNN hidden_dim 1000, batch_size 16, epoch_every_n_steps 500. This was consistent with the main results in the MimicGen paper. ✅ Achieved three CPU acceleration implementations for MIHD fusion training (2026-02-23) — scipy cdist vectorization replaced O(n²) nested loops (expected a 100-500x improvement). Random number generation was moved to GPU to eliminate the transmission overhead per epoch. QFormerFusion added a batch forward interface (expectation is a 20-50x improvement). ✅ Developed the BC-RNN Stack_D0 error scenario generation pipeline (2026-03-01) — The bug in the 4-layer continuous image observation access of robomimic BC-RNN was fixed. 11 tip_over error scenarios and MP4 visualizations were generated. ✅ Completed the full evaluation of Section 151673 RM-IDEAL (27 methods × 7 layers) (2026-02-28) — The RM-IDEAL evaluation with 27 different embedding methods was run. 189 three-dimensional panel visualizations were generated. staig_fusion had an average r of 0.396, ranking first (peak r of Layer_3 was 0.644). This quantified the advantage of multimodal fusion. ✅ Extended the evaluation framework to include 5 MimicGen tasks (2026-02-26) — 5 new task YAML configs and task_registry.yaml were created. The –task parameter was added to the 1/3/4 scripts. The observation dimension error caused by _D0 env suffix stripping was corrected from 65 to 37. run_full_eval.sh was rewritten to support multi-task loops. ✅ Completed the full benchmark test of STAIG fusion (11 DLPFC slices) (2026-02-23) — pca+uni2+staig_fusion and none+uni2+staig_fusion were run on 11 DLPFC slices. The UNI2 patch_size compatibility bug was fixed (256×256 → 224×224). 10/11 slices were successful, with an average ARI of 0.546. Section 151676 had known collapses. ✅ Completed the comparison experiment between MIHD Vision Refine and baseline (2026-02-23) — On slice 151673, a full comparison was run for 8 fusion methods with/without scan_cluster refine. qformer+no-refine was the best option (ARI=0.4832). It was found that refine was beneficial for weak fusion (attention +0.086) and harmful for strong fusion (-0.054). ✅ Fixed key bugs in evaluate_mimicgen.py and collector.py (2026-02-23) — The bug causing in-place array modification of quat2axisangle was fixed (using np.clip+copy instead). The collector.py’s scene-level EnvironmentMismatchError catching was fixed. The reproducibility of env.seed() was ensured, and the state dimension 8D was verified by assertion. Problems and Solutions 1. Pi0.5 full fine-tuning requires ~62GB/GPU. JAX FSDP=4 cannot effectively reduce memory. Repeated OOM in [Error Recovery Benchmark] (2026-02-23) Solution: Switch to the gemma_2b_lora+gemma_300m_lora architecture, which reduces training parameters by ~90% and reduces memory to ~22.5GB/GPU. Job 46553 ran smoothly at 2.0s/step.\n2. All three-way evaluations in M14 crashed on scene 122/649: ~130 natural_* scenario xml_hash incompatibilities with the current mimicgen environment caused EnvironmentMismatchError, leading to a complete evaluation process crashing [Error Recovery Benchmark] (2026-02-23) Solution: Add a try-except for EnvironmentMismatchError in collect_on_scenes() of collector.py. Skip incompatible scenarios and record warnings. Resume the process with –resume. It was confirmed that there were approximately 519 actual effective evaluation scenarios.\n3. Training logs had serious distortions due to stdout buffering: Pi0.5 training showed only ~580 steps, while actually reaching step 3000. This led to misjudgment of training termination and unnecessary restarts [Error Recovery Benchmark] (2026-02-23) Solution: Standardize the addition of PYTHONUNBUFFERED=1+stdbuf -oL in the training script and sbatch submission scripts. For long-term training, use sbatch to submit independent batch jobs and decouple them from the interactive session lifecycle.\n4. The success rate in Pi0.5 evaluation was 0%, which was misjudged as a model quality issue [Error Recovery Benchmark] (2026-02-26) Solution: It was confirmed that the root cause was that the training task (MimicGen 5 tasks) did not overlap with the evaluation task (PickPlace). Instead, it was evaluated on the training task (Coffee/Stack/Threading/Assembly).\n5. Observation dimension mismatch in BC-RNN evaluation (Expected 65, got 37) [Error Recovery Benchmark] (2026-02-26) Solution: Add import mimicgen to create env.registry during create_env(). Do not strip the _D0 suffix anymore. Keep all MimicGen observables (the _D0 environment provides additional object state observables).\n6. In scGPT, TransformerModel.init omitted self.use_fast_transformer, causing key remapping in load_pretrained() to never execute. This led to random initialization of 17.7% attention weights. When strict=False, this was silently ignored [MIHD] (2026-02-28) Solution: Add a line of self.use_fast_transformer = use_fast_transformer to model.py. After fixing this, ARI improved by 44.4%, and all 11 DLPFC slices’ embeddings were re-extracted.\n7. WebSocket client always encountered ConnectionRefusedError. Attempting different address formats (localhost/127.0.0.1/0.0.0.0) failed [Error Recovery Benchmark] (2026-02-28)Solution: It was found that the http_proxy environment variable was set to 127.0.0.1:10087. The websockets library failed to connect through this proxy. After unsetting all proxy variables at the beginning of run_eval.sh, the connection succeeded. 8. The CoffeeMachineBodyObject lacks the get_bounding_box_half_size() method. An AttributeError was reported during the rollout initialization of the MimicGen Coffee task due to an interface gap between MimicGen and the current robosuite version. [Error Recovery Benchmark] (2026-02-28) Solution: The entire call chain (coffee_machine.py → CoffeeMachineBodyObject → CompositeBodyObject → MujocoXMLObject) was traced back. The get_bounding_box_half_size() method was implemented in each of the three different levels of base classes.\n9. In HD data, the uns[‘spatial’] images appear to be full-sized but their coordinates are in the fullres pixel space after cropping. This mismatch leads to visual misalignment. Additionally, since X has been logged transformed, the pipeline will again perform normalize_total + log1p, resulting in a double transformation. [MIHD] (2026-02-28) Solution: In load_hd_data(), replace uns[‘spatial’] images with cropped_fullres.tif and recalculate the scalefactor. Add a skip_log parameter to preprocess_data(). For HD data with skip_log=True, only perform HVG filtering.\n10. The Coffee BC-RNN loss converged normally (-7.66→-15.4), but the SR remained at 0% for a long time. Tasks configured with the same parameters achieved 64% after 20 epochs. This performance is highly similar to that of models with insufficient capacity. [Error Recovery Benchmark] (2026-03-01) Solution: By comparing the actual obs key structure in the HDF5 dataset, it was found that Coffee requires a 57-dimensional object state (required for multi-stage precise operations). The configuration template lacked this field. Add extra_low_dim=[‘object’] to all 9 tasks and regenerate the configuration.\n11. There were four consecutive bugs when accessing image observations with robomimic BC-RNN: The logic for enabling the camera, the checkpoint config in JSON string format, issues with obtaining image resolution, and problems with converting from HWC to CHW formats. [Error Recovery Benchmark] (2026-03-01) Solution: ① Check the rgb modality from the checkpoint config JSON string (which requires json.loads). ② Read the actual 84×84 size from shape_metadata. ③ Manually perform HWC→CHW transposition and conversion from uint8 to float32/255 normalization (this is automatically handled by ObsUtils.process_obs in standard rollouts).\n12. There were four consecutive bugs when starting Pi0.5 LoRA training: ① Setting JAX_PLATFORMS=cpu alone was ineffective. ② The norm_stats path was incorrect. ③ The boolean parameter –overwrite=False was ineffective. ④ Access to W\u0026B network interfaces on HPC nodes was blocked. [Error Recovery Benchmark] (2026-03-01) Solution: ① Set CUDA_VISIBLE_DEVICES=\"\" + JAX_PLATFORMS=cpu simultaneously. ② The actual path for norm_stats is assets//benchmark//norm_stats.json. ③ Use –no-overwrite instead of –flag=False. ④ Preset WANDB_MODE to disabled.\n13. Adapting the pipeline path for VisiumHD HD data: Failure occurred when finding the image path for the vision encoder and loading spatial coordinates during the fusion stage, as it assumed the DLPFC directory structure. [MIHD] (2026-03-01) Solution: Add a cropped_fullres.tif pattern recognition to find_spatial_image(). Pass crop_dir.parent as data_root when calling the vision encoder. In the fusion stage, directly load coordinates from data.obsm[‘spatial’] without looking up the path.\n14. When calculating norm_stats, the GPU util value was 0, but the memory was fully occupied. The task did not progress for a long time. The root cause was that PaligemmaTokenizer eagerly loaded all visible GPUs when calling get_config().model. [Error Recovery Benchmark] (2026-03-01) Solution: Set CUDA_VISIBLE_DEVICES=\"\" + JAX_PLATFORMS=cpu simultaneously to force the CPU mode (norm_stats does not require model inference at all). Add CPU parallelism and sub-sampling (max-frames 10000) to reduce the calculation time from 10+ minutes to 2.5 minutes.\nLearning Outcomes Architecture JAX FSDP only divides parameter storage, which does not affect the loading of the complete model during initialization or forward activation memory. The full training state for Pi0.5 requires ~62GB/GPU, and a single A800 cannot handle full fine-tuning with 80GB. LoRA (gemma_2b_lora) is the only feasible solution for the A800 cluster, reducing the memory requirement to ~22.5GB. Switch to LoRA when encountering the warning “Can’t reduce memory use below 62.46GiB”. The observation keys configured for BC-RNN must match the task complexity: Tasks with multi-stage precise operations like Coffee require a 57-dimensional object state. A single 84×84 image cannot provide sufficient spatial precision. The performance of configuration bugs (normal loss but SR=0) is highly similar to insufficient model capacity. It is necessary to distinguish between them by comparing dataset structures. Vectorization and batching significantly accelerate the process: O(n²) nested loops can be reduced by about 100-500x through cdist matrix operations. Python’s loop iteration can also be accelerated by about 20-50x through batch GPU forward operations. Norm_stats calculations do not require model inference at all. Forcing the CPU mode, sub-sampling, and parallelism can reduce the calculation time from 10+ minutes to 2.5 minutes. Methodology for restructuring large repositories: Systematically grep to verify all imported dependencies, then execute in the order of “creating new modules → updating references → deleting old files”, and perform a dry-run verification. Before merging functions with the same name but different variants, carefully compare the boundary conditions (\u003evs\u003e=vs\u003c can lead to completely opposite results). Debugging PyTorch model.load_state_dict(strict=False) will silently ignore non-matching keys. Keyed weights may run for a long time with random values without causing any errors. Production code should actively print missing_keys/unexpected_keys and verify the statistical values of parameters. There may also be similar bugs in the official open-source repository. It is necessary to audit the weight loading path actively rather than blindly trusting it. Key details of robomimic BC-RNN inference: The checkpoint config is stored as a JSON string (which requires json.loads, not direct dict access). When bypassing the standard rollout process, manual HWC→CHW transposition and uint8→float32/255 normalization are required (this is automatically handled by ObsUtils.process obs in standard rollouts). Domain Knowledge Key conclusions from M14: BC-RNN SR=0.28%, Pi0/Pi0.5 SR=0%. The Recovery Progress of Random (0.0199) was actually higher than all learning strategies. This directly proves the necessity of LoRA fine-tuning in M15. The 649 scenario database consists of two types of environments: ~519 impulse/augmented compatible scenarios (xml_hash matching) and ~130 natural_* natural capture scenarios (xml_hash different). There were approximately 519 effective evaluation scenarios in M14. All document and target episode numbers need to be updated accordingly. STAIG fusion is overall leading in the RM-IDEAL evaluation (average r=0.396 for 151673, peak r=0.644 for Layer_3). Multimodal fusion has a much better ability to capture spatial niche structures than single-modal baselines (gene/vision average r≈0.06-0.12). The effect of Vision Refine is bipolar: It is beneficial for strong fusion (attention +0.086 ARI), harmful for weak fusion (-0.054 for qformer). Strong fusion already has the ability to handle high-dimensional inputs, and reducing dimensions actually results in a loss of information. Cross-task evaluation is a common pitfall in robot learning: If the training set task does not overlap with the evaluation task, it directly leads to 0% SR. It is necessary to ensure consistency between train/eval tasks during the experimental design phase. The MimicGen _D0 environment provides additional object observables. Removing the _D0 suffix from observations reduces the dimensionality from 65 to 37, disrupting the input consistency during reasoning. VisiumHD coordinate mapping: 2um bin of r_big//4 results in an 8um grid row (similar for col). The visualization size parameters of scanpy spatial are multiples of spot_diameter_fullres. For HD with 8μm diameter (diameter≈7.3), the size should be approximately 4.0. For DLPFC with a diameter of approximately 144, use size=1.0. The Leiden community found that resolution=1.0 is the default clustering strategy for unlabeled HD data (crop10large k=17, Silhouette=0.302). Tools Best practices for Slurm cluster training projects: For long-term training, sbatch should be used instead of srun to avoid session timeout due to SIGTERM. All training scripts should be standardized with PYTHONUNBUFFERED=1 + stdbuf -oL. Before starting the job, use fuser /dev/nvidiaX to clean up zombie GPU processes (monitoring tools like nvitop also hold CUDA contexts). MUJOCO_EGL_DEVICE_ID corresponds to the physical GPU number, not the logical CUDA_VISIBLE_DEVICES number. Key configurations for JAX/Pi0.5 training: ① Set CUDA_VISIBLE_DEVICES=\"\" + JAX_PLATFORMS=cpu simultaneously. ② XLA_PYTHON_CLIENT_MEM_FRACTION=0.95 is effective for A800 with 80GB (from 61 to 77.7GB). ③ HPC nodes must have WANDB_MODE set to disabled. ④ The argparse boolean flag –no-overwrite cannot be used instead of –flag=False. ⑤ The openpi norm_stats path is assets//benchmark//norm_stats.json. The HTTP/HTTPS proxy environment variable (http_proxy) will be transparently proxied by the Python websockets library to establish WebSocket connections. When debugging local services on HPC clusters, it is necessary to unset the proxy variables. The MimicGen environment registers with robosuite through the side effects of importing mimicgen. It is necessary to explicitly perform this import before calling external tools. It is necessary to trace back the entire inheritance chain and implement methods that are missing in third-party libraries in all base classes. Only fixing the point where it is called most recently will cause other subclasses to still report errors. The pam_slurm_adopt cluster’s GPU nodes do not support direct SSH access. srun –overlap can attach a new step to an existing interactive job to reuse node resources. Robomimic does not have a TTY environment, and will exit with EOFError if it encounters an existing checkpoint directory. It is necessary to completely clean the directory before starting each time. The checkpoint directory is the most reliable evidence of training completion. A SLURM job crashing does not mean that the training has failed. Notes on AI Usage Effective Modes:\n✓ Systematic code auditing to identify root causes: By comparing the key values in checkpoints and model state_dicts, it was possible to accurately locate the bug in ScGPT weight loading (just one line of omission). By comparing the actual obs key structure in the HDF5 dataset, a configuration defect in Coffee was discovered independently (without any human intervention). ✓ Complete call chain tracing: Fixed the issue where CoffeeMachineBodyObject lacked a method by tracing the three-level inheritance chain (coffee_machine → CoffeeMachineBodyObject → CompositeBodyObject → MujocoXMLObject). Implement it in all base classes instead of just fixing the point where it is called most recently. ✓ Progressive debugging: Resolved Pi0.5 training OOM issues by analyzing step by step (downgrading dependencies → patching source code → switching architectures → submitting sbatch jobs). ✓ SubAgent parallel monitoring: Monitored multiple long-time experiments through TaskOutput in the background and advanced the different projects across DCC/Tianhe clusters in parallel. Limitations:\n✗ Misjudged the memory usage principle of JAX FSDP (thought that FSDP=4 could be reduced to ~16GB). Only switched to LoRA after several OOMs. It was necessary to take immediate action when encountering the warning “Can’t reduce memory use below 62.46GiB”. ✗ Failed to identify the most obvious reason for the 0% success rate in Pi0.5 during diagnosis. Listed secondary factors such as OOM/action clipping first, and was directly questioned by users, hitting the key point. ✗ Lack of active long-term task health checks: Abnormalities such as GPU idling (util=0 but full memory) and processes getting stuck relied on users to discover them actively, rather than AI auditing them. ✗ lacked preventive verification before integrating external tools: Did not check the availability of mclust/rpy2, image format conventions (HWC vs CHW), outbound network restrictions (W\u0026B), and zombie GPU processes before multiple failures were fixed. ✗ Attempted to automatically call ExitPlanMode to proceed after writing the plan several times (was rejected by users 2-3 times). AI failed to understand that a plan is a decision-making checkpoint for users, not an automatic progress signal. ✗ Lacked active verification of outdated dialogue cache information (such as Pi0.5 step 5000 crash records). It was necessary to rely on the actual checkpoint file status rather than dialogue records. Next Week’s Plans Next week’s core tasks: ① Wait and analyze the results of the LoRA 9 task fine-tuning for Pi0.5 (expected to be completed in 53 hours). Compare it with the 4.2% base model baseline to verify the general improvement effect of LoRA on MimicGen tasks. ② Progress the training of BC-RNN 9 tasks to 600 epochs, focusing on the convergence of complex tasks such as Coffee/ThreePieceAssembly D1. ③ Fix the simulator bug in the Coffee environment initialization (object misalignment/crashing), and complete the closed-loop evaluation of Coffee BC-RNN. ④ Start the M15 experiment design: Based on the conclusions from M14 (learning strategy error scenario SR≈0%), plan the data collection strategy for LoRA fine-tuning in error scenarios, and determine the sampling ratio and data volume of error types. ⑤ Expand MIHD: Run multimodal benchmark tests on more VisiumHD slices to verify the statistical stability of STAIG fusion. Also conduct a special investigation into the training collapse of DLPFC 151676 slices (adjust tau/dropout rate/figure construction parameters).\nToken Usage Statistics Daily Cost Trend Date Tokens (millions) Cost ($) 2026-02-23 17.2 8.82 2026-02-26 15.1 6.34 2026-02-27 2.4 0.45 2026-02-28 53.2 34.91 2026-03-01 90.0 55.00 Peak Day: 2026-03-01 — $55.00 / 90.0M tokens\nClaude Code Metric Value Total Tokens 177,973,151 Input Tokens 238,487 Output Tokens 333,455 Cache Creation 9,184,774 Cache Reading 168,216,435 Total Cost $105.52 Model Usage Distribution Model Cost ($) Input Tokens Output Tokens claude-opus-4-6 94.14 52,476 198,099 claude-haiku-4-5-20251001 11.38 186,011 135,356 ",
+  "wordCount" : "4159",
+  "inLanguage": "en",
+  "datePublished": "2026-03-01T23:59:00-05:00",
+  "dateModified": "2026-03-01T23:59:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/weekly/2026-w09-weekly/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/weekly/2026-w09-weekly/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span>bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/weekly/">Weekly summary:</a></div>
+    <h1 class="post-title entry-hint-parent">
+      每周总结 2026-W09
+    </h1>
+    <div class="post-meta"><span title='2026-03-01 23:59:00 -0500 EST'>March 1, 2026</span>&nbsp;·&nbsp;<span>20 min</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="weekly-report--2026-w09-2026-02-23--2026-03-01">Weekly Report — 2026-W09 (2026-02-23 ~ 2026-03-01)<a hidden class="anchor" aria-hidden="true" href="#weekly-report--2026-w09-2026-02-23--2026-03-01">#</a></h1>
+<blockquote>
+<p>This week, we continued to work on two main tasks: space transcriptomics (MIHD) and the Error Recovery Benchmark on both DCC and Tianhe clusters. On DCC, we fixed a critical weight loading bug in scGPT, which improved ARI by 44.4%. We also extended the MIHD benchmark to the Visium HD dataset and completed a large-scale code refactoring involving approximately 250K lines of code. On Tianhe, we established the BC-RNN Phoenix baseline training pipeline with 9 tasks running in parallel. We identified and fixed the root cause of the 0% success rate in the Pi0.5 evaluation task, and obtained key conclusions from the M14 baseline evaluation (the learning strategy had an SR of approximately 0% under error scenarios, proving the necessity of M15 LoRA fine-tuning). Additionally, we successfully launched the parallel fine-tuning of Pi0.5 LoRA on 6×A800 with stable performance.</p>
+</blockquote>
+<h2 id="week-overview">Week Overview<a hidden class="anchor" aria-hidden="true" href="#week-overview">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Metric</th>
+          <th>Value</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Date Range</td>
+          <td>2026-02-23 ~ 2026-03-01</td>
+      </tr>
+      <tr>
+          <td>Active Days</td>
+          <td>5 / 7</td>
+      </tr>
+      <tr>
+          <td>Total Conversations</td>
+          <td>19</td>
+      </tr>
+      <tr>
+          <td>Projects Involved</td>
+          <td>5</td>
+      </tr>
+      <tr>
+          <td>Tasks Completed</td>
+          <td>35</td>
+      </tr>
+      <tr>
+          <td>Ongoing Tasks</td>
+          <td>6</td>
+      </tr>
+      <tr>
+          <td>Total Tokens</td>
+          <td>177,973,151</td>
+      </tr>
+      <tr>
+          <td>Total Cost</td>
+          <td>$105.52</td>
+      </tr>
+      <tr>
+          <td>Average Cost per Day</td>
+          <td>$21.10</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="project-progress">Project Progress<a hidden class="anchor" aria-hidden="true" href="#project-progress">#</a></h2>
+<h3 id="error-recovery-benchmark-error-recovery-benchmark-active-for-5-days---active">Error Recovery Benchmark (Error Recovery Benchmark) (Active for 5 days) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark-error-recovery-benchmark-active-for-5-days---active">#</a></h3>
+<p><strong>Completed:</strong></p>
+<ul>
+<li>M14 three-way evaluation (Pi0/Pi0.5/BC-RNN) completed: BC-RNN SR=0.28%, Pi0/Pi0.5 SR=0%. The Recovery Progress of Random was the highest, indicating that the learning strategy failed to generalize well under error injection scenarios. This directly proved the necessity of M15 LoRA fine-tuning.</li>
+<li>Identified and fixed the root cause of the 0% success rate in Pi0.5 evaluation: The training task (MimicGen 5 tasks) did not overlap with the evaluation task (PickPlace). Instead, it was evaluated on the training task.</li>
+<li>Complete implementation of BC-RNN Phoenix baseline: Image mode configuration rewritten to match the MimicGen paper. 9 tasks ran in parallel smoothly, and the Stack D0 achieved an SR of 64% after 22 epochs.</li>
+<li>Fixed defects in Coffee BC-RNN configuration: Added a missing 57-dimensional object observation key, fixing the root cause of Coffee&rsquo;s 0% SR.</li>
+<li>Completed the BC-RNN Stack_D0 error scenario generation pipeline: Fixed a bug in the 4-layer continuous image format, generated 11 tip_over scenarios and MP4 visualizations.</li>
+<li>Successful launch of Pi0.5 LoRA with 9 tasks running in parallel (6×A800, GPU utilization 100%, 77.7GB per card).</li>
+<li>The evaluation framework was extended to include 5 MimicGen tasks, with a new task registry and unified management of the &ndash;task parameter.</li>
+<li>Evaluation of the Pi0.5 Phoenix 9-task base model: Total SR=4.2% (Stack D0 24%, others ≤2%).</li>
+<li>Discovery of a database containing 649 scenarios: ~519 compatible scenarios + ~130 natural_* incompatible scenarios. The actual effective evaluation target was ~519.</li>
+</ul>
+<p><strong>Blocked Items:</strong></p>
+<ul>
+<li>⚠️ Initialization issues in the Coffee environment caused objects to be distorted or stuck (simulator bug). This issue was found after visualization of the BC-RNN rollout and remains unfixed.</li>
+<li>⚠️ The effect of Pi0.5 LoRA fine-tuning (compared to the 4.2% baseline) needs verification after training is completed.</li>
+</ul>
+<h3 id="mihd-multimodal-space-transcriptomics-fusion-active-for-3-days---active">MIHD (Multimodal Space Transcriptomics Fusion) (Active for 3 days) — 🔄 active<a hidden class="anchor" aria-hidden="true" href="#mihd-multimodal-space-transcriptomics-fusion-active-for-3-days---active">#</a></h3>
+<p><strong>Completed:</strong></p>
+<ul>
+<li>Fixed the critical weight loading bug in scGPT: The omission of self.use_fast_transformer in TransformerModel.<strong>init</strong> caused key remapping to never execute in load_pretrained(). After fixing this, ARI improved by 44.4%, and NMI improved by 33.3%.</li>
+<li>STAIG fusion RM-IDEAL evaluation led the competition (average r=0.396 for 151673, peak r=0.644 for Layer_3). This proves that multimodal fusion is much more effective than single-modal baseline in capturing spatial niches (avg r≈0.06-0.12).</li>
+<li>Full support for Visium HD crop10large: 8 files were modified, and 4 path adaptation bugs were fixed. Silhouette=0.343 was achieved end-to-end (vs PCA 0.086).</li>
+<li>Discovery of VisiumHD barcode mapping (r_big//4 pattern), and comparative visualizations of pathologist annotation, STHD cell type, and STAIG fusion clustering.</li>
+<li>Comparison experiment between Vision Refine: It was found that scan_cluster refine is beneficial for weak fusion but harmful for strong fusion. qformer+no-refine was the best option (ARI=0.4832).</li>
+<li>Large-scale refactoring of the repository in 6 phases: 41 files/~250K code and 5.3MB images were removed. 6 functional modules were extracted, and 440 experiments passed after dry-run verification. The bug causing logic reversal in BasicContrastive drop_feature was fixed.</li>
+<li>Three CPU acceleration implementations for STAIG fusion (vectorization of cdist + GPU-based random number generation + batch forward. Expectation is a 20-50x improvement).</li>
+</ul>
+<p><strong>Blocked Items:</strong></p>
+<ul>
+<li>⚠️ There were issues with objects being distorted or stuck during the initialization of the Coffee environment (simulator bug). This issue was found after visualization of the BC-RNN rollout and remains unfixed.</li>
+<li>⚠️ The effect of Pi0.5 LoRA fine-tuning (compared to the 4.2% baseline) needs verification after training is completed.</li>
+</ul>
+<h2 id="key-tasks">Key Tasks<a hidden class="anchor" aria-hidden="true" href="#key-tasks">#</a></h2>
+<ul>
+<li>✅ <strong>Fixed the scGPT use_fast_transformer weight loading bug and re-extracted all embeddings</strong> (2026-02-28) — The omission of self.use_fast_transformer in TransformerModel.<strong>init</strong> caused key remapping to never execute in load_pretrained(). All 17.7% attention weight parameters were randomly initialized. After fixing this, ARI improved by 44.4%, and all 186/186 parameters matched.</li>
+<li>✅ <strong>Identified the root cause of OOM in Pi0.5 full fine-tuning and switched to LoRA architecture</strong> (2026-02-23) — It was confirmed that JAX FSDP only divides parameter storage but does not reduce activation memory. The complete training state of Pi0.5 requires ~62GB/GPU on A800 or higher. Switching to gemma_2b_lora+gemma_300m_lora reduced memory to ~22.5GB. Job 46553 ran smoothly at 2.0s/step.</li>
+<li>✅ <strong>Completed the three-way evaluation of M14 and confirmed key conclusions</strong> (2026-02-27) — BC-RNN SR=0.28%, Pi0/Pi0.5 SR=0%. The Recovery Progress of Random (0.0199) was actually higher than all learning strategies. This proves that the learning strategy failed to generalize well under error injection scenarios, directly supporting the necessity of M15 LoRA fine-tuning.</li>
+<li>✅ <strong>Cleaned and refactored the MIHD repository in 6 phases</strong> (2026-03-01) — In Phase1, 41 dead files (~250K code + 5.3MB images) were removed. In Phases 2-4, the run_benchmark.py shared functions were moved to 6 modules and the bug causing logic reversal in BasicContrastive drop_feature was fixed (&gt;= replaced with &lt;). 440 experiments passed after dry-run verification.</li>
+<li>✅ <strong>Full support for Visium HD crop10large (8 files modified)</strong> (2026-02-28) — The data_loader/clustering/run_benchmark/pipeline modules were modified. Automatic clustering without annotations for HD was added, and HD-specific visualization logic and hd_global configuration sections were added. The coordinate space alignment and double preprocessing issues were fixed. Silhouette=0.343 was achieved end-to-end.</li>
+<li>✅ <strong>Discovered and fixed compatibility issues with M14 scenarios</strong> (2026-02-23) — All three-way evaluations crashed on scene 122. AI analysis using EnvironmentMismatchError found that the 649 scenario database contained two types of environments (~519 compatible + ~130 natural_* incompatible). The collector.py added a try-except for scene-level to fix this issue. There were approximately 519 actual effective evaluation scenarios.</li>
+<li>🔄 <strong>Launched the parallel fine-tuning pipeline for Pi0.5 LoRA with 9 tasks</strong> (2026-03-01) — The train_pi05_benchmark.py was created (5 subcommands). 18 configurations were registered to openpi/config.py. Four launch bugs were fixed (JAX_PLATFORMS, norm_stats path, boolean parameters, W&amp;B proxy). It successfully launched on 6×A800 with 100% GPU utilization and 77.7GB per card.</li>
+<li>🔄 <strong>Completed the script implementation of BC-RNN Phoenix baseline and launched 9 tasks in parallel</strong> (2026-02-28) — The train_bc_rnn_benchmark.py was implemented based on the hyperparameters from the MimicGen paper. Three library-level bugs were fixed (mujoco_py import, MimicGen environment registration, get_bounding_box_half_size inheritance chain). 9 tasks ran in parallel on a single GPU (~2.2GB VRAM per task), with 50 rollouts evaluated every 20 epochs.</li>
+<li>✅ <strong>Located and fixed the missing object observation keys in Coffee BC-RNN</strong> (2026-03-01) — By comparing the actual obs key structure of the HDF5 dataset, it was found that Coffee lacked a missing 57-dimensional object state (Pod/Machine/Holder position + relative pose + hinge angle). Extra_low_dim=[&lsquo;object&rsquo;] was added for all 9 tasks. This fixed the root cause of Coffee&rsquo;s 0% SR.</li>
+<li>✅ <strong>Identified and fixed the root cause of the 0% success rate in Pi0.5 evaluation</strong> (2026-02-26) — It was confirmed that the training task (MimicGen 5 tasks) did not overlap with the evaluation task (PickPlace). Instead, it was evaluated on the training task. Humans could directly identify this obvious issue through a single question, while AI analysis failed to detect it immediately.</li>
+<li>✅ <strong>Rewritten BC-RNN image mode configuration (5 tasks, consistent with MimicGen paper)</strong> (2026-02-26) — The bc_rnn_configs were rewritten from all low_dim to image mode: ResNet18+SpatialSoftmax encoder, CropRandomizer 76×76, RNN hidden_dim 1000, batch_size 16, epoch_every_n_steps 500. This was consistent with the main results in the MimicGen paper.</li>
+<li>✅ <strong>Achieved three CPU acceleration implementations for MIHD fusion training</strong> (2026-02-23) — scipy cdist vectorization replaced O(n²) nested loops (expected a 100-500x improvement). Random number generation was moved to GPU to eliminate the transmission overhead per epoch. QFormerFusion added a batch forward interface (expectation is a 20-50x improvement).</li>
+<li>✅ <strong>Developed the BC-RNN Stack_D0 error scenario generation pipeline</strong> (2026-03-01) — The bug in the 4-layer continuous image observation access of robomimic BC-RNN was fixed. 11 tip_over error scenarios and MP4 visualizations were generated.</li>
+<li>✅ <strong>Completed the full evaluation of Section 151673 RM-IDEAL (27 methods × 7 layers)</strong> (2026-02-28) — The RM-IDEAL evaluation with 27 different embedding methods was run. 189 three-dimensional panel visualizations were generated. staig_fusion had an average r of 0.396, ranking first (peak r of Layer_3 was 0.644). This quantified the advantage of multimodal fusion.</li>
+<li>✅ <strong>Extended the evaluation framework to include 5 MimicGen tasks</strong> (2026-02-26) — 5 new task YAML configs and task_registry.yaml were created. The &ndash;task parameter was added to the 1/3/4 scripts. The observation dimension error caused by _D0 env suffix stripping was corrected from 65 to 37. run_full_eval.sh was rewritten to support multi-task loops.</li>
+<li>✅ <strong>Completed the full benchmark test of STAIG fusion (11 DLPFC slices)</strong> (2026-02-23) — pca+uni2+staig_fusion and none+uni2+staig_fusion were run on 11 DLPFC slices. The UNI2 patch_size compatibility bug was fixed (256×256 → 224×224). 10/11 slices were successful, with an average ARI of 0.546. Section 151676 had known collapses.</li>
+<li>✅ <strong>Completed the comparison experiment between MIHD Vision Refine and baseline</strong> (2026-02-23) — On slice 151673, a full comparison was run for 8 fusion methods with/without scan_cluster refine. qformer+no-refine was the best option (ARI=0.4832). It was found that refine was beneficial for weak fusion (attention +0.086) and harmful for strong fusion (-0.054).</li>
+<li>✅ <strong>Fixed key bugs in evaluate_mimicgen.py and collector.py</strong> (2026-02-23) — The bug causing in-place array modification of quat2axisangle was fixed (using np.clip+copy instead). The collector.py&rsquo;s scene-level EnvironmentMismatchError catching was fixed. The reproducibility of env.seed() was ensured, and the state dimension 8D was verified by assertion.</li>
+</ul>
+<h2 id="problems-and-solutions">Problems and Solutions<a hidden class="anchor" aria-hidden="true" href="#problems-and-solutions">#</a></h2>
+<h3 id="1-pi05-full-fine-tuning-requires-62gbgpu-jax-fsdp4-cannot-effectively-reduce-memory-repeated-oom-in-error-recovery-benchmark-2026-02-23">1. Pi0.5 full fine-tuning requires ~62GB/GPU. JAX FSDP=4 cannot effectively reduce memory. Repeated OOM in [Error Recovery Benchmark] (2026-02-23)<a hidden class="anchor" aria-hidden="true" href="#1-pi05-full-fine-tuning-requires-62gbgpu-jax-fsdp4-cannot-effectively-reduce-memory-repeated-oom-in-error-recovery-benchmark-2026-02-23">#</a></h3>
+<p><strong>Solution:</strong> Switch to the gemma_2b_lora+gemma_300m_lora architecture, which reduces training parameters by ~90% and reduces memory to ~22.5GB/GPU. Job 46553 ran smoothly at 2.0s/step.</p>
+<h3 id="2-all-three-way-evaluations-in-m14-crashed-on-scene-122649-130-natural_-scenario-xml_hash-incompatibilities-with-the-current-mimicgen-environment-caused-environmentmismatcherror-leading-to-a-complete-evaluation-process-crashing-error-recovery-benchmark-2026-02-23">2. All three-way evaluations in M14 crashed on scene 122/649: ~130 natural_* scenario xml_hash incompatibilities with the current mimicgen environment caused EnvironmentMismatchError, leading to a complete evaluation process crashing [Error Recovery Benchmark] (2026-02-23)<a hidden class="anchor" aria-hidden="true" href="#2-all-three-way-evaluations-in-m14-crashed-on-scene-122649-130-natural_-scenario-xml_hash-incompatibilities-with-the-current-mimicgen-environment-caused-environmentmismatcherror-leading-to-a-complete-evaluation-process-crashing-error-recovery-benchmark-2026-02-23">#</a></h3>
+<p><strong>Solution:</strong> Add a try-except for EnvironmentMismatchError in collect_on_scenes() of collector.py. Skip incompatible scenarios and record warnings. Resume the process with &ndash;resume. It was confirmed that there were approximately 519 actual effective evaluation scenarios.</p>
+<h3 id="3-training-logs-had-serious-distortions-due-to-stdout-buffering-pi05-training-showed-only-580-steps-while-actually-reaching-step-3000-this-led-to-misjudgment-of-training-termination-and-unnecessary-restarts-error-recovery-benchmark-2026-02-23">3. Training logs had serious distortions due to stdout buffering: Pi0.5 training showed only ~580 steps, while actually reaching step 3000. This led to misjudgment of training termination and unnecessary restarts [Error Recovery Benchmark] (2026-02-23)<a hidden class="anchor" aria-hidden="true" href="#3-training-logs-had-serious-distortions-due-to-stdout-buffering-pi05-training-showed-only-580-steps-while-actually-reaching-step-3000-this-led-to-misjudgment-of-training-termination-and-unnecessary-restarts-error-recovery-benchmark-2026-02-23">#</a></h3>
+<p><strong>Solution:</strong> Standardize the addition of PYTHONUNBUFFERED=1+stdbuf -oL in the training script and sbatch submission scripts. For long-term training, use sbatch to submit independent batch jobs and decouple them from the interactive session lifecycle.</p>
+<h3 id="4-the-success-rate-in-pi05-evaluation-was-0-which-was-misjudged-as-a-model-quality-issue-error-recovery-benchmark-2026-02-26">4. The success rate in Pi0.5 evaluation was 0%, which was misjudged as a model quality issue [Error Recovery Benchmark] (2026-02-26)<a hidden class="anchor" aria-hidden="true" href="#4-the-success-rate-in-pi05-evaluation-was-0-which-was-misjudged-as-a-model-quality-issue-error-recovery-benchmark-2026-02-26">#</a></h3>
+<p><strong>Solution:</strong> It was confirmed that the root cause was that the training task (MimicGen 5 tasks) did not overlap with the evaluation task (PickPlace). Instead, it was evaluated on the training task (Coffee/Stack/Threading/Assembly).</p>
+<h3 id="5-observation-dimension-mismatch-in-bc-rnn-evaluation-expected-65-got-37-error-recovery-benchmark-2026-02-26">5. Observation dimension mismatch in BC-RNN evaluation (Expected 65, got 37) [Error Recovery Benchmark] (2026-02-26)<a hidden class="anchor" aria-hidden="true" href="#5-observation-dimension-mismatch-in-bc-rnn-evaluation-expected-65-got-37-error-recovery-benchmark-2026-02-26">#</a></h3>
+<p><strong>Solution:</strong> Add import mimicgen to create env.registry during create_env(). Do not strip the _D0 suffix anymore. Keep all MimicGen observables (the _D0 environment provides additional object state observables).</p>
+<h3 id="6-in-scgpt-transformermodelinit-omitted-selfuse_fast_transformer-causing-key-remapping-in-load_pretrained-to-never-execute-this-led-to-random-initialization-of-177-attention-weights-when-strictfalse-this-was-silently-ignored-mihd-2026-02-28">6. In scGPT, TransformerModel.<strong>init</strong> omitted self.use_fast_transformer, causing key remapping in load_pretrained() to never execute. This led to random initialization of 17.7% attention weights. When strict=False, this was silently ignored [MIHD] (2026-02-28)<a hidden class="anchor" aria-hidden="true" href="#6-in-scgpt-transformermodelinit-omitted-selfuse_fast_transformer-causing-key-remapping-in-load_pretrained-to-never-execute-this-led-to-random-initialization-of-177-attention-weights-when-strictfalse-this-was-silently-ignored-mihd-2026-02-28">#</a></h3>
+<p><strong>Solution:</strong> Add a line of self.use_fast_transformer = use_fast_transformer to model.py. After fixing this, ARI improved by 44.4%, and all 11 DLPFC slices&rsquo; embeddings were re-extracted.</p>
+<h3 id="7-websocket-client-always-encountered-connectionrefusederror-attempting-different-address-formats-localhost1270010000-failed-error-recovery-benchmark-2026-02-28solution-it-was-found-that-the-http_proxy-environment-variable-was-set-to-12700110087-the-websockets-library-failed-to-connect-through-this-proxy-after-unsetting-all-proxy-variables-at-the-beginning-of-run_evalsh-the-connection-succeeded">7. WebSocket client always encountered ConnectionRefusedError. Attempting different address formats (localhost/127.0.0.1/0.0.0.0) failed [Error Recovery Benchmark] (2026-02-28)<strong>Solution:</strong> It was found that the http_proxy environment variable was set to 127.0.0.1:10087. The websockets library failed to connect through this proxy. After unsetting all proxy variables at the beginning of run_eval.sh, the connection succeeded.<a hidden class="anchor" aria-hidden="true" href="#7-websocket-client-always-encountered-connectionrefusederror-attempting-different-address-formats-localhost1270010000-failed-error-recovery-benchmark-2026-02-28solution-it-was-found-that-the-http_proxy-environment-variable-was-set-to-12700110087-the-websockets-library-failed-to-connect-through-this-proxy-after-unsetting-all-proxy-variables-at-the-beginning-of-run_evalsh-the-connection-succeeded">#</a></h3>
+<h3 id="8-the-coffeemachinebodyobject-lacks-the-get_bounding_box_half_size-method-an-attributeerror-was-reported-during-the-rollout-initialization-of-the-mimicgen-coffee-task-due-to-an-interface-gap-between-mimicgen-and-the-current-robosuite-version-error-recovery-benchmark-2026-02-28">8. The CoffeeMachineBodyObject lacks the get_bounding_box_half_size() method. An AttributeError was reported during the rollout initialization of the MimicGen Coffee task due to an interface gap between MimicGen and the current robosuite version. [Error Recovery Benchmark] (2026-02-28)<a hidden class="anchor" aria-hidden="true" href="#8-the-coffeemachinebodyobject-lacks-the-get_bounding_box_half_size-method-an-attributeerror-was-reported-during-the-rollout-initialization-of-the-mimicgen-coffee-task-due-to-an-interface-gap-between-mimicgen-and-the-current-robosuite-version-error-recovery-benchmark-2026-02-28">#</a></h3>
+<p><strong>Solution:</strong> The entire call chain (coffee_machine.py → CoffeeMachineBodyObject → CompositeBodyObject → MujocoXMLObject) was traced back. The get_bounding_box_half_size() method was implemented in each of the three different levels of base classes.</p>
+<h3 id="9-in-hd-data-the-unsspatial-images-appear-to-be-full-sized-but-their-coordinates-are-in-the-fullres-pixel-space-after-cropping-this-mismatch-leads-to-visual-misalignment-additionally-since-x-has-been-logged-transformed-the-pipeline-will-again-perform-normalize_total--log1p-resulting-in-a-double-transformation-mihd-2026-02-28">9. In HD data, the uns[&lsquo;spatial&rsquo;] images appear to be full-sized but their coordinates are in the fullres pixel space after cropping. This mismatch leads to visual misalignment. Additionally, since X has been logged transformed, the pipeline will again perform normalize_total + log1p, resulting in a double transformation. [MIHD] (2026-02-28)<a hidden class="anchor" aria-hidden="true" href="#9-in-hd-data-the-unsspatial-images-appear-to-be-full-sized-but-their-coordinates-are-in-the-fullres-pixel-space-after-cropping-this-mismatch-leads-to-visual-misalignment-additionally-since-x-has-been-logged-transformed-the-pipeline-will-again-perform-normalize_total--log1p-resulting-in-a-double-transformation-mihd-2026-02-28">#</a></h3>
+<p><strong>Solution:</strong> In load_hd_data(), replace uns[&lsquo;spatial&rsquo;] images with cropped_fullres.tif and recalculate the scalefactor. Add a skip_log parameter to preprocess_data(). For HD data with skip_log=True, only perform HVG filtering.</p>
+<h3 id="10-the-coffee-bc-rnn-loss-converged-normally--766-154-but-the-sr-remained-at-0-for-a-long-time-tasks-configured-with-the-same-parameters-achieved-64-after-20-epochs-this-performance-is-highly-similar-to-that-of-models-with-insufficient-capacity-error-recovery-benchmark-2026-03-01">10. The Coffee BC-RNN loss converged normally (-7.66→-15.4), but the SR remained at 0% for a long time. Tasks configured with the same parameters achieved 64% after 20 epochs. This performance is highly similar to that of models with insufficient capacity. [Error Recovery Benchmark] (2026-03-01)<a hidden class="anchor" aria-hidden="true" href="#10-the-coffee-bc-rnn-loss-converged-normally--766-154-but-the-sr-remained-at-0-for-a-long-time-tasks-configured-with-the-same-parameters-achieved-64-after-20-epochs-this-performance-is-highly-similar-to-that-of-models-with-insufficient-capacity-error-recovery-benchmark-2026-03-01">#</a></h3>
+<p><strong>Solution:</strong> By comparing the actual obs key structure in the HDF5 dataset, it was found that Coffee requires a 57-dimensional object state (required for multi-stage precise operations). The configuration template lacked this field. Add extra_low_dim=[&lsquo;object&rsquo;] to all 9 tasks and regenerate the configuration.</p>
+<h3 id="11-there-were-four-consecutive-bugs-when-accessing-image-observations-with-robomimic-bc-rnn-the-logic-for-enabling-the-camera-the-checkpoint-config-in-json-string-format-issues-with-obtaining-image-resolution-and-problems-with-converting-from-hwc-to-chw-formats-error-recovery-benchmark-2026-03-01">11. There were four consecutive bugs when accessing image observations with robomimic BC-RNN: The logic for enabling the camera, the checkpoint config in JSON string format, issues with obtaining image resolution, and problems with converting from HWC to CHW formats. [Error Recovery Benchmark] (2026-03-01)<a hidden class="anchor" aria-hidden="true" href="#11-there-were-four-consecutive-bugs-when-accessing-image-observations-with-robomimic-bc-rnn-the-logic-for-enabling-the-camera-the-checkpoint-config-in-json-string-format-issues-with-obtaining-image-resolution-and-problems-with-converting-from-hwc-to-chw-formats-error-recovery-benchmark-2026-03-01">#</a></h3>
+<p><strong>Solution:</strong> ① Check the rgb modality from the checkpoint config JSON string (which requires json.loads). ② Read the actual 84×84 size from shape_metadata. ③ Manually perform HWC→CHW transposition and conversion from uint8 to float32/255 normalization (this is automatically handled by ObsUtils.process_obs in standard rollouts).</p>
+<h3 id="12-there-were-four-consecutive-bugs-when-starting-pi05-lora-training--setting-jax_platformscpu-alone-was-ineffective--the-norm_stats-path-was-incorrect--the-boolean-parameter-overwritefalse-was-ineffective--access-to-wb-network-interfaces-on-hpc-nodes-was-blocked-error-recovery-benchmark-2026-03-01">12. There were four consecutive bugs when starting Pi0.5 LoRA training: ① Setting JAX_PLATFORMS=cpu alone was ineffective. ② The norm_stats path was incorrect. ③ The boolean parameter &ndash;overwrite=False was ineffective. ④ Access to W&amp;B network interfaces on HPC nodes was blocked. [Error Recovery Benchmark] (2026-03-01)<a hidden class="anchor" aria-hidden="true" href="#12-there-were-four-consecutive-bugs-when-starting-pi05-lora-training--setting-jax_platformscpu-alone-was-ineffective--the-norm_stats-path-was-incorrect--the-boolean-parameter-overwritefalse-was-ineffective--access-to-wb-network-interfaces-on-hpc-nodes-was-blocked-error-recovery-benchmark-2026-03-01">#</a></h3>
+<p><strong>Solution:</strong> ① Set CUDA_VISIBLE_DEVICES=&quot;&quot; + JAX_PLATFORMS=cpu simultaneously. ② The actual path for norm_stats is assets/<config>/benchmark/<dataset>/norm_stats.json. ③ Use &ndash;no-overwrite instead of &ndash;flag=False. ④ Preset WANDB_MODE to disabled.</p>
+<h3 id="13-adapting-the-pipeline-path-for-visiumhd-hd-data-failure-occurred-when-finding-the-image-path-for-the-vision-encoder-and-loading-spatial-coordinates-during-the-fusion-stage-as-it-assumed-the-dlpfc-directory-structure-mihd-2026-03-01">13. Adapting the pipeline path for VisiumHD HD data: Failure occurred when finding the image path for the vision encoder and loading spatial coordinates during the fusion stage, as it assumed the DLPFC directory structure. [MIHD] (2026-03-01)<a hidden class="anchor" aria-hidden="true" href="#13-adapting-the-pipeline-path-for-visiumhd-hd-data-failure-occurred-when-finding-the-image-path-for-the-vision-encoder-and-loading-spatial-coordinates-during-the-fusion-stage-as-it-assumed-the-dlpfc-directory-structure-mihd-2026-03-01">#</a></h3>
+<p><strong>Solution:</strong> Add a cropped_fullres.tif pattern recognition to find_spatial_image(). Pass crop_dir.parent as data_root when calling the vision encoder. In the fusion stage, directly load coordinates from data.obsm[&lsquo;spatial&rsquo;] without looking up the path.</p>
+<h3 id="14-when-calculating-norm_stats-the-gpu-util-value-was-0-but-the-memory-was-fully-occupied-the-task-did-not-progress-for-a-long-time-the-root-cause-was-that-paligemmatokenizer-eagerly-loaded-all-visible-gpus-when-calling-get_configmodel-error-recovery-benchmark-2026-03-01">14. When calculating norm_stats, the GPU util value was 0, but the memory was fully occupied. The task did not progress for a long time. The root cause was that PaligemmaTokenizer eagerly loaded all visible GPUs when calling get_config().model. [Error Recovery Benchmark] (2026-03-01)<a hidden class="anchor" aria-hidden="true" href="#14-when-calculating-norm_stats-the-gpu-util-value-was-0-but-the-memory-was-fully-occupied-the-task-did-not-progress-for-a-long-time-the-root-cause-was-that-paligemmatokenizer-eagerly-loaded-all-visible-gpus-when-calling-get_configmodel-error-recovery-benchmark-2026-03-01">#</a></h3>
+<p><strong>Solution:</strong> Set CUDA_VISIBLE_DEVICES=&quot;&quot; + JAX_PLATFORMS=cpu simultaneously to force the CPU mode (norm_stats does not require model inference at all). Add CPU parallelism and sub-sampling (max-frames 10000) to reduce the calculation time from 10+ minutes to 2.5 minutes.</p>
+<h2 id="learning-outcomes">Learning Outcomes<a hidden class="anchor" aria-hidden="true" href="#learning-outcomes">#</a></h2>
+<h3 id="architecture">Architecture<a hidden class="anchor" aria-hidden="true" href="#architecture">#</a></h3>
+<ul>
+<li>JAX FSDP only divides parameter storage, which does not affect the loading of the complete model during initialization or forward activation memory. The full training state for Pi0.5 requires ~62GB/GPU, and a single A800 cannot handle full fine-tuning with 80GB. LoRA (gemma_2b_lora) is the only feasible solution for the A800 cluster, reducing the memory requirement to ~22.5GB. Switch to LoRA when encountering the warning &ldquo;Can&rsquo;t reduce memory use below 62.46GiB&rdquo;.</li>
+<li>The observation keys configured for BC-RNN must match the task complexity: Tasks with multi-stage precise operations like Coffee require a 57-dimensional object state. A single 84×84 image cannot provide sufficient spatial precision. The performance of configuration bugs (normal loss but SR=0) is highly similar to insufficient model capacity. It is necessary to distinguish between them by comparing dataset structures.</li>
+<li>Vectorization and batching significantly accelerate the process: O(n²) nested loops can be reduced by about 100-500x through cdist matrix operations. Python&rsquo;s loop iteration can also be accelerated by about 20-50x through batch GPU forward operations. Norm_stats calculations do not require model inference at all. Forcing the CPU mode, sub-sampling, and parallelism can reduce the calculation time from 10+ minutes to 2.5 minutes.</li>
+<li>Methodology for restructuring large repositories: Systematically grep to verify all imported dependencies, then execute in the order of &ldquo;creating new modules → updating references → deleting old files&rdquo;, and perform a dry-run verification. Before merging functions with the same name but different variants, carefully compare the boundary conditions (&gt;vs&gt;=vs&lt; can lead to completely opposite results).</li>
+</ul>
+<h3 id="debugging">Debugging<a hidden class="anchor" aria-hidden="true" href="#debugging">#</a></h3>
+<ul>
+<li>PyTorch model.load_state_dict(strict=False) will silently ignore non-matching keys. Keyed weights may run for a long time with random values without causing any errors. Production code should actively print missing_keys/unexpected_keys and verify the statistical values of parameters. There may also be similar bugs in the official open-source repository. It is necessary to audit the weight loading path actively rather than blindly trusting it.</li>
+<li>Key details of robomimic BC-RNN inference: The checkpoint config is stored as a JSON string (which requires json.loads, not direct dict access). When bypassing the standard rollout process, manual HWC→CHW transposition and uint8→float32/255 normalization are required (this is automatically handled by ObsUtils.process obs in standard rollouts).</li>
+</ul>
+<h3 id="domain-knowledge">Domain Knowledge<a hidden class="anchor" aria-hidden="true" href="#domain-knowledge">#</a></h3>
+<ul>
+<li>Key conclusions from M14: BC-RNN SR=0.28%, Pi0/Pi0.5 SR=0%. The Recovery Progress of Random (0.0199) was actually higher than all learning strategies. This directly proves the necessity of LoRA fine-tuning in M15.</li>
+<li>The 649 scenario database consists of two types of environments: ~519 impulse/augmented compatible scenarios (xml_hash matching) and ~130 natural_* natural capture scenarios (xml_hash different). There were approximately 519 effective evaluation scenarios in M14. All document and target episode numbers need to be updated accordingly.</li>
+<li>STAIG fusion is overall leading in the RM-IDEAL evaluation (average r=0.396 for 151673, peak r=0.644 for Layer_3). Multimodal fusion has a much better ability to capture spatial niche structures than single-modal baselines (gene/vision average r≈0.06-0.12). The effect of Vision Refine is bipolar: It is beneficial for strong fusion (attention +0.086 ARI), harmful for weak fusion (-0.054 for qformer). Strong fusion already has the ability to handle high-dimensional inputs, and reducing dimensions actually results in a loss of information.</li>
+<li>Cross-task evaluation is a common pitfall in robot learning: If the training set task does not overlap with the evaluation task, it directly leads to 0% SR. It is necessary to ensure consistency between train/eval tasks during the experimental design phase. The MimicGen _D0 environment provides additional object observables. Removing the _D0 suffix from observations reduces the dimensionality from 65 to 37, disrupting the input consistency during reasoning.</li>
+<li>VisiumHD coordinate mapping: 2um bin of r_big//4 results in an 8um grid row (similar for col). The visualization size parameters of scanpy spatial are multiples of spot_diameter_fullres. For HD with 8μm diameter (diameter≈7.3), the size should be approximately 4.0. For DLPFC with a diameter of approximately 144, use size=1.0. The Leiden community found that resolution=1.0 is the default clustering strategy for unlabeled HD data (crop10large k=17, Silhouette=0.302).</li>
+</ul>
+<h3 id="tools">Tools<a hidden class="anchor" aria-hidden="true" href="#tools">#</a></h3>
+<ul>
+<li>Best practices for Slurm cluster training projects: For long-term training, sbatch should be used instead of srun to avoid session timeout due to SIGTERM. All training scripts should be standardized with PYTHONUNBUFFERED=1 + stdbuf -oL. Before starting the job, use fuser /dev/nvidiaX to clean up zombie GPU processes (monitoring tools like nvitop also hold CUDA contexts). MUJOCO_EGL_DEVICE_ID corresponds to the physical GPU number, not the logical CUDA_VISIBLE_DEVICES number.</li>
+<li>Key configurations for JAX/Pi0.5 training: ① Set CUDA_VISIBLE_DEVICES=&quot;&quot; + JAX_PLATFORMS=cpu simultaneously. ② XLA_PYTHON_CLIENT_MEM_FRACTION=0.95 is effective for A800 with 80GB (from 61 to 77.7GB). ③ HPC nodes must have WANDB_MODE set to disabled. ④ The argparse boolean flag &ndash;no-overwrite cannot be used instead of &ndash;flag=False. ⑤ The openpi norm_stats path is assets/<config>/benchmark/<dataset>/norm_stats.json.</li>
+<li>The HTTP/HTTPS proxy environment variable (http_proxy) will be transparently proxied by the Python websockets library to establish WebSocket connections. When debugging local services on HPC clusters, it is necessary to unset the proxy variables. The MimicGen environment registers with robosuite through the side effects of importing mimicgen. It is necessary to explicitly perform this import before calling external tools. It is necessary to trace back the entire inheritance chain and implement methods that are missing in third-party libraries in all base classes. Only fixing the point where it is called most recently will cause other subclasses to still report errors.</li>
+<li>The pam_slurm_adopt cluster&rsquo;s GPU nodes do not support direct SSH access. srun &ndash;overlap can attach a new step to an existing interactive job to reuse node resources. Robomimic does not have a TTY environment, and will exit with EOFError if it encounters an existing checkpoint directory. It is necessary to completely clean the directory before starting each time. The checkpoint directory is the most reliable evidence of training completion. A SLURM job crashing does not mean that the training has failed.</li>
+</ul>
+<h2 id="notes-on-ai-usage">Notes on AI Usage<a hidden class="anchor" aria-hidden="true" href="#notes-on-ai-usage">#</a></h2>
+<p><strong>Effective Modes:</strong></p>
+<ul>
+<li>✓ Systematic code auditing to identify root causes: By comparing the key values in checkpoints and model state_dicts, it was possible to accurately locate the bug in ScGPT weight loading (just one line of omission). By comparing the actual obs key structure in the HDF5 dataset, a configuration defect in Coffee was discovered independently (without any human intervention).</li>
+<li>✓ Complete call chain tracing: Fixed the issue where CoffeeMachineBodyObject lacked a method by tracing the three-level inheritance chain (coffee_machine → CoffeeMachineBodyObject → CompositeBodyObject → MujocoXMLObject). Implement it in all base classes instead of just fixing the point where it is called most recently.</li>
+<li>✓ Progressive debugging: Resolved Pi0.5 training OOM issues by analyzing step by step (downgrading dependencies → patching source code → switching architectures → submitting sbatch jobs).</li>
+<li>✓ SubAgent parallel monitoring: Monitored multiple long-time experiments through TaskOutput in the background and advanced the different projects across DCC/Tianhe clusters in parallel.</li>
+</ul>
+<p><strong>Limitations:</strong></p>
+<ul>
+<li>✗ Misjudged the memory usage principle of JAX FSDP (thought that FSDP=4 could be reduced to ~16GB). Only switched to LoRA after several OOMs. It was necessary to take immediate action when encountering the warning &ldquo;Can&rsquo;t reduce memory use below 62.46GiB&rdquo;.</li>
+<li>✗ Failed to identify the most obvious reason for the 0% success rate in Pi0.5 during diagnosis. Listed secondary factors such as OOM/action clipping first, and was directly questioned by users, hitting the key point.</li>
+<li>✗ Lack of active long-term task health checks: Abnormalities such as GPU idling (util=0 but full memory) and processes getting stuck relied on users to discover them actively, rather than AI auditing them.</li>
+<li>✗ lacked preventive verification before integrating external tools: Did not check the availability of mclust/rpy2, image format conventions (HWC vs CHW), outbound network restrictions (W&amp;B), and zombie GPU processes before multiple failures were fixed.</li>
+<li>✗ Attempted to automatically call ExitPlanMode to proceed after writing the plan several times (was rejected by users 2-3 times). AI failed to understand that a plan is a decision-making checkpoint for users, not an automatic progress signal.</li>
+<li>✗ Lacked active verification of outdated dialogue cache information (such as Pi0.5 step 5000 crash records). It was necessary to rely on the actual checkpoint file status rather than dialogue records.</li>
+</ul>
+<h2 id="next-weeks-plans">Next Week&rsquo;s Plans<a hidden class="anchor" aria-hidden="true" href="#next-weeks-plans">#</a></h2>
+<p>Next week&rsquo;s core tasks: ① Wait and analyze the results of the LoRA 9 task fine-tuning for Pi0.5 (expected to be completed in 53 hours). Compare it with the 4.2% base model baseline to verify the general improvement effect of LoRA on MimicGen tasks. ② Progress the training of BC-RNN 9 tasks to 600 epochs, focusing on the convergence of complex tasks such as Coffee/ThreePieceAssembly D1. ③ Fix the simulator bug in the Coffee environment initialization (object misalignment/crashing), and complete the closed-loop evaluation of Coffee BC-RNN. ④ Start the M15 experiment design: Based on the conclusions from M14 (learning strategy error scenario SR≈0%), plan the data collection strategy for LoRA fine-tuning in error scenarios, and determine the sampling ratio and data volume of error types. ⑤ Expand MIHD: Run multimodal benchmark tests on more VisiumHD slices to verify the statistical stability of STAIG fusion. Also conduct a special investigation into the training collapse of DLPFC 151676 slices (adjust tau/dropout rate/figure construction parameters).</p>
+<h2 id="token-usage-statistics">Token Usage Statistics<a hidden class="anchor" aria-hidden="true" href="#token-usage-statistics">#</a></h2>
+<h3 id="daily-cost-trend">Daily Cost Trend<a hidden class="anchor" aria-hidden="true" href="#daily-cost-trend">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Date</th>
+          <th>Tokens (millions)</th>
+          <th>Cost ($)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>2026-02-23</td>
+          <td>17.2</td>
+          <td>8.82</td>
+      </tr>
+      <tr>
+          <td>2026-02-26</td>
+          <td>15.1</td>
+          <td>6.34</td>
+      </tr>
+      <tr>
+          <td>2026-02-27</td>
+          <td>2.4</td>
+          <td>0.45</td>
+      </tr>
+      <tr>
+          <td>2026-02-28</td>
+          <td>53.2</td>
+          <td>34.91</td>
+      </tr>
+      <tr>
+          <td>2026-03-01</td>
+          <td>90.0</td>
+          <td>55.00</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Peak Day:</strong> 2026-03-01 — $55.00 / 90.0M tokens</p>
+<h3 id="claude-code">Claude Code<a hidden class="anchor" aria-hidden="true" href="#claude-code">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Metric</th>
+          <th>Value</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Total Tokens</td>
+          <td>177,973,151</td>
+      </tr>
+      <tr>
+          <td>Input Tokens</td>
+          <td>238,487</td>
+      </tr>
+      <tr>
+          <td>Output Tokens</td>
+          <td>333,455</td>
+      </tr>
+      <tr>
+          <td>Cache Creation</td>
+          <td>9,184,774</td>
+      </tr>
+      <tr>
+          <td>Cache Reading</td>
+          <td>168,216,435</td>
+      </tr>
+      <tr>
+          <td>Total Cost</td>
+          <td>$105.52</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="model-usage-distribution">Model Usage Distribution<a hidden class="anchor" aria-hidden="true" href="#model-usage-distribution">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Model</th>
+          <th>Cost ($)</th>
+          <th>Input Tokens</th>
+          <th>Output Tokens</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>claude-opus-4-6</td>
+          <td>94.14</td>
+          <td>52,476</td>
+          <td>198,099</td>
+      </tr>
+      <tr>
+          <td>claude-haiku-4-5-20251001</td>
+          <td>11.38</td>
+          <td>186,011</td>
+          <td>135,356</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

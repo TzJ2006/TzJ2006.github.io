@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>错误信息：2026-02-26 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="在天津超级计算机上，我们系统地研究了Pi0.5/BC-RNN的训练与评估过程之间的本质差异，并针对这些问题进行了相应的处理。我们的评估框架已经扩展至包含5个MimicGen任务；同时，对BC-RNN图像模式的并行训练工作也已开始实施。我们还探讨了在1万到10万步之间评估Pi0.5 checkpoint的需求条件。为方便在MacBook电脑上处理数据，我们优化了LaTeX简历格式的设计。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-26/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-02-26/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-26/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-26/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="错误信息：2026-02-26">
+  <meta property="og:description" content="在天津超级计算机上，我们系统地研究了Pi0.5/BC-RNN的训练与评估过程之间的本质差异，并针对这些问题进行了相应的处理。我们的评估框架已经扩展至包含5个MimicGen任务；同时，对BC-RNN图像模式的并行训练工作也已开始实施。我们还探讨了在1万到10万步之间评估Pi0.5 checkpoint的需求条件。为方便在MacBook电脑上处理数据，我们优化了LaTeX简历格式的设计。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-26T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-26T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="错误信息：2026-02-26">
+  <meta name="twitter:description" content="在天津超级计算机上，我们系统地研究了Pi0.5/BC-RNN的训练与评估过程之间的本质差异，并针对这些问题进行了相应的处理。我们的评估框架已经扩展至包含5个MimicGen任务；同时，对BC-RNN图像模式的并行训练工作也已开始实施。我们还探讨了在1万到10万步之间评估Pi0.5 checkpoint的需求条件。为方便在MacBook电脑上处理数据，我们优化了LaTeX简历格式的设计。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "bugJournal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "每日总结：",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "错误信息：2026-02-26",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/2026-02-26/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "错误信息：2026-02-26",
+  "name": "错误信息：2026-02-26",
+  "description": "在天津超级计算机上，我们系统地研究了Pi0.5/BC-RNN的训练与评估过程之间的本质差异，并针对这些问题进行了相应的处理。我们的评估框架已经扩展至包含5个MimicGen任务；同时，对BC-RNN图像模式的并行训练工作也已开始实施。我们还探讨了在1万到10万步之间评估Pi0.5 checkpoint的需求条件。为方便在MacBook电脑上处理数据，我们优化了LaTeX简历格式的设计。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "每日报告 — 2026-02-26 当日要点 已完成的工作： 调查了两个核心问题：Pi0.5在评估任务中的成功率仅为0%，且BC-RNN的维度不匹配。评估框架扩展为包含5个MimicGen任务。开始并行训练BC-RNN图像模式，并探索了评估Pi0.5 phoenix_comparison检查点的基础设施。计划采用两阶段评估流程。 实施方法： 通过日志分析和代码审查确定了根本原因（任务不匹配、_D0环境注册问题）。根据官方MimicGen指南重新编写了BC-RNN图像模式配置。使用srun工具，在49个节点上同时启动5个训练任务，资源为8×A800。并行探索两个代码库以定位检查点，并了解VLA服务器与评估客户端之间的通信架构。 成果： 确定了Pi0.5 0%成功率的原因，并建立了一个与任务相关的评估框架。BC-RNN训练已完成，结果可以直接与MimicGen论文中的发现进行比较。为Pi0.5定义了两阶段评估流程（VLA服务器+evaluate_mimicgen.py），第一阶段的技术障碍已解决。 在天津超级计算机上，我们系统地解决了Pi0.5/BC-RNN训练和评估过程之间的根本不匹配问题。评估框架扩展为包含5个MimicGen任务，并开始并行训练BC-RNN图像模式。我们还探索了以10,000 - 100,000步为间隔评估Pi0.5检查点的基础设施。在MacBook上优化了LaTeX简历格式。\n当日任务 架构与策略 ✅ 分析与解决Pi0.5训练中任务不匹配问题 — 调查了Pi0.5 0%成功率的原因：训练是在5个MimicGen任务上进行的，但评估使用了PickPlace（不属于训练集）。这表明任务之间存在完全不匹配。通过添加import mimicgen来创建Coffee_D0和其他MimicGen环境，解决了BC-RNN维度不匹配问题。停止删除_D0后缀，并纠正了LSTM输入维度的错误，从预期的65改为实际的37。 🔄 重新编写BC-RNN训练配置以适应图像模式，并开始5个并行任务 — 将BC-RNN JSON配置重写为适合图像模式的5个任务：启用agentview_image + robot0_eye_in_hand_image，ResNet18Conv + SpatialSoftmax(32kp)编码器，76×76 CropRandomizer，RNN隐藏层维度=1000，批量大小=16，hdf5_cache_mode=low_dim。使用srun –jobid=45628在49个节点上同时启动5个训练任务，共600次循环。每次会话结束时，任务进度如下：coffee（初始化84%），stack（第26轮），stack_three（第188轮），threading（第198轮），three_piece_assembly（第190轮）。 🔄 探索并规划Pi0.5 MimicGen评估流程 — 系统地探索了以10,000 - 100,000步为间隔的phoenix_comparison检查点的位置，间隔约为5000步。我们明确了两个代码库之间的关系：tangzijia编写的evaluate_mimicgen.py/start_vla_server.py与zhaoganlong编写的serve_policy.py。确认评估结果目录为空（首次评估）。计划采用两阶段评估流程：在GPU节点上启动VLA服务器→在评估端执行evaluate_mimicgen.py。由于登录节点上没有可用的GPU资源，实际评估尚未进行。 ✅ 扩展评估框架以支持5个MimicGen任务 — 创建了5个新的任务YAML配置（coffee/stack/stack_three/threading/three_piece_assembly）和task_registry.yaml。在1_generate_scenes.py/3_collect_data.py/4_analyze_results.py中添加–task参数，并重新编写run_full_eval.sh以支持多任务处理。 实施与修复 ✅ LaTeX简历格式优化 — 根据Jake的简历模板为用户Tang Zijia生成了专业的LaTeX简历。经过多次迭代后，出版部分得到了优化：将flushright改为resumeProjectHeading inline，最终采用两行格式，论文标题出现在第一行，作者角色和会议名称则位于第二行的两侧。满意的用户可以直接将简历粘贴到Overleaf进行编译。 ✅ 多项目连接测试 — 发送了多个仅包含\"hello\"的短会话，这些会话包含在mozihao-VLA、chenxingping-X-VLA和HOME等项目中。大多数会话都被用户中断，这表明这些可能是连接测试或偶然启动。 问题与解决方案 关键问题 1. Pi0.5评估的成功率为0%。最初怀疑是模型训练问题或动作裁剪问题。 解决方案： 根本原因是任务完全不匹配：Pi0.5在5个MimicGen任务上进行了训练，但评估使用了PickPlace（不属于训练集）。通过将评估方法改为使用训练任务解决了这个问题。\n关键洞察： 确保名为local/mimicgen_phoenix_9tasks的训练数据集实际上包含5个MimicGen任务。PickPlace代表一个完全不同的任务系统，0%的成功率是不可避免的。将评估框架与训练任务对齐对于成功的实验至关重要。\n2. BC-RNN推理中的RuntimeError：input.size(-1)必须等于input_size。预期值为65，但实际为37。 解决方案： 在create_env()中移除了Coffee_D0，导致MimicGen环境中的额外观测数据丢失。通过注册_D0环境并保留所有环境细节解决了这个问题。\n关键洞察： _D0环境通过robosuite注册机制提供了额外的对象状态。删除后缀会导致观测维度与训练期间不同。\n3. Pi0.5评估基础设施的挑战：登录节点上没有可用的GPU，两个代码库之间的关系不明确（tangzijia vs zhaoganlong），以及评估结果目录为空。**解决方案：**使用squeue来确认用户是否拥有可重复使用的交互式GPU节点（an49，任务编号45628）。明确了两个代码库之间的关系：优先使用tangzijia的evaluate_mimicgen.py（适用于9个MimicGen任务，采用封装的TCP协议），而zhaoganlong的serve_policy.py使用WebSocket协议，需要进行兼容性检查。一个空的评估结果目录表明这是第一次评估。**关键洞察：**两个代码库使用了不同的通信协议（TCP与WebSocket），在进行评估之前需要确认这一点。拥有现有的SLURM交互式作业可以避免重新申请GPU资源。 4. BC-RNN训练配置最初设置为low_dim模式，这与MimicGen论文中的设置不一致。 **解决方案：**审查了官方的MimicGen配置生成脚本，确认论文使用的是图像模式（84×84，ResNet18编码器）。所有5个任务的配置都进行了修改。\n**关键洞察：**MimicGen论文中的主要结果基于图像观测数据。low_dim并不是基准比较指标。主要参数包括：hidden_dim=1000, actor_layer_dims=[], batch_size=16, CropRandomizer 76×76。\n一般性问题 5. SLURM sbatch提交失败：用户的组不被允许使用这个分区（xy-a800）。 **解决方案：**找到了一个现有的交互式作业（45628, an49）正在运行。使用srun –jobid=45628 –overlap允许在现有分配的资源上运行5个训练进程，从而绕过了分区权限限制。\n**关键洞察：**srun可以附加到现有的SLURM交互式作业分配中。当sbatch权限不可用时，这是一个可行的替代方案。\n6. LaTeX简历出版部分：长标题没有使用换行符正确格式化。 **解决方案：**将单行内联格式改为两行格式，使用resumeSubheading：第一行是标题，第二行是作者角色和影响因子。\n**关键洞察：**在LaTeX中，长文本应该使用两行来避免溢出。应根据文本长度选择合适的命令。\n人类思维与人工智能思维 战略层面 Pi0.5训练数据范围的判断 角色 想法 人类 用户直接问道：“你是将9个任务混合在一起进行模型训练吗？”这直接指出了任务覆盖性的问题。 人工智能 最初关注于技术细节，如动作裁剪和OOM问题。局部日志分散了人工智能的注意力，使其无法质疑训练/评估任务之间基本的一致性。 **差异分析：**与人类相比，人工智能更注重项目的整体逻辑，而人类更能理解项目的整体结构。用户的单个问题直接指出了根本原因，而人工智能需要用户的指导来纠正其方法。\nBC-RNN观测模式和评估进度的选择 角色 想法 人类 用户明确要求使用与论文结果一致的图片模式。在评估过程中再次提出了这一要求，表明希望更快地进入执行阶段，而不是停留在规划阶段。 人工智能 最初创建了一个low_dim配置，但没有明确选择观测模式。在完成评估探索后，它仍然处于“设计方案”阶段，并没有积极采取行动来执行。” **差异分析：**用户有一个明确的目标，即与论文结果保持一致，并希望快速推进。人工智能倾向于在采取行动之前提供技术解决方案或完整的探索，导致用户的期望与其方法之间存在差距。\n实施层面 LaTeX格式调整 角色 想法 人类 用户要求将作者角色放在第二行，并通过多次迭代精确表达视觉美学需求。 人工智能 最初以单行格式提出技术解决方案。经过多次迭代后，满足了用户的布局要求。” **差异分析：**用户的视觉需求需要反复调整，而人工智能倾向于优先考虑技术可行性而非最佳视觉效果。\n人工智能的局限性 主要限制 在分析Pi0.5的0%成功率时，技术问题（OOM、动作裁剪、服务器故障）被优先处理，而没有检查训练/评估任务之间基本的一致性。这导致了由于用户的问题而导致的返工。 在实施之前，关键参数没有仔细选择：BC-RNN配置是使用low_dim模板创建的，没有考虑观测模式。在提交SLURM作业时，没有检查分区权限，导致两种情况都需要返工。 在Pi0.5评估阶段，尽管使用了多个并行子代理来收集信息，但过程仍然停留在设计阶段，并没有进展到实际执行（例如，通过SSH在GPU节点上启动服务器），这与用户预期的快速执行速度不符。 一般限制 LaTeX简历格式需要多次调整（3次）以满足用户的布局要求。最终要求并未提前预计到。 今日总结 主要结论- 确保评估框架与训练任务的一致性对于成功的实验至关重要：在设计评估流程时，需要确认训练集所涵盖的具体任务。任何异常的成功率都应该优先检查任务覆盖问题的一致性。 MimicGen不提供预训练的检查点，只提供HDF5演示数据集。基准算法BC-RNN需要独立训练。论文中的主要结果使用的是图像观测数据（ResNet18 + SpatialSoftmax 84×84），而不是低维度数据。_D0环境必须在import mimicgen到robosuite时注册；不允许删除后缀，否则观测维度会有所不同，导致BC-RNN推理失败。主要参数包括：hidden_dim=1000, actor_layer_dims=[], batch_size=16, CropRandomizer 76×76, hdf5_cache_mode=low_dim。 Pi0.5评估采用了两阶段架构：①在GPU节点上使用openpi05 conda环境启动WebSocket策略服务器；②在评估端执行evaluate_mimicgen.py，以连接服务器并重复执行9个MimicGen任务，每个任务迭代20次。phoenix_comparison检查点包含了从10,000到100,000步的完整检查点，允许在评估过程中进行多步比较。 两个现有的代码库（tangzijia的error_recovery_benchmark和zhaoganlong的运动自我反射框架）使用不同的通信协议：前者使用TCP套接字，后者使用WebSocket。在使用之前需要确认兼容性；优先使用tangzijia的版本（适用于处理9个MimicGen任务）。 实践总结 srun –jobid= –overlap可以附加到现有的SLURM交互式作业上，以运行额外的进程，当sbatch分区权限不可用时，它是一个可行的替代方案。 会议摘要 ErrorRecoveryBenchmark**🔄 Pi0.5/BC-RNN训练评估问题的调查，扩展为5任务评估框架，开始BC-RNN图像模式训练，计划进行Pi0.5评估过程** 01:10:41.534 | claude_code 用户指出了Pi0.5的0%成功率和BC-RNN维度不匹配的问题。AI最初专注于技术细节，但由于被本地日志分散了注意力，导致对根本问题的误解：训练是在5个MimicGen任务上进行的，而评估则使用了PickPlace。随后，实现了一个多任务评估框架（5个任务的YAML配置+脚本参数），并将BC-RNN的配置从低维度改为图像模式。使用srun –jobid=45628在an49节点上运行，配备8×A800资源，解决了_D0环境注册问题。同时开始并行训练5个BC-RNN任务。与此同时，在10,000到100,000步之间，探索了phoenix_comparison检查点，并明确了两个代码库之间的关系。定义了一个两阶段评估过程（VLA服务器+evaluate_mimicgen.py）。由于登录节点上没有可用的GPU，因此尚未进行实际评估。\nResumeBuilder ✅ LaTeX简历格式优化：多次迭代后优化了发表部分 04:33:57.481 | claude_code 用户基于Markdown提供了唐志佳（杜克大学计算机科学）的学术简历，包括4篇论文。AI根据Jake的简历模板生成了初始版本。经过多次迭代后，发表部分得到了优化：从flushright改为resumeProjectHeading内联，最终采用了两行格式，标题出现在第一行，作者角色和会议名称则位于第二行的两侧。满意的用户可以将其直接粘贴到Overleaf中进行编译。\n多项目连接测试（mozihao-VLA/chenxingping-X-VLA/HOME） ❌ 多项目目录连接测试 11:18:53.200 | claude_code 用户发送了仅包含\"hello\"的短会话，这些会话出现在mozihao-VLA、chenxingping-X-VLA和HOME/sysu_gbli2xy_1等项目中。大多数会话都被用户中断，这表明这些测试要么是连接检查，要么是偶然启动的。\n令牌使用 概述 指标 数值 总令牌数 27,735,699 输入令牌数 36,934 输出令牌数 23,324 缓存创建次数 1,628,765 缓存读取次数 26,046,676 缓存命中率 94.1% 总成本（美元） $15.6040 模型详情| 模型 | 输入 | 输出 | 缓存创建次数 | 缓存读取次数 | 成本 | |——|——|——|————|————|——| | claude-opus-4-6 | 20,565 | 13,462 | 879,151 | 15,156,354 | $13.5122 | 86.6% | | claude-haiku-4-5-20251001 | 16,369 | 9,862 | 749,614 | 10,890,322 | $2.0917 | 13.4% |\n设备使用 设备 总令牌数 输入 输出 成本 MacBook 673,457 27 519 $0.4893 Tianhe 27,062,242 36,907 22,805 $15.1147 ",
+  "wordCount" : "249",
+  "inLanguage": "zh",
+  "datePublished": "2026-02-26T00:00:00-05:00",
+  "dateModified": "2026-02-26T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/daily/2026-02-26/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="zh"
+                        data-translation-url="https://tzj2006.github.io/bugjournal/daily/2026-02-26/">EN
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/zh/">主页</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/">bugJournal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/daily/">每日总结：</a></div>
+    <h1 class="post-title entry-hint-parent">
+      错误信息：2026-02-26
+    </h1>
+    <div class="post-meta"><span title='2026-02-26 00:00:00 -0500 EST'>2026年2月26日</span>&nbsp;·&nbsp;<span>2 分钟</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="每日报告--2026-02-26">每日报告 — 2026-02-26<a hidden class="anchor" aria-hidden="true" href="#每日报告--2026-02-26">#</a></h1>
+<h2 id="当日要点">当日要点<a hidden class="anchor" aria-hidden="true" href="#当日要点">#</a></h2>
+<ul>
+<li><strong>已完成的工作：</strong> 调查了两个核心问题：Pi0.5在评估任务中的成功率仅为0%，且BC-RNN的维度不匹配。评估框架扩展为包含5个MimicGen任务。开始并行训练BC-RNN图像模式，并探索了评估Pi0.5 phoenix_comparison检查点的基础设施。计划采用两阶段评估流程。</li>
+<li><strong>实施方法：</strong> 通过日志分析和代码审查确定了根本原因（任务不匹配、_D0环境注册问题）。根据官方MimicGen指南重新编写了BC-RNN图像模式配置。使用srun工具，在49个节点上同时启动5个训练任务，资源为8×A800。并行探索两个代码库以定位检查点，并了解VLA服务器与评估客户端之间的通信架构。</li>
+<li><strong>成果：</strong> 确定了Pi0.5 0%成功率的原因，并建立了一个与任务相关的评估框架。BC-RNN训练已完成，结果可以直接与MimicGen论文中的发现进行比较。为Pi0.5定义了两阶段评估流程（VLA服务器+evaluate_mimicgen.py），第一阶段的技术障碍已解决。</li>
+</ul>
+<blockquote>
+<p>在天津超级计算机上，我们系统地解决了Pi0.5/BC-RNN训练和评估过程之间的根本不匹配问题。评估框架扩展为包含5个MimicGen任务，并开始并行训练BC-RNN图像模式。我们还探索了以10,000 - 100,000步为间隔评估Pi0.5检查点的基础设施。在MacBook上优化了LaTeX简历格式。</p>
+</blockquote>
+<h2 id="当日任务">当日任务<a hidden class="anchor" aria-hidden="true" href="#当日任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>分析与解决Pi0.5训练中任务不匹配问题</strong> — 调查了Pi0.5 0%成功率的原因：训练是在5个MimicGen任务上进行的，但评估使用了PickPlace（不属于训练集）。这表明任务之间存在完全不匹配。通过添加import mimicgen来创建Coffee_D0和其他MimicGen环境，解决了BC-RNN维度不匹配问题。停止删除_D0后缀，并纠正了LSTM输入维度的错误，从预期的65改为实际的37。</li>
+<li>🔄 <strong>重新编写BC-RNN训练配置以适应图像模式，并开始5个并行任务</strong> — 将BC-RNN JSON配置重写为适合图像模式的5个任务：启用agentview_image + robot0_eye_in_hand_image，ResNet18Conv + SpatialSoftmax(32kp)编码器，76×76 CropRandomizer，RNN隐藏层维度=1000，批量大小=16，hdf5_cache_mode=low_dim。使用srun &ndash;jobid=45628在49个节点上同时启动5个训练任务，共600次循环。每次会话结束时，任务进度如下：coffee（初始化84%），stack（第26轮），stack_three（第188轮），threading（第198轮），three_piece_assembly（第190轮）。</li>
+<li>🔄 <strong>探索并规划Pi0.5 MimicGen评估流程</strong> — 系统地探索了以10,000 - 100,000步为间隔的phoenix_comparison检查点的位置，间隔约为5000步。我们明确了两个代码库之间的关系：tangzijia编写的evaluate_mimicgen.py/start_vla_server.py与zhaoganlong编写的serve_policy.py。确认评估结果目录为空（首次评估）。计划采用两阶段评估流程：在GPU节点上启动VLA服务器→在评估端执行evaluate_mimicgen.py。由于登录节点上没有可用的GPU资源，实际评估尚未进行。</li>
+<li>✅ <strong>扩展评估框架以支持5个MimicGen任务</strong> — 创建了5个新的任务YAML配置（coffee/stack/stack_three/threading/three_piece_assembly）和task_registry.yaml。在1_generate_scenes.py/3_collect_data.py/4_analyze_results.py中添加&ndash;task参数，并重新编写run_full_eval.sh以支持多任务处理。</li>
+</ul>
+<h3 id="实施与修复">实施与修复<a hidden class="anchor" aria-hidden="true" href="#实施与修复">#</a></h3>
+<ul>
+<li>✅ <strong>LaTeX简历格式优化</strong> — 根据Jake的简历模板为用户Tang Zijia生成了专业的LaTeX简历。经过多次迭代后，出版部分得到了优化：将flushright改为resumeProjectHeading inline，最终采用两行格式，论文标题出现在第一行，作者角色和会议名称则位于第二行的两侧。满意的用户可以直接将简历粘贴到Overleaf进行编译。</li>
+<li>✅ <strong>多项目连接测试</strong> — 发送了多个仅包含&quot;hello&quot;的短会话，这些会话包含在mozihao-VLA、chenxingping-X-VLA和HOME等项目中。大多数会话都被用户中断，这表明这些可能是连接测试或偶然启动。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-pi05评估的成功率为0最初怀疑是模型训练问题或动作裁剪问题">1. Pi0.5评估的成功率为0%。最初怀疑是模型训练问题或动作裁剪问题。<a hidden class="anchor" aria-hidden="true" href="#1-pi05评估的成功率为0最初怀疑是模型训练问题或动作裁剪问题">#</a></h4>
+<p><strong>解决方案：</strong> 根本原因是任务完全不匹配：Pi0.5在5个MimicGen任务上进行了训练，但评估使用了PickPlace（不属于训练集）。通过将评估方法改为使用训练任务解决了这个问题。</p>
+<p><strong>关键洞察：</strong> 确保名为local/mimicgen_phoenix_9tasks的训练数据集实际上包含5个MimicGen任务。PickPlace代表一个完全不同的任务系统，0%的成功率是不可避免的。将评估框架与训练任务对齐对于成功的实验至关重要。</p>
+<h4 id="2-bc-rnn推理中的runtimeerrorinputsize-1必须等于input_size预期值为65但实际为37">2. BC-RNN推理中的RuntimeError：input.size(-1)必须等于input_size。预期值为65，但实际为37。<a hidden class="anchor" aria-hidden="true" href="#2-bc-rnn推理中的runtimeerrorinputsize-1必须等于input_size预期值为65但实际为37">#</a></h4>
+<p><strong>解决方案：</strong> 在create_env()中移除了Coffee_D0，导致MimicGen环境中的额外观测数据丢失。通过注册_D0环境并保留所有环境细节解决了这个问题。</p>
+<p><strong>关键洞察：</strong> _D0环境通过robosuite注册机制提供了额外的对象状态。删除后缀会导致观测维度与训练期间不同。</p>
+<h4 id="3-pi05评估基础设施的挑战登录节点上没有可用的gpu两个代码库之间的关系不明确tangzijia-vs-zhaoganlong以及评估结果目录为空解决方案使用squeue来确认用户是否拥有可重复使用的交互式gpu节点an49任务编号45628明确了两个代码库之间的关系优先使用tangzijia的evaluate_mimicgenpy适用于9个mimicgen任务采用封装的tcp协议而zhaoganlong的serve_policypy使用websocket协议需要进行兼容性检查一个空的评估结果目录表明这是第一次评估关键洞察两个代码库使用了不同的通信协议tcp与websocket在进行评估之前需要确认这一点拥有现有的slurm交互式作业可以避免重新申请gpu资源">3. Pi0.5评估基础设施的挑战：登录节点上没有可用的GPU，两个代码库之间的关系不明确（tangzijia vs zhaoganlong），以及评估结果目录为空。**解决方案：**使用squeue来确认用户是否拥有可重复使用的交互式GPU节点（an49，任务编号45628）。明确了两个代码库之间的关系：优先使用tangzijia的evaluate_mimicgen.py（适用于9个MimicGen任务，采用封装的TCP协议），而zhaoganlong的serve_policy.py使用WebSocket协议，需要进行兼容性检查。一个空的评估结果目录表明这是第一次评估。**关键洞察：**两个代码库使用了不同的通信协议（TCP与WebSocket），在进行评估之前需要确认这一点。拥有现有的SLURM交互式作业可以避免重新申请GPU资源。<a hidden class="anchor" aria-hidden="true" href="#3-pi05评估基础设施的挑战登录节点上没有可用的gpu两个代码库之间的关系不明确tangzijia-vs-zhaoganlong以及评估结果目录为空解决方案使用squeue来确认用户是否拥有可重复使用的交互式gpu节点an49任务编号45628明确了两个代码库之间的关系优先使用tangzijia的evaluate_mimicgenpy适用于9个mimicgen任务采用封装的tcp协议而zhaoganlong的serve_policypy使用websocket协议需要进行兼容性检查一个空的评估结果目录表明这是第一次评估关键洞察两个代码库使用了不同的通信协议tcp与websocket在进行评估之前需要确认这一点拥有现有的slurm交互式作业可以避免重新申请gpu资源">#</a></h4>
+<h4 id="4-bc-rnn训练配置最初设置为low_dim模式这与mimicgen论文中的设置不一致">4. BC-RNN训练配置最初设置为low_dim模式，这与MimicGen论文中的设置不一致。<a hidden class="anchor" aria-hidden="true" href="#4-bc-rnn训练配置最初设置为low_dim模式这与mimicgen论文中的设置不一致">#</a></h4>
+<p>**解决方案：**审查了官方的MimicGen配置生成脚本，确认论文使用的是图像模式（84×84，ResNet18编码器）。所有5个任务的配置都进行了修改。</p>
+<p>**关键洞察：**MimicGen论文中的主要结果基于图像观测数据。low_dim并不是基准比较指标。主要参数包括：hidden_dim=1000, actor_layer_dims=[], batch_size=16, CropRandomizer 76×76。</p>
+<h3 id="一般性问题">一般性问题<a hidden class="anchor" aria-hidden="true" href="#一般性问题">#</a></h3>
+<h4 id="5-slurm-sbatch提交失败用户的组不被允许使用这个分区xy-a800">5. SLURM sbatch提交失败：用户的组不被允许使用这个分区（xy-a800）。<a hidden class="anchor" aria-hidden="true" href="#5-slurm-sbatch提交失败用户的组不被允许使用这个分区xy-a800">#</a></h4>
+<p>**解决方案：**找到了一个现有的交互式作业（45628, an49）正在运行。使用srun &ndash;jobid=45628 &ndash;overlap允许在现有分配的资源上运行5个训练进程，从而绕过了分区权限限制。</p>
+<p>**关键洞察：**srun可以附加到现有的SLURM交互式作业分配中。当sbatch权限不可用时，这是一个可行的替代方案。</p>
+<h4 id="6-latex简历出版部分长标题没有使用换行符正确格式化">6. LaTeX简历出版部分：长标题没有使用换行符正确格式化。<a hidden class="anchor" aria-hidden="true" href="#6-latex简历出版部分长标题没有使用换行符正确格式化">#</a></h4>
+<p>**解决方案：**将单行内联格式改为两行格式，使用resumeSubheading：第一行是标题，第二行是作者角色和影响因子。</p>
+<p>**关键洞察：**在LaTeX中，长文本应该使用两行来避免溢出。应根据文本长度选择合适的命令。</p>
+<h2 id="人类思维与人工智能思维">人类思维与人工智能思维<a hidden class="anchor" aria-hidden="true" href="#人类思维与人工智能思维">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="pi05训练数据范围的判断">Pi0.5训练数据范围的判断<a hidden class="anchor" aria-hidden="true" href="#pi05训练数据范围的判断">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>想法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户直接问道：“你是将9个任务混合在一起进行模型训练吗？”这直接指出了任务覆盖性的问题。</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>最初关注于技术细节，如动作裁剪和OOM问题。局部日志分散了人工智能的注意力，使其无法质疑训练/评估任务之间基本的一致性。</td>
+      </tr>
+  </tbody>
+</table>
+<p>**差异分析：**与人类相比，人工智能更注重项目的整体逻辑，而人类更能理解项目的整体结构。用户的单个问题直接指出了根本原因，而人工智能需要用户的指导来纠正其方法。</p>
+<h4 id="bc-rnn观测模式和评估进度的选择">BC-RNN观测模式和评估进度的选择<a hidden class="anchor" aria-hidden="true" href="#bc-rnn观测模式和评估进度的选择">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>想法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户明确要求使用与论文结果一致的图片模式。在评估过程中再次提出了这一要求，表明希望更快地进入执行阶段，而不是停留在规划阶段。</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>最初创建了一个low_dim配置，但没有明确选择观测模式。在完成评估探索后，它仍然处于“设计方案”阶段，并没有积极采取行动来执行。”</td>
+      </tr>
+  </tbody>
+</table>
+<p>**差异分析：**用户有一个明确的目标，即与论文结果保持一致，并希望快速推进。人工智能倾向于在采取行动之前提供技术解决方案或完整的探索，导致用户的期望与其方法之间存在差距。</p>
+<h3 id="实施层面">实施层面<a hidden class="anchor" aria-hidden="true" href="#实施层面">#</a></h3>
+<h4 id="latex格式调整">LaTeX格式调整<a hidden class="anchor" aria-hidden="true" href="#latex格式调整">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>想法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户要求将作者角色放在第二行，并通过多次迭代精确表达视觉美学需求。</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>最初以单行格式提出技术解决方案。经过多次迭代后，满足了用户的布局要求。”</td>
+      </tr>
+  </tbody>
+</table>
+<p>**差异分析：**用户的视觉需求需要反复调整，而人工智能倾向于优先考虑技术可行性而非最佳视觉效果。</p>
+<h2 id="人工智能的局限性">人工智能的局限性<a hidden class="anchor" aria-hidden="true" href="#人工智能的局限性">#</a></h2>
+<h3 id="主要限制">主要限制<a hidden class="anchor" aria-hidden="true" href="#主要限制">#</a></h3>
+<ul>
+<li>在分析Pi0.5的0%成功率时，技术问题（OOM、动作裁剪、服务器故障）被优先处理，而没有检查训练/评估任务之间基本的一致性。这导致了由于用户的问题而导致的返工。</li>
+<li>在实施之前，关键参数没有仔细选择：BC-RNN配置是使用low_dim模板创建的，没有考虑观测模式。在提交SLURM作业时，没有检查分区权限，导致两种情况都需要返工。</li>
+<li>在Pi0.5评估阶段，尽管使用了多个并行子代理来收集信息，但过程仍然停留在设计阶段，并没有进展到实际执行（例如，通过SSH在GPU节点上启动服务器），这与用户预期的快速执行速度不符。</li>
+</ul>
+<h3 id="一般限制">一般限制<a hidden class="anchor" aria-hidden="true" href="#一般限制">#</a></h3>
+<ul>
+<li>LaTeX简历格式需要多次调整（3次）以满足用户的布局要求。最终要求并未提前预计到。</li>
+</ul>
+<h2 id="今日总结">今日总结<a hidden class="anchor" aria-hidden="true" href="#今日总结">#</a></h2>
+<h3 id="主要结论--确保评估框架与训练任务的一致性对于成功的实验至关重要在设计评估流程时需要确认训练集所涵盖的具体任务任何异常的成功率都应该优先检查任务覆盖问题的一致性">主要结论- 确保评估框架与训练任务的一致性对于成功的实验至关重要：在设计评估流程时，需要确认训练集所涵盖的具体任务。任何异常的成功率都应该优先检查任务覆盖问题的一致性。<a hidden class="anchor" aria-hidden="true" href="#主要结论--确保评估框架与训练任务的一致性对于成功的实验至关重要在设计评估流程时需要确认训练集所涵盖的具体任务任何异常的成功率都应该优先检查任务覆盖问题的一致性">#</a></h3>
+<ul>
+<li>MimicGen不提供预训练的检查点，只提供HDF5演示数据集。基准算法BC-RNN需要独立训练。论文中的主要结果使用的是图像观测数据（ResNet18 + SpatialSoftmax 84×84），而不是低维度数据。_D0环境必须在import mimicgen到robosuite时注册；不允许删除后缀，否则观测维度会有所不同，导致BC-RNN推理失败。主要参数包括：hidden_dim=1000, actor_layer_dims=[], batch_size=16, CropRandomizer 76×76, hdf5_cache_mode=low_dim。</li>
+<li>Pi0.5评估采用了两阶段架构：①在GPU节点上使用openpi05 conda环境启动WebSocket策略服务器；②在评估端执行evaluate_mimicgen.py，以连接服务器并重复执行9个MimicGen任务，每个任务迭代20次。phoenix_comparison检查点包含了从10,000到100,000步的完整检查点，允许在评估过程中进行多步比较。</li>
+<li>两个现有的代码库（tangzijia的error_recovery_benchmark和zhaoganlong的运动自我反射框架）使用不同的通信协议：前者使用TCP套接字，后者使用WebSocket。在使用之前需要确认兼容性；优先使用tangzijia的版本（适用于处理9个MimicGen任务）。</li>
+</ul>
+<h3 id="实践总结">实践总结<a hidden class="anchor" aria-hidden="true" href="#实践总结">#</a></h3>
+<ul>
+<li>srun &ndash;jobid=<id> &ndash;overlap可以附加到现有的SLURM交互式作业上，以运行额外的进程，当sbatch分区权限不可用时，它是一个可行的替代方案。</li>
+</ul>
+<h2 id="会议摘要">会议摘要<a hidden class="anchor" aria-hidden="true" href="#会议摘要">#</a></h2>
+<h3 id="errorrecoverybenchmark-pi05bc-rnn训练评估问题的调查扩展为5任务评估框架开始bc-rnn图像模式训练计划进行pi05评估过程">ErrorRecoveryBenchmark**🔄 Pi0.5/BC-RNN训练评估问题的调查，扩展为5任务评估框架，开始BC-RNN图像模式训练，计划进行Pi0.5评估过程**<a hidden class="anchor" aria-hidden="true" href="#errorrecoverybenchmark-pi05bc-rnn训练评估问题的调查扩展为5任务评估框架开始bc-rnn图像模式训练计划进行pi05评估过程">#</a></h3>
+<p><em>01:10:41.534 | claude_code</em>
+用户指出了Pi0.5的0%成功率和BC-RNN维度不匹配的问题。AI最初专注于技术细节，但由于被本地日志分散了注意力，导致对根本问题的误解：训练是在5个MimicGen任务上进行的，而评估则使用了PickPlace。随后，实现了一个多任务评估框架（5个任务的YAML配置+脚本参数），并将BC-RNN的配置从低维度改为图像模式。使用srun &ndash;jobid=45628在an49节点上运行，配备8×A800资源，解决了_D0环境注册问题。同时开始并行训练5个BC-RNN任务。与此同时，在10,000到100,000步之间，探索了phoenix_comparison检查点，并明确了两个代码库之间的关系。定义了一个两阶段评估过程（VLA服务器+evaluate_mimicgen.py）。由于登录节点上没有可用的GPU，因此尚未进行实际评估。</p>
+<h3 id="resumebuilder">ResumeBuilder<a hidden class="anchor" aria-hidden="true" href="#resumebuilder">#</a></h3>
+<p><strong>✅ LaTeX简历格式优化：多次迭代后优化了发表部分</strong>
+<em>04:33:57.481 | claude_code</em>
+用户基于Markdown提供了唐志佳（杜克大学计算机科学）的学术简历，包括4篇论文。AI根据Jake的简历模板生成了初始版本。经过多次迭代后，发表部分得到了优化：从flushright改为resumeProjectHeading内联，最终采用了两行格式，标题出现在第一行，作者角色和会议名称则位于第二行的两侧。满意的用户可以将其直接粘贴到Overleaf中进行编译。</p>
+<h3 id="多项目连接测试mozihao-vlachenxingping-x-vlahome">多项目连接测试（mozihao-VLA/chenxingping-X-VLA/HOME）<a hidden class="anchor" aria-hidden="true" href="#多项目连接测试mozihao-vlachenxingping-x-vlahome">#</a></h3>
+<p><strong>❌ 多项目目录连接测试</strong>
+<em>11:18:53.200 | claude_code</em>
+用户发送了仅包含&quot;hello&quot;的短会话，这些会话出现在mozihao-VLA、chenxingping-X-VLA和HOME/sysu_gbli2xy_1等项目中。大多数会话都被用户中断，这表明这些测试要么是连接检查，要么是偶然启动的。</p>
+<h2 id="令牌使用">令牌使用<a hidden class="anchor" aria-hidden="true" href="#令牌使用">#</a></h2>
+<h3 id="概述">概述<a hidden class="anchor" aria-hidden="true" href="#概述">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>数值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>总令牌数</td>
+          <td>27,735,699</td>
+      </tr>
+      <tr>
+          <td>输入令牌数</td>
+          <td>36,934</td>
+      </tr>
+      <tr>
+          <td>输出令牌数</td>
+          <td>23,324</td>
+      </tr>
+      <tr>
+          <td>缓存创建次数</td>
+          <td>1,628,765</td>
+      </tr>
+      <tr>
+          <td>缓存读取次数</td>
+          <td>26,046,676</td>
+      </tr>
+      <tr>
+          <td>缓存命中率</td>
+          <td>94.1%</td>
+      </tr>
+      <tr>
+          <td>总成本（美元）</td>
+          <td>$15.6040</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="模型详情-模型--输入--输出--缓存创建次数--缓存读取次数--成本-">模型详情| 模型 | 输入 | 输出 | 缓存创建次数 | 缓存读取次数 | 成本 |<a hidden class="anchor" aria-hidden="true" href="#模型详情-模型--输入--输出--缓存创建次数--缓存读取次数--成本-">#</a></h3>
+<p>|&mdash;&mdash;|&mdash;&mdash;|&mdash;&mdash;|&mdash;&mdash;&mdash;&mdash;|&mdash;&mdash;&mdash;&mdash;|&mdash;&mdash;|
+| claude-opus-4-6 | 20,565 | 13,462 | 879,151 | 15,156,354 | $13.5122 | 86.6% |
+| claude-haiku-4-5-20251001 | 16,369 | 9,862 | 749,614 | 10,890,322 | $2.0917 | 13.4% |</p>
+<h3 id="设备使用">设备使用<a hidden class="anchor" aria-hidden="true" href="#设备使用">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>设备</th>
+          <th>总令牌数</th>
+          <th>输入</th>
+          <th>输出</th>
+          <th>成本</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>MacBook</td>
+          <td>673,457</td>
+          <td>27</td>
+          <td>519</td>
+          <td>$0.4893</td>
+      </tr>
+      <tr>
+          <td>Tianhe</td>
+          <td>27,062,242</td>
+          <td>36,907</td>
+          <td>22,805</td>
+          <td>$15.1147</td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
