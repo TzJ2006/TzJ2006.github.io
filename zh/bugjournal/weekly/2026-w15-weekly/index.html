@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Weekly Summary 2026-W15 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal, Weekly Summary">
+<meta name="description" content="本周在学术研究、生产系统以及开发基础设施领域取得了显著成果，涉及超过12个重要项目。我们成功交付了完全可用的系统：采用LifeCopilot架构的升级版本，包含7种OpenClaw功能；会议辅助AI助手；更高效的SSH终端多路复用工具；以及支持双语处理的工作流工具链。此外，我们还完成了重要的研究基础设施建设的任务：对MIHD空间组学论文进行了修订，增加了3项新的交叉切片实验，揭示了聚类与检索之间的权衡关系；制定了基准测试规划框架（长达2246行的详细计划）；并根据61篇论文的评审结果，制定了NeurIPS学术写作规范。我们还实现了MimicGen错误恢复框架，包括忠实于原始架构的增强机制、适用于626种场景的人类收集工作流程，以及修复了6个关键漏洞。同时，我们建立了强大的工具集：通过OpenRouter的集成，TokenMonitor的定价准确性得到了提升，其应用范围扩展到了3000多个模型；实现了统一的Claude代码权限管理；并开发了具有时区感知功能的SSH处理机制。最后，我们将Hugo的部署流程从完全故障状态恢复至正常状态，同时将翻译基础设施迁移到本地Ollama环境中，从而摆脱了对云API的依赖。我们还解决了一些基本的机器学习流程问题（如BOSS数据集映射、Crossformer架构不匹配、电池数值异常等问题）。总体而言，我们在数据准确性、认证安全以及模型兼容性等方面解决了20多个关键问题。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/weekly/2026-w15-weekly/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/weekly/2026-w15-weekly/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/weekly/2026-w15-weekly/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/weekly/2026-w15-weekly/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Weekly Summary 2026-W15">
+  <meta property="og:description" content="本周在学术研究、生产系统以及开发基础设施领域取得了显著成果，涉及超过12个重要项目。我们成功交付了完全可用的系统：采用LifeCopilot架构的升级版本，包含7种OpenClaw功能；会议辅助AI助手；更高效的SSH终端多路复用工具；以及支持双语处理的工作流工具链。此外，我们还完成了重要的研究基础设施建设的任务：对MIHD空间组学论文进行了修订，增加了3项新的交叉切片实验，揭示了聚类与检索之间的权衡关系；制定了基准测试规划框架（长达2246行的详细计划）；并根据61篇论文的评审结果，制定了NeurIPS学术写作规范。我们还实现了MimicGen错误恢复框架，包括忠实于原始架构的增强机制、适用于626种场景的人类收集工作流程，以及修复了6个关键漏洞。同时，我们建立了强大的工具集：通过OpenRouter的集成，TokenMonitor的定价准确性得到了提升，其应用范围扩展到了3000多个模型；实现了统一的Claude代码权限管理；并开发了具有时区感知功能的SSH处理机制。最后，我们将Hugo的部署流程从完全故障状态恢复至正常状态，同时将翻译基础设施迁移到本地Ollama环境中，从而摆脱了对云API的依赖。我们还解决了一些基本的机器学习流程问题（如BOSS数据集映射、Crossformer架构不匹配、电池数值异常等问题）。总体而言，我们在数据准确性、认证安全以及模型兼容性等方面解决了20多个关键问题。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-04-12T23:59:00-05:00">
+    <meta property="article:modified_time" content="2026-04-12T23:59:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Weekly Summary 2026-W15">
+  <meta name="twitter:description" content="本周在学术研究、生产系统以及开发基础设施领域取得了显著成果，涉及超过12个重要项目。我们成功交付了完全可用的系统：采用LifeCopilot架构的升级版本，包含7种OpenClaw功能；会议辅助AI助手；更高效的SSH终端多路复用工具；以及支持双语处理的工作流工具链。此外，我们还完成了重要的研究基础设施建设的任务：对MIHD空间组学论文进行了修订，增加了3项新的交叉切片实验，揭示了聚类与检索之间的权衡关系；制定了基准测试规划框架（长达2246行的详细计划）；并根据61篇论文的评审结果，制定了NeurIPS学术写作规范。我们还实现了MimicGen错误恢复框架，包括忠实于原始架构的增强机制、适用于626种场景的人类收集工作流程，以及修复了6个关键漏洞。同时，我们建立了强大的工具集：通过OpenRouter的集成，TokenMonitor的定价准确性得到了提升，其应用范围扩展到了3000多个模型；实现了统一的Claude代码权限管理；并开发了具有时区感知功能的SSH处理机制。最后，我们将Hugo的部署流程从完全故障状态恢复至正常状态，同时将翻译基础设施迁移到本地Ollama环境中，从而摆脱了对云API的依赖。我们还解决了一些基本的机器学习流程问题（如BOSS数据集映射、Crossformer架构不匹配、电池数值异常等问题）。总体而言，我们在数据准确性、认证安全以及模型兼容性等方面解决了20多个关键问题。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "每周总结",
+      "item": "https://tzj2006.github.io/zh/bugjournal/weekly/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Weekly Summary 2026-W15",
+      "item": "https://tzj2006.github.io/zh/bugjournal/weekly/2026-w15-weekly/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Weekly Summary 2026-W15",
+  "name": "Weekly Summary 2026-W15",
+  "description": "本周在学术研究、生产系统以及开发基础设施领域取得了显著成果，涉及超过12个重要项目。我们成功交付了完全可用的系统：采用LifeCopilot架构的升级版本，包含7种OpenClaw功能；会议辅助AI助手；更高效的SSH终端多路复用工具；以及支持双语处理的工作流工具链。此外，我们还完成了重要的研究基础设施建设的任务：对MIHD空间组学论文进行了修订，增加了3项新的交叉切片实验，揭示了聚类与检索之间的权衡关系；制定了基准测试规划框架（长达2246行的详细计划）；并根据61篇论文的评审结果，制定了NeurIPS学术写作规范。我们还实现了MimicGen错误恢复框架，包括忠实于原始架构的增强机制、适用于626种场景的人类收集工作流程，以及修复了6个关键漏洞。同时，我们建立了强大的工具集：通过OpenRouter的集成，TokenMonitor的定价准确性得到了提升，其应用范围扩展到了3000多个模型；实现了统一的Claude代码权限管理；并开发了具有时区感知功能的SSH处理机制。最后，我们将Hugo的部署流程从完全故障状态恢复至正常状态，同时将翻译基础设施迁移到本地Ollama环境中，从而摆脱了对云API的依赖。我们还解决了一些基本的机器学习流程问题（如BOSS数据集映射、Crossformer架构不匹配、电池数值异常等问题）。总体而言，我们在数据准确性、认证安全以及模型兼容性等方面解决了20多个关键问题。",
+  "keywords": [
+    "Bug Journal", "Weekly Summary"
+  ],
+  "articleBody": "每周报告 — 2026-W15 (2026-04-06 ~ 2026-04-12) 本周在学术研究、生产系统以及开发基础设施方面取得了非凡的成就，涉及12个以上的重要项目。我们成功交付了完全可生产化的系统（包括LifeCopilot架构升级，包含7个OpenClaw功能，会议辅助AI助手，BetterSSH终端多路复用器，以及双语管道处理工具）。我们还完成了重要的研究基础设施建设：对MIHD空间组学论文进行了修订，增加了3个新的交叉切片实验，揭示了聚类与检索之间的权衡关系；制定了基准测试框架（长达2246行的蓝图）；并从61篇论文评审中学习了NeurIPS学术写作的方法。此外，我们还实现了MimicGen错误恢复系统，该系统具有忠实于原始设计的增强架构，并实现了626场景的人类数据收集流程，同时修复了6个关键漏洞。我们还建立了强大的工具：通过OpenRouter集成，TokenMonitor的定价准确性得到了提升，适用于3000多个模型；统一了Claude代码的权限管理；实现了考虑时区的SSH处理功能。我们的Hugo部署流程也从完全失败状态恢复到正常运行状态，并将翻译基础设施迁移到本地Ollama，从而消除了对云API的依赖。我们还解决了一些基本的机器学习流程问题，比如BOSS数据集映射、Crossformer架构不匹配以及电池数值的异常传播等问题。此外，我们还解决了20多个关键障碍，这些问题涉及数据正确性、认证安全以及模型兼容性等方面。\n每周概览 指标 值 日期范围 2026-04-06 ~ 2026-04-12 活跃天数 7天/7天 总对话数 71次 项目数量 35个 已完成任务数 73个 进行中的任务数 3个 总代币数 466,374,500 总成本 $399.27 Claude代码代币数 365,537,985 Claude代码成本 $345.50 Codex代币数 100,836,515 Codex成本 $53.77 每日平均成本 $57.04 项目进展 MIHD空间组学（4天活跃）— 🔄 活跃 成果：\n完成了三项新的交叉切片RM-IDEAL实验（151673↔151674, 151508↔151509, 151673↔151669），揭示了特定供体的第三层模式以及聚类与检索之间的权衡关系。 发现了核心发现：STAIG在全局聚类方面表现优异（ARI 0.546），但会将边界过度均一化（96%的上皮组织），而Attention融合则实现了平衡的检索效果（60/40的比例）。 重新编写了引言部分，采用6句话的路线图结构，将内容分为R1-R6几个部分，并以ARI 0.26→0.55的关键发现作为起点。 将R5部分从4段扩展到了6段，并加入了QueST引用和跨部分检索的价值主张。 完成了HD免疫生态位查询分析，识别出T细胞富集模式（3.8倍PCA对比2.2倍STAIG）。 发现了6个优化机会，包括向量化对比损失技术，有望提高10-50倍的速度。 确定了该论文的定位，即《Nature Methods Analysis》，评估了冷冻FM与自监督融合范式。 将计划文件从367行扩展到2246行，采用了并行代理策略（论文计划、存储库蓝图、模块规范）。 建立了4个核心任务和无标签术语框架。 发现HD GPU实验已经完成，剩下2个P0级障碍需要解决：ARI数据收集和DE分析流程。 障碍：\n⚠️ 来自已发布方法的ARI数据收集（P0级） ⚠️ DE分析流程的实施（P0级） MimicGen错误恢复系统（5天活跃）— 🔄 活跃 成果：\n分析了1282个成功的MimicGen结果和953个失败的结果，确定了需要人工收集的626个场景。 实现了完整的人工远程操作工作流程（identify_failed_scenes.py, collect_success_from_error.py, convert_teleop_to_hdf5.py）。 重构了增强架构，从“重复错误注入”改为“固定错误场景+重置随机化”，以符合原始MimicGen设计。 将增强系统从动作回放改为忠实于MimicGen目标姿态的路线执行。 修复了6个关键错误：子任务分割（从6个减少到2个）、夹持器检测（连续闭合）、路径解析、元数据补全（datagen_info）、配额规则（仅可增强）。 实现了目标姿态记录、每个子任务的物体引用以及通过WaypointTrajectory进行路线插值。 创建了backfill_recovery_target_poses.py脚本，用于迁移23个现有的堆栈演示。 验证了实际生成结果：成功率为739/1365（54.1%），识别出626个失败场景。 创建了600多行的恢复流程参考文档，包括RBG分类法和数据流。 诊断出MimicGen的兼容要求：完整的datagen_info元数据以及干净的初始状态语义。 障碍：\n⚠️ 626个失败场景需要手动使用SpaceMouse收集数据 ⚠️ 人工演示数据的质量问题：收集了24个演示，只有3个可以重新播放，没有可增强的 ⚠️ SpaceMouse收集的数据由于错误状态和缺失元数据而无法与MimicGen增强功能兼容 gadget双语内容流程（4天活跃）— ✅ 完成 成果：\n将云端的LLM API迁移到本地Ollama服务，使用HY-MT1.5-1.8B模型 实现了共享翻译基础设施（common/ollama.py, common/translation.py） 将12个核心文件（总结模块和研究模块）从中文转换为英文LLM提示和Markdown渲染 通过并行代理验证，解决了6个剩余的中文问题：合并上下文字符串、matplotlib标签、DEEP_EVAL评论、模板、JSON修复提示、配置默认值 将Ollama翻译后端与备用架构和重试机制集成（4次尝试，每次间隔5秒） 在57分钟内完成了74个文件的批量翻译（42份日报、9份周报、21份研究简介） 更新了全面的文档（5个关键的CLAUDE.md章节） LifeCopilot + 会议辅助工具（3天活跃）— ✅ 完成 成果：\nLifeCopilot：整合了7个OpenClaw核心功能（健康监测、配置热重载、JSONL生命周期、会话持久性、思维搜索、梦境服务、断路器），并增加了10个新模块和70个通过测试的测试 会议辅助工具：通过ccplan第0-11阶段完成创建（Screenpipe+MCP+Claude Code CLI架构，5个功能，跨平台安装脚本，27个MCP工具指南） 修复了Screenpipe 0.2.13的兼容性问题（Protobuf错误），并从过时的Homebrew更换为npx 扩展了ASR后端支持：Moonshine v2（延迟73-107毫秒）和Voxtral-Mini-4B（4B参数，13种语言） 将会议辅助工具开源到GitHub，附带450行的全面教程 障碍：\n⚠️ Whisper逐块语言检测会导致句子内代码切换的质量不佳（架构限制，通过自定义词汇表和重转录工作流程解决了这个问题） TokenMonitor（3天活跃）— ✅ 完成成就： 统一了缓存层的定价策略，与Claude Code的定价完全一致（利率为1.25倍），并增加了网络搜索跟踪功能（每次请求收费0.01美元） 集成OpenRouter API，实现全面的模型覆盖（包含3000多种模型，其中92种为中文模型） 实现了基于SSH的远程时区感知日期过滤功能（包括TZ偏移检测、本地转换以及新增8个测试场景） 修复了浮点球塌陷闪烁问题（由WebView2异步渲染引起）以及移动故障（CSS过渡时间问题） 构建了使用数据存档系统（每小时聚合数据，并进行时间边界去重处理） 修复了定价缓存版本控制中的错误（添加了CACHE_VERSION=2） 在CI修复后发布v0.7.2版本 所有307个Rust代码和219个前端测试均通过 网站/Hugo部署基础设施（2天活跃）——已完成 成就：\n修复了网站/update.sh脚本中的4个严重错误（如步骤编号、PID重复、文件替换、目录保护等问题） 建立了完整的Hugo部署环境（Hugo扩展版本为0.154.5，使用PaperMod主题，并整合了GitHub Pages功能） 流水线现在能够完成从压缩到部署的全部7个步骤 错误恢复基准测试重构（2天活跃）——正在进行中 成就：\n通过提取3个BaseErrorSkill辅助函数，消除了130多行代码重复部分 通过使用上下文管理器，修复了4个脚本文件中出现的HDF5资源泄漏问题 完成了226/229个测试的通过情况（发现了3个现有的分类测试错误） 完成了技术架构文档的编写，回答了3个关键设计问题 创建了完整的CLAUDE.md和TUTORIAL.md文档，包含了系统架构、12种错误技能分类以及5个RBG组的相关内容 阻塞问题：\n⚠️ 在stuck_no_progress D1断言中存在3个分类测试失败的情况（这些错误已经存在于测试代码中） BetterSSH终端多路复用器（1天活跃）——已完成 成就：\n通过超级技能链实现了从零到生产的完整实施过程（从头脑风暴到优化） 架构：Node.js+Fastify+ssh2/node-pty+React+xterm.js，采用单仓库模式，并支持双WebSocket连接 以ECL驱动开发，并通过对抗性评审修复了9个缺陷（其中2个为严重安全漏洞：未认证的PTY写入和SSH参数注入） 实现了41个文件，195个测试通过 终端升级：WebGL渲染器、Unicode11、Catppuccin主题、ResizeObserver、实例池化等功能 服务器选择面板支持本地和远程会话功能 电池预测管道（2天活跃）——已完成 成就：\n生成了均匀采样的数据集（每周期4个点，通过线性插值得到，共221K行数据） 识别并删除了导致StandardScaler出现NaN值的损坏数据（电池数据31个，周期833个NaN值） 实现了全面的训练日志记录功能（实验参数、每个阶段的指标、提前停止机制） 完成了LiPM基础模型的文献综述（超过30篇论文，涉及6个维度：电池FMs、物理信息融合、不规则时间序列、迁移学习、增强技术） ML管道调试（BOSS/Crossformer）（1天活跃）——已完成 成就：\n通过实现conversion_index.json溯源跟踪和三方关联，解决了BOSS PairedDataset映射问题 修改了build_paired_mapping.py、paired_dataset.py和config.py文件，以支持同时从单个或多个OSS增强数据集中采样 诊断出Crossformer的性能差距为18倍：发现LIPM零填充和DSW嵌入连续性假设之间存在根本架构差异 实现了针对电池数据集的时间均匀重采样功能（以1秒、5秒、10秒为间隔，通过scipy插值实现） NeurIPS 2025数据集跟踪写作方法（1天活跃）——已完成 成就：\n检索了544篇论文，确定了7篇口头报告和8篇重点报告，并通过OpenReview API获取了61份官方评论 分析了评论者的偏好：以“全面”（17次提及）、 “社区”（17次提及）、 “新颖”（15次提及）和“清晰”（28次提及）作为评价标准 创建了453行的SKILL.md文档，包含了5种思维模型、10种决策启发式规则以及章节级别的写作指导 发现口头报告的平均得分（5.00）低于重点报告的平均得分（5.16），这证实了评论分数并非唯一的接受因素 OCR翻译集成（1天活跃）——已完成 成就：\n将Ollama翻译功能集成到OCR项目中，并实现了按需服务管理功能 增加了重试机制（尝试4次，每次间隔5秒），以确保服务的稳定性 处理了三个PDF章节，实现了批量OCR和双语翻译功能 关键任务- ✅ BetterSSH全栈实现（从零到生产）（2026-04-11）——完整的生命周期：需求分析、架构设计、ECL文档编写以及对抗性评审（包含9个缺陷，其中2个为关键安全漏洞），实现了41个文件，通过了195次测试- ✅ LifeCopilot OpenClaw核心功能增强集成（2026-04-09）——整合了7个功能：健康监控、CronScheduler并发控制、配置热重载、JSONL生命周期管理、会话持久化、思维搜索与梦想整合、断路器机制。新增了10个模块，70次测试通过**解决方案：**系统地跟踪了整个过程。发现有一个循环列中有4个NaN值，来源于一个损坏的行（电池31，循环833）。StandardScaler计算了NaN的平均值标准差，导致所有缩放后的数值满足(data - NaN) / NaN = NaN。删除了那个损坏的行。 19. TokenMonitor的成本与Claude的/cost输出不一致[TokenMonitor] (2026-04-10)**解决方案：**发现TokenMonitor在1小时缓存令牌上使用了2.0倍的乘数，而Claude Code则采用了统一的1.25倍费率。已将pricing.rs中的cache_write_1h定价调整为与Claude Code完全一致。 20. CircuitBreaker HALF_OPEN竞争条件：在锁外进行状态检查允许多个探针同时进入[LifeCopilot] (2026-04-10) **解决方案：**将状态检查移入’async with self._lock’块中，以确保状态检查的原子性以及转换过程。\n21. MIHD论文的定位不明确——最初被描述为“融合策略基准测试”，核心贡献描述模糊[MIHD Benchmark] (2026-04-10) **解决方案：**将其重新定位为“冻结的FM + 自监督融合范式评估”，回答“这种方法能否替代经过微调的方法”。将叙述从方法提案改为系统的边界探索。\n22. LiteLLM定价数据库缺少主要的中文AI模型（GLM、Qwen、DeepSeek）——中文AI生态系统存在系统性差距[TokenMonitor] (2026-04-10) **解决方案：**将OpenRouter API（包含92个中文模型条目）与LiteLLM优先合并，实现并发获取。OpenRouter提供基础覆盖，LiteLLM在可用时覆盖这些条目。增加了7天的自动刷新功能。\n23. MimicGen增强验证全部失败（0/10场景），cubeA未解决（在表格级别高度为0.82）[MimicGen Error Recovery] (2026-04-11) **解决方案：**通过多轮诊断找到了根本原因：子任务碎片化（6个子任务=5个边界问题，错误累积）+没有抓取后缓冲区+夹持器检测错误（首次与连续闭合情况不同）+收回子任务未产生扭曲+路径解析错误。已修复所有问题：简化为2个子任务，增加了15帧缓冲器，改进了夹持器检测，将收回操作合并到重新获取操作中，修复了路径解析问题。\n24. success_demos.hdf5无法作为MimicGen的源文件——缺少env_interface_name和env_interface_type属性[MimicGen Error Recovery] (2026-04-11) **解决方案：**在三个地方添加了ensure_env_interface attrs()辅助函数：filter_valid_source、augment_success_demos、generate_success_from_error。已修补了7个任务的现有HDF5文件。\n25. BetterSSH前端按钮无响应——WebSocket消息无声丢失[BetterSSH] (2026-04-11) **解决方案：**追踪到index.ts中onMessage()占位符返回null。实例化SessionManager，加载SSH/BetterSSH配置，完成完整消息路由（get_sessions、create_session、destroy_session、send_input、resize）。\n26. 删除JSONL日志后，令牌使用数据消失[TokenMonitor] (2026-04-11) **解决方案：**在{app_data_dir}/usage-archive/目录下实现了仅追加的每小时聚合归档，使用时间边界划分（归档覆盖[0..frontier]，实时源覆盖(frontier..now)），以防止重复计算。\n27. Claude Code在探索性项目中频繁请求权限，影响开发效率[Infrastructure] (2026-04-11) **解决方案：**将80多个枚举的Bash命令权限简化为单个工具级别的通配符“Bash”，涵盖所有Bash命令。将删除操作从拒绝改为需要确认。\n28. 对抗性审查发现WebSocket写入未经认证(ATK-007)[BetterSSH] (2026-04-11) **解决方案：**添加了REQ-009：127.0.0.1绑定+256位会话令牌（在启动时随机生成并打印），所有WS升级都会验证查询字符串令牌。\n29. OpenReview API返回403禁止访问NeurIPS论文评审数据[NeurIPS Writing Methodology] (2026-04-11) **解决方案：**诊断出双层阻塞问题：(1)OpenReview API现在对所有请求强制执行认证令牌（禁用匿名访问）；(2)频繁的探测触发了nginx速率限制。使用用户OpenReview凭据(tongtongtot@163.com)通过openreview-py SDK登录，成功获取了61篇评论。增加了请求延迟以避免速率限制。\n30. 终端渲染质量差——字体模糊，滚动缓慢，中间点击粘贴失败[BetterSSH] (2026-04-11) **解决方案：**确定xterm.js是行业标准，但缺少插件。添加了WebGL渲染器（GPU加速）、Unicode11（CJK）、改进的主题（Catppuccin Mocha）、更好的字体集（Cascadia Code后备链）。\n31. GLM5.1和DeepSeek-Reasoner显示$0.00定价，尽管已集成OpenRouter[TokenMonitor] (2026-04-11) **解决方案：**在PricingCache结构中添加了版本字段（CACHE_VERSION=2），当引入新的定价来源时，仅包含LiteLLM数据的过时缓存会自动失效。\n32. 切换终端会话会丢弃所有终端内容——没有滚动回退历史记录[BetterSSH] (2026-04-11) **解决方案：**改变了终端生命周期：在useEffect([],[])中一次性创建xterm实例，跨会话重复使用。在切换时：term.clear()→订阅新会话→后端发送RingBuffer填充→term.write()\n33. SpaceMouse收集的实验无法被MimicGen增强，而MimicGen生成的实验则可以[MimicGen Error Recovery] (2026-04-12) **解决方案：**发现MimicGen需要完整的datagen_info元数据（eef_pose、object_poses、target_pose、gripper_action、subtask_term_signals）以及干净的初始状态语义。SpaceMouse实验通常从错误状态开始，缺乏所需的元数据。确定了两个独立的实验流程：恢复实验（简化格式）与成功实验（与MimicGen兼容的格式）\n34. Benchmark_rm_ideal.py覆盖了每个新实验对的summary.csv，导致151673↔151669的结果丢失[MIHD Experiments] (2026-04-06) **解决方案：**在每对实验完成后立即进行备份（summary_151673_151674.csv），通过heredoc手动重建丢失的151673↔151669数据。\n35. HD Niche Query可视化中有不可见的查询点（红色星标记在热图背景中难以识别）[MIHD Visualization] (2026-04-06) **解决方案：**将标记大小从20增加到26，添加白色外环（大小=32），应用于所有4个面板，在H\u0026E面板中添加箭头+文字标签\n36. Ollama服务在批量翻译过程中断连接（第10/26块）[OCR Translation] (2026-04-08) **解决方案：**在translate_ocr_with_ollama.py中添加重试机制，最多尝试4次，每次间隔5秒的指数式延迟\n学习成果 架构（架构）- ccplan的对抗性评审（第5阶段）非常有价值。在会议辅助系统中，作为对抗性批评者的代码评审子代理发现了主规划器遗漏的6个严重问题，其中包括严重的中文-英文混合转录限制问题。复杂的项目规划必须引入独立的批评视角，重点在于“规划器可能会遗漏什么”，而不是“计划是否正确”。- 超级力量技能链的力量：头脑风暴（需求分析）→ccplan（基于ECL驱动的实施）→优化（质量提升）构成了完整的软件生命周期。ECL文档作为跨会话持续的“设计合同”，可以在多个轮次、不同代理甚至不同模型之间保持上下文一致性。 对抗性评审的价值：批评者代理在BetterSSH中发现了9个问题，其中2个是严重的（未经验证的PTY写入、SSH参数注入），4个是较严重的（令牌暴力破解、原型污染），这些问题在生产环境中可能导致安全灾难。需求阶段的修复成本远低于代码阶段和生产阶段。 对于具有位置编码的序列模型来说，零填充并不中立——它会破坏语义意义。Crossformer的DSWEmbedding假设连续段；带有不规则间隙的零填充补丁会误导模型学习到“零模式”，而不是时间依赖性。架构假设必须与数据预处理相匹配。 在冻结的基础模型嵌入中发现了聚类检索之间的权衡：STAIG的空间图对比学习优化了全局域聚类（ARI 0.546），但过度 homogenize 了边界（96%的相同域检索），而注意力融合则平衡了跨域边界检索（60/40的比例）。最佳策略因任务而异。 以对象为中心的变形本质：相对于对象的运动模式是不变的，通过坐标变换T_eef_new = T_obj_target × T_obj_src⁻¹ × T_eef_source来保存。两步理解：（1）消除源对象的绝对位置（2）用新对象的位置重新映射。 MimicGen的原始设计智慧：（1）最小化子任务数量（仅包含2个子任务）（2）抓取后缓冲10-20帧以确保稳定的抓取效果（3）env.reset()回到初始位置可以减少姿态差异（4）准闭环执行（目标姿态到动作的计算每个步骤的增量） MimicGen的核心设计是源演示加上env.reset()的随机化：应该将错误场景视为固定的“初始状态”，然后使用placement_initializer生成变体，而不是为每个目标重新注入错误。 基准论文评估的是范式，而不是方法——《自然方法分析》论文不需要SOTA，但需要系统性的答案来回答“这种方法能走多远”。叙述从“我们的方法是最好的”转变为“这种范式的边界和瓶颈是什么”。 MCP（模型上下文协议）作为AI助手与外部工具之间的标准接口，大大简化了集成复杂性。会议辅助系统展示了：Screenpipe通过27个MCP工具暴露出所有功能，Claude Code CLI无需自定义代码就能实现完整的会议问答。这证明了标准协议的价值——工具提供商只需实现一次MCP服务器，所有支持MCP的AI助手都可以直接使用。 忠实的算法实现需要理解完整的执行模型，而不仅仅是数据转换。MimicGen的成功来自于每个子任务的路径级闭环修正，仅靠更好的开环动作变形是无法复制的——表面相似性掩盖了深层次的架构差异。 错误恢复数据集故意排除了导致错误的动作，以防止模型学习失败模式。训练仅使用人类远程操作演示中的后注入恢复片段，过滤掉成功轨迹。 数据来源跟踪必须在每个转换流程步骤中明确记录。HDF5到LeRobot的转换会丢失source_file+demo_idx的映射；解决方案是在转换过程中记录conversion_index.json，以便与生成时的元数据建立桥梁键关联，实现1对N的关联。 并行代理调度模式：将独立模块（配置/解析器/本地PTY）分配给不同的子代理进行并行实现，然后集中验证。开发效率可提高3-5倍。关键是识别没有依赖关系的依赖DAG叶子节点，最大化并行性。 xterm.js是行业标准的浏览器终端（VS Code、Replit、Vercel、ttyd都使用它）。其质量取决于完整的插件堆栈：WebGL用于GPU渲染，Unicode11用于中文处理，Fit用于调整大小，SearchAddon，WebLinksAddon。仅使用基本的xterm.js不足以满足生产环境需求。 JSONL（仅追加日志）+内存缓存的混合架构对于需要持久性和性能的场景非常有效。关键设计点：（1）原子写入（tmp→os.replace）可以防止崩溃时的损坏（2）读取时懒加载（首次访问时读取最近的N条记录）可以避免启动缓慢（3）有界缓冲区（deque(maxlen)）可以防止内存泄漏（4）统一的时间戳采用ISO 8601 UTC以避免时区问题（5）定期归档可以防止无限增长 时间边界划分（存档覆盖已完成的小时，实时源覆盖当前小时）巧妙地解决了去重问题，无需显式的记录级跟踪——零重叠意味着零重复计数- 代码重复会隐藏错误，因为修复不会传播到其他地方。在12个错误技能文件中，帧阈值不一致（e08:30 vs 标准20），这是代码审查时发现的无意问题。提取共享的帮助函数可以确保一致性，并在重构过程中发现错误。 Node.js 24及以上版本内置了环境变量代理支持（–use-env-proxy标志/NODE_USE_ENV_PROXY=1），但只读取大写形式的HTTP_PROXY/HTTPS_PROXY/NO_PROXY，而不读取小写形式。当shell代理设置脚本仅导出小写形式时，这是一个常见的陷阱。所有Node CLI工具都需要进行统一修复。 在将基于LLM的管道从一种语言转换为另一种语言时，验证必须包括：(1)静态提示模板 (2)运行时上下文注入 (3)非文本输出（图表/图片）(4)提示中出现的代码注释 (5)生成的模板/骨架 (6)错误恢复逻辑。并行代理验证模式（每个子系统一个）比单次遍历grep更为彻底。 日期时间时区处理的细微差别：date_naive()在DateTime上提取的是源时区的日期，而不是本地时区的日期。对于远程时间戳过滤，必须先使用with_timezone(\u0026chrono::Local)将日期转换为本地时区。这对于任何跨时区数据的分布式系统来说非常重要。 StandardScaler的NaN传播机制：任何特征列中存在NaN的单行数据会导致StandardScaler.fit()计算NaN统计值（均值/标准差），并通过(x - NaN) / NaN = NaN的方式传播到所有已缩放的数据。在归一化操作之前，始终需要验证数据的NaN/Inf情况。 LeRobot 0.4.0中的形状处理设计存在矛盾：validate_frame需要ndarray，而get_hf_features_from_features则将其映射为标量值。解决方案是在episode_buffer层在验证和编码之间插入类型转换。 始终用真实数据进行交叉验证聚合指标。日志解析错误会导致不正确的统计数据；通过直接检查文件数量（HDF5 demo_N组）和结构化报告（generation_report.json）来验证数据。从已知输入约束出发的合理性检查可以及早发现报告中的错误。 对抗性代码审查可以发现前向实现中遗漏的问题。批评子代理发现了就地变异的语义、调用点之间的模式差异以及主代理在最初提取帮助方法时忽略的防御性检查位置。 子任务碎片化带来的成本：每个子任务的边界都是独立的“查询对象姿态→重新变形→5步插值”，错误会不断累积。6个子任务相当于5个错误来源，远远高于原来的1个。 连续闭合检测的重要性：机器人抓取可能有多次尝试，如果first_gripperClosed超过阈值，则可能会失败。需要检测连续闭合（≥10帧）以确认成功抓取。 多进程调试的复杂性：(1)每个工作线程需要独立的env+augmenter实例 (2)路径解析更容易出错（相对路径容易错过层次结构）(3)需要明确的绝对路径，如demos_dir (4)robosuite的WARNING需要在工作线程函数中单独抑制 Asycio状态机的正确性不变量：状态检查和转换必须在同一锁范围内是原子性的；任何超出锁范围的检查都会引入竞争窗口 时间重采样中的插值与外推：线性插值应保持在观测到的数据范围内。强制数据进入固定的全局范围会导致外推产生无效值。使用每样本自适应范围可以避免外推伪影 格式兼容性包括三个层面：文件结构（NPZ vs HDF5）、元数据完整性（datagen_info字段）以及语义假设（起始状态、任务覆盖）。一个文件可以通过结构检查，但无法满足语义要求 MimicGen的源代码示例需要完整的datagen_info元数据（eef_pose、object_poses、target_pose、gripper_action、subtask_term_signals）以及语义假设（干净的初始状态、完整的任务轨迹、有效的子任务转换）。从错误状态恢复的示例需要单独的增强流程 Homebrew公式已过时，这是一个重要的信号——当遇到低级依赖问题时，首先检查上游维护状态，而不是调试废弃版本 WebGL渲染相对于原生窗口几何变化是异步的。SetWindowPos会同步修改窗口大小/位置，但Chromium需要1-2帧来渲染新内容。对于具有复杂布局的透明窗口，这种异步差距会导致可见的闪烁。在几何变化前显示ShowWindow(SW_HIDE)，在几何变化后显示SW_SHOWNOACTIVATE可以防止中间帧被合并- 本地LLM翻译（Ollama HY-MT1.5-7B）适用于技术内容的生产环境：在57分钟内完成了74个文件的批量翻译，且翻译质量良好，无需支付API费用或速率限制。对于服务中的短暂故障，需要强大的重试机制（4次尝试，每次间隔5秒）。 张量操作的向量化消除了Python循环开销，并实现了GPU并行性：将BasicContrastive对比损失从节点级循环重构为批量logsumexp操作，速度提升了10-50倍，同时保持了相同的数学行为。 从成熟的开源项目中移植经过验证的架构模式比从头开始设计更高效可靠。关键在于理解原始设计的理念（为什么使用4个状态而不是3个？为什么要限制重启次数？为什么要采用指数式退避？），然后适应目标上下文。这种“理解→移植→适应”的工作流程大大降低了设计风险，因为源项目已经发现了潜在的缺陷。 Claude Code –output-format stream-json：研究表明Claude原生支持结构化输出（以换行符分隔的JSON格式），无需使用正则表达式进行解析。这一发现使Parser的可靠性从“启发式”提升到了“确定性”。在重新发明之前，应该先进行研究。 TypeScript严格模式的ROI：195个测试中没有类型错误，这就是生产就绪的代码。类型系统在重构过程中具有非常重要的保护作用（在提取了parsed-state-utils之后，所有调用点都自动进行了类型检查）。前期花费20%的时间编写类型，后期则可以节省80%的调试时间。 Claude Code权限系统支持工具级别的通配符（例如“Bash”可以匹配所有Bash命令），可以使用最小配置来替代数十种枚举规则。 全球AI定价需要采用多源策略，并具备地理多样性——西方数据库（LiteLLM）系统性地缺乏中文模型；中文来源也缺乏西方模型。冗余是必不可少的，而不是可选的。 Rust的性能模式：避免不必要的clone()，使用借用结构体进行序列化，当只需要元数据时，优先进行行计数而非完全反序列化。 在高性能计算批处理作业中，资源泄漏可能会在长时间运行后累积，导致神秘的OOM崩溃。Python的上下文管理器（“with”语句）可以防止这类错误。所有的h5py.File()调用都应该使用上下文管理器。 Hugo网站部署需要三个独立的组件：hugo二进制文件、主题仓库和部署Git仓库。任何一个缺失的组件都会导致不同的阶段失败。应该将这些作为明确的先决条件记录在验证清单中。 Bash set -e脚本需要对可选操作进行防御性保护。在可能缺少目录中查找命令时会触发非零退出码；必须在find/压缩操作之前添加[ -d “$DIR” ]检查，以区分“目录为空”和“命令失败”。 在数据执行具有确定性的情况下，数据格式迁移更加安全：保存（初始状态、操作）→在模拟环境中重放→重建缺失字段（目标姿态、物体方向）。这样可以实现向后兼容的增强功能，而无需重新收集整个演示语料库。 在时间序列上下文中，“均匀采样”通常意味着相同的时间间隔（恒定的Δt），而不是跨类别的平衡样本分布。这对于假设有固定时间步长的序列模型如Transformers非常重要。Scipy插值可以将不规则样本转换为均匀网格。 在不断变化的数据源中，缓存系统必须包含明确的版本字段——仅TTL过期是不够的，还需要处理模式/源的变化。 终端大小调整同步需要全链协调：ResizeObserver（前端）→term.onResize→WebSocket消息→SessionManager→PTY.resize()。不匹配会导致在错误的列上包装。去抖动可以防止在拖动调整大小时出现洪水效应。 终端实例在会话切换时不应被销毁——它们会保留滚动回显缓冲区（10000行）。正确的模式是一次创建，然后通过clear()+后端RingBuffer（2MB）填充来在多个会话中重复使用。 React闭包陷阱修复模式：第三方库回调（xterm.js onData）在useEffect中注册会捕获过时的属性——这是一个常见的错误。通用解决方案是：props→ref，useEffect同步ref.current，回调读取ref.current。这是React生态系统的最佳实践。 WebSocket的健壮性有三个要素：重新连接（指数式退避）、压力控制（bufferedAmount检查）以及心跳机制（尚未实现，但应该考虑）。分布式系统的网络层必须假设“连接随时可能断开”，而不是“连接应该是稳定的”。 文件系统符号链接为双启动系统提供了零开销的双向同步。用符号链接替换单独的Ubuntu/Windows文件夹到单个Windows分区，可以消除同步延迟，并确保单一来源的准确性，而不会造成文件重复。- 对于不规则时间序列数据： (1) 插值到均匀网格可以保持连续性；(2) 时间窗口聚合可以避免零填充；(3) 时间感知模型（GRU-D、BRITS、NAOMI）能够自然处理空白时段；(4) 添加时间差作为特征有助于使模型更加均匀。对于假设数据具有连续性的模型，切勿使用零填充。 MimicGen在错误场景下的成功率较低（成功演示的整体成功率为57.4%，而人类演示增强的成功率为9.57%）；当自动生成的成功率达到瓶颈时，需要人类远程操作来确保全面覆盖。 多数据集对比学习需要映射级别的源标记和基于列表的数据集级架构；这使得可以从异构的增强源中灵活采样（单个或多个OSS扰动）。 NeurIPS DB Track评审优先级（基于61次评审）：最受重视的品质是“全面性”（17次提及）、“社区性”（17次）、“新颖性”（15次）、“清晰性”（28次）、“设计良好”（13次）。最常见的批评是“缺乏比较”（基线不足）、 “细节不足”（方法不明确）、 “范围有限”（应用狭窄）。最佳论文（Artificial Hivemind）的口头评审平均得分最低，为4.75分——AC决策超越了评审分数。口头评审平均得分（5.00）低于焦点评审平均得分（5.16），这表明评分并非唯一的录取因素。 空间转录组学中的图对比学习发展：从STAIG（节点级别）到QueST（子图级别），再到Loki（跨模态）的发展，表明领域进展是从“每个问题一种方法”到“一个基础模型适用于多种任务”的转变。 术语选择很重要：无标签与零样本——“零样本”容易被误解为“完全没有训练”，而无标签/无注释则准确传达了“无需手动注释”的核心优势。分层定义（编码器零样本+融合自监督）避免了歧义。 自监督学习的“自由信号”框架——空间转录组学坐标结构是Visium芯片固有的结构化信息。将空间图视为“自由监督信号”可以明确无标签的价值，并增强其实用性（无需额外的注释成本）。 LiPM论文展示了用于电池任务的物理信息预训练：使用MMAE进行跨模态耦合，使用CIR进行库仑积分（电荷守恒），使用双尺度编码器进行不规则采样。关键见解是：当物理约束被正确编码时，特定领域的基模型优于通用时间序列模型。 准备用于MimicGen的数据集需要特定的元数据结构：每个demo_*/datagen_info必须包含env_interface_name和env_interface_type，否则DataGenerator无法正确初始化环境。 人类演示数据的质量验证应该提前到收集阶段：单纯的远程操作成功是不够的，还必须同时验证重放稳定性和可扩充性，否则将收集大量无法用于训练的数据。 配额计数逻辑需要反映真实的可用性：仅可扩充的配额应该比仅重放的配额更严格，但更为合理，因为即使可重放的非可扩充演示也无法扩展训练集。- 前沿的ASR模型格局（2026年）：真正的流式模型很少见。Moonshine v2（延迟73-107毫秒，参数数量34-245百万）和Voxtral-Mini-4B-Realtime（延迟480毫秒，参数数量4亿）代表了最先进的技术。Moonshine使用基于回调的API，适合实时转录；Voxtral需要手动分块，但提供更高的准确性。两者都支持Apple Silicon的原生加速（Moonshine使用CoreML，Voxtral使用MLX）。 OpenReview API认证架构（2026年）：所有数据端点都需要登录令牌；只有/login端点允许匿名访问（返回验证错误）。Web前端通过Next.js RSC使用服务器端凭据。限流在nginx层进行（基于IP），短时间内触发约30次请求。学术论文评审API越来越严格，需要机构或个人凭证。 代码审查的分层修复方案：CRITICAL（安全/竞争）→HIGH（已弃用的API/私有访问）→MEDIUM（类型/风格）→LOW（linter），并在每层之后进行测试验证，以避免级联故障。 Pydantic v2迁移模式：dict→model_dump()，但测试模拟必须通过辅助函数如_make_settingsmock()同步提供相同的接口。 多阶段数据处理流程的正确性需要端到端验证——特殊值（如-1）的处理必须在所有阶段保持一致（预处理→数据集→损失→评估）。 在多管道项目中，技术术语需要明确的项目特定定义。“源演示”在恢复管道中可能意味着不同的东西，而在标准的MimicGen管道中则意味着success_demos.hdf5。文档应建立清晰的命名空间。 在解决问题过程中生成的文档继承了调试叙述。对于团队入职文档，需要明确的重新表述：说明当前的设计，而不是发现它的路径。受众意识必须外部注入，而不是自发产生。 人工智能使用注意事项 有效模式：\n✓ 并行代理编排用于大规模任务：3个代理在14秒内生成了MIHD 2246行的蓝图，而顺序处理则需要45-60秒；4个代理可以同时完成空间转录组学论文研究 ✓ 超级技能链（头脑风暴→ccplan→优化）提供了完整的软件生命周期框架，ECL文档保持了会话之间的上下文一致性 ✓ ccplan阶段的对抗性评审发现了多个项目中的15个严重问题（BetterSSH中有2个CRITICAL安全问题，LifeCopilot中有6个CRITICAL/HIGH问题），这些问题如果进入生产环境将会造成危害 ✓ 系统化的代码考古学：通过8个框架模块追踪LeRobot类型错误，找到了validate_frame与get_hf_features_from_features之间的矛盾 ✓ 多轮迭代调试：经过6轮调试才解决了所有MimicGen错误（子任务碎片化→撤回→gripper→插值→并行化→缓存） ✓ 以研究为先的方法：在实现自定义PTY解析器之前，先调查Claude Code –output-format stream-json，从而将可靠性从启发式提升为确定性 ✓ 在脚本执行前系统性地验证依赖关系：阅读代码→检查依赖关系→验证结构→运行脚本，从而在运行时捕捉环境问题 ✓ 通过多项选择题来结构化澄清需求，逐步缩小解决方案空间，减少歧义 ✓ 带有行号引用的代码考古学为20多个文件中的复杂执行路径提供了精确的技术文档 ✓ 通过性能分析发现了向量化机会：用批处理张量操作替换了每个节点的循环，速度提高了10-50倍 ✓ 通过基准测试对汇总指标进行交叉验证，可以及早发现报告中的错误局限性： ✗ 在BetterSSH实施之前未能主动推荐技术研究——需要人工提醒去搜索现有的解决方案 ✗ 隐藏需求的发现不足：错过了BetterSSH中的本地会话支持，直到有人明确提到非SSH CLI的使用 ✗ 初始英文转换遗漏了6类剩余中文内容（运行上下文字符串、图表标签、提示中的评论、模板、错误恢复）——需要明确的并行代理验证 ✗ 概念映射错误：将“训练源演示”解释为MimicGen的success_demos.hdf5，而不是项目特定的“训练恢复演示”，且未进行明确修正 ✗ 文档语气不匹配：“团队入职”需要生成的“纠正叙述”风格，需要明确的受众反馈 ✗ 经过6轮调试才识别出所有MimicGen问题——无法在单次分析中预见全部问题范围 ✗ 过度依赖文件内容缓存导致多次出现“文件已被修改”的错误——需要谨慎重新读取策略 ✗ 无法自主发现集群特定的操作规范（如/app/bin/proxy.sh），必须依赖用户提供的隐性知识 ✗ 在诊断过程中连续请求约30次触发了OpenReview的限制，而并未提前实施指数级退避策略 ✗ 子代理执行进度不透明：5个并行后台代理没有任何中间进度，只有“等待完成”——缺乏实时可见性 ✗ 未主动识别Crossformer零填充与DSW嵌入连续性假设的根本不兼容——直到用户明确询问“此输入还有价值吗？”才发现问题——需要的是基本原理推理，而非表面级的代码比较 ✗ 初始优化计划忽略了normalize_direction()辅助函数中的就地变异副作用；需要明确的对抗性批评来识别这些问题 ✗ 报告了错误的MimicGen统计数据（398个演示），引用了有缺陷的摘要脚本，而并未对真实的HDF5文件或generation_report JSON进行交叉验证 ✗ 安全审查产生了误报：尽管本地HPC管道没有网络暴露，仍将np.load(allow_pickle=True)标记为严重问题 ✗ 未能明确区分“均匀采样”术语，默认采用统计分布解释，而不是时间规律性，且没有进行说明 ✗ OCR翻译设计完全依赖于5轮用户互动来提供实现选择；没有主动分析源文件特征 ✗ 在规划.codex/配置时未预料到只读挂载点限制，需要在执行过程中转向AGENTS.md方法 ✗ 在切换到conda run，然后切换到系统Python之前，多次尝试使用conda activate后台命令失败 ✗ 只有在第一次服务失败后才添加了Ollama重试机制；应该预见到本地LLM服务的不稳定性 下周展望 P0关键优先级： (1) 完成MIHD基准测试剩余的障碍——从已发布的空间转录组学方法中收集ARI数据，并实施DE分析流程，以推动论文提交进程。(2) 通过新重构的增强系统，端到端验证MimicGen错误恢复训练流程，并评估人类收集的演示质量（当前：24个演示，3个可重放，0个可增强）。(3) 解决人类演示收集协议问题——在收集阶段建立质量门限，以确保重放稳定性和可增强性验证，防止数据积累不可用。正在开发：(4) 继续电池基础模型研究——实施受LiPM启发的物理信息预训练架构（MMAE+CIR+双尺度编码器），并在均匀采样数据集上进行评估。(5) 部署并监控生产系统——LifeCopilot健康监控涵盖18+服务，进行中英文混合转录质量的现实世界使用测试，BetterSSH多服务器会话管理验证，TokenMonitor定价准确性监控。(6) 开始系统性地优化代码，针对MIHD代码库中的10-50倍加速机会，通过向量化操作实现效率提升。技术债务与基础设施：(7) 解决错误恢复基准测试中剩余的3个分类测试错误（停滞无进展D1断言）。(8) 监控OpenRouter API的稳定性，确保中文模型定价覆盖，并在必要时实施回退策略。(9) 标准化剩余项目的开发工具（统一的Claude Code权限，考虑时区处理）。扩展目标：将NeurIPS学术写作方法论框架应用于MIHD论文起草；探索固定数据管道的LIBERO训练实验；将Ollama翻译基础设施扩展到剩余项目，并实现CI/CD集成。\n令牌使用统计 总计：$399.27 — 4.664亿令牌\n峰值日： 2026-04-11 — $126.59 / 1.595亿令牌\n每日平均： $57.04\n",
+  "wordCount" : "526",
+  "inLanguage": "zh",
+  "datePublished": "2026-04-12T23:59:00-05:00",
+  "dateModified": "2026-04-12T23:59:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/weekly/2026-w15-weekly/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="zh"
+                        data-translation-url="https://tzj2006.github.io/bugjournal/weekly/2026-w15-weekly/">EN
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span>bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/zh/">主页</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/">Bug Journal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/weekly/">每周总结</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Weekly Summary 2026-W15
+    </h1>
+    <div class="post-meta"><span title='2026-04-12 23:59:00 -0500 -0500'>2026年4月12日</span>&nbsp;·&nbsp;<span>3 分钟</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="每周报告--2026-w15-2026-04-06--2026-04-12">每周报告 — 2026-W15 (2026-04-06 ~ 2026-04-12)<a hidden class="anchor" aria-hidden="true" href="#每周报告--2026-w15-2026-04-06--2026-04-12">#</a></h1>
+<blockquote>
+<p>本周在学术研究、生产系统以及开发基础设施方面取得了非凡的成就，涉及12个以上的重要项目。我们成功交付了完全可生产化的系统（包括LifeCopilot架构升级，包含7个OpenClaw功能，会议辅助AI助手，BetterSSH终端多路复用器，以及双语管道处理工具）。我们还完成了重要的研究基础设施建设：对MIHD空间组学论文进行了修订，增加了3个新的交叉切片实验，揭示了聚类与检索之间的权衡关系；制定了基准测试框架（长达2246行的蓝图）；并从61篇论文评审中学习了NeurIPS学术写作的方法。此外，我们还实现了MimicGen错误恢复系统，该系统具有忠实于原始设计的增强架构，并实现了626场景的人类数据收集流程，同时修复了6个关键漏洞。我们还建立了强大的工具：通过OpenRouter集成，TokenMonitor的定价准确性得到了提升，适用于3000多个模型；统一了Claude代码的权限管理；实现了考虑时区的SSH处理功能。我们的Hugo部署流程也从完全失败状态恢复到正常运行状态，并将翻译基础设施迁移到本地Ollama，从而消除了对云API的依赖。我们还解决了一些基本的机器学习流程问题，比如BOSS数据集映射、Crossformer架构不匹配以及电池数值的异常传播等问题。此外，我们还解决了20多个关键障碍，这些问题涉及数据正确性、认证安全以及模型兼容性等方面。</p>
+</blockquote>
+<h2 id="每周概览">每周概览<a hidden class="anchor" aria-hidden="true" href="#每周概览">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>指标</th>
+          <th>值</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>日期范围</td>
+          <td>2026-04-06 ~ 2026-04-12</td>
+      </tr>
+      <tr>
+          <td>活跃天数</td>
+          <td>7天/7天</td>
+      </tr>
+      <tr>
+          <td>总对话数</td>
+          <td>71次</td>
+      </tr>
+      <tr>
+          <td>项目数量</td>
+          <td>35个</td>
+      </tr>
+      <tr>
+          <td>已完成任务数</td>
+          <td>73个</td>
+      </tr>
+      <tr>
+          <td>进行中的任务数</td>
+          <td>3个</td>
+      </tr>
+      <tr>
+          <td>总代币数</td>
+          <td>466,374,500</td>
+      </tr>
+      <tr>
+          <td>总成本</td>
+          <td>$399.27</td>
+      </tr>
+      <tr>
+          <td>Claude代码代币数</td>
+          <td>365,537,985</td>
+      </tr>
+      <tr>
+          <td>Claude代码成本</td>
+          <td>$345.50</td>
+      </tr>
+      <tr>
+          <td>Codex代币数</td>
+          <td>100,836,515</td>
+      </tr>
+      <tr>
+          <td>Codex成本</td>
+          <td>$53.77</td>
+      </tr>
+      <tr>
+          <td>每日平均成本</td>
+          <td>$57.04</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="项目进展">项目进展<a hidden class="anchor" aria-hidden="true" href="#项目进展">#</a></h2>
+<h3 id="mihd空间组学4天活跃--活跃">MIHD空间组学（4天活跃）— 🔄 活跃<a hidden class="anchor" aria-hidden="true" href="#mihd空间组学4天活跃--活跃">#</a></h3>
+<p><strong>成果：</strong></p>
+<ul>
+<li>完成了三项新的交叉切片RM-IDEAL实验（151673↔151674, 151508↔151509, 151673↔151669），揭示了特定供体的第三层模式以及聚类与检索之间的权衡关系。</li>
+<li>发现了核心发现：STAIG在全局聚类方面表现优异（ARI 0.546），但会将边界过度均一化（96%的上皮组织），而Attention融合则实现了平衡的检索效果（60/40的比例）。</li>
+<li>重新编写了引言部分，采用6句话的路线图结构，将内容分为R1-R6几个部分，并以ARI 0.26→0.55的关键发现作为起点。</li>
+<li>将R5部分从4段扩展到了6段，并加入了QueST引用和跨部分检索的价值主张。</li>
+<li>完成了HD免疫生态位查询分析，识别出T细胞富集模式（3.8倍PCA对比2.2倍STAIG）。</li>
+<li>发现了6个优化机会，包括向量化对比损失技术，有望提高10-50倍的速度。</li>
+<li>确定了该论文的定位，即《Nature Methods Analysis》，评估了冷冻FM与自监督融合范式。</li>
+<li>将计划文件从367行扩展到2246行，采用了并行代理策略（论文计划、存储库蓝图、模块规范）。</li>
+<li>建立了4个核心任务和无标签术语框架。</li>
+<li>发现HD GPU实验已经完成，剩下2个P0级障碍需要解决：ARI数据收集和DE分析流程。</li>
+</ul>
+<p><strong>障碍：</strong></p>
+<ul>
+<li>⚠️ 来自已发布方法的ARI数据收集（P0级）</li>
+<li>⚠️ DE分析流程的实施（P0级）</li>
+</ul>
+<h3 id="mimicgen错误恢复系统5天活跃--活跃">MimicGen错误恢复系统（5天活跃）— 🔄 活跃<a hidden class="anchor" aria-hidden="true" href="#mimicgen错误恢复系统5天活跃--活跃">#</a></h3>
+<p><strong>成果：</strong></p>
+<ul>
+<li>分析了1282个成功的MimicGen结果和953个失败的结果，确定了需要人工收集的626个场景。</li>
+<li>实现了完整的人工远程操作工作流程（identify_failed_scenes.py, collect_success_from_error.py, convert_teleop_to_hdf5.py）。</li>
+<li>重构了增强架构，从“重复错误注入”改为“固定错误场景+重置随机化”，以符合原始MimicGen设计。</li>
+<li>将增强系统从动作回放改为忠实于MimicGen目标姿态的路线执行。</li>
+<li>修复了6个关键错误：子任务分割（从6个减少到2个）、夹持器检测（连续闭合）、路径解析、元数据补全（datagen_info）、配额规则（仅可增强）。</li>
+<li>实现了目标姿态记录、每个子任务的物体引用以及通过WaypointTrajectory进行路线插值。</li>
+<li>创建了backfill_recovery_target_poses.py脚本，用于迁移23个现有的堆栈演示。</li>
+<li>验证了实际生成结果：成功率为739/1365（54.1%），识别出626个失败场景。</li>
+<li>创建了600多行的恢复流程参考文档，包括RBG分类法和数据流。</li>
+<li>诊断出MimicGen的兼容要求：完整的datagen_info元数据以及干净的初始状态语义。</li>
+</ul>
+<p><strong>障碍：</strong></p>
+<ul>
+<li>⚠️ 626个失败场景需要手动使用SpaceMouse收集数据</li>
+<li>⚠️ 人工演示数据的质量问题：收集了24个演示，只有3个可以重新播放，没有可增强的</li>
+<li>⚠️ SpaceMouse收集的数据由于错误状态和缺失元数据而无法与MimicGen增强功能兼容</li>
+</ul>
+<h3 id="gadget双语内容流程4天活跃--完成">gadget双语内容流程（4天活跃）— ✅ 完成<a hidden class="anchor" aria-hidden="true" href="#gadget双语内容流程4天活跃--完成">#</a></h3>
+<p><strong>成果：</strong></p>
+<ul>
+<li>将云端的LLM API迁移到本地Ollama服务，使用HY-MT1.5-1.8B模型</li>
+<li>实现了共享翻译基础设施（common/ollama.py, common/translation.py）</li>
+<li>将12个核心文件（总结模块和研究模块）从中文转换为英文LLM提示和Markdown渲染</li>
+<li>通过并行代理验证，解决了6个剩余的中文问题：合并上下文字符串、matplotlib标签、DEEP_EVAL评论、模板、JSON修复提示、配置默认值</li>
+<li>将Ollama翻译后端与备用架构和重试机制集成（4次尝试，每次间隔5秒）</li>
+<li>在57分钟内完成了74个文件的批量翻译（42份日报、9份周报、21份研究简介）</li>
+<li>更新了全面的文档（5个关键的CLAUDE.md章节）</li>
+</ul>
+<h3 id="lifecopilot--会议辅助工具3天活跃--完成">LifeCopilot + 会议辅助工具（3天活跃）— ✅ 完成<a hidden class="anchor" aria-hidden="true" href="#lifecopilot--会议辅助工具3天活跃--完成">#</a></h3>
+<p><strong>成果：</strong></p>
+<ul>
+<li>LifeCopilot：整合了7个OpenClaw核心功能（健康监测、配置热重载、JSONL生命周期、会话持久性、思维搜索、梦境服务、断路器），并增加了10个新模块和70个通过测试的测试</li>
+<li>会议辅助工具：通过ccplan第0-11阶段完成创建（Screenpipe+MCP+Claude Code CLI架构，5个功能，跨平台安装脚本，27个MCP工具指南）</li>
+<li>修复了Screenpipe 0.2.13的兼容性问题（Protobuf错误），并从过时的Homebrew更换为npx</li>
+<li>扩展了ASR后端支持：Moonshine v2（延迟73-107毫秒）和Voxtral-Mini-4B（4B参数，13种语言）</li>
+<li>将会议辅助工具开源到GitHub，附带450行的全面教程</li>
+</ul>
+<p><strong>障碍：</strong></p>
+<ul>
+<li>⚠️ Whisper逐块语言检测会导致句子内代码切换的质量不佳（架构限制，通过自定义词汇表和重转录工作流程解决了这个问题）</li>
+</ul>
+<h3 id="tokenmonitor3天活跃--完成成就">TokenMonitor（3天活跃）— ✅ 完成<strong>成就：</strong><a hidden class="anchor" aria-hidden="true" href="#tokenmonitor3天活跃--完成成就">#</a></h3>
+<ul>
+<li>统一了缓存层的定价策略，与Claude Code的定价完全一致（利率为1.25倍），并增加了网络搜索跟踪功能（每次请求收费0.01美元）</li>
+<li>集成OpenRouter API，实现全面的模型覆盖（包含3000多种模型，其中92种为中文模型）</li>
+<li>实现了基于SSH的远程时区感知日期过滤功能（包括TZ偏移检测、本地转换以及新增8个测试场景）</li>
+<li>修复了浮点球塌陷闪烁问题（由WebView2异步渲染引起）以及移动故障（CSS过渡时间问题）</li>
+<li>构建了使用数据存档系统（每小时聚合数据，并进行时间边界去重处理）</li>
+<li>修复了定价缓存版本控制中的错误（添加了CACHE_VERSION=2）</li>
+<li>在CI修复后发布v0.7.2版本</li>
+<li>所有307个Rust代码和219个前端测试均通过</li>
+</ul>
+<h3 id="网站hugo部署基础设施2天活跃已完成">网站/Hugo部署基础设施（2天活跃）——已完成<a hidden class="anchor" aria-hidden="true" href="#网站hugo部署基础设施2天活跃已完成">#</a></h3>
+<p><strong>成就：</strong></p>
+<ul>
+<li>修复了网站/update.sh脚本中的4个严重错误（如步骤编号、PID重复、文件替换、目录保护等问题）</li>
+<li>建立了完整的Hugo部署环境（Hugo扩展版本为0.154.5，使用PaperMod主题，并整合了GitHub Pages功能）</li>
+<li>流水线现在能够完成从压缩到部署的全部7个步骤</li>
+</ul>
+<h3 id="错误恢复基准测试重构2天活跃正在进行中">错误恢复基准测试重构（2天活跃）——正在进行中<a hidden class="anchor" aria-hidden="true" href="#错误恢复基准测试重构2天活跃正在进行中">#</a></h3>
+<p><strong>成就：</strong></p>
+<ul>
+<li>通过提取3个BaseErrorSkill辅助函数，消除了130多行代码重复部分</li>
+<li>通过使用上下文管理器，修复了4个脚本文件中出现的HDF5资源泄漏问题</li>
+<li>完成了226/229个测试的通过情况（发现了3个现有的分类测试错误）</li>
+<li>完成了技术架构文档的编写，回答了3个关键设计问题</li>
+<li>创建了完整的CLAUDE.md和TUTORIAL.md文档，包含了系统架构、12种错误技能分类以及5个RBG组的相关内容</li>
+</ul>
+<p><strong>阻塞问题：</strong></p>
+<ul>
+<li>⚠️ 在stuck_no_progress D1断言中存在3个分类测试失败的情况（这些错误已经存在于测试代码中）</li>
+</ul>
+<h3 id="betterssh终端多路复用器1天活跃已完成">BetterSSH终端多路复用器（1天活跃）——已完成<a hidden class="anchor" aria-hidden="true" href="#betterssh终端多路复用器1天活跃已完成">#</a></h3>
+<p><strong>成就：</strong></p>
+<ul>
+<li>通过超级技能链实现了从零到生产的完整实施过程（从头脑风暴到优化）</li>
+<li>架构：Node.js+Fastify+ssh2/node-pty+React+xterm.js，采用单仓库模式，并支持双WebSocket连接</li>
+<li>以ECL驱动开发，并通过对抗性评审修复了9个缺陷（其中2个为严重安全漏洞：未认证的PTY写入和SSH参数注入）</li>
+<li>实现了41个文件，195个测试通过</li>
+<li>终端升级：WebGL渲染器、Unicode11、Catppuccin主题、ResizeObserver、实例池化等功能</li>
+<li>服务器选择面板支持本地和远程会话功能</li>
+</ul>
+<h3 id="电池预测管道2天活跃已完成">电池预测管道（2天活跃）——已完成<a hidden class="anchor" aria-hidden="true" href="#电池预测管道2天活跃已完成">#</a></h3>
+<p><strong>成就：</strong></p>
+<ul>
+<li>生成了均匀采样的数据集（每周期4个点，通过线性插值得到，共221K行数据）</li>
+<li>识别并删除了导致StandardScaler出现NaN值的损坏数据（电池数据31个，周期833个NaN值）</li>
+<li>实现了全面的训练日志记录功能（实验参数、每个阶段的指标、提前停止机制）</li>
+<li>完成了LiPM基础模型的文献综述（超过30篇论文，涉及6个维度：电池FMs、物理信息融合、不规则时间序列、迁移学习、增强技术）</li>
+</ul>
+<h3 id="ml管道调试bosscrossformer1天活跃已完成">ML管道调试（BOSS/Crossformer）（1天活跃）——已完成<a hidden class="anchor" aria-hidden="true" href="#ml管道调试bosscrossformer1天活跃已完成">#</a></h3>
+<p><strong>成就：</strong></p>
+<ul>
+<li>通过实现conversion_index.json溯源跟踪和三方关联，解决了BOSS PairedDataset映射问题</li>
+<li>修改了build_paired_mapping.py、paired_dataset.py和config.py文件，以支持同时从单个或多个OSS增强数据集中采样</li>
+<li>诊断出Crossformer的性能差距为18倍：发现LIPM零填充和DSW嵌入连续性假设之间存在根本架构差异</li>
+<li>实现了针对电池数据集的时间均匀重采样功能（以1秒、5秒、10秒为间隔，通过scipy插值实现）</li>
+</ul>
+<h3 id="neurips-2025数据集跟踪写作方法1天活跃已完成">NeurIPS 2025数据集跟踪写作方法（1天活跃）——已完成<a hidden class="anchor" aria-hidden="true" href="#neurips-2025数据集跟踪写作方法1天活跃已完成">#</a></h3>
+<p><strong>成就：</strong></p>
+<ul>
+<li>检索了544篇论文，确定了7篇口头报告和8篇重点报告，并通过OpenReview API获取了61份官方评论</li>
+<li>分析了评论者的偏好：以“全面”（17次提及）、 “社区”（17次提及）、 “新颖”（15次提及）和“清晰”（28次提及）作为评价标准</li>
+<li>创建了453行的SKILL.md文档，包含了5种思维模型、10种决策启发式规则以及章节级别的写作指导</li>
+<li>发现口头报告的平均得分（5.00）低于重点报告的平均得分（5.16），这证实了评论分数并非唯一的接受因素</li>
+</ul>
+<h3 id="ocr翻译集成1天活跃已完成">OCR翻译集成（1天活跃）——已完成<a hidden class="anchor" aria-hidden="true" href="#ocr翻译集成1天活跃已完成">#</a></h3>
+<p><strong>成就：</strong></p>
+<ul>
+<li>将Ollama翻译功能集成到OCR项目中，并实现了按需服务管理功能</li>
+<li>增加了重试机制（尝试4次，每次间隔5秒），以确保服务的稳定性</li>
+<li>处理了三个PDF章节，实现了批量OCR和双语翻译功能</li>
+</ul>
+<h2 id="关键任务---betterssh全栈实现从零到生产2026-04-11完整的生命周期需求分析架构设计ecl文档编写以及对抗性评审包含9个缺陷其中2个为关键安全漏洞实现了41个文件通过了195次测试---lifecopilot-openclaw核心功能增强集成2026-04-09整合了7个功能健康监控cronscheduler并发控制配置热重载jsonl生命周期管理会话持久化思维搜索与梦想整合断路器机制新增了10个模块70次测试通过解决方案系统地跟踪了整个过程发现有一个循环列中有4个nan值来源于一个损坏的行电池31循环833standardscaler计算了nan的平均值标准差导致所有缩放后的数值满足data---nan--nan--nan删除了那个损坏的行">关键任务- ✅ <strong>BetterSSH全栈实现（从零到生产）</strong>（2026-04-11）——完整的生命周期：需求分析、架构设计、ECL文档编写以及对抗性评审（包含9个缺陷，其中2个为关键安全漏洞），实现了41个文件，通过了195次测试- ✅ <strong>LifeCopilot OpenClaw核心功能增强集成</strong>（2026-04-09）——整合了7个功能：健康监控、CronScheduler并发控制、配置热重载、JSONL生命周期管理、会话持久化、思维搜索与梦想整合、断路器机制。新增了10个模块，70次测试通过**解决方案：**系统地跟踪了整个过程。发现有一个循环列中有4个NaN值，来源于一个损坏的行（电池31，循环833）。StandardScaler计算了NaN的平均值标准差，导致所有缩放后的数值满足(data - NaN) / NaN = NaN。删除了那个损坏的行。<a hidden class="anchor" aria-hidden="true" href="#关键任务---betterssh全栈实现从零到生产2026-04-11完整的生命周期需求分析架构设计ecl文档编写以及对抗性评审包含9个缺陷其中2个为关键安全漏洞实现了41个文件通过了195次测试---lifecopilot-openclaw核心功能增强集成2026-04-09整合了7个功能健康监控cronscheduler并发控制配置热重载jsonl生命周期管理会话持久化思维搜索与梦想整合断路器机制新增了10个模块70次测试通过解决方案系统地跟踪了整个过程发现有一个循环列中有4个nan值来源于一个损坏的行电池31循环833standardscaler计算了nan的平均值标准差导致所有缩放后的数值满足data---nan--nan--nan删除了那个损坏的行">#</a></h2>
+<h3 id="19-tokenmonitor的成本与claude的cost输出不一致tokenmonitor-2026-04-10解决方案发现tokenmonitor在1小时缓存令牌上使用了20倍的乘数而claude-code则采用了统一的125倍费率已将pricingrs中的cache_write_1h定价调整为与claude-code完全一致">19. TokenMonitor的成本与Claude的/cost输出不一致[TokenMonitor] (2026-04-10)**解决方案：**发现TokenMonitor在1小时缓存令牌上使用了2.0倍的乘数，而Claude Code则采用了统一的1.25倍费率。已将pricing.rs中的cache_write_1h定价调整为与Claude Code完全一致。<a hidden class="anchor" aria-hidden="true" href="#19-tokenmonitor的成本与claude的cost输出不一致tokenmonitor-2026-04-10解决方案发现tokenmonitor在1小时缓存令牌上使用了20倍的乘数而claude-code则采用了统一的125倍费率已将pricingrs中的cache_write_1h定价调整为与claude-code完全一致">#</a></h3>
+<h3 id="20-circuitbreaker-half_open竞争条件在锁外进行状态检查允许多个探针同时进入lifecopilot-2026-04-10">20. CircuitBreaker HALF_OPEN竞争条件：在锁外进行状态检查允许多个探针同时进入[LifeCopilot] (2026-04-10)<a hidden class="anchor" aria-hidden="true" href="#20-circuitbreaker-half_open竞争条件在锁外进行状态检查允许多个探针同时进入lifecopilot-2026-04-10">#</a></h3>
+<p>**解决方案：**将状态检查移入&rsquo;async with self._lock&rsquo;块中，以确保状态检查的原子性以及转换过程。</p>
+<h3 id="21-mihd论文的定位不明确最初被描述为融合策略基准测试核心贡献描述模糊mihd-benchmark-2026-04-10">21. MIHD论文的定位不明确——最初被描述为“融合策略基准测试”，核心贡献描述模糊[MIHD Benchmark] (2026-04-10)<a hidden class="anchor" aria-hidden="true" href="#21-mihd论文的定位不明确最初被描述为融合策略基准测试核心贡献描述模糊mihd-benchmark-2026-04-10">#</a></h3>
+<p>**解决方案：**将其重新定位为“冻结的FM + 自监督融合范式评估”，回答“这种方法能否替代经过微调的方法”。将叙述从方法提案改为系统的边界探索。</p>
+<h3 id="22-litellm定价数据库缺少主要的中文ai模型glmqwendeepseek中文ai生态系统存在系统性差距tokenmonitor-2026-04-10">22. LiteLLM定价数据库缺少主要的中文AI模型（GLM、Qwen、DeepSeek）——中文AI生态系统存在系统性差距[TokenMonitor] (2026-04-10)<a hidden class="anchor" aria-hidden="true" href="#22-litellm定价数据库缺少主要的中文ai模型glmqwendeepseek中文ai生态系统存在系统性差距tokenmonitor-2026-04-10">#</a></h3>
+<p>**解决方案：**将OpenRouter API（包含92个中文模型条目）与LiteLLM优先合并，实现并发获取。OpenRouter提供基础覆盖，LiteLLM在可用时覆盖这些条目。增加了7天的自动刷新功能。</p>
+<h3 id="23-mimicgen增强验证全部失败010场景cubea未解决在表格级别高度为082mimicgen-error-recovery-2026-04-11">23. MimicGen增强验证全部失败（0/10场景），cubeA未解决（在表格级别高度为0.82）[MimicGen Error Recovery] (2026-04-11)<a hidden class="anchor" aria-hidden="true" href="#23-mimicgen增强验证全部失败010场景cubea未解决在表格级别高度为082mimicgen-error-recovery-2026-04-11">#</a></h3>
+<p>**解决方案：**通过多轮诊断找到了根本原因：子任务碎片化（6个子任务=5个边界问题，错误累积）+没有抓取后缓冲区+夹持器检测错误（首次与连续闭合情况不同）+收回子任务未产生扭曲+路径解析错误。已修复所有问题：简化为2个子任务，增加了15帧缓冲器，改进了夹持器检测，将收回操作合并到重新获取操作中，修复了路径解析问题。</p>
+<h3 id="24-success_demoshdf5无法作为mimicgen的源文件缺少env_interface_name和env_interface_type属性mimicgen-error-recovery-2026-04-11">24. success_demos.hdf5无法作为MimicGen的源文件——缺少env_interface_name和env_interface_type属性[MimicGen Error Recovery] (2026-04-11)<a hidden class="anchor" aria-hidden="true" href="#24-success_demoshdf5无法作为mimicgen的源文件缺少env_interface_name和env_interface_type属性mimicgen-error-recovery-2026-04-11">#</a></h3>
+<p>**解决方案：**在三个地方添加了ensure_env_interface attrs()辅助函数：filter_valid_source、augment_success_demos、generate_success_from_error。已修补了7个任务的现有HDF5文件。</p>
+<h3 id="25-betterssh前端按钮无响应websocket消息无声丢失betterssh-2026-04-11">25. BetterSSH前端按钮无响应——WebSocket消息无声丢失[BetterSSH] (2026-04-11)<a hidden class="anchor" aria-hidden="true" href="#25-betterssh前端按钮无响应websocket消息无声丢失betterssh-2026-04-11">#</a></h3>
+<p>**解决方案：**追踪到index.ts中onMessage()占位符返回null。实例化SessionManager，加载SSH/BetterSSH配置，完成完整消息路由（get_sessions、create_session、destroy_session、send_input、resize）。</p>
+<h3 id="26-删除jsonl日志后令牌使用数据消失tokenmonitor-2026-04-11">26. 删除JSONL日志后，令牌使用数据消失[TokenMonitor] (2026-04-11)<a hidden class="anchor" aria-hidden="true" href="#26-删除jsonl日志后令牌使用数据消失tokenmonitor-2026-04-11">#</a></h3>
+<p>**解决方案：**在{app_data_dir}/usage-archive/目录下实现了仅追加的每小时聚合归档，使用时间边界划分（归档覆盖[0..frontier]，实时源覆盖(frontier..now)），以防止重复计算。</p>
+<h3 id="27-claude-code在探索性项目中频繁请求权限影响开发效率infrastructure-2026-04-11">27. Claude Code在探索性项目中频繁请求权限，影响开发效率[Infrastructure] (2026-04-11)<a hidden class="anchor" aria-hidden="true" href="#27-claude-code在探索性项目中频繁请求权限影响开发效率infrastructure-2026-04-11">#</a></h3>
+<p>**解决方案：**将80多个枚举的Bash命令权限简化为单个工具级别的通配符“Bash”，涵盖所有Bash命令。将删除操作从拒绝改为需要确认。</p>
+<h3 id="28-对抗性审查发现websocket写入未经认证atk-007betterssh-2026-04-11">28. 对抗性审查发现WebSocket写入未经认证(ATK-007)[BetterSSH] (2026-04-11)<a hidden class="anchor" aria-hidden="true" href="#28-对抗性审查发现websocket写入未经认证atk-007betterssh-2026-04-11">#</a></h3>
+<p>**解决方案：**添加了REQ-009：127.0.0.1绑定+256位会话令牌（在启动时随机生成并打印），所有WS升级都会验证查询字符串令牌。</p>
+<h3 id="29-openreview-api返回403禁止访问neurips论文评审数据neurips-writing-methodology-2026-04-11">29. OpenReview API返回403禁止访问NeurIPS论文评审数据[NeurIPS Writing Methodology] (2026-04-11)<a hidden class="anchor" aria-hidden="true" href="#29-openreview-api返回403禁止访问neurips论文评审数据neurips-writing-methodology-2026-04-11">#</a></h3>
+<p>**解决方案：**诊断出双层阻塞问题：(1)OpenReview API现在对所有请求强制执行认证令牌（禁用匿名访问）；(2)频繁的探测触发了nginx速率限制。使用用户OpenReview凭据(<a href="mailto:tongtongtot@163.com">tongtongtot@163.com</a>)通过openreview-py SDK登录，成功获取了61篇评论。增加了请求延迟以避免速率限制。</p>
+<h3 id="30-终端渲染质量差字体模糊滚动缓慢中间点击粘贴失败betterssh-2026-04-11">30. 终端渲染质量差——字体模糊，滚动缓慢，中间点击粘贴失败[BetterSSH] (2026-04-11)<a hidden class="anchor" aria-hidden="true" href="#30-终端渲染质量差字体模糊滚动缓慢中间点击粘贴失败betterssh-2026-04-11">#</a></h3>
+<p>**解决方案：**确定xterm.js是行业标准，但缺少插件。添加了WebGL渲染器（GPU加速）、Unicode11（CJK）、改进的主题（Catppuccin Mocha）、更好的字体集（Cascadia Code后备链）。</p>
+<h3 id="31-glm51和deepseek-reasoner显示000定价尽管已集成openroutertokenmonitor-2026-04-11">31. GLM5.1和DeepSeek-Reasoner显示$0.00定价，尽管已集成OpenRouter[TokenMonitor] (2026-04-11)<a hidden class="anchor" aria-hidden="true" href="#31-glm51和deepseek-reasoner显示000定价尽管已集成openroutertokenmonitor-2026-04-11">#</a></h3>
+<p>**解决方案：**在PricingCache结构中添加了版本字段（CACHE_VERSION=2），当引入新的定价来源时，仅包含LiteLLM数据的过时缓存会自动失效。</p>
+<h3 id="32-切换终端会话会丢弃所有终端内容没有滚动回退历史记录betterssh-2026-04-11">32. 切换终端会话会丢弃所有终端内容——没有滚动回退历史记录[BetterSSH] (2026-04-11)<a hidden class="anchor" aria-hidden="true" href="#32-切换终端会话会丢弃所有终端内容没有滚动回退历史记录betterssh-2026-04-11">#</a></h3>
+<p>**解决方案：**改变了终端生命周期：在useEffect([],[])中一次性创建xterm实例，跨会话重复使用。在切换时：term.clear()→订阅新会话→后端发送RingBuffer填充→term.write()</p>
+<h3 id="33-spacemouse收集的实验无法被mimicgen增强而mimicgen生成的实验则可以mimicgen-error-recovery-2026-04-12">33. SpaceMouse收集的实验无法被MimicGen增强，而MimicGen生成的实验则可以[MimicGen Error Recovery] (2026-04-12)<a hidden class="anchor" aria-hidden="true" href="#33-spacemouse收集的实验无法被mimicgen增强而mimicgen生成的实验则可以mimicgen-error-recovery-2026-04-12">#</a></h3>
+<p>**解决方案：**发现MimicGen需要完整的datagen_info元数据（eef_pose、object_poses、target_pose、gripper_action、subtask_term_signals）以及干净的初始状态语义。SpaceMouse实验通常从错误状态开始，缺乏所需的元数据。确定了两个独立的实验流程：恢复实验（简化格式）与成功实验（与MimicGen兼容的格式）</p>
+<h3 id="34-benchmark_rm_idealpy覆盖了每个新实验对的summarycsv导致151673151669的结果丢失mihd-experiments-2026-04-06">34. Benchmark_rm_ideal.py覆盖了每个新实验对的summary.csv，导致151673↔151669的结果丢失[MIHD Experiments] (2026-04-06)<a hidden class="anchor" aria-hidden="true" href="#34-benchmark_rm_idealpy覆盖了每个新实验对的summarycsv导致151673151669的结果丢失mihd-experiments-2026-04-06">#</a></h3>
+<p>**解决方案：**在每对实验完成后立即进行备份（summary_151673_151674.csv），通过heredoc手动重建丢失的151673↔151669数据。</p>
+<h3 id="35-hd-niche-query可视化中有不可见的查询点红色星标记在热图背景中难以识别mihd-visualization-2026-04-06">35. HD Niche Query可视化中有不可见的查询点（红色星标记在热图背景中难以识别）[MIHD Visualization] (2026-04-06)<a hidden class="anchor" aria-hidden="true" href="#35-hd-niche-query可视化中有不可见的查询点红色星标记在热图背景中难以识别mihd-visualization-2026-04-06">#</a></h3>
+<p>**解决方案：**将标记大小从20增加到26，添加白色外环（大小=32），应用于所有4个面板，在H&amp;E面板中添加箭头+文字标签</p>
+<h3 id="36-ollama服务在批量翻译过程中断连接第1026块ocr-translation-2026-04-08">36. Ollama服务在批量翻译过程中断连接（第10/26块）[OCR Translation] (2026-04-08)<a hidden class="anchor" aria-hidden="true" href="#36-ollama服务在批量翻译过程中断连接第1026块ocr-translation-2026-04-08">#</a></h3>
+<p>**解决方案：**在translate_ocr_with_ollama.py中添加重试机制，最多尝试4次，每次间隔5秒的指数式延迟</p>
+<h2 id="学习成果">学习成果<a hidden class="anchor" aria-hidden="true" href="#学习成果">#</a></h2>
+<h3 id="架构架构--ccplan的对抗性评审第5阶段非常有价值在会议辅助系统中作为对抗性批评者的代码评审子代理发现了主规划器遗漏的6个严重问题其中包括严重的中文-英文混合转录限制问题复杂的项目规划必须引入独立的批评视角重点在于规划器可能会遗漏什么而不是计划是否正确--超级力量技能链的力量头脑风暴需求分析ccplan基于ecl驱动的实施优化质量提升构成了完整的软件生命周期ecl文档作为跨会话持续的设计合同可以在多个轮次不同代理甚至不同模型之间保持上下文一致性">架构（架构）- ccplan的对抗性评审（第5阶段）非常有价值。在会议辅助系统中，作为对抗性批评者的代码评审子代理发现了主规划器遗漏的6个严重问题，其中包括严重的中文-英文混合转录限制问题。复杂的项目规划必须引入独立的批评视角，重点在于“规划器可能会遗漏什么”，而不是“计划是否正确”。- 超级力量技能链的力量：头脑风暴（需求分析）→ccplan（基于ECL驱动的实施）→优化（质量提升）构成了完整的软件生命周期。ECL文档作为跨会话持续的“设计合同”，可以在多个轮次、不同代理甚至不同模型之间保持上下文一致性。<a hidden class="anchor" aria-hidden="true" href="#架构架构--ccplan的对抗性评审第5阶段非常有价值在会议辅助系统中作为对抗性批评者的代码评审子代理发现了主规划器遗漏的6个严重问题其中包括严重的中文-英文混合转录限制问题复杂的项目规划必须引入独立的批评视角重点在于规划器可能会遗漏什么而不是计划是否正确--超级力量技能链的力量头脑风暴需求分析ccplan基于ecl驱动的实施优化质量提升构成了完整的软件生命周期ecl文档作为跨会话持续的设计合同可以在多个轮次不同代理甚至不同模型之间保持上下文一致性">#</a></h3>
+<ul>
+<li>对抗性评审的价值：批评者代理在BetterSSH中发现了9个问题，其中2个是严重的（未经验证的PTY写入、SSH参数注入），4个是较严重的（令牌暴力破解、原型污染），这些问题在生产环境中可能导致安全灾难。需求阶段的修复成本远低于代码阶段和生产阶段。</li>
+<li>对于具有位置编码的序列模型来说，零填充并不中立——它会破坏语义意义。Crossformer的DSWEmbedding假设连续段；带有不规则间隙的零填充补丁会误导模型学习到“零模式”，而不是时间依赖性。架构假设必须与数据预处理相匹配。</li>
+<li>在冻结的基础模型嵌入中发现了聚类检索之间的权衡：STAIG的空间图对比学习优化了全局域聚类（ARI 0.546），但过度 homogenize 了边界（96%的相同域检索），而注意力融合则平衡了跨域边界检索（60/40的比例）。最佳策略因任务而异。</li>
+<li>以对象为中心的变形本质：相对于对象的运动模式是不变的，通过坐标变换T_eef_new = T_obj_target × T_obj_src⁻¹ × T_eef_source来保存。两步理解：（1）消除源对象的绝对位置（2）用新对象的位置重新映射。</li>
+<li>MimicGen的原始设计智慧：（1）最小化子任务数量（仅包含2个子任务）（2）抓取后缓冲10-20帧以确保稳定的抓取效果（3）env.reset()回到初始位置可以减少姿态差异（4）准闭环执行（目标姿态到动作的计算每个步骤的增量）</li>
+<li>MimicGen的核心设计是源演示加上env.reset()的随机化：应该将错误场景视为固定的“初始状态”，然后使用placement_initializer生成变体，而不是为每个目标重新注入错误。</li>
+<li>基准论文评估的是范式，而不是方法——《自然方法分析》论文不需要SOTA，但需要系统性的答案来回答“这种方法能走多远”。叙述从“我们的方法是最好的”转变为“这种范式的边界和瓶颈是什么”。</li>
+<li>MCP（模型上下文协议）作为AI助手与外部工具之间的标准接口，大大简化了集成复杂性。会议辅助系统展示了：Screenpipe通过27个MCP工具暴露出所有功能，Claude Code CLI无需自定义代码就能实现完整的会议问答。这证明了标准协议的价值——工具提供商只需实现一次MCP服务器，所有支持MCP的AI助手都可以直接使用。</li>
+<li>忠实的算法实现需要理解完整的执行模型，而不仅仅是数据转换。MimicGen的成功来自于每个子任务的路径级闭环修正，仅靠更好的开环动作变形是无法复制的——表面相似性掩盖了深层次的架构差异。</li>
+<li>错误恢复数据集故意排除了导致错误的动作，以防止模型学习失败模式。训练仅使用人类远程操作演示中的后注入恢复片段，过滤掉成功轨迹。</li>
+<li>数据来源跟踪必须在每个转换流程步骤中明确记录。HDF5到LeRobot的转换会丢失source_file+demo_idx的映射；解决方案是在转换过程中记录conversion_index.json，以便与生成时的元数据建立桥梁键关联，实现1对N的关联。</li>
+<li>并行代理调度模式：将独立模块（配置/解析器/本地PTY）分配给不同的子代理进行并行实现，然后集中验证。开发效率可提高3-5倍。关键是识别没有依赖关系的依赖DAG叶子节点，最大化并行性。</li>
+<li>xterm.js是行业标准的浏览器终端（VS Code、Replit、Vercel、ttyd都使用它）。其质量取决于完整的插件堆栈：WebGL用于GPU渲染，Unicode11用于中文处理，Fit用于调整大小，SearchAddon，WebLinksAddon。仅使用基本的xterm.js不足以满足生产环境需求。</li>
+<li>JSONL（仅追加日志）+内存缓存的混合架构对于需要持久性和性能的场景非常有效。关键设计点：（1）原子写入（tmp→os.replace）可以防止崩溃时的损坏（2）读取时懒加载（首次访问时读取最近的N条记录）可以避免启动缓慢（3）有界缓冲区（deque(maxlen)）可以防止内存泄漏（4）统一的时间戳采用ISO 8601 UTC以避免时区问题（5）定期归档可以防止无限增长</li>
+<li>时间边界划分（存档覆盖已完成的小时，实时源覆盖当前小时）巧妙地解决了去重问题，无需显式的记录级跟踪——零重叠意味着零重复计数- 代码重复会隐藏错误，因为修复不会传播到其他地方。在12个错误技能文件中，帧阈值不一致（e08:30 vs 标准20），这是代码审查时发现的无意问题。提取共享的帮助函数可以确保一致性，并在重构过程中发现错误。</li>
+<li>Node.js 24及以上版本内置了环境变量代理支持（&ndash;use-env-proxy标志/NODE_USE_ENV_PROXY=1），但只读取大写形式的HTTP_PROXY/HTTPS_PROXY/NO_PROXY，而不读取小写形式。当shell代理设置脚本仅导出小写形式时，这是一个常见的陷阱。所有Node CLI工具都需要进行统一修复。</li>
+<li>在将基于LLM的管道从一种语言转换为另一种语言时，验证必须包括：(1)静态提示模板 (2)运行时上下文注入 (3)非文本输出（图表/图片）(4)提示中出现的代码注释 (5)生成的模板/骨架 (6)错误恢复逻辑。并行代理验证模式（每个子系统一个）比单次遍历grep更为彻底。</li>
+<li>日期时间时区处理的细微差别：date_naive()在DateTime<FixedOffset>上提取的是源时区的日期，而不是本地时区的日期。对于远程时间戳过滤，必须先使用with_timezone(&amp;chrono::Local)将日期转换为本地时区。这对于任何跨时区数据的分布式系统来说非常重要。</li>
+<li>StandardScaler的NaN传播机制：任何特征列中存在NaN的单行数据会导致StandardScaler.fit()计算NaN统计值（均值/标准差），并通过(x - NaN) / NaN = NaN的方式传播到所有已缩放的数据。在归一化操作之前，始终需要验证数据的NaN/Inf情况。</li>
+<li>LeRobot 0.4.0中的形状处理设计存在矛盾：validate_frame需要ndarray，而get_hf_features_from_features则将其映射为标量值。解决方案是在episode_buffer层在验证和编码之间插入类型转换。</li>
+<li>始终用真实数据进行交叉验证聚合指标。日志解析错误会导致不正确的统计数据；通过直接检查文件数量（HDF5 demo_N组）和结构化报告（generation_report.json）来验证数据。从已知输入约束出发的合理性检查可以及早发现报告中的错误。</li>
+<li>对抗性代码审查可以发现前向实现中遗漏的问题。批评子代理发现了就地变异的语义、调用点之间的模式差异以及主代理在最初提取帮助方法时忽略的防御性检查位置。</li>
+<li>子任务碎片化带来的成本：每个子任务的边界都是独立的“查询对象姿态→重新变形→5步插值”，错误会不断累积。6个子任务相当于5个错误来源，远远高于原来的1个。</li>
+<li>连续闭合检测的重要性：机器人抓取可能有多次尝试，如果first_gripperClosed超过阈值，则可能会失败。需要检测连续闭合（≥10帧）以确认成功抓取。</li>
+<li>多进程调试的复杂性：(1)每个工作线程需要独立的env+augmenter实例 (2)路径解析更容易出错（相对路径容易错过层次结构）(3)需要明确的绝对路径，如demos_dir (4)robosuite的WARNING需要在工作线程函数中单独抑制</li>
+<li>Asycio状态机的正确性不变量：状态检查和转换必须在同一锁范围内是原子性的；任何超出锁范围的检查都会引入竞争窗口</li>
+<li>时间重采样中的插值与外推：线性插值应保持在观测到的数据范围内。强制数据进入固定的全局范围会导致外推产生无效值。使用每样本自适应范围可以避免外推伪影</li>
+<li>格式兼容性包括三个层面：文件结构（NPZ vs HDF5）、元数据完整性（datagen_info字段）以及语义假设（起始状态、任务覆盖）。一个文件可以通过结构检查，但无法满足语义要求</li>
+<li>MimicGen的源代码示例需要完整的datagen_info元数据（eef_pose、object_poses、target_pose、gripper_action、subtask_term_signals）以及语义假设（干净的初始状态、完整的任务轨迹、有效的子任务转换）。从错误状态恢复的示例需要单独的增强流程</li>
+<li>Homebrew公式已过时，这是一个重要的信号——当遇到低级依赖问题时，首先检查上游维护状态，而不是调试废弃版本</li>
+<li>WebGL渲染相对于原生窗口几何变化是异步的。SetWindowPos会同步修改窗口大小/位置，但Chromium需要1-2帧来渲染新内容。对于具有复杂布局的透明窗口，这种异步差距会导致可见的闪烁。在几何变化前显示ShowWindow(SW_HIDE)，在几何变化后显示SW_SHOWNOACTIVATE可以防止中间帧被合并- 本地LLM翻译（Ollama HY-MT1.5-7B）适用于技术内容的生产环境：在57分钟内完成了74个文件的批量翻译，且翻译质量良好，无需支付API费用或速率限制。对于服务中的短暂故障，需要强大的重试机制（4次尝试，每次间隔5秒）。</li>
+<li>张量操作的向量化消除了Python循环开销，并实现了GPU并行性：将BasicContrastive对比损失从节点级循环重构为批量logsumexp操作，速度提升了10-50倍，同时保持了相同的数学行为。</li>
+<li>从成熟的开源项目中移植经过验证的架构模式比从头开始设计更高效可靠。关键在于理解原始设计的理念（为什么使用4个状态而不是3个？为什么要限制重启次数？为什么要采用指数式退避？），然后适应目标上下文。这种“理解→移植→适应”的工作流程大大降低了设计风险，因为源项目已经发现了潜在的缺陷。</li>
+<li>Claude Code &ndash;output-format stream-json：研究表明Claude原生支持结构化输出（以换行符分隔的JSON格式），无需使用正则表达式进行解析。这一发现使Parser的可靠性从“启发式”提升到了“确定性”。在重新发明之前，应该先进行研究。</li>
+<li>TypeScript严格模式的ROI：195个测试中没有类型错误，这就是生产就绪的代码。类型系统在重构过程中具有非常重要的保护作用（在提取了parsed-state-utils之后，所有调用点都自动进行了类型检查）。前期花费20%的时间编写类型，后期则可以节省80%的调试时间。</li>
+<li>Claude Code权限系统支持工具级别的通配符（例如“Bash”可以匹配所有Bash命令），可以使用最小配置来替代数十种枚举规则。</li>
+<li>全球AI定价需要采用多源策略，并具备地理多样性——西方数据库（LiteLLM）系统性地缺乏中文模型；中文来源也缺乏西方模型。冗余是必不可少的，而不是可选的。</li>
+<li>Rust的性能模式：避免不必要的clone()，使用借用结构体进行序列化，当只需要元数据时，优先进行行计数而非完全反序列化。</li>
+<li>在高性能计算批处理作业中，资源泄漏可能会在长时间运行后累积，导致神秘的OOM崩溃。Python的上下文管理器（“with”语句）可以防止这类错误。所有的h5py.File()调用都应该使用上下文管理器。</li>
+<li>Hugo网站部署需要三个独立的组件：hugo二进制文件、主题仓库和部署Git仓库。任何一个缺失的组件都会导致不同的阶段失败。应该将这些作为明确的先决条件记录在验证清单中。</li>
+<li>Bash set -e脚本需要对可选操作进行防御性保护。在可能缺少目录中查找命令时会触发非零退出码；必须在find/压缩操作之前添加[ -d &ldquo;$DIR&rdquo; ]检查，以区分“目录为空”和“命令失败”。</li>
+<li>在数据执行具有确定性的情况下，数据格式迁移更加安全：保存（初始状态、操作）→在模拟环境中重放→重建缺失字段（目标姿态、物体方向）。这样可以实现向后兼容的增强功能，而无需重新收集整个演示语料库。</li>
+<li>在时间序列上下文中，“均匀采样”通常意味着相同的时间间隔（恒定的Δt），而不是跨类别的平衡样本分布。这对于假设有固定时间步长的序列模型如Transformers非常重要。Scipy插值可以将不规则样本转换为均匀网格。</li>
+<li>在不断变化的数据源中，缓存系统必须包含明确的版本字段——仅TTL过期是不够的，还需要处理模式/源的变化。</li>
+<li>终端大小调整同步需要全链协调：ResizeObserver（前端）→term.onResize→WebSocket消息→SessionManager→PTY.resize()。不匹配会导致在错误的列上包装。去抖动可以防止在拖动调整大小时出现洪水效应。</li>
+<li>终端实例在会话切换时不应被销毁——它们会保留滚动回显缓冲区（10000行）。正确的模式是一次创建，然后通过clear()+后端RingBuffer（2MB）填充来在多个会话中重复使用。</li>
+<li>React闭包陷阱修复模式：第三方库回调（xterm.js onData）在useEffect中注册会捕获过时的属性——这是一个常见的错误。通用解决方案是：props→ref，useEffect同步ref.current，回调读取ref.current。这是React生态系统的最佳实践。</li>
+<li>WebSocket的健壮性有三个要素：重新连接（指数式退避）、压力控制（bufferedAmount检查）以及心跳机制（尚未实现，但应该考虑）。分布式系统的网络层必须假设“连接随时可能断开”，而不是“连接应该是稳定的”。</li>
+<li>文件系统符号链接为双启动系统提供了零开销的双向同步。用符号链接替换单独的Ubuntu/Windows文件夹到单个Windows分区，可以消除同步延迟，并确保单一来源的准确性，而不会造成文件重复。- 对于不规则时间序列数据： (1) 插值到均匀网格可以保持连续性；(2) 时间窗口聚合可以避免零填充；(3) 时间感知模型（GRU-D、BRITS、NAOMI）能够自然处理空白时段；(4) 添加时间差作为特征有助于使模型更加均匀。对于假设数据具有连续性的模型，切勿使用零填充。</li>
+<li>MimicGen在错误场景下的成功率较低（成功演示的整体成功率为57.4%，而人类演示增强的成功率为9.57%）；当自动生成的成功率达到瓶颈时，需要人类远程操作来确保全面覆盖。</li>
+<li>多数据集对比学习需要映射级别的源标记和基于列表的数据集级架构；这使得可以从异构的增强源中灵活采样（单个或多个OSS扰动）。</li>
+<li>NeurIPS DB Track评审优先级（基于61次评审）：最受重视的品质是“全面性”（17次提及）、“社区性”（17次）、“新颖性”（15次）、“清晰性”（28次）、“设计良好”（13次）。最常见的批评是“缺乏比较”（基线不足）、 “细节不足”（方法不明确）、 “范围有限”（应用狭窄）。最佳论文（Artificial Hivemind）的口头评审平均得分最低，为4.75分——AC决策超越了评审分数。口头评审平均得分（5.00）低于焦点评审平均得分（5.16），这表明评分并非唯一的录取因素。</li>
+<li>空间转录组学中的图对比学习发展：从STAIG（节点级别）到QueST（子图级别），再到Loki（跨模态）的发展，表明领域进展是从“每个问题一种方法”到“一个基础模型适用于多种任务”的转变。</li>
+<li>术语选择很重要：无标签与零样本——“零样本”容易被误解为“完全没有训练”，而无标签/无注释则准确传达了“无需手动注释”的核心优势。分层定义（编码器零样本+融合自监督）避免了歧义。</li>
+<li>自监督学习的“自由信号”框架——空间转录组学坐标结构是Visium芯片固有的结构化信息。将空间图视为“自由监督信号”可以明确无标签的价值，并增强其实用性（无需额外的注释成本）。</li>
+<li>LiPM论文展示了用于电池任务的物理信息预训练：使用MMAE进行跨模态耦合，使用CIR进行库仑积分（电荷守恒），使用双尺度编码器进行不规则采样。关键见解是：当物理约束被正确编码时，特定领域的基模型优于通用时间序列模型。</li>
+<li>准备用于MimicGen的数据集需要特定的元数据结构：每个demo_*/datagen_info必须包含env_interface_name和env_interface_type，否则DataGenerator无法正确初始化环境。</li>
+<li>人类演示数据的质量验证应该提前到收集阶段：单纯的远程操作成功是不够的，还必须同时验证重放稳定性和可扩充性，否则将收集大量无法用于训练的数据。</li>
+<li>配额计数逻辑需要反映真实的可用性：仅可扩充的配额应该比仅重放的配额更严格，但更为合理，因为即使可重放的非可扩充演示也无法扩展训练集。- 前沿的ASR模型格局（2026年）：真正的流式模型很少见。Moonshine v2（延迟73-107毫秒，参数数量34-245百万）和Voxtral-Mini-4B-Realtime（延迟480毫秒，参数数量4亿）代表了最先进的技术。Moonshine使用基于回调的API，适合实时转录；Voxtral需要手动分块，但提供更高的准确性。两者都支持Apple Silicon的原生加速（Moonshine使用CoreML，Voxtral使用MLX）。</li>
+<li>OpenReview API认证架构（2026年）：所有数据端点都需要登录令牌；只有/login端点允许匿名访问（返回验证错误）。Web前端通过Next.js RSC使用服务器端凭据。限流在nginx层进行（基于IP），短时间内触发约30次请求。学术论文评审API越来越严格，需要机构或个人凭证。</li>
+<li>代码审查的分层修复方案：CRITICAL（安全/竞争）→HIGH（已弃用的API/私有访问）→MEDIUM（类型/风格）→LOW（linter），并在每层之后进行测试验证，以避免级联故障。</li>
+<li>Pydantic v2迁移模式：<strong>dict</strong>→model_dump()，但测试模拟必须通过辅助函数如_make_settingsmock()同步提供相同的接口。</li>
+<li>多阶段数据处理流程的正确性需要端到端验证——特殊值（如-1）的处理必须在所有阶段保持一致（预处理→数据集→损失→评估）。</li>
+<li>在多管道项目中，技术术语需要明确的项目特定定义。“源演示”在恢复管道中可能意味着不同的东西，而在标准的MimicGen管道中则意味着success_demos.hdf5。文档应建立清晰的命名空间。</li>
+<li>在解决问题过程中生成的文档继承了调试叙述。对于团队入职文档，需要明确的重新表述：说明当前的设计，而不是发现它的路径。受众意识必须外部注入，而不是自发产生。</li>
+</ul>
+<h2 id="人工智能使用注意事项">人工智能使用注意事项<a hidden class="anchor" aria-hidden="true" href="#人工智能使用注意事项">#</a></h2>
+<p><strong>有效模式：</strong></p>
+<ul>
+<li>✓ 并行代理编排用于大规模任务：3个代理在14秒内生成了MIHD 2246行的蓝图，而顺序处理则需要45-60秒；4个代理可以同时完成空间转录组学论文研究</li>
+<li>✓ 超级技能链（头脑风暴→ccplan→优化）提供了完整的软件生命周期框架，ECL文档保持了会话之间的上下文一致性</li>
+<li>✓ ccplan阶段的对抗性评审发现了多个项目中的15个严重问题（BetterSSH中有2个CRITICAL安全问题，LifeCopilot中有6个CRITICAL/HIGH问题），这些问题如果进入生产环境将会造成危害</li>
+<li>✓ 系统化的代码考古学：通过8个框架模块追踪LeRobot类型错误，找到了validate_frame与get_hf_features_from_features之间的矛盾</li>
+<li>✓ 多轮迭代调试：经过6轮调试才解决了所有MimicGen错误（子任务碎片化→撤回→gripper→插值→并行化→缓存）</li>
+<li>✓ 以研究为先的方法：在实现自定义PTY解析器之前，先调查Claude Code &ndash;output-format stream-json，从而将可靠性从启发式提升为确定性</li>
+<li>✓ 在脚本执行前系统性地验证依赖关系：阅读代码→检查依赖关系→验证结构→运行脚本，从而在运行时捕捉环境问题</li>
+<li>✓ 通过多项选择题来结构化澄清需求，逐步缩小解决方案空间，减少歧义</li>
+<li>✓ 带有行号引用的代码考古学为20多个文件中的复杂执行路径提供了精确的技术文档</li>
+<li>✓ 通过性能分析发现了向量化机会：用批处理张量操作替换了每个节点的循环，速度提高了10-50倍</li>
+<li>✓ 通过基准测试对汇总指标进行交叉验证，可以及早发现报告中的错误<strong>局限性：</strong></li>
+<li>✗ 在BetterSSH实施之前未能主动推荐技术研究——需要人工提醒去搜索现有的解决方案</li>
+<li>✗ 隐藏需求的发现不足：错过了BetterSSH中的本地会话支持，直到有人明确提到非SSH CLI的使用</li>
+<li>✗ 初始英文转换遗漏了6类剩余中文内容（运行上下文字符串、图表标签、提示中的评论、模板、错误恢复）——需要明确的并行代理验证</li>
+<li>✗ 概念映射错误：将“训练源演示”解释为MimicGen的success_demos.hdf5，而不是项目特定的“训练恢复演示”，且未进行明确修正</li>
+<li>✗ 文档语气不匹配：“团队入职”需要生成的“纠正叙述”风格，需要明确的受众反馈</li>
+<li>✗ 经过6轮调试才识别出所有MimicGen问题——无法在单次分析中预见全部问题范围</li>
+<li>✗ 过度依赖文件内容缓存导致多次出现“文件已被修改”的错误——需要谨慎重新读取策略</li>
+<li>✗ 无法自主发现集群特定的操作规范（如/app/bin/proxy.sh），必须依赖用户提供的隐性知识</li>
+<li>✗ 在诊断过程中连续请求约30次触发了OpenReview的限制，而并未提前实施指数级退避策略</li>
+<li>✗ 子代理执行进度不透明：5个并行后台代理没有任何中间进度，只有“等待完成”——缺乏实时可见性</li>
+<li>✗ 未主动识别Crossformer零填充与DSW嵌入连续性假设的根本不兼容——直到用户明确询问“此输入还有价值吗？”才发现问题——需要的是基本原理推理，而非表面级的代码比较</li>
+<li>✗ 初始优化计划忽略了normalize_direction()辅助函数中的就地变异副作用；需要明确的对抗性批评来识别这些问题</li>
+<li>✗ 报告了错误的MimicGen统计数据（398个演示），引用了有缺陷的摘要脚本，而并未对真实的HDF5文件或generation_report JSON进行交叉验证</li>
+<li>✗ 安全审查产生了误报：尽管本地HPC管道没有网络暴露，仍将np.load(allow_pickle=True)标记为严重问题</li>
+<li>✗ 未能明确区分“均匀采样”术语，默认采用统计分布解释，而不是时间规律性，且没有进行说明</li>
+<li>✗ OCR翻译设计完全依赖于5轮用户互动来提供实现选择；没有主动分析源文件特征</li>
+<li>✗ 在规划.codex/配置时未预料到只读挂载点限制，需要在执行过程中转向AGENTS.md方法</li>
+<li>✗ 在切换到conda run，然后切换到系统Python之前，多次尝试使用conda activate后台命令失败</li>
+<li>✗ 只有在第一次服务失败后才添加了Ollama重试机制；应该预见到本地LLM服务的不稳定性</li>
+</ul>
+<h2 id="下周展望">下周展望<a hidden class="anchor" aria-hidden="true" href="#下周展望">#</a></h2>
+<p><strong>P0关键优先级：</strong> (1) 完成MIHD基准测试剩余的障碍——从已发布的空间转录组学方法中收集ARI数据，并实施DE分析流程，以推动论文提交进程。(2) 通过新重构的增强系统，端到端验证MimicGen错误恢复训练流程，并评估人类收集的演示质量（当前：24个演示，3个可重放，0个可增强）。(3) 解决人类演示收集协议问题——在收集阶段建立质量门限，以确保重放稳定性和可增强性验证，防止数据积累不可用。<strong>正在开发</strong>：(4) 继续电池基础模型研究——实施受LiPM启发的物理信息预训练架构（MMAE+CIR+双尺度编码器），并在均匀采样数据集上进行评估。(5) 部署并监控生产系统——LifeCopilot健康监控涵盖18+服务，进行中英文混合转录质量的现实世界使用测试，BetterSSH多服务器会话管理验证，TokenMonitor定价准确性监控。(6) 开始系统性地优化代码，针对MIHD代码库中的10-50倍加速机会，通过向量化操作实现效率提升。<strong>技术债务与基础设施</strong>：(7) 解决错误恢复基准测试中剩余的3个分类测试错误（停滞无进展D1断言）。(8) 监控OpenRouter API的稳定性，确保中文模型定价覆盖，并在必要时实施回退策略。(9) 标准化剩余项目的开发工具（统一的Claude Code权限，考虑时区处理）。<strong>扩展目标</strong>：将NeurIPS学术写作方法论框架应用于MIHD论文起草；探索固定数据管道的LIBERO训练实验；将Ollama翻译基础设施扩展到剩余项目，并实现CI/CD集成。</p>
+<h2 id="令牌使用统计">令牌使用统计<a hidden class="anchor" aria-hidden="true" href="#令牌使用统计">#</a></h2>
+<p><strong>总计：$399.27</strong> — 4.664亿令牌</p>
+<p><strong>峰值日：</strong> 2026-04-11 — $126.59 / 1.595亿令牌</p>
+<p><strong>每日平均：</strong> $57.04</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
