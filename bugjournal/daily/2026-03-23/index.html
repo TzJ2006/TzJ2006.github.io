@@ -7,7 +7,7 @@
 <meta name="robots" content="index, follow">
 <title>Bug Journal 2026-03-23 | TzJ&#39;s Net</title>
 <meta name="keywords" content="Bug Journal">
-<meta name="description" content="DCC HPC集群已经通过rclone同步技术进行了初始化。此外，GPU节点上的相关配置也已经完成。目前，MIHD研究项目中遇到的几个问题已经被识别并记录下来。">
+<meta name="description" content="在 DCC HPC 集群完成环境初始化（rclone 同步、GPU 节点调研、技能安装），并梳理 MIHD 研究项目的当前问题并写入文档。">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-23/">
 <link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
@@ -85,7 +85,7 @@
 <meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-23/">
   <meta property="og:site_name" content="TzJ&#39;s Net">
   <meta property="og:title" content="Bug Journal 2026-03-23">
-  <meta property="og:description" content="DCC HPC集群已经通过rclone同步技术进行了初始化。此外，GPU节点上的相关配置也已经完成。目前，MIHD研究项目中遇到的几个问题已经被识别并记录下来。">
+  <meta property="og:description" content="在 DCC HPC 集群完成环境初始化（rclone 同步、GPU 节点调研、技能安装），并梳理 MIHD 研究项目的当前问题并写入文档。">
   <meta property="og:locale" content="en_us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="bugjournal">
@@ -94,7 +94,7 @@
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Bug Journal 2026-03-23">
-  <meta name="twitter:description" content="DCC HPC集群已经通过rclone同步技术进行了初始化。此外，GPU节点上的相关配置也已经完成。目前，MIHD研究项目中遇到的几个问题已经被识别并记录下来。">
+  <meta name="twitter:description" content="在 DCC HPC 集群完成环境初始化（rclone 同步、GPU 节点调研、技能安装），并梳理 MIHD 研究项目的当前问题并写入文档。">
 
 
 <script type="application/ld+json">
@@ -129,12 +129,12 @@
   "@type": "BlogPosting",
   "headline": "Bug Journal 2026-03-23",
   "name": "Bug Journal 2026-03-23",
-  "description": "DCC HPC集群已经通过rclone同步技术进行了初始化。此外，GPU节点上的相关配置也已经完成。目前，MIHD研究项目中遇到的几个问题已经被识别并记录下来。",
+  "description": "在 DCC HPC 集群完成环境初始化（rclone 同步、GPU 节点调研、技能安装），并梳理 MIHD 研究项目的当前问题并写入文档。",
   "keywords": [
     "Bug Journal"
   ],
-  "articleBody": "| Model | Input | Output | Number of Cache Entries Created | Number of Cache Entries Read | $1.7933 | 100.0% |\n",
-  "wordCount" : "23",
+  "articleBody": "Daily Report — 2026-03-23 Daily Overview Completed tasks: Synchronized gadget project data on the DCC HPC cluster, installed the cchelper skill, and conducted research on GPU resources. Additionally, I identified the key challenges in the MIHD spatial transcriptomics multimodal clustering project and documented them in a problem summary document. Execution method: Used rclone + sync.py to fetch data from Google Drive. Utilized SLURM commands (sinfo/sacctmgr) to query cluster resources. Manually installed the cchelper skill directory in ~/.claude/skills/. Then, I integrated all issues by analyzing the plans.md/RESULTS.md diagnostic reports. Impact: The new device DCC was configured from scratch to a working environment. The historical issues of the MIHD project were systematically organized into PROBLEM_SUMMARY.md, providing a structured entry point for subsequent ablation experiments and debugging. The DCC HPC cluster was initialized with rclone synchronization, GPU node research, and skill installation. The current issues of the MIHD research project were identified and documented.\nTasks Architecture \u0026 Strategy ✅ MIHD project progress and issue analysis — Reviewed the current status of the MIHD project (best ARI 0.546, root cause of cross-slice retrieval failure, list of fixed bugs) and created a structured problem summary document docs/PROBLEM_SUMMARY.md. Implementation \u0026 Fixes ✅ DCC environment initialization: rclone synchronization of Google Drive data — Created ~/.config/gadget/sync.json on the DCC cluster. Synchronized the four types of data from gdrive:gadget to the local machine using sync.py pull. Successfully synchronized 11 directories and 3 sets of files. ✅ DCC GPU node research — Used sinfo/sacctmgr to find available GPU partitions for the user account (yizhanglab): common (RTX 2080), gpu-common, scavenger-gpu (including A6000/RTX 5000-6000 Ada), and scavenger-h200 (H200×8). The TRES limit for the account is cpu=100, mem=500G. ✅ Installing cchelper skill in DCC — Installed the skills/cchelper directory into ~/.claude/skills/cchelper/, which includes SKILL.md, helper.md, ecl-schema.md, and methods-catalog.md. Problems \u0026 Solutions Critical Issues 1. MIHD cross-slice retrieval almost completely failed (10 out of 14 queries had SL@50=0) Solution: It was determined that the root cause was PCA/STAIG processing each slice independently, resulting in an uncomparable embedding space. The solution is to use scGPT embedding (shared space, average SL@50=0.416, 100% hit rate). Key insight: The comparability of the embedding space (whether it has a shared coordinate system) is more fundamental than the quality of the embedding. Different encoders should be used for cross-slice tasks and single-slice clustering.\n2. The ARI of MIHD single slices differs from the SOTA (current 0.546 vs target 0.60+) Solution: A four-stage ablation experiment plan was developed (clustering ablation → batch effect analysis → retrieval probe → 151676 special diagnosis). This plan has not been fully executed yet. Key insight: The zero variance of the 151676 embedding caused mclust to fail. Retracing to KMeans reduced the mean value, but the root cause remains unknown.\nGeneral Issues 3. There is no ~/.config/gadget/sync.json on DCC, preventing sync.py from running Solution: AI retrieved the existing summarize config to get the rclone remote configuration. Manually created sync.json and verified the remote directory structure before executing pull. Key insight: Configuration files do not automatically migrate during device initialization. It’s necessary to infer from existing configurations and rebuild them.\n4. When using cp -r to copy the cchelper directory, files are copied to ~/.claude/skills/ instead of maintaining the sub-directory structure Solution: After identifying the issue, created sub-directories using mkdir -p ~/.claude/skills/cchelper. Then, moved the scattered files in mv. Key insight: cp -r will copy the contents of the source directory directly if the destination directory already exists. It’s necessary to confirm the destination path before executing this command.\nHuman vs AI Approaches Strategic Level Documenting problem summaries Role Approach Human Users actively asked to write detailed problems into an.md file after AI summarized them. This promoted the documentation of knowledge. AI AI typically responds in conversation form without actively suggesting to document results Difference Analysis: Humans have the ability to convert conversation content into documents. AI tends to provide answers in conversation form rather than actively documenting results.\nImplementation Level Clarifying private file synchronization needs Role Approach Human Users requested to synchronize private files on Google Drive. Their intentions were unclear, and they didn’t specify target directories or specific folders. AI AI listed the directory structure on Google Drive and then asked for specific requirements. It didn’t make any assumptions and proceeded with the execution Difference Analysis: AI chose to confirm rather than guess when the requirements were unclear. This is the correct approach, but the conversation didn’t result in actual synchronization.\nAI Limitations Critical Limitations When analyzing MIHD projects, AI relied entirely on existing documents (plans.md/RESULTS.md/diagnostic reports). It couldn’t infer hidden progress or determine the priority of ablation experiments. General Limitations Copying directories ignored the behavior difference of cp -r when the destination already existed. This resulted in files being copied instead of maintaining the sub-directory structure. This issue was discovered and corrected by AI itself. Searching for rclone configuration using glob search timed out in large HPC file systems (20 seconds). It’s necessary to switch to a more precise path search strategy. Learnings Key Learnings In spatial transcriptomics cross-slice tasks, the comparability of the embedding space (shared coordinate system) is more important than the local quality of the embedding. Foundation Model (scGPT) is suitable for cross-slice retrieval because it outputs a fixed representation space. However, PCA/STAIG processes slices independently, making the coordinate system non-comparable. The optimal method for single-slice clustering (STAIG) is different from the optimal method for cross-slice retrieval (scGPT). Different encoders need to be chosen for different tasks, rather than trying to find a unified optimal solution. Practical Learnings The scavenger-h200 partition on the DCC cluster provides H200×8 nodes (although they are抢占式). These nodes are important resources for training tasks that require high memory. The TRES limit of 100 CPU cores and 500G of memory is a hard constraint when submitting large jobs. Conversation Summaries Gadget (DCC) ✅ Synchronized all data from Google Drive according to sync.py configuration 19:27:27.829 | claude_code The user requested to synchronize the content of Google Drive to DCC locally using sync.py configuration. AI found that sync.json didn’t exist. It inferred that the remote path was gdrive:gadget. After creating the configuration file, it performed a dry-run preview, and then executed the actual pull.成功地同步了summarize/research/test/website 共11个目录，6个新目录没有被同步。\n✅ Queryed available GPU nodes and partitions on the DCC SLURM cluster 20:57:23.648 | claude_code The user asked about available GPU nodes on the DCC cluster. AI used the sinfo/sacctmgr command to find out that the user account yizhanglab could access common (RTX 2080), gpu-common, scavenger-gpu (including A6000/RTX 5000-6000 Ada), and scavenger-h200 (H200×8) partitions. The TRES limit was set at cpu=100/mem=500G. AI also provided example srun commands for each partition.\n✅ Installed the cchelper custom skill in DCC 21:03:52.648 | claude_code The user requested to load the skills within the project. AI found the skills/cchelper directory (Evolving Constraint Planning skill) and installed it in ~/.claude/skills/. During this process, cp -r caused files to be copied to ~/.claude/skills/ instead of maintaining the sub-directory structure. AI then discovered this issue and corrected it using mkdir+mv. Finally, it confirmed that 4 skill files were correctly installed in the ~/.claude/skills/cchelper/ subdirectory.\n🔄 Initially explored rclone configuration on DCC to synchronize private Google Drive files 19:20:48.829 | claude_code The user requested to synchronize private files on Google Drive using the existing rclone configuration on the DCC cluster. AI confirmed that rclone was available and that gdrive: remote was configured. It listed the directory structure on the cloud (ADnet/ZLibrary/gadget/summarize/tmp). Since the user didn’t specify the target folder and local path, the conversation ended without actually synchronizing the files.\nMIHD ✅ Analyzed the current progress and main issues of the MIHD project and wrote them into PROBLEM_SUMMARY.md 21:08:23.848 | claude_code The user asked about the progress of the MIHD project and the issues encountered. After reading the plans.md/RESULTS.md diagnostic reports, AI identified that the project had completed the evaluation of the framework and 10 fusion strategies. There were also four unresolved issues (ARI gap/cross-slice retrieval failure/151676 crash/scGPT paradox), as well as five fixed historical bugs. The user further requested to write the issues into a document. AI created docs/PROBLEM_SUMMARY.md, which contained a structured summary of 4 major sections.\nToken Usage Total: $0.71 — 0.7M tokens\n",
+  "wordCount" : "1354",
   "inLanguage": "en",
   "datePublished": "2026-03-23T00:00:00-05:00",
   "dateModified": "2026-03-23T00:00:00-05:00",
@@ -240,11 +240,130 @@
     <h1 class="post-title entry-hint-parent">
       Bug Journal 2026-03-23
     </h1>
-    <div class="post-meta"><span title='2026-03-23 00:00:00 -0500 -0500'>March 23, 2026</span>&nbsp;·&nbsp;<span>1 min</span>
+    <div class="post-meta"><span title='2026-03-23 00:00:00 -0500 -0500'>March 23, 2026</span>&nbsp;·&nbsp;<span>7 min</span>
 
 </div>
   </header> 
-  <div class="post-content"><p>| Model | Input | Output | Number of Cache Entries Created | Number of Cache Entries Read | $1.7933 | 100.0% |</p>
+  <div class="post-content"><h1 id="daily-report--2026-03-23">Daily Report — 2026-03-23<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-03-23">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>Completed tasks:</strong> Synchronized gadget project data on the DCC HPC cluster, installed the cchelper skill, and conducted research on GPU resources. Additionally, I identified the key challenges in the MIHD spatial transcriptomics multimodal clustering project and documented them in a problem summary document.</li>
+<li><strong>Execution method:</strong> Used rclone + sync.py to fetch data from Google Drive. Utilized SLURM commands (sinfo/sacctmgr) to query cluster resources. Manually installed the cchelper skill directory in ~/.claude/skills/. Then, I integrated all issues by analyzing the plans.md/RESULTS.md diagnostic reports.</li>
+<li><strong>Impact:</strong> The new device DCC was configured from scratch to a working environment. The historical issues of the MIHD project were systematically organized into PROBLEM_SUMMARY.md, providing a structured entry point for subsequent ablation experiments and debugging.</li>
+</ul>
+<blockquote>
+<p>The DCC HPC cluster was initialized with rclone synchronization, GPU node research, and skill installation. The current issues of the MIHD research project were identified and documented.</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>MIHD project progress and issue analysis</strong> — Reviewed the current status of the MIHD project (best ARI 0.546, root cause of cross-slice retrieval failure, list of fixed bugs) and created a structured problem summary document docs/PROBLEM_SUMMARY.md.</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>✅ <strong>DCC environment initialization: rclone synchronization of Google Drive data</strong> — Created ~/.config/gadget/sync.json on the DCC cluster. Synchronized the four types of data from gdrive:gadget to the local machine using sync.py pull. Successfully synchronized 11 directories and 3 sets of files.</li>
+<li>✅ <strong>DCC GPU node research</strong> — Used sinfo/sacctmgr to find available GPU partitions for the user account (yizhanglab): common (RTX 2080), gpu-common, scavenger-gpu (including A6000/RTX 5000-6000 Ada), and scavenger-h200 (H200×8). The TRES limit for the account is cpu=100, mem=500G.</li>
+<li>✅ <strong>Installing cchelper skill in DCC</strong> — Installed the skills/cchelper directory into ~/.claude/skills/cchelper/, which includes SKILL.md, helper.md, ecl-schema.md, and methods-catalog.md.</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-mihd-cross-slice-retrieval-almost-completely-failed-10-out-of-14-queries-had-sl500">1. MIHD cross-slice retrieval almost completely failed (10 out of 14 queries had SL@50=0)<a hidden class="anchor" aria-hidden="true" href="#1-mihd-cross-slice-retrieval-almost-completely-failed-10-out-of-14-queries-had-sl500">#</a></h4>
+<p><strong>Solution:</strong> It was determined that the root cause was PCA/STAIG processing each slice independently, resulting in an uncomparable embedding space. The solution is to use scGPT embedding (shared space, average SL@50=0.416, 100% hit rate).
+<strong>Key insight:</strong> The comparability of the embedding space (whether it has a shared coordinate system) is more fundamental than the quality of the embedding. Different encoders should be used for cross-slice tasks and single-slice clustering.</p>
+<h4 id="2-the-ari-of-mihd-single-slices-differs-from-the-sota-current-0546-vs-target-060">2. The ARI of MIHD single slices differs from the SOTA (current 0.546 vs target 0.60+)<a hidden class="anchor" aria-hidden="true" href="#2-the-ari-of-mihd-single-slices-differs-from-the-sota-current-0546-vs-target-060">#</a></h4>
+<p><strong>Solution:</strong> A four-stage ablation experiment plan was developed (clustering ablation → batch effect analysis → retrieval probe → 151676 special diagnosis). This plan has not been fully executed yet.
+<strong>Key insight:</strong> The zero variance of the 151676 embedding caused mclust to fail. Retracing to KMeans reduced the mean value, but the root cause remains unknown.</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="3-there-is-no-configgadgetsyncjson-on-dcc-preventing-syncpy-from-running">3. There is no ~/.config/gadget/sync.json on DCC, preventing sync.py from running<a hidden class="anchor" aria-hidden="true" href="#3-there-is-no-configgadgetsyncjson-on-dcc-preventing-syncpy-from-running">#</a></h4>
+<p><strong>Solution:</strong> AI retrieved the existing summarize config to get the rclone remote configuration. Manually created sync.json and verified the remote directory structure before executing pull.
+<strong>Key insight:</strong> Configuration files do not automatically migrate during device initialization. It&rsquo;s necessary to infer from existing configurations and rebuild them.</p>
+<h4 id="4-when-using-cp--r-to-copy-the-cchelper-directory-files-are-copied-to-claudeskills-instead-of-maintaining-the-sub-directory-structure">4. When using cp -r to copy the cchelper directory, files are copied to ~/.claude/skills/ instead of maintaining the sub-directory structure<a hidden class="anchor" aria-hidden="true" href="#4-when-using-cp--r-to-copy-the-cchelper-directory-files-are-copied-to-claudeskills-instead-of-maintaining-the-sub-directory-structure">#</a></h4>
+<p><strong>Solution:</strong> After identifying the issue, created sub-directories using mkdir -p ~/.claude/skills/cchelper. Then, moved the scattered files in mv.
+<strong>Key insight:</strong> cp -r will copy the contents of the source directory directly if the destination directory already exists. It&rsquo;s necessary to confirm the destination path before executing this command.</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="documenting-problem-summaries">Documenting problem summaries<a hidden class="anchor" aria-hidden="true" href="#documenting-problem-summaries">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Users actively asked to write detailed problems into an.md file after AI summarized them. This promoted the documentation of knowledge.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI typically responds in conversation form without actively suggesting to document results</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Humans have the ability to convert conversation content into documents. AI tends to provide answers in conversation form rather than actively documenting results.</p>
+<h3 id="implementation-level">Implementation Level<a hidden class="anchor" aria-hidden="true" href="#implementation-level">#</a></h3>
+<h4 id="clarifying-private-file-synchronization-needs">Clarifying private file synchronization needs<a hidden class="anchor" aria-hidden="true" href="#clarifying-private-file-synchronization-needs">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Users requested to synchronize private files on Google Drive. Their intentions were unclear, and they didn&rsquo;t specify target directories or specific folders.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI listed the directory structure on Google Drive and then asked for specific requirements. It didn&rsquo;t make any assumptions and proceeded with the execution</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> AI chose to confirm rather than guess when the requirements were unclear. This is the correct approach, but the conversation didn&rsquo;t result in actual synchronization.</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="critical-limitations">Critical Limitations<a hidden class="anchor" aria-hidden="true" href="#critical-limitations">#</a></h3>
+<ul>
+<li>When analyzing MIHD projects, AI relied entirely on existing documents (plans.md/RESULTS.md/diagnostic reports). It couldn&rsquo;t infer hidden progress or determine the priority of ablation experiments.</li>
+</ul>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>Copying directories ignored the behavior difference of cp -r when the destination already existed. This resulted in files being copied instead of maintaining the sub-directory structure. This issue was discovered and corrected by AI itself.</li>
+<li>Searching for rclone configuration using glob search timed out in large HPC file systems (20 seconds). It&rsquo;s necessary to switch to a more precise path search strategy.</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>In spatial transcriptomics cross-slice tasks, the comparability of the embedding space (shared coordinate system) is more important than the local quality of the embedding. Foundation Model (scGPT) is suitable for cross-slice retrieval because it outputs a fixed representation space. However, PCA/STAIG processes slices independently, making the coordinate system non-comparable.</li>
+<li>The optimal method for single-slice clustering (STAIG) is different from the optimal method for cross-slice retrieval (scGPT). Different encoders need to be chosen for different tasks, rather than trying to find a unified optimal solution.</li>
+</ul>
+<h3 id="practical-learnings">Practical Learnings<a hidden class="anchor" aria-hidden="true" href="#practical-learnings">#</a></h3>
+<ul>
+<li>The scavenger-h200 partition on the DCC cluster provides H200×8 nodes (although they are抢占式). These nodes are important resources for training tasks that require high memory. The TRES limit of 100 CPU cores and 500G of memory is a hard constraint when submitting large jobs.</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<h3 id="gadget-dcc">Gadget (DCC)<a hidden class="anchor" aria-hidden="true" href="#gadget-dcc">#</a></h3>
+<p><strong>✅ Synchronized all data from Google Drive according to sync.py configuration</strong>
+<em>19:27:27.829 | claude_code</em>
+The user requested to synchronize the content of Google Drive to DCC locally using sync.py configuration. AI found that sync.json didn&rsquo;t exist. It inferred that the remote path was gdrive:gadget. After creating the configuration file, it performed a dry-run preview, and then executed the actual pull.成功地同步了summarize/research/test/website 共11个目录，6个新目录没有被同步。</p>
+<p><strong>✅ Queryed available GPU nodes and partitions on the DCC SLURM cluster</strong>
+<em>20:57:23.648 | claude_code</em>
+The user asked about available GPU nodes on the DCC cluster. AI used the sinfo/sacctmgr command to find out that the user account yizhanglab could access common (RTX 2080), gpu-common, scavenger-gpu (including A6000/RTX 5000-6000 Ada), and scavenger-h200 (H200×8) partitions. The TRES limit was set at cpu=100/mem=500G. AI also provided example srun commands for each partition.</p>
+<p><strong>✅ Installed the cchelper custom skill in DCC</strong>
+<em>21:03:52.648 | claude_code</em>
+The user requested to load the skills within the project. AI found the skills/cchelper directory (Evolving Constraint Planning skill) and installed it in ~/.claude/skills/. During this process, cp -r caused files to be copied to ~/.claude/skills/ instead of maintaining the sub-directory structure. AI then discovered this issue and corrected it using mkdir+mv. Finally, it confirmed that 4 skill files were correctly installed in the ~/.claude/skills/cchelper/ subdirectory.</p>
+<p><strong>🔄 Initially explored rclone configuration on DCC to synchronize private Google Drive files</strong>
+<em>19:20:48.829 | claude_code</em>
+The user requested to synchronize private files on Google Drive using the existing rclone configuration on the DCC cluster. AI confirmed that rclone was available and that gdrive: remote was configured. It listed the directory structure on the cloud (ADnet/ZLibrary/gadget/summarize/tmp). Since the user didn&rsquo;t specify the target folder and local path, the conversation ended without actually synchronizing the files.</p>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>✅ Analyzed the current progress and main issues of the MIHD project and wrote them into PROBLEM_SUMMARY.md</strong>
+<em>21:08:23.848 | claude_code</em>
+The user asked about the progress of the MIHD project and the issues encountered. After reading the plans.md/RESULTS.md diagnostic reports, AI identified that the project had completed the evaluation of the framework and 10 fusion strategies. There were also four unresolved issues (ARI gap/cross-slice retrieval failure/151676 crash/scGPT paradox), as well as five fixed historical bugs. The user further requested to write the issues into a document. AI created docs/PROBLEM_SUMMARY.md, which contained a structured summary of 4 major sections.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-03-23-usage.png"></p>
+<p><strong>Total: $0.71</strong> — 0.7M tokens</p>
 
 
   </div>

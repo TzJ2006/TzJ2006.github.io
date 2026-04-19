@@ -7,7 +7,7 @@
 <meta name="robots" content="index, follow">
 <title>Bug Journal 2026-02-09 | TzJ&#39;s Net</title>
 <meta name="keywords" content="Bug Journal">
-<meta name="description" content="在MIHD项目的聚类分析和RM-Iideal可视化图表中，新增了一个定量叠加层。所有关于DLPFC切片的基础测试，以及RM-Iideal评估工作，都已经完成。">
+<meta name="description" content="The visualization of the MIHD benchmark tests has been improved, with various metrics now displayed. Additionally, a comprehensive RM-Ideal evaluation of the DLPFC region has been initiated.">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-02-09/">
 <link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
@@ -85,7 +85,7 @@
 <meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-02-09/">
   <meta property="og:site_name" content="TzJ&#39;s Net">
   <meta property="og:title" content="Bug Journal 2026-02-09">
-  <meta property="og:description" content="在MIHD项目的聚类分析和RM-Iideal可视化图表中，新增了一个定量叠加层。所有关于DLPFC切片的基础测试，以及RM-Iideal评估工作，都已经完成。">
+  <meta property="og:description" content="The visualization of the MIHD benchmark tests has been improved, with various metrics now displayed. Additionally, a comprehensive RM-Ideal evaluation of the DLPFC region has been initiated.">
   <meta property="og:locale" content="en_us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="bugjournal">
@@ -94,7 +94,7 @@
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Bug Journal 2026-02-09">
-  <meta name="twitter:description" content="在MIHD项目的聚类分析和RM-Iideal可视化图表中，新增了一个定量叠加层。所有关于DLPFC切片的基础测试，以及RM-Iideal评估工作，都已经完成。">
+  <meta name="twitter:description" content="The visualization of the MIHD benchmark tests has been improved, with various metrics now displayed. Additionally, a comprehensive RM-Ideal evaluation of the DLPFC region has been initiated.">
 
 
 <script type="application/ld+json">
@@ -129,12 +129,12 @@
   "@type": "BlogPosting",
   "headline": "Bug Journal 2026-02-09",
   "name": "Bug Journal 2026-02-09",
-  "description": "在MIHD项目的聚类分析和RM-Iideal可视化图表中，新增了一个定量叠加层。所有关于DLPFC切片的基础测试，以及RM-Iideal评估工作，都已经完成。",
+  "description": "The visualization of the MIHD benchmark tests has been improved, with various metrics now displayed. Additionally, a comprehensive RM-Ideal evaluation of the DLPFC region has been initiated.",
   "keywords": [
     "Bug Journal"
   ],
-  "articleBody": "Token Usage | Token | Input | Output | Cost | Percentage | |———|——–|——–|0.0917|1.2%|\n",
-  "wordCount" : "14",
+  "articleBody": "Daily Report — 2026-02-09 Daily Overview Completed Work: Modified the MIHD visualization process to display clustering metrics (ARI, NMI, Silhouette) and RM-Ideal metrics (Spearman, P@K) directly on the chart. Benchmarks were conducted in 7 DLPFC regions. Implementation Method: Reorganized the visualization functionality using matplotlib subplots with text overlay. Switched from parallel execution to sequential execution to handle GPU memory limitations. --skip_cached was used to preserve existing results. Impact: The visualization function now allows for immediate quantitative evaluation without needing to view the console. The optimal configuration (PCA+UNI+STAIG fusion) was identified, and a comprehensive RM-Ideal benchmark baseline was established. The MIHD benchmark visualization function has been enhanced with metric overlay capabilities. Comprehensive RM-Ideal evaluations are available in 7 DLPFC regions.\nTasks Architecture and Strategy ✅ Run STAIG fusion benchmarks in all DLPFC regions — Executed benchmarks for PCA+UNI+STAIG fusion configurations in 11 DLPFC regions using --skip_cached to preserve existing results. 🔄 Perform RM-Ideal evaluations in 7 regions — Conducted RM-Ideal niche query evaluations for embedding methods in all available regions using the WWL graph kernel. Implementation and Fixes ✅ Add metric overlay to clustering visualizations — Reorganized utils/visualization.py and run_benchmark.py to display ARI/NMI/Silhouette scores below the clustering graph. ✅ Add metric overlay to RM-Ideal visualizations — Added Spearman correlation, P@K, and SameLabel@K metrics to the heatmap visualization in evaluate_rm_ideal.py. Issues and Solutions Key Issues Despite modifying utils/visualization.py, metric overlay still does not appear on the chart. Solution: It was found that there is a duplicate create_clustering_visualization function on line 1644 of run_benchmark.py, covering the utils version. Both versions were modified accordingly.\nKey Insight: In a large code base, it’s necessary to grep all files for function definitions to determine whether a single modification is effective.\nThere is a risk of overwriting existing good results in the pca_uni_staig_fusion directory. Solution: Use --skip_cached instead of --override to preserve cached embeddings from completed regions.\nKey Insight: Before running experiments again, it’s essential to check existing results. Use the cache flag to distinguish between incremental completion and full reruns.\nGeneral Issues When running 3 STAIG fusion experiments simultaneously, OOM termination occurred due to parallel GPU tasks (exit code 137). Solution: Switch to sequential execution by using the \u0026\u0026 command in a single Bash call.\nKey Insight: In deep learning benchmarks involving large amounts of spatial transcriptomics data, exclusive GPU access is required. Parallelization should only be performed on CPU-intensive tasks.\nRegions 151510, 151672, and 151674 failed due to missing spatial coordinates or OpenCV errors. Solution: The script continued processing the remaining regions. These were identified as data integrity issues that required separate investigation.\nKey Insight: A robust benchmark process should validate data prerequisites (spatial coordinates, image files) and gracefully fail when duplicates are encountered, providing clear error messages.\nHuman-AI Approaches Strategic Level Preserve existing good results. Role Method Human The human explicitly stated that there is a folder named pca_uni_staig_fusion containing very good results, and advised not to overwrite them. AI The AI initially ran with the --override flag, which would overwrite existing results. Difference Analysis: Humans knew which results were valuable and should be preserved. The AI reran everything without checking the existing work.\nDetect duplicate function definitions. Role Method Human The human noticed that the metrics did not appear and suggested investigating why the modification didn’t work. AI The AI modified utils/visualization.py, but did not check if there were other functions with the same name in the code base. Difference Analysis: Humans’ domain knowledge helped identify that run_benchmark.py might have its own local copy. The AI relied on grep after the fact, rather than actively checking for shadow functions.\nImplementation Level Identify the best configuration. Role Method Human The human asked to check the logs and run the exact same code to get the highest ARI and NMI scores. AI The AI systematically checked all summary CSVs and experiment logs to determine that uni_staig_fusion was the best configuration, followed by pca_uni_staig_fusion. Difference Analysis: Humans provided clear instructions, using metrics as selection criteria. The AI performed systematic comparisons and correctly identified pca_uni_staig_fusion after being clarified by humans.\nAI Limitations Key Limitations Failed to detect duplicate function definitions. Modifications were made to utils/visualization.py, but run_benchmark.py was not checked for local copies, resulting in overwriting. The --override flag was used by default, without checking whether valuable existing results would be lost. General Limitations Attempted to run 3 GPU-intensive deep learning tasks in parallel, leading to OOM termination due to GPU memory limitations. Lessons Learned Key Lessons In a large code base with modular utility tools, always use grep to find all occurrences of function names. Local copies can overwrite imports, causing silent modifications to fail. In deep learning benchmarks involving spatial transcriptomics data (more than 4000 points, 1024-dimensional embeddings, STAIG training), exclusive GPU access is required. Parallelization should only be performed on CPU-intensive tasks like RM-Ideal WWL graph kernels. Experiment management requires clear caching strategies: use --override for full reruns, --skip_cached for incremental completion, and avoid using any flags to fail on duplicate items. Practical Experience Visualization refactoring pattern: Explicitly creating fig/axes makes it possible to add custom annotations (metric text overlay). However, Scanspy’s save= parameter does not support this. Conversation Summary 🔄 Run STAIG fusion benchmarks in all DLPFC regions 21:50:31.276 | claude_code The user requested to run benchmarks for STAIG fusion + UNI2 + GCN/PCA/None in all 12 DLPFC regions. Initial parallel execution led to OOM. Switching to sequential execution, but encountered data issues (missing spatial coordinates). The user explicitly requested to use the pca_uni_staig_fusion configuration with the highest ARI/NMI scores. --skip_cached was used to preserve existing results. Seven regions were successfully completed (four failed due to data issues). 🔄 Start RM-Ideal evaluation benchmarks in all sections 22:57:20.481 | claude_code The user requested to run RM-Ideal niche query evaluations on slides containing available embeddings. Seven parallel evaluation tasks were initiated (one per section), using the WWL graph kernel to calculate spatial segmentation matching scores. Each section took about 25 points per second, involving seven segmentation labels. The evaluations for five sections were completed within minutes, while two sections are still ongoing due to the use of multiple embedding methods.\n✅ Add metric layers for clustering and RM-Ideal visualizations 21:46:17.845 | claude_code The user requested to overlay ARI/NMI scores on the clustering graph and p-values on the RM-Ideal heatmap. This was achieved by restructuring the visualization functions to use explicit matplotlib subplots with text annotations. A duplicate function definition was found in run_benchmark.py, which overrides the functionality in utils/visualization.py. This was tested in region 151508, and the metrics were displayed correctly.\nToken Usage Total usage: $7.87 — 10 million tokens\n",
+  "wordCount" : "1095",
   "inLanguage": "en",
   "datePublished": "2026-02-09T00:00:00-05:00",
   "dateModified": "2026-02-09T00:00:00-05:00",
@@ -240,13 +240,142 @@
     <h1 class="post-title entry-hint-parent">
       Bug Journal 2026-02-09
     </h1>
-    <div class="post-meta"><span title='2026-02-09 00:00:00 -0500 EST'>February 9, 2026</span>&nbsp;·&nbsp;<span>1 min</span>
+    <div class="post-meta"><span title='2026-02-09 00:00:00 -0500 EST'>February 9, 2026</span>&nbsp;·&nbsp;<span>6 min</span>
 
 </div>
   </header> 
-  <div class="post-content"><h3 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h3>
-<p>| Token | Input | Output | Cost | Percentage |
-|&mdash;&mdash;&mdash;|&mdash;&mdash;&ndash;|&mdash;&mdash;&ndash;|0.0917|1.2%|</p>
+  <div class="post-content"><h1 id="daily-report--2026-02-09">Daily Report — 2026-02-09<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-02-09">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>Completed Work:</strong> Modified the MIHD visualization process to display clustering metrics (ARI, NMI, Silhouette) and RM-Ideal metrics (Spearman, P@K) directly on the chart. Benchmarks were conducted in 7 DLPFC regions.</li>
+<li><strong>Implementation Method:</strong> Reorganized the visualization functionality using matplotlib subplots with text overlay. Switched from parallel execution to sequential execution to handle GPU memory limitations. <code>--skip_cached</code> was used to preserve existing results.</li>
+<li><strong>Impact:</strong> The visualization function now allows for immediate quantitative evaluation without needing to view the console. The optimal configuration (PCA+UNI+STAIG fusion) was identified, and a comprehensive RM-Ideal benchmark baseline was established.</li>
+</ul>
+<blockquote>
+<p>The MIHD benchmark visualization function has been enhanced with metric overlay capabilities. Comprehensive RM-Ideal evaluations are available in 7 DLPFC regions.</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture-and-strategy">Architecture and Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture-and-strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Run STAIG fusion benchmarks in all DLPFC regions</strong> — Executed benchmarks for PCA+UNI+STAIG fusion configurations in 11 DLPFC regions using <code>--skip_cached</code> to preserve existing results.</li>
+<li>🔄 <strong>Perform RM-Ideal evaluations in 7 regions</strong> — Conducted RM-Ideal niche query evaluations for embedding methods in all available regions using the WWL graph kernel.</li>
+</ul>
+<h3 id="implementation-and-fixes">Implementation and Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation-and-fixes">#</a></h3>
+<ul>
+<li>✅ <strong>Add metric overlay to clustering visualizations</strong> — Reorganized <code>utils/visualization.py</code> and <code>run_benchmark.py</code> to display ARI/NMI/Silhouette scores below the clustering graph.</li>
+<li>✅ <strong>Add metric overlay to RM-Ideal visualizations</strong> — Added Spearman correlation, P@K, and SameLabel@K metrics to the heatmap visualization in <code>evaluate_rm_ideal.py</code>.</li>
+</ul>
+<h2 id="issues-and-solutions">Issues and Solutions<a hidden class="anchor" aria-hidden="true" href="#issues-and-solutions">#</a></h2>
+<h3 id="key-issues">Key Issues<a hidden class="anchor" aria-hidden="true" href="#key-issues">#</a></h3>
+<h4 id="despite-modifying-utilsvisualizationpy-metric-overlay-still-does-not-appear-on-the-chart">Despite modifying <code>utils/visualization.py</code>, metric overlay still does not appear on the chart.<a hidden class="anchor" aria-hidden="true" href="#despite-modifying-utilsvisualizationpy-metric-overlay-still-does-not-appear-on-the-chart">#</a></h4>
+<p><strong>Solution:</strong> It was found that there is a duplicate <code>create_clustering_visualization</code> function on line 1644 of <code>run_benchmark.py</code>, covering the <code>utils</code> version. Both versions were modified accordingly.</p>
+<p><strong>Key Insight:</strong> In a large code base, it&rsquo;s necessary to grep all files for function definitions to determine whether a single modification is effective.</p>
+<h4 id="there-is-a-risk-of-overwriting-existing-good-results-in-the-pca_uni_staig_fusion-directory">There is a risk of overwriting existing good results in the <code>pca_uni_staig_fusion</code> directory.<a hidden class="anchor" aria-hidden="true" href="#there-is-a-risk-of-overwriting-existing-good-results-in-the-pca_uni_staig_fusion-directory">#</a></h4>
+<p><strong>Solution:</strong> Use <code>--skip_cached</code> instead of <code>--override</code> to preserve cached embeddings from completed regions.</p>
+<p><strong>Key Insight:</strong> Before running experiments again, it&rsquo;s essential to check existing results. Use the cache flag to distinguish between incremental completion and full reruns.</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="when-running-3-staig-fusion-experiments-simultaneously-oom-termination-occurred-due-to-parallel-gpu-tasks-exit-code-137">When running 3 STAIG fusion experiments simultaneously, OOM termination occurred due to parallel GPU tasks (exit code 137).<a hidden class="anchor" aria-hidden="true" href="#when-running-3-staig-fusion-experiments-simultaneously-oom-termination-occurred-due-to-parallel-gpu-tasks-exit-code-137">#</a></h4>
+<p><strong>Solution:</strong> Switch to sequential execution by using the <code>&amp;&amp;</code> command in a single Bash call.</p>
+<p><strong>Key Insight:</strong> In deep learning benchmarks involving large amounts of spatial transcriptomics data, exclusive GPU access is required. Parallelization should only be performed on CPU-intensive tasks.</p>
+<h4 id="regions-151510-151672-and-151674-failed-due-to-missing-spatial-coordinates-or-opencv-errors">Regions 151510, 151672, and 151674 failed due to missing spatial coordinates or OpenCV errors.<a hidden class="anchor" aria-hidden="true" href="#regions-151510-151672-and-151674-failed-due-to-missing-spatial-coordinates-or-opencv-errors">#</a></h4>
+<p><strong>Solution:</strong> The script continued processing the remaining regions. These were identified as data integrity issues that required separate investigation.</p>
+<p><strong>Key Insight:</strong> A robust benchmark process should validate data prerequisites (spatial coordinates, image files) and gracefully fail when duplicates are encountered, providing clear error messages.</p>
+<h2 id="human-ai-approaches">Human-AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="preserve-existing-good-results">Preserve existing good results.<a hidden class="anchor" aria-hidden="true" href="#preserve-existing-good-results">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Method</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>The human explicitly stated that there is a folder named <code>pca_uni_staig_fusion</code> containing very good results, and advised not to overwrite them.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>The AI initially ran with the <code>--override</code> flag, which would overwrite existing results.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Humans knew which results were valuable and should be preserved. The AI reran everything without checking the existing work.</p>
+<h4 id="detect-duplicate-function-definitions">Detect duplicate function definitions.<a hidden class="anchor" aria-hidden="true" href="#detect-duplicate-function-definitions">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Method</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>The human noticed that the metrics did not appear and suggested investigating why the modification didn&rsquo;t work.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>The AI modified <code>utils/visualization.py</code>, but did not check if there were other functions with the same name in the code base.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Humans&rsquo; domain knowledge helped identify that <code>run_benchmark.py</code> might have its own local copy. The AI relied on grep after the fact, rather than actively checking for shadow functions.</p>
+<h3 id="implementation-level">Implementation Level<a hidden class="anchor" aria-hidden="true" href="#implementation-level">#</a></h3>
+<h4 id="identify-the-best-configuration">Identify the best configuration.<a hidden class="anchor" aria-hidden="true" href="#identify-the-best-configuration">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Method</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>The human asked to check the logs and run the exact same code to get the highest ARI and NMI scores.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>The AI systematically checked all summary CSVs and experiment logs to determine that <code>uni_staig_fusion</code> was the best configuration, followed by <code>pca_uni_staig_fusion</code>.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Humans provided clear instructions, using metrics as selection criteria. The AI performed systematic comparisons and correctly identified <code>pca_uni_staig_fusion</code> after being clarified by humans.</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="key-limitations">Key Limitations<a hidden class="anchor" aria-hidden="true" href="#key-limitations">#</a></h3>
+<ul>
+<li>Failed to detect duplicate function definitions. Modifications were made to <code>utils/visualization.py</code>, but <code>run_benchmark.py</code> was not checked for local copies, resulting in overwriting.</li>
+<li>The <code>--override</code> flag was used by default, without checking whether valuable existing results would be lost.</li>
+</ul>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>Attempted to run 3 GPU-intensive deep learning tasks in parallel, leading to OOM termination due to GPU memory limitations.</li>
+</ul>
+<h2 id="lessons-learned">Lessons Learned<a hidden class="anchor" aria-hidden="true" href="#lessons-learned">#</a></h2>
+<h3 id="key-lessons">Key Lessons<a hidden class="anchor" aria-hidden="true" href="#key-lessons">#</a></h3>
+<ul>
+<li>In a large code base with modular utility tools, always use grep to find all occurrences of function names. Local copies can overwrite imports, causing silent modifications to fail.</li>
+<li>In deep learning benchmarks involving spatial transcriptomics data (more than 4000 points, 1024-dimensional embeddings, STAIG training), exclusive GPU access is required. Parallelization should only be performed on CPU-intensive tasks like RM-Ideal WWL graph kernels.</li>
+<li>Experiment management requires clear caching strategies: use <code>--override</code> for full reruns, <code>--skip_cached</code> for incremental completion, and avoid using any flags to fail on duplicate items.</li>
+</ul>
+<h3 id="practical-experience">Practical Experience<a hidden class="anchor" aria-hidden="true" href="#practical-experience">#</a></h3>
+<ul>
+<li>Visualization refactoring pattern: Explicitly creating <code>fig/axes</code> makes it possible to add custom annotations (metric text overlay). However, Scanspy&rsquo;s <code>save=</code> parameter does not support this.</li>
+</ul>
+<h2 id="conversation-summary">Conversation Summary<a hidden class="anchor" aria-hidden="true" href="#conversation-summary">#</a></h2>
+<p><strong>🔄 Run STAIG fusion benchmarks in all DLPFC regions</strong>
+<em>21:50:31.276 | claude_code</em>
+The user requested to run benchmarks for STAIG fusion + UNI2 + GCN/PCA/None in all 12 DLPFC regions. Initial parallel execution led to OOM. Switching to sequential execution, but encountered data issues (missing spatial coordinates). The user explicitly requested to use the <code>pca_uni_staig_fusion</code> configuration with the highest ARI/NMI scores. <code>--skip_cached</code> was used to preserve existing results. Seven regions were successfully completed (four failed due to data issues). <strong>🔄 Start RM-Ideal evaluation benchmarks in all sections</strong>
+<em>22:57:20.481 | claude_code</em>
+The user requested to run RM-Ideal niche query evaluations on slides containing available embeddings. Seven parallel evaluation tasks were initiated (one per section), using the WWL graph kernel to calculate spatial segmentation matching scores. Each section took about 25 points per second, involving seven segmentation labels. The evaluations for five sections were completed within minutes, while two sections are still ongoing due to the use of multiple embedding methods.</p>
+<p><strong>✅ Add metric layers for clustering and RM-Ideal visualizations</strong>
+<em>21:46:17.845 | claude_code</em>
+The user requested to overlay ARI/NMI scores on the clustering graph and p-values on the RM-Ideal heatmap. This was achieved by restructuring the visualization functions to use explicit matplotlib subplots with text annotations. A duplicate function definition was found in <code>run_benchmark.py</code>, which overrides the functionality in <code>utils/visualization.py</code>. This was tested in region 151508, and the metrics were displayed correctly.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-02-09-usage.png"></p>
+<p><strong>Total usage: $7.87</strong> — 10 million tokens</p>
 
 
   </div>

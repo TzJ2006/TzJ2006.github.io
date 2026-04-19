@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-04-19 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Set up website build environment on Linux, debugged translation pipeline failures, and fixed cross-platform compatibility issues">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-04-19/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-04-19/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-19/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-04-19/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-04-19">
+  <meta property="og:description" content="Set up website build environment on Linux, debugged translation pipeline failures, and fixed cross-platform compatibility issues">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-04-19T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-04-19T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-04-19">
+  <meta name="twitter:description" content="Set up website build environment on Linux, debugged translation pipeline failures, and fixed cross-platform compatibility issues">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Daily Summary",
+      "item": "https://tzj2006.github.io/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-04-19",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-04-19/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-04-19",
+  "name": "Bug Journal 2026-04-19",
+  "description": "Set up website build environment on Linux, debugged translation pipeline failures, and fixed cross-platform compatibility issues",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-04-19 Daily Overview What was done: Configured Hugo website build environment and resolved multiple blocking issues in the gadget project’s bilingual content generation pipeline How it was done: Systematic dependency installation via conda/uv/pip, diagnosed tokenizer download failures and YAML frontmatter corruption, applied targeted fixes for empty files and Windows line endings Impact: Achieved successful end-to-end website build with vLLM-accelerated translation, establishing reproducible local development workflow DesktopLinux What was done: Environment setup for gadget website build system, fixed translation pipeline failures (brotli/vLLM), debugged YAML frontmatter issues, resolved bash script syntax errors from Windows line endings How it was done: Installed Python dependencies into conda AI environment using uv package manager, replaced buggy brotlicffi with brotli C extension, installed vLLM for GPU-accelerated translation, fixed 7 corrupted markdown frontmatter files, converted CRLF to LF in update.sh Impact: Hugo build now completes successfully (222ms) with full bilingual content generation; resolved cross-platform compatibility issues blocking Linux development MacBook What was done: No substantive work - all sessions were authentication prompts How it was done: Multiple ‘Not logged in’ messages throughout the day Impact: No development progress on MacBook device Set up website build environment on Linux, debugged translation pipeline failures, and fixed cross-platform compatibility issues\nTasks Architecture \u0026 Strategy ✅ Fix translation model tokenizer download failure — Replace buggy brotlicffi with brotli C extension to fix ‘brotli: decoder process called with data when can_accept_more_data() is False’ error blocking tencent/HY-MT1.5-1.8B tokenizer download ✅ Install vLLM for GPU-accelerated translation — Install vLLM (\u003e=0.8) on Linux to provide VLLMEngine backend for local batch translation, replacing slower transformers backend Implementation \u0026 Fixes ✅ Repair corrupted YAML frontmatter in markdown files — Fix 7 files with YAML parse errors: translation artifacts (HYMTPH_0 placeholders, unescaped brackets in keywords array), unescaped apostrophes in single-quoted summary fields ✅ Set up gadget website build environment on Linux — Install Hugo, Python dependencies (Pillow, torch, transformers, vLLM), uv package manager, and gadget package with website extras into conda AI environment ✅ Fix bash script syntax error from Windows line endings — Convert update.sh from CRLF to LF line endings to resolve ‘syntax error near unexpected token $’\\r’’ error on Linux ✅ Fix empty markdown files blocking Hugo build — Delete 0-byte files (2026-04-monthly.md/.zh.md, 2026-W15-weekly.md/.zh.md, kent_w_nixon.md/.zh.md, 2025-02-16.md/.zh.md) generated from incomplete monthly/weekly summaries Problems \u0026 Solutions Critical Issues 1. Tokenizer download failing with ‘brotli: decoder process called with data when can_accept_more_data() is False’ error Solution: Installed brotli C extension package to replace buggy brotlicffi, cleared HF cache, re-downloaded tokenizer successfully\nKey Insight: brotlicffi has a known decoder bug; the brotli C extension is more reliable for HuggingFace model downloads\n2. Translation engine failing with ‘requires accelerate’ error after tokenizer fix Solution: Installed vLLM (which includes accelerate as dependency) to provide GPU-accelerated VLLMEngine backend for Linux\nKey Insight: On Linux, vLLM is the preferred translation backend (3x faster than transformers) and automatically pulls in all required dependencies\nGeneral Issues 3. YAML parse errors in frontmatter: ‘mapping values are not allowed here’ for fan_chen.md summary field Solution: Changed YAML summary field from single quotes to double quotes to properly escape apostrophes in “This researcher’s” text\nKey Insight: YAML single-quoted strings don’t escape internal apostrophes - need double quotes or literal block scalars for text with apostrophes\n4. Hugo preflight check failing on empty markdown files with ‘missing frontmatter delimiters’ errors Solution: Deleted 0-byte files from outputs/site/ and website/content/ directories - these were remnants of incomplete monthly/weekly generation runs\nKey Insight: Empty files are generated when monthly/weekly summary scripts run before enough data exists; incremental generation should skip these gracefully\n5. Bash script failing with ‘syntax error near unexpected token $’\\r’’ on line 29 Solution: Used sed to convert Windows CRLF line endings to Unix LF line endings in update.sh\nKey Insight: Bash interprets \\r as part of syntax tokens rather than line endings; scripts edited on Windows must be converted before running on Linux\nHuman vs AI Approaches Implementation Level Python package installation strategy Role Approach Human Use uv package manager for faster dependency resolution and installation into existing conda AI environment AI Initially suggested pip install without considering speed optimization or checking for existing environment Difference Analysis: Human knew about uv’s performance benefits and directed AI to check for existing environment first rather than creating new one\nDiagnosing bash syntax error Role Approach Human Immediately suspected Windows line endings issue after seeing syntax error pattern AI Read full script file first, then ran bash -n to identify specific error location before diagnosing CRLF issue Difference Analysis: Human recognized the \\r error pattern from experience; AI needed to methodically verify via bash -n output\nAI Limitations General Limitations Required multiple build iterations to discover all 7 frontmatter errors rather than proactively scanning all markdown files upfront Cannot run sudo commands from Claude Code bash tool - user must manually install system packages like pngquant Did not immediately recognize Windows CRLF line endings as cause of bash syntax error until after running bash -n diagnostic Learnings Key Learnings Local translation infrastructure requires careful dependency chain: brotli (not brotlicffi) for model downloads, vLLM (includes accelerate) for GPU inference on Linux, transformers fallback on Windows YAML frontmatter validation must check for unescaped quotes/apostrophes in single-quoted strings and translation placeholder artifacts before Hugo build Practical Learnings Cross-platform script compatibility requires explicit line ending normalization when files are edited on Windows and executed on Linux uv package manager provides significantly faster dependency resolution than pip for large Python projects, especially when combined with conda environments Conversation Summaries gadget website ✅ Fix translation pipeline and frontmatter validation errors 05:52:18.369 | claude_code Debugged multiple blocking issues in website build: (1) brotli decoder error blocking tokenizer download - fixed by installing brotli C extension and clearing HF cache, (2) missing accelerate dependency - resolved by installing vLLM with GPU acceleration, (3) 7 corrupted markdown files with empty content or YAML parse errors - deleted empty files and fixed unescaped quotes in frontmatter. Final build succeeded in 222ms with full bilingual translation working via VLLMEngine.\n✅ Environment setup for Hugo website build 05:44:30.240 | claude_code Installed website build dependencies into conda AI environment using uv package manager. Verified existing packages (Hugo, Python 3.12, torch, transformers, vLLM), installed gadget[website] editable package, identified pngquant as requiring manual sudo install. Confirmed successful Hugo build (363ms, 197 pages).\n✅ Fix bash syntax error in update.sh 05:50:54.888 | claude_code Resolved bash syntax error ‘unexpected token $’\\r’’ by converting Windows CRLF line endings to Unix LF format using sed. Script now passes bash -n syntax validation.\nSystem administration 🔍 Check disk space and explore file usage 05:47:29.430 | claude_code User requested disk space check on Linux - AI showed 369GB free (21% used) on root partition, 880GB free on Windows mount. User asked about dust command for finding large files but it wasn’t installed.\nToken Usage Total: $65.32 — 59.5M tokens\n",
+  "wordCount" : "1140",
+  "inLanguage": "en",
+  "datePublished": "2026-04-19T00:00:00-05:00",
+  "dateModified": "2026-04-19T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-04-19/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-19/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/daily/">Daily Summary</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-04-19
+    </h1>
+    <div class="post-meta"><span title='2026-04-19 00:00:00 -0500 -0500'>April 19, 2026</span>&nbsp;·&nbsp;<span>6 min</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="daily-report--2026-04-19">Daily Report — 2026-04-19<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-04-19">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Configured Hugo website build environment and resolved multiple blocking issues in the gadget project&rsquo;s bilingual content generation pipeline</li>
+<li><strong>How it was done:</strong> Systematic dependency installation via conda/uv/pip, diagnosed tokenizer download failures and YAML frontmatter corruption, applied targeted fixes for empty files and Windows line endings</li>
+<li><strong>Impact:</strong> Achieved successful end-to-end website build with vLLM-accelerated translation, establishing reproducible local development workflow</li>
+</ul>
+<h3 id="desktoplinux">DesktopLinux<a hidden class="anchor" aria-hidden="true" href="#desktoplinux">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Environment setup for gadget website build system, fixed translation pipeline failures (brotli/vLLM), debugged YAML frontmatter issues, resolved bash script syntax errors from Windows line endings</li>
+<li><strong>How it was done:</strong> Installed Python dependencies into conda AI environment using uv package manager, replaced buggy brotlicffi with brotli C extension, installed vLLM for GPU-accelerated translation, fixed 7 corrupted markdown frontmatter files, converted CRLF to LF in update.sh</li>
+<li><strong>Impact:</strong> Hugo build now completes successfully (222ms) with full bilingual content generation; resolved cross-platform compatibility issues blocking Linux development</li>
+</ul>
+<h3 id="macbook">MacBook<a hidden class="anchor" aria-hidden="true" href="#macbook">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> No substantive work - all sessions were authentication prompts</li>
+<li><strong>How it was done:</strong> Multiple &lsquo;Not logged in&rsquo; messages throughout the day</li>
+<li><strong>Impact:</strong> No development progress on MacBook device</li>
+</ul>
+<blockquote>
+<p>Set up website build environment on Linux, debugged translation pipeline failures, and fixed cross-platform compatibility issues</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Fix translation model tokenizer download failure</strong> — Replace buggy brotlicffi with brotli C extension to fix &lsquo;brotli: decoder process called with data when can_accept_more_data() is False&rsquo; error blocking tencent/HY-MT1.5-1.8B tokenizer download</li>
+<li>✅ <strong>Install vLLM for GPU-accelerated translation</strong> — Install vLLM (&gt;=0.8) on Linux to provide VLLMEngine backend for local batch translation, replacing slower transformers backend</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>✅ <strong>Repair corrupted YAML frontmatter in markdown files</strong> — Fix 7 files with YAML parse errors: translation artifacts (HYMTPH_0 placeholders, unescaped brackets in keywords array), unescaped apostrophes in single-quoted summary fields</li>
+<li>✅ <strong>Set up gadget website build environment on Linux</strong> — Install Hugo, Python dependencies (Pillow, torch, transformers, vLLM), uv package manager, and gadget package with website extras into conda AI environment</li>
+<li>✅ <strong>Fix bash script syntax error from Windows line endings</strong> — Convert update.sh from CRLF to LF line endings to resolve &lsquo;syntax error near unexpected token $&rsquo;\r&rsquo;&rsquo; error on Linux</li>
+<li>✅ <strong>Fix empty markdown files blocking Hugo build</strong> — Delete 0-byte files (2026-04-monthly.md/.zh.md, 2026-W15-weekly.md/.zh.md, kent_w_nixon.md/.zh.md, 2025-02-16.md/.zh.md) generated from incomplete monthly/weekly summaries</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-tokenizer-download-failing-with-brotli-decoder-process-called-with-data-when-can_accept_more_data-is-false-error">1. Tokenizer download failing with &lsquo;brotli: decoder process called with data when can_accept_more_data() is False&rsquo; error<a hidden class="anchor" aria-hidden="true" href="#1-tokenizer-download-failing-with-brotli-decoder-process-called-with-data-when-can_accept_more_data-is-false-error">#</a></h4>
+<p><strong>Solution:</strong> Installed brotli C extension package to replace buggy brotlicffi, cleared HF cache, re-downloaded tokenizer successfully</p>
+<p><strong>Key Insight:</strong> brotlicffi has a known decoder bug; the brotli C extension is more reliable for HuggingFace model downloads</p>
+<h4 id="2-translation-engine-failing-with-requires-accelerate-error-after-tokenizer-fix">2. Translation engine failing with &lsquo;requires accelerate&rsquo; error after tokenizer fix<a hidden class="anchor" aria-hidden="true" href="#2-translation-engine-failing-with-requires-accelerate-error-after-tokenizer-fix">#</a></h4>
+<p><strong>Solution:</strong> Installed vLLM (which includes accelerate as dependency) to provide GPU-accelerated VLLMEngine backend for Linux</p>
+<p><strong>Key Insight:</strong> On Linux, vLLM is the preferred translation backend (3x faster than transformers) and automatically pulls in all required dependencies</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="3-yaml-parse-errors-in-frontmatter-mapping-values-are-not-allowed-here-for-fan_chenmd-summary-field">3. YAML parse errors in frontmatter: &lsquo;mapping values are not allowed here&rsquo; for fan_chen.md summary field<a hidden class="anchor" aria-hidden="true" href="#3-yaml-parse-errors-in-frontmatter-mapping-values-are-not-allowed-here-for-fan_chenmd-summary-field">#</a></h4>
+<p><strong>Solution:</strong> Changed YAML summary field from single quotes to double quotes to properly escape apostrophes in &ldquo;This researcher&rsquo;s&rdquo; text</p>
+<p><strong>Key Insight:</strong> YAML single-quoted strings don&rsquo;t escape internal apostrophes - need double quotes or literal block scalars for text with apostrophes</p>
+<h4 id="4-hugo-preflight-check-failing-on-empty-markdown-files-with-missing-frontmatter-delimiters-errors">4. Hugo preflight check failing on empty markdown files with &lsquo;missing frontmatter delimiters&rsquo; errors<a hidden class="anchor" aria-hidden="true" href="#4-hugo-preflight-check-failing-on-empty-markdown-files-with-missing-frontmatter-delimiters-errors">#</a></h4>
+<p><strong>Solution:</strong> Deleted 0-byte files from outputs/site/ and website/content/ directories - these were remnants of incomplete monthly/weekly generation runs</p>
+<p><strong>Key Insight:</strong> Empty files are generated when monthly/weekly summary scripts run before enough data exists; incremental generation should skip these gracefully</p>
+<h4 id="5-bash-script-failing-with-syntax-error-near-unexpected-token-r-on-line-29">5. Bash script failing with &lsquo;syntax error near unexpected token $&rsquo;\r&rsquo;&rsquo; on line 29<a hidden class="anchor" aria-hidden="true" href="#5-bash-script-failing-with-syntax-error-near-unexpected-token-r-on-line-29">#</a></h4>
+<p><strong>Solution:</strong> Used sed to convert Windows CRLF line endings to Unix LF line endings in update.sh</p>
+<p><strong>Key Insight:</strong> Bash interprets \r as part of syntax tokens rather than line endings; scripts edited on Windows must be converted before running on Linux</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="implementation-level">Implementation Level<a hidden class="anchor" aria-hidden="true" href="#implementation-level">#</a></h3>
+<h4 id="python-package-installation-strategy">Python package installation strategy<a hidden class="anchor" aria-hidden="true" href="#python-package-installation-strategy">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Use uv package manager for faster dependency resolution and installation into existing conda AI environment</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Initially suggested pip install without considering speed optimization or checking for existing environment</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human knew about uv&rsquo;s performance benefits and directed AI to check for existing environment first rather than creating new one</p>
+<h4 id="diagnosing-bash-syntax-error">Diagnosing bash syntax error<a hidden class="anchor" aria-hidden="true" href="#diagnosing-bash-syntax-error">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Immediately suspected Windows line endings issue after seeing syntax error pattern</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Read full script file first, then ran bash -n to identify specific error location before diagnosing CRLF issue</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human recognized the \r error pattern from experience; AI needed to methodically verify via bash -n output</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>Required multiple build iterations to discover all 7 frontmatter errors rather than proactively scanning all markdown files upfront</li>
+<li>Cannot run sudo commands from Claude Code bash tool - user must manually install system packages like pngquant</li>
+<li>Did not immediately recognize Windows CRLF line endings as cause of bash syntax error until after running bash -n diagnostic</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>Local translation infrastructure requires careful dependency chain: brotli (not brotlicffi) for model downloads, vLLM (includes accelerate) for GPU inference on Linux, transformers fallback on Windows</li>
+<li>YAML frontmatter validation must check for unescaped quotes/apostrophes in single-quoted strings and translation placeholder artifacts before Hugo build</li>
+</ul>
+<h3 id="practical-learnings">Practical Learnings<a hidden class="anchor" aria-hidden="true" href="#practical-learnings">#</a></h3>
+<ul>
+<li>Cross-platform script compatibility requires explicit line ending normalization when files are edited on Windows and executed on Linux</li>
+<li>uv package manager provides significantly faster dependency resolution than pip for large Python projects, especially when combined with conda environments</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<h3 id="gadget-website">gadget website<a hidden class="anchor" aria-hidden="true" href="#gadget-website">#</a></h3>
+<p><strong>✅ Fix translation pipeline and frontmatter validation errors</strong>
+<em>05:52:18.369 | claude_code</em>
+Debugged multiple blocking issues in website build: (1) brotli decoder error blocking tokenizer download - fixed by installing brotli C extension and clearing HF cache, (2) missing accelerate dependency - resolved by installing vLLM with GPU acceleration, (3) 7 corrupted markdown files with empty content or YAML parse errors - deleted empty files and fixed unescaped quotes in frontmatter. Final build succeeded in 222ms with full bilingual translation working via VLLMEngine.</p>
+<p><strong>✅ Environment setup for Hugo website build</strong>
+<em>05:44:30.240 | claude_code</em>
+Installed website build dependencies into conda AI environment using uv package manager. Verified existing packages (Hugo, Python 3.12, torch, transformers, vLLM), installed gadget[website] editable package, identified pngquant as requiring manual sudo install. Confirmed successful Hugo build (363ms, 197 pages).</p>
+<p><strong>✅ Fix bash syntax error in update.sh</strong>
+<em>05:50:54.888 | claude_code</em>
+Resolved bash syntax error &lsquo;unexpected token $&rsquo;\r&rsquo;&rsquo; by converting Windows CRLF line endings to Unix LF format using sed. Script now passes bash -n syntax validation.</p>
+<h3 id="system-administration">System administration<a hidden class="anchor" aria-hidden="true" href="#system-administration">#</a></h3>
+<p><strong>🔍 Check disk space and explore file usage</strong>
+<em>05:47:29.430 | claude_code</em>
+User requested disk space check on Linux - AI showed 369GB free (21% used) on root partition, 880GB free on Windows mount. User asked about dust command for finding large files but it wasn&rsquo;t installed.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-04-19-usage.png"></p>
+<p><strong>Total: $65.32</strong> — 59.5M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

@@ -7,7 +7,7 @@
 <meta name="robots" content="index, follow">
 <title>Bug Journal 2026-02-01 | TzJ&#39;s Net</title>
 <meta name="keywords" content="Bug Journal">
-<meta name="description" content="与性能相关的问题已经得到解决。现在，MIHD GCN的实现方式与原始的STAIG完全相同。经过分析，问题的根本原因在于基因特征维度的设置不正确。">
+<meta name="description" content="已经解决了MIHD空间转录组学模型性能下降的问题（性能从0.4降到了0.13）。我们实现了STAIG GCN对齐算法，并发现环境条件和聚类方法是影响模型性能的关键因素。">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-02-01/">
 <link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
@@ -85,7 +85,7 @@
 <meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-02-01/">
   <meta property="og:site_name" content="TzJ&#39;s Net">
   <meta property="og:title" content="Bug Journal 2026-02-01">
-  <meta property="og:description" content="与性能相关的问题已经得到解决。现在，MIHD GCN的实现方式与原始的STAIG完全相同。经过分析，问题的根本原因在于基因特征维度的设置不正确。">
+  <meta property="og:description" content="已经解决了MIHD空间转录组学模型性能下降的问题（性能从0.4降到了0.13）。我们实现了STAIG GCN对齐算法，并发现环境条件和聚类方法是影响模型性能的关键因素。">
   <meta property="og:locale" content="en_us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="bugjournal">
@@ -94,7 +94,7 @@
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Bug Journal 2026-02-01">
-  <meta name="twitter:description" content="与性能相关的问题已经得到解决。现在，MIHD GCN的实现方式与原始的STAIG完全相同。经过分析，问题的根本原因在于基因特征维度的设置不正确。">
+  <meta name="twitter:description" content="已经解决了MIHD空间转录组学模型性能下降的问题（性能从0.4降到了0.13）。我们实现了STAIG GCN对齐算法，并发现环境条件和聚类方法是影响模型性能的关键因素。">
 
 
 <script type="application/ld+json">
@@ -129,12 +129,12 @@
   "@type": "BlogPosting",
   "headline": "Bug Journal 2026-02-01",
   "name": "Bug Journal 2026-02-01",
-  "description": "与性能相关的问题已经得到解决。现在，MIHD GCN的实现方式与原始的STAIG完全相同。经过分析，问题的根本原因在于基因特征维度的设置不正确。",
+  "description": "已经解决了MIHD空间转录组学模型性能下降的问题（性能从0.4降到了0.13）。我们实现了STAIG GCN对齐算法，并发现环境条件和聚类方法是影响模型性能的关键因素。",
   "keywords": [
     "Bug Journal"
   ],
-  "articleBody": "Model Details | Model | Input | Output | Cost | Share | | —- | —- | —- | $0.1840 | 8.4% |\n",
-  "wordCount" : "24",
+  "articleBody": "Daily Report — 2026-02-01 Daily Overview Completed Work: Fixed the significant performance decline of the MIHD model, and aligned the GCN implementation with the original STAIG paper. Implementation Methods: Conducted root cause analysis through version comparison, parameter tracking, and systematic code fixes; conducted parallel proxy exploration to compare across projects. Impact: Improved model performance from ARI 0.09 to 0.28-0.45; clarified the architectural differences between STAIG and MIHD for future development. Debugged and fixed the performance decline of the MIHD spatial transcriptomics model (ARI decreased from 0.4 to 0.13), aligned the STAIG GCN, and identified environment/clustering methods as key factors.\nTasks Architecture and Strategy ✅ Debugged MIHD ARI performance decline (0.4→0.13) — Conducted root cause analysis through parameter analysis, identifying an incorrect gene feature dimension (3000D raw data vs 50D PCA). ✅ Fixed STAIGTrainer parameter handling issues — Corrected num_epochs and edge_weight_method, removed incorrect raw_gene_expr logic; restored default parameters (num_layers=2, tau=30.0, learning_rate=0.001). ✅ Aligned STAIG GCN in MIHD — Added apply_activation_to_last_layer parameter to GCNGeneEncoder, updated edge weight method, and provided CLI support for gcn encoder. ✅ Analyzed GCN implementations across projects — Deployed parallel exploration proxies to systematically compare the differences between STAIG and MIHD GCN architectures across 6 dimensions. Implementation and Fixes ✅ Benchmark GCN + UNI2 + STAIG fusion — Used kmeans clustering for multi-configured comparisons on Section 151676. ✅ Installed dependencies (torch_geometric, scikit-misc) — Set up necessary packages in the current environment for GCN testing. Problems and Solutions Key Issues 1. ARI decreased from 0.4+ to 0.13, unclear why previous configurations worked Solution: Version comparison showed that the code was modified, passing 3000D raw gene expression instead of 50D PCA embeddings to STAIG training; restored use of PCA embeddings.\nKey Insight: run_benchmark_core.py contained incorrect “fix” code, passing 3000D raw gene expression when geneencoder=‘pca’, disrupting the workflow using 50D PCA features.\n2. Even after fixing, test results showed ARI at 0.13 instead of expected 0.4 Solution: Found that tests were performed using kmeans clustering in the base/AI environment; historically successful cases were achieved using rpy2+mclust clustering in the General environment.\nKey Insight: Clustering methods (mclust vs kmeans) have a significant impact on downstream metrics; environment configuration is crucial for reproducibility.\n3. Configuration parameters (num_epochs, learning_rate, num_hidden) were not read correctly Solution: Updated STAIGFusionTrainer.init to read all training parameters from staig_alignment_config, not just tau and num_layers.\nKey Insight: Incomplete configuration parsing led to incorrect hyperparameters being used despite correct YAML configuration.\n4. Edge_weight_method default value was incorrect (‘softmax_log’ vs ‘softmax_neglog’) Solution: Changed default value from ‘softmax_log’ (distance large → weight large) to ‘softmax_neglog’ (distance small → weight large), matching proven high-performance configurations.\nKey Insight: The direction of edge weights significantly affects graph-based learning; STAIG uses logarithmic distances, while optimal MIHD configurations use negative logarithmic distances.\n5. MIHD GCNGeneEncoder architecture did not match the original STAIG implementation Solution: Added apply_activation_to_last_layer parameter (default True) to align with STAIG design, where activation functions are applied to all layers including the last layer.\nKey Insight: Minor architectural differences (last layer activation) can accumulate and lead to differences from the reference implementation.\nHuman and Artificial Intelligence Approaches Strategic Level Root Cause Diagnosis Strategy Role Method Human Immediately assumed differences in environment and clustering methods based on historical knowledge of the General environment Artificial Intelligence Started debugging at the parameter level, traced back through code versions, and finally identified environmental issues after exhausting code-level fixes Difference Analysis: Humans used domain memory and pattern recognition to assume environmental issues early; AI adopted a systematic bottom-up approach, from code to environment.\nUnderstanding the mismatch between 50D and 3000D dimensions Role Method Human Immediately realized that passing raw gene expression (3000D) instead of PCA embeddings (50D) would disrupt STAIG training Artificial Intelligence Identified dimensional differences through log analysis, but needed to test older versions to confirm this was the root cause Difference Analysis: Humans understood the dimensional requirements of a specific domain; AI verified this through empirical testing.\nWhen to use git history for comparison Role Method Human Requested git diff comparison, selecting the successful version (2a9a4b1) to find changes Artificial Intelligence Initially focused on fixing current code parameters; only checked git history after user guidance, revealing some key default parameter changes Difference Analysis: Humans recognized the importance of version control archaeology earlier; AI needed explicit guidance to use git history to debug regression issues.\nLimitations of Artificial Intelligence Key Limitations AI did not immediately realize that kmeans and mclust clustering methods could cause such a large metric difference (ARI 0.13 vs 0.4), requiring the user to point out environmental issues. AI tried to fix a lot of code before checking if tests were running in the wrong environment, wasting debugging time on non-related issues. General Limitations AI did not actively suggest using git blame/log to find the time when regression issues occurred, only using version control after explicit user instructions. AI’s parallel exploration proxies provided a comprehensive architecture comparison, but did not initially consider differences in activation functions as the most important divergence points. Lessons Learned Key Lesson Learned: In machine learning regression debugging, environment configuration (such as conda environments, clustering libraries) may be more important than code-level fixes; ensure the execution environment matches historical successful cases. When debugging performance regression issues, comparing git history with the last known good version is usually faster than directly modifying the current code; version tracing should be an early step in the workflow. Mismatch in input dimensions (50D PCA vs 3000D raw features) can lead to significant performance degradation in graph neural networks; ensure feature dimensions match model expectations. Minor architectural differences (such as last layer activation functions, edge weight directions, etc.) can accumulate and lead to significant differences when replicating research implementations; comprehensive parameter alignment is crucial. The choice of clustering methods (such as mclust vs kmeans) has a significant impact on spatial transcriptomics evaluation metrics; to replicate the results of biological information science papers, it is usually necessary to integrate with R using rpy2. The deployment of parallel proxies for cross-codebase comparison is very effective for systematic architecture analysis; two proxies that simultaneously explored STAIG and MIHD provided a comprehensive comparison result during one round of testing.\nDialogue Summary MIHD Spatial Transcriptomics ✅ Debugged ARI performance regression issue (from 0.4 to 0.13) and fixed STAIG trainer\n05:23:52.274 | claude_code\nThrough systematic debugging, we found that the reason ARI decreased from 0.4+ to 0.13 was due to a code error, passing 3000D raw gene expression data instead of 50D PCA embedding data to STAIG training. We fixed the parameter reading logic, restored correct default values (num_epochs=550, tau=30.0, edge_weight_method=‘softmax_neglog’), and removed the raw_gene_expr logic. Verifying these fixes restored ARI to the range of 0.28-0.45. We found that the best results require a general conda environment with rpy2+mclust, rather than just a basic environment with kmeans.\nMIHD and STAIG Architecture Comparison ✅ Aligned GCN implementations and compared benchmark tests\n05:24:33.554 | claude_code\nWe deployed parallel exploration proxies to systematically compare STAIG and MIHD GCN implementations. We identified six key architectural differences: activation function for the last layer, graph construction efficiency (O(n²) vs O(n log n)), edge weight direction, temperature parameters, default number of layers, and pseudo-label generation methods. We achieved alignment by adding the apply_activation_to_last_layer parameter to GCNGeneEncoder, updating edge weight methods, and providing CLI support. Benchmark tests showed that GCN+UNI2+STAIG had an ARI value of 0.1325 in the kmeans environment, while the expected value in the correct environment was 0.4+.\nToken Usage Total usage: $2.19 — 1.7 million tokens\n",
+  "wordCount" : "1238",
   "inLanguage": "en",
   "datePublished": "2026-02-01T00:00:00-05:00",
   "dateModified": "2026-02-01T00:00:00-05:00",
@@ -240,13 +240,142 @@
     <h1 class="post-title entry-hint-parent">
       Bug Journal 2026-02-01
     </h1>
-    <div class="post-meta"><span title='2026-02-01 00:00:00 -0500 EST'>February 1, 2026</span>&nbsp;·&nbsp;<span>1 min</span>
+    <div class="post-meta"><span title='2026-02-01 00:00:00 -0500 EST'>February 1, 2026</span>&nbsp;·&nbsp;<span>6 min</span>
 
 </div>
   </header> 
-  <div class="post-content"><h3 id="model-details">Model Details<a hidden class="anchor" aria-hidden="true" href="#model-details">#</a></h3>
-<p>| Model | Input | Output | Cost | Share |
-| &mdash;- | &mdash;- | &mdash;- | $0.1840 | 8.4% |</p>
+  <div class="post-content"><h1 id="daily-report--2026-02-01">Daily Report — 2026-02-01<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-02-01">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>Completed Work:</strong> Fixed the significant performance decline of the MIHD model, and aligned the GCN implementation with the original STAIG paper.</li>
+<li><strong>Implementation Methods:</strong> Conducted root cause analysis through version comparison, parameter tracking, and systematic code fixes; conducted parallel proxy exploration to compare across projects.</li>
+<li><strong>Impact:</strong> Improved model performance from ARI 0.09 to 0.28-0.45; clarified the architectural differences between STAIG and MIHD for future development.</li>
+</ul>
+<blockquote>
+<p>Debugged and fixed the performance decline of the MIHD spatial transcriptomics model (ARI decreased from 0.4 to 0.13), aligned the STAIG GCN, and identified environment/clustering methods as key factors.</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture-and-strategy">Architecture and Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture-and-strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Debugged MIHD ARI performance decline (0.4→0.13)</strong> — Conducted root cause analysis through parameter analysis, identifying an incorrect gene feature dimension (3000D raw data vs 50D PCA).</li>
+<li>✅ <strong>Fixed STAIGTrainer parameter handling issues</strong> — Corrected num_epochs and edge_weight_method, removed incorrect raw_gene_expr logic; restored default parameters (num_layers=2, tau=30.0, learning_rate=0.001).</li>
+<li>✅ <strong>Aligned STAIG GCN in MIHD</strong> — Added apply_activation_to_last_layer parameter to GCNGeneEncoder, updated edge weight method, and provided CLI support for gcn encoder.</li>
+<li>✅ <strong>Analyzed GCN implementations across projects</strong> — Deployed parallel exploration proxies to systematically compare the differences between STAIG and MIHD GCN architectures across 6 dimensions.</li>
+</ul>
+<h3 id="implementation-and-fixes">Implementation and Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation-and-fixes">#</a></h3>
+<ul>
+<li>✅ <strong>Benchmark GCN + UNI2 + STAIG fusion</strong> — Used kmeans clustering for multi-configured comparisons on Section 151676.</li>
+<li>✅ <strong>Installed dependencies (torch_geometric, scikit-misc)</strong> — Set up necessary packages in the current environment for GCN testing.</li>
+</ul>
+<h2 id="problems-and-solutions">Problems and Solutions<a hidden class="anchor" aria-hidden="true" href="#problems-and-solutions">#</a></h2>
+<h3 id="key-issues">Key Issues<a hidden class="anchor" aria-hidden="true" href="#key-issues">#</a></h3>
+<h4 id="1-ari-decreased-from-04-to-013-unclear-why-previous-configurations-worked">1. ARI decreased from 0.4+ to 0.13, unclear why previous configurations worked<a hidden class="anchor" aria-hidden="true" href="#1-ari-decreased-from-04-to-013-unclear-why-previous-configurations-worked">#</a></h4>
+<p><strong>Solution:</strong> Version comparison showed that the code was modified, passing 3000D raw gene expression instead of 50D PCA embeddings to STAIG training; restored use of PCA embeddings.</p>
+<p><strong>Key Insight:</strong> run_benchmark_core.py contained incorrect &ldquo;fix&rdquo; code, passing 3000D raw gene expression when geneencoder=&lsquo;pca&rsquo;, disrupting the workflow using 50D PCA features.</p>
+<h4 id="2-even-after-fixing-test-results-showed-ari-at-013-instead-of-expected-04">2. Even after fixing, test results showed ARI at 0.13 instead of expected 0.4<a hidden class="anchor" aria-hidden="true" href="#2-even-after-fixing-test-results-showed-ari-at-013-instead-of-expected-04">#</a></h4>
+<p><strong>Solution:</strong> Found that tests were performed using kmeans clustering in the base/AI environment; historically successful cases were achieved using rpy2+mclust clustering in the General environment.</p>
+<p><strong>Key Insight:</strong> Clustering methods (mclust vs kmeans) have a significant impact on downstream metrics; environment configuration is crucial for reproducibility.</p>
+<h4 id="3-configuration-parameters-num_epochs-learning_rate-num_hidden-were-not-read-correctly">3. Configuration parameters (num_epochs, learning_rate, num_hidden) were not read correctly<a hidden class="anchor" aria-hidden="true" href="#3-configuration-parameters-num_epochs-learning_rate-num_hidden-were-not-read-correctly">#</a></h4>
+<p><strong>Solution:</strong> Updated STAIGFusionTrainer.<strong>init</strong> to read all training parameters from staig_alignment_config, not just tau and num_layers.</p>
+<p><strong>Key Insight:</strong> Incomplete configuration parsing led to incorrect hyperparameters being used despite correct YAML configuration.</p>
+<h4 id="4-edge_weight_method-default-value-was-incorrect-softmax_log-vs-softmax_neglog">4. Edge_weight_method default value was incorrect (&lsquo;softmax_log&rsquo; vs &lsquo;softmax_neglog&rsquo;)<a hidden class="anchor" aria-hidden="true" href="#4-edge_weight_method-default-value-was-incorrect-softmax_log-vs-softmax_neglog">#</a></h4>
+<p><strong>Solution:</strong> Changed default value from &lsquo;softmax_log&rsquo; (distance large → weight large) to &lsquo;softmax_neglog&rsquo; (distance small → weight large), matching proven high-performance configurations.</p>
+<p><strong>Key Insight:</strong> The direction of edge weights significantly affects graph-based learning; STAIG uses logarithmic distances, while optimal MIHD configurations use negative logarithmic distances.</p>
+<h4 id="5-mihd-gcngeneencoder-architecture-did-not-match-the-original-staig-implementation">5. MIHD GCNGeneEncoder architecture did not match the original STAIG implementation<a hidden class="anchor" aria-hidden="true" href="#5-mihd-gcngeneencoder-architecture-did-not-match-the-original-staig-implementation">#</a></h4>
+<p><strong>Solution:</strong> Added apply_activation_to_last_layer parameter (default True) to align with STAIG design, where activation functions are applied to all layers including the last layer.</p>
+<p><strong>Key Insight:</strong> Minor architectural differences (last layer activation) can accumulate and lead to differences from the reference implementation.</p>
+<h2 id="human-and-artificial-intelligence-approaches">Human and Artificial Intelligence Approaches<a hidden class="anchor" aria-hidden="true" href="#human-and-artificial-intelligence-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="root-cause-diagnosis-strategy">Root Cause Diagnosis Strategy<a hidden class="anchor" aria-hidden="true" href="#root-cause-diagnosis-strategy">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Method</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Immediately assumed differences in environment and clustering methods based on historical knowledge of the General environment</td>
+      </tr>
+      <tr>
+          <td>Artificial Intelligence</td>
+          <td>Started debugging at the parameter level, traced back through code versions, and finally identified environmental issues after exhausting code-level fixes</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Humans used domain memory and pattern recognition to assume environmental issues early; AI adopted a systematic bottom-up approach, from code to environment.</p>
+<h4 id="understanding-the-mismatch-between-50d-and-3000d-dimensions">Understanding the mismatch between 50D and 3000D dimensions<a hidden class="anchor" aria-hidden="true" href="#understanding-the-mismatch-between-50d-and-3000d-dimensions">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Method</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Immediately realized that passing raw gene expression (3000D) instead of PCA embeddings (50D) would disrupt STAIG training</td>
+      </tr>
+      <tr>
+          <td>Artificial Intelligence</td>
+          <td>Identified dimensional differences through log analysis, but needed to test older versions to confirm this was the root cause</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Humans understood the dimensional requirements of a specific domain; AI verified this through empirical testing.</p>
+<h4 id="when-to-use-git-history-for-comparison">When to use git history for comparison<a hidden class="anchor" aria-hidden="true" href="#when-to-use-git-history-for-comparison">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Method</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Requested git diff comparison, selecting the successful version (2a9a4b1) to find changes</td>
+      </tr>
+      <tr>
+          <td>Artificial Intelligence</td>
+          <td>Initially focused on fixing current code parameters; only checked git history after user guidance, revealing some key default parameter changes</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Humans recognized the importance of version control archaeology earlier; AI needed explicit guidance to use git history to debug regression issues.</p>
+<h2 id="limitations-of-artificial-intelligence">Limitations of Artificial Intelligence<a hidden class="anchor" aria-hidden="true" href="#limitations-of-artificial-intelligence">#</a></h2>
+<h3 id="key-limitations">Key Limitations<a hidden class="anchor" aria-hidden="true" href="#key-limitations">#</a></h3>
+<ul>
+<li>AI did not immediately realize that kmeans and mclust clustering methods could cause such a large metric difference (ARI 0.13 vs 0.4), requiring the user to point out environmental issues.</li>
+<li>AI tried to fix a lot of code before checking if tests were running in the wrong environment, wasting debugging time on non-related issues.</li>
+</ul>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>AI did not actively suggest using git blame/log to find the time when regression issues occurred, only using version control after explicit user instructions.</li>
+<li>AI&rsquo;s parallel exploration proxies provided a comprehensive architecture comparison, but did not initially consider differences in activation functions as the most important divergence points.</li>
+</ul>
+<h2 id="lessons-learned">Lessons Learned<a hidden class="anchor" aria-hidden="true" href="#lessons-learned">#</a></h2>
+<h3 id="key-lesson-learned-in-machine-learning-regression-debugging-environment-configuration-such-as-conda-environments-clustering-libraries-may-be-more-important-than-code-level-fixes-ensure-the-execution-environment-matches-historical-successful-cases">Key Lesson Learned: In machine learning regression debugging, environment configuration (such as conda environments, clustering libraries) may be more important than code-level fixes; ensure the execution environment matches historical successful cases.<a hidden class="anchor" aria-hidden="true" href="#key-lesson-learned-in-machine-learning-regression-debugging-environment-configuration-such-as-conda-environments-clustering-libraries-may-be-more-important-than-code-level-fixes-ensure-the-execution-environment-matches-historical-successful-cases">#</a></h3>
+<p>When debugging performance regression issues, comparing git history with the last known good version is usually faster than directly modifying the current code; version tracing should be an early step in the workflow.
+Mismatch in input dimensions (50D PCA vs 3000D raw features) can lead to significant performance degradation in graph neural networks; ensure feature dimensions match model expectations.
+Minor architectural differences (such as last layer activation functions, edge weight directions, etc.) can accumulate and lead to significant differences when replicating research implementations; comprehensive parameter alignment is crucial.
+The choice of clustering methods (such as mclust vs kmeans) has a significant impact on spatial transcriptomics evaluation metrics; to replicate the results of biological information science papers, it is usually necessary to integrate with R using rpy2.
+The deployment of parallel proxies for cross-codebase comparison is very effective for systematic architecture analysis; two proxies that simultaneously explored STAIG and MIHD provided a comprehensive comparison result during one round of testing.</p>
+<h2 id="dialogue-summary">Dialogue Summary<a hidden class="anchor" aria-hidden="true" href="#dialogue-summary">#</a></h2>
+<h3 id="mihd-spatial-transcriptomics">MIHD Spatial Transcriptomics<a hidden class="anchor" aria-hidden="true" href="#mihd-spatial-transcriptomics">#</a></h3>
+<p><strong>✅ Debugged ARI performance regression issue (from 0.4 to 0.13) and fixed STAIG trainer</strong><br>
+<em>05:23:52.274 | claude_code</em><br>
+Through systematic debugging, we found that the reason ARI decreased from 0.4+ to 0.13 was due to a code error, passing 3000D raw gene expression data instead of 50D PCA embedding data to STAIG training. We fixed the parameter reading logic, restored correct default values (num_epochs=550, tau=30.0, edge_weight_method=&lsquo;softmax_neglog&rsquo;), and removed the raw_gene_expr logic. Verifying these fixes restored ARI to the range of 0.28-0.45. We found that the best results require a general conda environment with rpy2+mclust, rather than just a basic environment with kmeans.</p>
+<h3 id="mihd-and-staig-architecture-comparison">MIHD and STAIG Architecture Comparison<a hidden class="anchor" aria-hidden="true" href="#mihd-and-staig-architecture-comparison">#</a></h3>
+<p><strong>✅ Aligned GCN implementations and compared benchmark tests</strong><br>
+<em>05:24:33.554 | claude_code</em><br>
+We deployed parallel exploration proxies to systematically compare STAIG and MIHD GCN implementations. We identified six key architectural differences: activation function for the last layer, graph construction efficiency (O(n²) vs O(n log n)), edge weight direction, temperature parameters, default number of layers, and pseudo-label generation methods. We achieved alignment by adding the apply_activation_to_last_layer parameter to GCNGeneEncoder, updating edge weight methods, and providing CLI support. Benchmark tests showed that GCN+UNI2+STAIG had an ARI value of 0.1325 in the kmeans environment, while the expected value in the correct environment was 0.4+.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-02-01-usage.png"></p>
+<p><strong>Total usage: $2.19</strong> — 1.7 million tokens</p>
 
 
   </div>

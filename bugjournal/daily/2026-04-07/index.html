@@ -7,7 +7,7 @@
 <meta name="robots" content="index, follow">
 <title>Bug Journal 2026-04-07 | TzJ&#39;s Net</title>
 <meta name="keywords" content="Bug Journal">
-<meta name="description" content="网站更新过程已经恢复至正常运作状态。所有步骤都已经成功完成。与此同时，每日/每月报告的同步处理过程也已经启动。">
+<meta name="description" content="修复 website/update.sh 的 4 个脚本 Bug 并搭建完整 Hugo 部署环境，网站更新流程从完全失败恢复到 7 步全部通过，同时启动全量日报/周报 MCP 同步流程">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-04-07/">
 <link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
@@ -85,7 +85,7 @@
 <meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-04-07/">
   <meta property="og:site_name" content="TzJ&#39;s Net">
   <meta property="og:title" content="Bug Journal 2026-04-07">
-  <meta property="og:description" content="网站更新过程已经恢复至正常运作状态。所有步骤都已经成功完成。与此同时，每日/每月报告的同步处理过程也已经启动。">
+  <meta property="og:description" content="修复 website/update.sh 的 4 个脚本 Bug 并搭建完整 Hugo 部署环境，网站更新流程从完全失败恢复到 7 步全部通过，同时启动全量日报/周报 MCP 同步流程">
   <meta property="og:locale" content="en_us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="bugjournal">
@@ -94,7 +94,7 @@
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Bug Journal 2026-04-07">
-  <meta name="twitter:description" content="网站更新过程已经恢复至正常运作状态。所有步骤都已经成功完成。与此同时，每日/每月报告的同步处理过程也已经启动。">
+  <meta name="twitter:description" content="修复 website/update.sh 的 4 个脚本 Bug 并搭建完整 Hugo 部署环境，网站更新流程从完全失败恢复到 7 步全部通过，同时启动全量日报/周报 MCP 同步流程">
 
 
 <script type="application/ld+json">
@@ -129,12 +129,12 @@
   "@type": "BlogPosting",
   "headline": "Bug Journal 2026-04-07",
   "name": "Bug Journal 2026-04-07",
-  "description": "网站更新过程已经恢复至正常运作状态。所有步骤都已经成功完成。与此同时，每日/每月报告的同步处理过程也已经启动。",
+  "description": "修复 website/update.sh 的 4 个脚本 Bug 并搭建完整 Hugo 部署环境，网站更新流程从完全失败恢复到 7 步全部通过，同时启动全量日报/周报 MCP 同步流程",
   "keywords": [
     "Bug Journal"
   ],
-  "articleBody": "Model Decomposition Model Input Output Reasoning GPT-5.4 8,211,120 103,148 65,215 ",
-  "wordCount" : "10",
+  "articleBody": "Daily Report — 2026-04-07 Daily Overview What was done: Conducted a comprehensive review of the website/update.sh script, fixed 4 bugs in the script, and helped set up a complete Hugo site deployment environment. This allowed the website update process to recover from continuous failures at exit codes 1/127/128 to all passing successfully in 7 steps. How it was done: Used a hierarchical verification strategy: first reviewed the code, then checked dependencies, and finally ran the script. This helped identify missing components (Hugo, theme, deployment repository) and logical bugs (duplicate PIDs, missing files, directory protection issues). After manually installing missing components, multiple verifications were performed. Impact: The website’s CI pipeline is now functional. Hugo build and GitHub Pages deployment paths are connected, allowing content to be published without manual intervention. Additionally, silent errors in the video compression rollback branch were identified and fixed, preventing future content loss. Fixed 4 bugs in the website/update.sh script and set up a complete Hugo deployment environment. The website update process has recovered from complete failure to all passing in 7 steps. The full daily/weekly/monthly MCP synchronization process has also been initiated.\nTasks Architecture \u0026 Strategy ✅ Verified the availability of the website/update.sh script — The system checked all dependencies and directory structures of update.sh. It was found that Hugo was not installed, themes/PaperMod/ were missing, the public/ deployment repository was missing, and pngquant/HandBrakeCLI was not installed. These were both fatal and minor issues. ✅ Fixed the bugs in the update.sh script — Four bugs were fixed: inconsistent step numbers (1/6→1/7), duplicate video compression PIDs added to the pids array, HandBrakeCLI rollback branches did not replace original files after compression, and the find command triggered set -e termination when static/images and static/videos directories did not exist. Implementation \u0026 Fixes ✅ Set up a complete Hugo deployment environment — This was completed by the user: installed Hugo extended v0.154.5, cloned the PaperMod theme to themes/PaperMod, cloned tzj2006.github.io to public/, and configured GitHub authentication. 🔄 Initiated the full daily/weekly/monthly MCP synchronization and merging process — The status was checked using the MCP gadget tool. It was found that there were sessions for 6 dates (Apr 1-5, Apr 7), but no reports were generated. No weekly report was available. Data for Apr 7 was exported, and subsequent data will be merged to generate weekly reports. Problems \u0026 Solutions Critical Issues 1. Hugo was not installed, causing the script to terminate at Step 5 with “hugo: command not found” (exit code 127) Solution: The user installed Hugo extended v0.154.5 using the system package manager.\nKey Insight: set -e will convert any command failure into script termination. The absence of Hugo prevented the 7-step process from reaching the critical build stage.\n2. The themes/PaperMod/ and public/ directories were missing, preventing Hugo build and deployment Solution: The user cloned the PaperMod theme and tzj2006.github.io deployment repository.\nKey Insight: Hugo site deployment depends on three independent components: the Hugo binary, the theme repository, and the deployment Git repository. Any missing component will cause a silent or terminated failure. These conditions should be clearly stated in the documentation.\nGeneral Issues 3. The static/videos directory was missing, causing an error with the find command and set -e to terminate Step 4 unexpectedly Solution: A directory existence check ([ -d “$DIR”]) was added before the find command. If the directory did not exist, the step was skipped.\nKey Insight: Operations on optional/empty directories must be protected in the set -e script. Otherwise, normal “directory not created” scenarios could cause unexpected script termination.\n4. The PIDs of the HandBrakeCLI rollback branch were duplicated in the pids array, and the original files were not replaced after compression (output was .hb.mp4) Solution: The pids+=($!) and echo statements were moved to their respective if/else branches. The \u0026\u0026 mv command was added after the HandBrakeCLI command to replace the original files.\nKey Insight: The PID tracking logic for parallel background tasks needs to be carefully aligned with the if/else control flow. Putting common code outside the branches can lead to duplicate execution and silent file replacement errors.\n5. git push failed due to insufficient GitHub authentication (could not read Username for ‘[[[HYMTPH_0]]’) Solution: The user configured SSH keys or used gh auth before running the script. The script passed successfully.\nKey Insight: HTTPS remotes require pre-configured credentials in non-interactive shells. The deployment repository should use SSH remotes to avoid environmental differences.\nHuman vs AI Approaches Strategic Level Script verification strategy Role Approach Human The user proposed the verification task without specifying the method, expecting to know whether the script worked properly. AI AI preferred static analysis: first reviewed the script and CLAUDE.md to understand the architecture, then checked external dependencies, directory structures, and logical correctness. Finally, the script was run for verification. Difference Analysis: AI’s hierarchical verification identified all fatal problems before running, avoiding multiple blind runs. However, AI cannot solve environment issues at the sudo level, so it ultimately relies on human intervention.\nImplementation Level Hugo installation method Role Approach Human The user chose to install via the system package manager (ubuntu apt), resulting in v0.154.5. AI AI suggested using snap or downloading pre-compiled binaries from GitHub releases. However, this was not possible due to lack of sudo permissions. Difference Analysis: The user’s choice of system package installation was simpler, and the version was more recent than what AI suggested. AI’s suggestion focused more on version control and cross-distribution compatibility, which may be too complex for local development environments.\nAI Limitations General Limitations Unable to execute commands that require sudo privileges (such as installing Hugo or pngquant). Only scripts could be generated, which had to be executed manually by the user. This prevented the entire environment setup from being completed. Unable to configure GitHub authentication (SSH keys or gh auth). This blocked the initial successful deployment, requiring manual intervention by the user. Parallel tool calls failed multiple times during this session due to race conditions. This forced a serial call, significantly reducing efficiency. Learnings Key Learnings Hugo site deployment requires three independent dependencies to be met simultaneously: the Hugo binary, the theme repository, and the deployment Git repository. Any missing dependency can cause failures at different stages. These conditions should be clearly listed in the project documentation. Practical Learnings In the bash set -e script, a directory existence check must be added to the find operation on optional directories. Otherwise, normal “directory not created” scenarios could cause unexpected script termination. The code for parallel background tasks (\u0026 + pids tracking) must be carefully aligned with the if/else control flow. Putting common code outside the branches can lead to duplicate PID tracking and silent file replacement errors. Conversation Summaries Gadget Website ✅ Verified and fixed fatal environment issues and logical bugs in the website/update.sh script. The Hugo deployment process is now fully functional. 04:12:15.435 | claude_code The user requested verification of whether the website update script worked properly. AI used a hierarchical approach to identify three fatal issues: Hugo not installed, PaperMod theme missing, and public deployment repository missing. Additionally, four logical bugs were identified: inconsistent step numbers, duplicate video PID tracking, HandBrakeCLI not replacing files after rollback, and set -e termination when optional directories were missing. After the user installed the required dependencies and configured GitHub authentication, the script passed successfully in 7 steps. Hugo build and GitHub Pages deployment were also verified successfully.\nGadget Summary 🔄 Initiated the full daily/weekly/monthly MCP synchronization and merging process using the MCP gadget tool. 04:25:03.485 | claude_code The user requested simultaneous synchronization and merging of daily/weekly/monthly reports. AI checked the status using the MCP gadget. It was found that there were sessions for 6 dates (Apr 1-5, Apr 7), but no reports were generated. No weekly report was available. Considering the order of daily/weekly/monthly reporting, AI decided to export data for Apr 7 first, then merge it in bulk. The sessions ended while the export was in progress, and the subsequent process was not completed.\nToken Usage Total: $40.04 — 45.4M tokens\n",
+  "wordCount" : "1329",
   "inLanguage": "en",
   "datePublished": "2026-04-07T00:00:00-05:00",
   "dateModified": "2026-04-07T00:00:00-05:00",
@@ -240,29 +240,121 @@
     <h1 class="post-title entry-hint-parent">
       Bug Journal 2026-04-07
     </h1>
-    <div class="post-meta"><span title='2026-04-07 00:00:00 -0500 -0500'>April 7, 2026</span>&nbsp;·&nbsp;<span>1 min</span>
+    <div class="post-meta"><span title='2026-04-07 00:00:00 -0500 -0500'>April 7, 2026</span>&nbsp;·&nbsp;<span>7 min</span>
 
 </div>
   </header> 
-  <div class="post-content"><h3 id="model-decomposition">Model Decomposition<a hidden class="anchor" aria-hidden="true" href="#model-decomposition">#</a></h3>
+  <div class="post-content"><h1 id="daily-report--2026-04-07">Daily Report — 2026-04-07<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-04-07">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Conducted a comprehensive review of the website/update.sh script, fixed 4 bugs in the script, and helped set up a complete Hugo site deployment environment. This allowed the website update process to recover from continuous failures at exit codes 1/127/128 to all passing successfully in 7 steps.</li>
+<li><strong>How it was done:</strong> Used a hierarchical verification strategy: first reviewed the code, then checked dependencies, and finally ran the script. This helped identify missing components (Hugo, theme, deployment repository) and logical bugs (duplicate PIDs, missing files, directory protection issues). After manually installing missing components, multiple verifications were performed.</li>
+<li><strong>Impact:</strong> The website&rsquo;s CI pipeline is now functional. Hugo build and GitHub Pages deployment paths are connected, allowing content to be published without manual intervention. Additionally, silent errors in the video compression rollback branch were identified and fixed, preventing future content loss.</li>
+</ul>
+<blockquote>
+<p>Fixed 4 bugs in the website/update.sh script and set up a complete Hugo deployment environment. The website update process has recovered from complete failure to all passing in 7 steps. The full daily/weekly/monthly MCP synchronization process has also been initiated.</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Verified the availability of the website/update.sh script</strong> — The system checked all dependencies and directory structures of update.sh. It was found that Hugo was not installed, themes/PaperMod/ were missing, the public/ deployment repository was missing, and pngquant/HandBrakeCLI was not installed. These were both fatal and minor issues.</li>
+<li>✅ <strong>Fixed the bugs in the update.sh script</strong> — Four bugs were fixed: inconsistent step numbers (1/6→1/7), duplicate video compression PIDs added to the pids array, HandBrakeCLI rollback branches did not replace original files after compression, and the find command triggered set -e termination when static/images and static/videos directories did not exist.</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>✅ <strong>Set up a complete Hugo deployment environment</strong> — This was completed by the user: installed Hugo extended v0.154.5, cloned the PaperMod theme to themes/PaperMod, cloned tzj2006.github.io to public/, and configured GitHub authentication.</li>
+<li>🔄 <strong>Initiated the full daily/weekly/monthly MCP synchronization and merging process</strong> — The status was checked using the MCP gadget tool. It was found that there were sessions for 6 dates (Apr 1-5, Apr 7), but no reports were generated. No weekly report was available. Data for Apr 7 was exported, and subsequent data will be merged to generate weekly reports.</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-hugo-was-not-installed-causing-the-script-to-terminate-at-step-5-with-hugo-command-not-found-exit-code-127">1. Hugo was not installed, causing the script to terminate at Step 5 with &ldquo;hugo: command not found&rdquo; (exit code 127)<a hidden class="anchor" aria-hidden="true" href="#1-hugo-was-not-installed-causing-the-script-to-terminate-at-step-5-with-hugo-command-not-found-exit-code-127">#</a></h4>
+<p><strong>Solution:</strong> The user installed Hugo extended v0.154.5 using the system package manager.</p>
+<p><strong>Key Insight:</strong> set -e will convert any command failure into script termination. The absence of Hugo prevented the 7-step process from reaching the critical build stage.</p>
+<h4 id="2-the-themespapermod-and-public-directories-were-missing-preventing-hugo-build-and-deployment">2. The themes/PaperMod/ and public/ directories were missing, preventing Hugo build and deployment<a hidden class="anchor" aria-hidden="true" href="#2-the-themespapermod-and-public-directories-were-missing-preventing-hugo-build-and-deployment">#</a></h4>
+<p><strong>Solution:</strong> The user cloned the PaperMod theme and tzj2006.github.io deployment repository.</p>
+<p><strong>Key Insight:</strong> Hugo site deployment depends on three independent components: the Hugo binary, the theme repository, and the deployment Git repository. Any missing component will cause a silent or terminated failure. These conditions should be clearly stated in the documentation.</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="3-the-staticvideos-directory-was-missing-causing-an-error-with-the-find-command-and-set--e-to-terminate-step-4-unexpectedly">3. The static/videos directory was missing, causing an error with the find command and set -e to terminate Step 4 unexpectedly<a hidden class="anchor" aria-hidden="true" href="#3-the-staticvideos-directory-was-missing-causing-an-error-with-the-find-command-and-set--e-to-terminate-step-4-unexpectedly">#</a></h4>
+<p><strong>Solution:</strong> A directory existence check ([ -d &ldquo;$DIR&rdquo;]) was added before the find command. If the directory did not exist, the step was skipped.</p>
+<p><strong>Key Insight:</strong> Operations on optional/empty directories must be protected in the set -e script. Otherwise, normal &ldquo;directory not created&rdquo; scenarios could cause unexpected script termination.</p>
+<h4 id="4-the-pids-of-the-handbrakecli-rollback-branch-were-duplicated-in-the-pids-array-and-the-original-files-were-not-replaced-after-compression-output-was-hbmp4">4. The PIDs of the HandBrakeCLI rollback branch were duplicated in the pids array, and the original files were not replaced after compression (output was .hb.mp4)<a hidden class="anchor" aria-hidden="true" href="#4-the-pids-of-the-handbrakecli-rollback-branch-were-duplicated-in-the-pids-array-and-the-original-files-were-not-replaced-after-compression-output-was-hbmp4">#</a></h4>
+<p><strong>Solution:</strong> The pids+=($!) and echo statements were moved to their respective if/else branches. The &amp;&amp; mv command was added after the HandBrakeCLI command to replace the original files.</p>
+<p><strong>Key Insight:</strong> The PID tracking logic for parallel background tasks needs to be carefully aligned with the if/else control flow. Putting common code outside the branches can lead to duplicate execution and silent file replacement errors.</p>
+<h4 id="5-git-push-failed-due-to-insufficient-github-authentication-could-not-read-username-for-hymtph_0">5. git push failed due to insufficient GitHub authentication (could not read Username for &lsquo;[[[HYMTPH_0]]&rsquo;)<a hidden class="anchor" aria-hidden="true" href="#5-git-push-failed-due-to-insufficient-github-authentication-could-not-read-username-for-hymtph_0">#</a></h4>
+<p><strong>Solution:</strong> The user configured SSH keys or used gh auth before running the script. The script passed successfully.</p>
+<p><strong>Key Insight:</strong> HTTPS remotes require pre-configured credentials in non-interactive shells. The deployment repository should use SSH remotes to avoid environmental differences.</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="script-verification-strategy">Script verification strategy<a hidden class="anchor" aria-hidden="true" href="#script-verification-strategy">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>Model</th>
-          <th>Input</th>
-          <th>Output</th>
-          <th>Reasoning</th>
+          <th>Role</th>
+          <th>Approach</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td>GPT-5.4</td>
-          <td>8,211,120</td>
-          <td>103,148</td>
-          <td>65,215</td>
+          <td>Human</td>
+          <td>The user proposed the verification task without specifying the method, expecting to know whether the script worked properly.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI preferred static analysis: first reviewed the script and CLAUDE.md to understand the architecture, then checked external dependencies, directory structures, and logical correctness. Finally, the script was run for verification.</td>
       </tr>
   </tbody>
 </table>
+<p><strong>Difference Analysis:</strong> AI&rsquo;s hierarchical verification identified all fatal problems before running, avoiding multiple blind runs. However, AI cannot solve environment issues at the sudo level, so it ultimately relies on human intervention.</p>
+<h3 id="implementation-level">Implementation Level<a hidden class="anchor" aria-hidden="true" href="#implementation-level">#</a></h3>
+<h4 id="hugo-installation-method">Hugo installation method<a hidden class="anchor" aria-hidden="true" href="#hugo-installation-method">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>The user chose to install via the system package manager (ubuntu apt), resulting in v0.154.5.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI suggested using snap or downloading pre-compiled binaries from GitHub releases. However, this was not possible due to lack of sudo permissions.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> The user&rsquo;s choice of system package installation was simpler, and the version was more recent than what AI suggested. AI&rsquo;s suggestion focused more on version control and cross-distribution compatibility, which may be too complex for local development environments.</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>Unable to execute commands that require sudo privileges (such as installing Hugo or pngquant). Only scripts could be generated, which had to be executed manually by the user. This prevented the entire environment setup from being completed.</li>
+<li>Unable to configure GitHub authentication (SSH keys or gh auth). This blocked the initial successful deployment, requiring manual intervention by the user.</li>
+<li>Parallel tool calls failed multiple times during this session due to race conditions. This forced a serial call, significantly reducing efficiency.</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>Hugo site deployment requires three independent dependencies to be met simultaneously: the Hugo binary, the theme repository, and the deployment Git repository. Any missing dependency can cause failures at different stages. These conditions should be clearly listed in the project documentation.</li>
+</ul>
+<h3 id="practical-learnings">Practical Learnings<a hidden class="anchor" aria-hidden="true" href="#practical-learnings">#</a></h3>
+<ul>
+<li>In the bash set -e script, a directory existence check must be added to the find operation on optional directories. Otherwise, normal &ldquo;directory not created&rdquo; scenarios could cause unexpected script termination.</li>
+<li>The code for parallel background tasks (&amp; + pids tracking) must be carefully aligned with the if/else control flow. Putting common code outside the branches can lead to duplicate PID tracking and silent file replacement errors.</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<h3 id="gadget-website">Gadget Website<a hidden class="anchor" aria-hidden="true" href="#gadget-website">#</a></h3>
+<p><strong>✅ Verified and fixed fatal environment issues and logical bugs in the website/update.sh script. The Hugo deployment process is now fully functional.</strong>
+<em>04:12:15.435 | claude_code</em>
+The user requested verification of whether the website update script worked properly. AI used a hierarchical approach to identify three fatal issues: Hugo not installed, PaperMod theme missing, and public deployment repository missing. Additionally, four logical bugs were identified: inconsistent step numbers, duplicate video PID tracking, HandBrakeCLI not replacing files after rollback, and set -e termination when optional directories were missing. After the user installed the required dependencies and configured GitHub authentication, the script passed successfully in 7 steps. Hugo build and GitHub Pages deployment were also verified successfully.</p>
+<h3 id="gadget-summary">Gadget Summary<a hidden class="anchor" aria-hidden="true" href="#gadget-summary">#</a></h3>
+<p><strong>🔄 Initiated the full daily/weekly/monthly MCP synchronization and merging process using the MCP gadget tool.</strong>
+<em>04:25:03.485 | claude_code</em>
+The user requested simultaneous synchronization and merging of daily/weekly/monthly reports. AI checked the status using the MCP gadget. It was found that there were sessions for 6 dates (Apr 1-5, Apr 7), but no reports were generated. No weekly report was available. Considering the order of daily/weekly/monthly reporting, AI decided to export data for Apr 7 first, then merge it in bulk. The sessions ended while the export was in progress, and the subsequent process was not completed.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-04-07-usage.png"></p>
+<p><strong>Total: $40.04</strong> — 45.4M tokens</p>
 
 
   </div>

@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-04-17 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Created task-switching checkpoint skill, enhanced MeetingHelper with multi-language ASR, Metal GPU acceleration, and real-time noise suppression, then conducted comprehensive website code review fixing 11 bugs including critical CSS layout issue">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-04-17/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-04-17/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-17/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-04-17/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-04-17">
+  <meta property="og:description" content="Created task-switching checkpoint skill, enhanced MeetingHelper with multi-language ASR, Metal GPU acceleration, and real-time noise suppression, then conducted comprehensive website code review fixing 11 bugs including critical CSS layout issue">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-04-17T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-04-17T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-04-17">
+  <meta name="twitter:description" content="Created task-switching checkpoint skill, enhanced MeetingHelper with multi-language ASR, Metal GPU acceleration, and real-time noise suppression, then conducted comprehensive website code review fixing 11 bugs including critical CSS layout issue">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Daily Summary",
+      "item": "https://tzj2006.github.io/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-04-17",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-04-17/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-04-17",
+  "name": "Bug Journal 2026-04-17",
+  "description": "Created task-switching checkpoint skill, enhanced MeetingHelper with multi-language ASR, Metal GPU acceleration, and real-time noise suppression, then conducted comprehensive website code review fixing 11 bugs including critical CSS layout issue",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-04-17 Daily Overview What was done: Developed /checkpoint skill for rapid project switching with context persistence, enhanced MeetingHelper ASR system (multi-language support, Metal GPU via mlx-whisper migration, real-time noise suppression with automatic calibration), and fixed website bugs (build script parameter handling, Hugo sanity checks, CSS class mismatch breaking layout) How it was done: Built skill with save/resume/update modes plus PostToolUse hooks for automation, migrated from CPU-only faster-whisper to Metal-accelerated mlx-whisper, integrated noisereduce library with 0.5s noise fingerprint calibration across 5 ASR backends, conducted parallel code review using exploration agents, fixed parameter handling and CSS selectors through iterative browser testing Impact: Improved developer productivity through persistent task snapshots, enabled GPU-accelerated real-time ASR with flexible language selection and noise suppression in noisy environments, resolved critical website build pipeline issues and restored broken layout caused by theme-template version drift Created task-switching checkpoint skill, enhanced MeetingHelper with multi-language ASR, Metal GPU acceleration, and real-time noise suppression, then conducted comprehensive website code review fixing 11 bugs including critical CSS layout issue\nTasks Architecture \u0026 Strategy ✅ Website code review and bug fixing — Comprehensive audit of Hugo website directory covering build scripts, config, templates, and CSS. Fixed 11 bugs including update.sh parameter handling, Hugo build sanity check, compress_video.py resource leak, config.yml mainSections, favicon git whitelist, localStorage privacy hardening, parallel compression exit code checks, CSS accessibility support, and critical header.html CSS class mismatch (nav→header-nav) ✅ Create /checkpoint skill for task-switching context management — Built lightweight skill to save/resume/update work progress (plan.md) when switching between coding tasks, with modes: save (capture state), resume (restore context), update (incremental changes), all (cold-start project scan). Added PostToolUse hook for automatic checkpoint after plan mode exits. ✅ Migrate MeetingHelper to mlx-whisper for Metal GPU acceleration — Replaced CPU-only faster-whisper (CTranslate2) with mlx-whisper for Apple Silicon Metal GPU inference, including API migration (WhisperModel → mlx_whisper.transcribe) and warmup logic ✅ Implement real-time noise suppression for MeetingHelper — Added NoiseSuppressor class with automatic noise fingerprint calibration (first 0.5s), integrated denoising into all 5 ASR backends (Sherpa/Qwen/Whisper/Moonshine/Voxtral), made it default-on with –no-denoise opt-out ✅ Implement multi-language ASR support for MeetingHelper — Added –language parameter (zh/en/zh+en) with backend-specific handling: Whisper uses initial_prompt for mixed-language, Qwen3-ASR uses language parameter, bilingual models ignore the flag. Included download-models.sh for batch pre-download of 6 ASR backend models. ✅ Fix MeetingHelper operational issues — Enhanced stop.sh with SIGTERM → 3s wait → SIGKILL escalation plus pgrep cleanup, relocated transcripts/ to project root with gitignore, adjusted silence_threshold (0.008→0.02) and added compression_ratio_threshold/no_speech_threshold to prevent hallucinations Implementation \u0026 Fixes ✅ Update MeetingHelper tutorial documentation — Completely rewrote tutorial.md with dual-layer architecture explanation (subtitle overlay + Screenpipe), Python dependency clarification, 6 ASR backend comparison table, BlackHole virtual audio setup, and updated project structure ✅ Website deployment and sync — Synced bugJournal content from staging to website, restored public/.git deployment repository after accidental deletion, executed rclone sync to Google Drive ❌ Fix Claude Code Opus 4.7 model configuration — Fixed ANSI escape code pollution ([1m]) in settings.json and updated model ID from 4.6 to 4.7, but encountered AWS Bedrock permission error preventing Opus 4.7 access Problems \u0026 Solutions Critical Issues 1. Website menu layout completely broken (vertical stacking instead of horizontal nav bar) after config.yml modifications Solution: Discovered custom header.html used class=‘nav’ while PaperMod theme CSS (after update) expects class=‘header-nav’ — changed template to match theme\nKey Insight: Custom theme overrides must stay synchronized with theme updates — CSS selector mismatches cause silent layout failures without build errors\n2. faster-whisper running on CPU only on macOS (no CUDA), causing slow inference Solution: Migrated to mlx-whisper which uses Apple Silicon’s Metal GPU, changing from WhisperModel API to mlx_whisper.transcribe() with warmup step\nKey Insight: CTranslate2-based models require NVIDIA CUDA; on Apple Silicon, mlx-based alternatives provide native Metal acceleration\n3. Whisper producing repetitive hallucinations (‘Meh Meh Meh…’) when keyboard typing sounds captured Solution: Adjusted silence_threshold from 0.008 to 0.02, added compression_ratio_threshold=2.4 and no_speech_threshold=0.6 to filter non-speech audio\nKey Insight: Low silence thresholds cause ASR hallucinations on non-speech sounds; VAD pre-filtering or stricter thresholds essential for noisy environments\n4. Single-language ASR parameter insufficient for mixed-language meetings (Chinese+English) Solution: Designed –language with three modes: zh (force Chinese), en (force English), zh+en (Whisper uses initial_prompt for mixed-language, Qwen3-ASR auto-detects)\nKey Insight: Mixed-language support requires backend-specific strategies: initial_prompt for Whisper, language=None for Qwen3-ASR, native bilingual for Sherpa\n5. MeetingHelper ASR accuracy suffered in noisy environments without pre-processing Solution: Implemented NoiseSuppressor class using noisereduce library with spectral gating (stationary=True, prop_decrease=0.8), automatic noise profile calibration during first 0.5s of capture, integrated into sd.InputStream pipeline before ASR\nKey Insight: Real-time audio processing requires denoising between capture and ASR, not after; RMS-based silence detection should happen post-denoising for accurate thresholding\n6. Hugo build failures could produce empty or partial public/ directory, but update.sh would still attempt git push deployment Solution: Added if [ ! -f “$PUBLIC_DIR/index.html” ]; then exit 1; fi check after hugo command\nKey Insight: Critical build steps need sanity checks before irreversible actions like git push — exit codes alone are insufficient\n7. compress_video.py used module-level code that created temp files without cleanup if HandBrakeCLI failed, making it unsafe to import Solution: Refactored into compress_video() function with try/finally for temp file cleanup, moved CLI logic to main()\nKey Insight: Python scripts intended for both CLI and import use must separate side effects into functions and use if name == ‘main’ guard\nGeneral Issues 8. update.sh run_translation_phase() used shift to discard first argument but call sites passed description strings, creating confusing parameter handling Solution: Removed shift from function and removed description string arguments from all call sites\nKey Insight: Shell functions don’t need to explicitly consume description parameters — let callers pass only what the function actually uses\n9. stop.sh failed to reliably terminate subtitle window processes, leaving orphaned Python processes Solution: Implemented two-stage termination: send SIGTERM, wait 3 seconds, escalate to SIGKILL if alive, plus pgrep-based cleanup for orphans\nKey Insight: PyObjC’s app.run() may not respond to basic signals; robust process management requires timeout + escalation + process scanning\nHuman vs AI Approaches Strategic Level Performance optimization initiative Role Approach Human User noticed Whisper on CPU, proactively asked why, and suggested switching to mlx-whisper AI AI implemented faster-whisper with device=‘cpu’ without questioning performance limitation until user raised it Difference Analysis: Human demonstrated active performance awareness and domain knowledge (knew mlx-whisper exists), while AI accepted suboptimal default\nCSS loading diagnosis Role Approach Human Used browser DevTools and visual inspection (screenshots) to confirm CSS was loaded but layout rules weren’t applying, suspected selector mismatch AI Initially suspected caching issues, port conflicts, and SRI integrity problems — spent multiple attempts clearing caches before examining CSS selectors Difference Analysis: Human used visual debugging (browser render) to narrow hypothesis space early; AI relied on server-side verification that couldn’t detect selector mismatch\nWhisper’s condition_on_previous_text parameter Role Approach Human Keep condition_on_previous_text=True as correct default behavior AI Suggested setting condition_on_previous_text=False to prevent repetition loop Difference Analysis: AI misdiagnosed the repetition problem — issue was low silence_threshold capturing keyboard noise, not the continuity parameter. Human’s domain knowledge caught this.\nMixed-language meeting scenario Role Approach Human Immediately asked ‘what if there are two languages?’ when AI proposed single-language –language flag AI Initially designed –language as single-value parameter without considering bilingual meetings Difference Analysis: Human anticipated real-world edge case that AI’s initial design missed; demonstrates deeper understanding of user scenarios\nConfig.yml menu structure Role Approach Human Noticed website broke after config changes, insisted problem persisted through multiple AI fix attempts, provided visual evidence via screenshots AI Initially restructured menu from top-level to per-language, then reverted after realizing Hugo’s implicit behavior differs across versions Difference Analysis: Human provided ground truth through persistent observation; AI made assumptions about Hugo’s multilingual config behavior without fully understanding version-specific quirks\nCold-start project scan trigger strategy Role Approach Human User insisted expensive project scan should be opt-in via explicit /checkpoint all command, not automatic AI Initially designed cold-start as automatic fallback when plan.md missing, triggered during normal save/resume flow Difference Analysis: Human prioritized predictability and explicit control over convenience for expensive operations; AI prioritized automation without considering cost implications\nDefault behavior for noise suppression feature Role Approach Human User immediately requested denoising be default-on with –no-denoise opt-out, prioritizing real-world usability AI AI initially implemented opt-in –denoise flag, following conservative pattern of explicit feature activation Difference Analysis: Human recognized practical UX consideration that denoising should be transparent default; AI defaulted to explicit opt-in without considering common use case\nAI Limitations Critical Limitations Missed theme version drift issue: custom templates (header.html) were based on old PaperMod version with class=‘nav’, but theme CSS updated to .header-nav selector — no systematic check for theme-template synchronization Accepted CPU-only faster-whisper on macOS without recognizing performance limitation or suggesting Metal GPU alternatives Designed expensive operations (project scan, model downloads) as automatic fallbacks rather than explicit opt-in commands with progress indicators Spent many debugging rounds on CSS loading mechanics (caching, HTTP status, SRI integrity) before checking HTML/CSS selector mismatch — didn’t prioritize front-end debugging pattern (inspect element → check selector) Failed to anticipate that Hugo multilingual menu configuration structure changes would have breaking behavior differences — treated as simple refactoring Initial –language design didn’t account for mixed-language meetings, only considering single-language constraint Misdiagnosed Whisper repetition as condition_on_previous_text issue when root cause was low silence_threshold capturing non-speech sounds Deleted public/.git deployment repository during aggressive cache cleanup without checking if it was a separate git repository General Limitations Did not proactively check for missing dependencies (sounddevice) before attempting to start ASR service, and failed to surface first-time model download (1.6GB) in user-facing progress indicator Learnings Key Learnings Custom Hugo theme overrides must be audited against upstream theme changes — CSS class renames in themes silently break custom templates with no build errors, only runtime layout failures Expensive background operations (large downloads, project scans) should be explicit user actions with progress indicators, not hidden automatic fallbacks Apple Silicon ASR optimization: CTranslate2 (faster-whisper) requires CUDA, use mlx-based alternatives for Metal GPU acceleration on macOS Audio pipeline denoising must occur post-capture, pre-ASR: inserting NoiseSuppressor after data.flatten() but before stream.accept_waveform() maximizes effectiveness. Noise fingerprint calibration using initial silent period (0.5s) enables stationary noise reduction without pre-trained models. Browser-based visual debugging (DevTools inspect → check applied styles → trace selector mismatch) is more effective for CSS layout issues than server-side file verification Mixed-language ASR requires per-backend strategies: Whisper needs initial_prompt guidance, Qwen3-ASR auto-detects with language=None, Sherpa has native bilingual models ASR hallucination (repetitive output) often stems from low silence_threshold capturing non-speech sounds; VAD pre-filtering or stricter thresholds solve this .claude/settings.json is team-shareable (should be committed), while .claude/settings.local.json is personal (should be gitignored) Bash set -e does not propagate exit codes from background jobs — must explicitly capture exit codes with wait $pid || fail_flag=1 pattern for parallel task error handling Claude Code hook system can only execute shell commands, not skills directly; use JSON output to prompt Claude for skill execution after hook triggers Practical Learnings Process termination robustness requires timeout + signal escalation (SIGTERM → wait → SIGKILL) + cleanup scanning (pgrep) ANSI terminal escape codes can pollute configuration files when values are copy-pasted from colorized CLI output, breaking parsers that expect clean strings Python scripts intended for both CLI and import must use if name == ‘main’ guard and wrap side effects in functions — module-level code with resource allocation creates cleanup hazards Hugo’s public/ directory is often a separate git repository for deployment (GitHub Pages) — rm -rf public/ during cache cleanup destroys deployment history Conversation Summaries gadget ✅ Create /checkpoint skill for task-switching context management 14:32:49.684 | claude_code Developed lightweight skill to save/resume/update work-in-progress context (plan.md) for rapid task switching. User refined design through iteration: changed cold-start from auto-trigger to explicit /checkpoint all command, configured PostToolUse hook to auto-run checkpoint after plan mode exits, discussed .claude/settings.json git tracking strategy. Skill created at ~/.claude/skills/checkpoint/SKILL.md with four modes (save/resume/update/all) and hook configuration added to project settings.\nMeetingHelper ✅ Multi-language ASR support and Metal GPU acceleration 15:14:58.703 | claude_code Enhanced MeetingHelper ASR system across multiple sessions: fixed stop.sh process termination (SIGTERM → wait → SIGKILL escalation), relocated transcripts to project root, implemented –language parameter (zh/en/zh+en with backend-specific handling), created download-models.sh for batch pre-download, debugged Whisper hallucinations (adjusted silence_threshold/compression_ratio_threshold), and migrated from CPU-only faster-whisper to Metal-accelerated mlx-whisper. User proactively identified performance limitation and suggested mlx-whisper, spotted mixed-language edge case AI’s initial design missed, and corrected AI’s misdiagnosis of condition_on_previous_text parameter. Final system supports flexible language selection with GPU acceleration on Apple Silicon.\n✅ Real-time noise suppression implementation and documentation update 15:33:56.474 | claude_code User requested vocal separation research for feeding clean speech to LLM. AI researched Demucs/Spleeter/RNNoise options and proposed two pipelines; user chose real-time preprocessing approach. Implemented NoiseSuppressor class using noisereduce library with 0.5s automatic calibration, integrated across all 5 ASR backends (Sherpa/Qwen/Whisper/Moonshine/Voxtral). User requested denoising be default-on; AI refactored to –no-denoise opt-out pattern. Separately, completely rewrote tutorial.md with dual-layer architecture explanation (local subtitle overlay + Screenpipe backend), Python dependency clarification, 6 ASR backend comparison table, BlackHole virtual audio setup, and updated project structure.\nRandom Test 🔄 Claude Code Opus 4.7 configuration debugging 01:32:34.253 | claude_code User reported inability to use Opus 4.7 model and requested fix. AI checked Claude Code settings files and discovered two issues: model ID contained ANSI escape code [1m] from terminal formatting, and version was 4.6 not 4.7. AI corrected both settings.json and settings.bedrock.json to use clean us.anthropic.claude-opus-4-7-v1 identifier. Subsequent testing revealed AWS Bedrock permission error indicating account lacks access to Opus 4.7 model, requiring AWS Sales contact for approval.\ngadget (website) ✅ Comprehensive website code review and bug fixing 15:33:15.251 | claude_code Conducted full-stack audit of Hugo website directory using parallel exploration agents. Discovered 11 bugs across build scripts (update.sh parameter handling, missing Hugo sanity check, compress_video.py resource leak), config (mainSections invalid entry, favicon gitignore, localStorage privacy hardening), and templates (CSS accessibility, parallel compression exit codes). Fixed all issues but introduced menu restructuring bug that broke site layout. After extensive debugging (cache clearing, port checks, HTTP verification), user provided screenshots showing CSS was loaded but layout rules not applying. Root cause discovered: custom header.html template used obsolete CSS class ’nav’ while updated PaperMod theme expects ‘header-nav’ — theme version drift. Final fix restored full site functionality. Also synced bugJournal content via staging script and executed rclone push to Google Drive.\nToken Usage Total: $45.86 — 43.3M tokens\n",
+  "wordCount" : "2381",
+  "inLanguage": "en",
+  "datePublished": "2026-04-17T00:00:00-05:00",
+  "dateModified": "2026-04-17T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-04-17/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-17/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/daily/">Daily Summary</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-04-17
+    </h1>
+    <div class="post-meta"><span title='2026-04-17 00:00:00 -0500 -0500'>April 17, 2026</span>&nbsp;·&nbsp;<span>12 min</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="daily-report--2026-04-17">Daily Report — 2026-04-17<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-04-17">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Developed /checkpoint skill for rapid project switching with context persistence, enhanced MeetingHelper ASR system (multi-language support, Metal GPU via mlx-whisper migration, real-time noise suppression with automatic calibration), and fixed website bugs (build script parameter handling, Hugo sanity checks, CSS class mismatch breaking layout)</li>
+<li><strong>How it was done:</strong> Built skill with save/resume/update modes plus PostToolUse hooks for automation, migrated from CPU-only faster-whisper to Metal-accelerated mlx-whisper, integrated noisereduce library with 0.5s noise fingerprint calibration across 5 ASR backends, conducted parallel code review using exploration agents, fixed parameter handling and CSS selectors through iterative browser testing</li>
+<li><strong>Impact:</strong> Improved developer productivity through persistent task snapshots, enabled GPU-accelerated real-time ASR with flexible language selection and noise suppression in noisy environments, resolved critical website build pipeline issues and restored broken layout caused by theme-template version drift</li>
+</ul>
+<blockquote>
+<p>Created task-switching checkpoint skill, enhanced MeetingHelper with multi-language ASR, Metal GPU acceleration, and real-time noise suppression, then conducted comprehensive website code review fixing 11 bugs including critical CSS layout issue</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Website code review and bug fixing</strong> — Comprehensive audit of Hugo website directory covering build scripts, config, templates, and CSS. Fixed 11 bugs including update.sh parameter handling, Hugo build sanity check, compress_video.py resource leak, config.yml mainSections, favicon git whitelist, localStorage privacy hardening, parallel compression exit code checks, CSS accessibility support, and critical header.html CSS class mismatch (nav→header-nav)</li>
+<li>✅ <strong>Create /checkpoint skill for task-switching context management</strong> — Built lightweight skill to save/resume/update work progress (plan.md) when switching between coding tasks, with modes: save (capture state), resume (restore context), update (incremental changes), all (cold-start project scan). Added PostToolUse hook for automatic checkpoint after plan mode exits.</li>
+<li>✅ <strong>Migrate MeetingHelper to mlx-whisper for Metal GPU acceleration</strong> — Replaced CPU-only faster-whisper (CTranslate2) with mlx-whisper for Apple Silicon Metal GPU inference, including API migration (WhisperModel → mlx_whisper.transcribe) and warmup logic</li>
+<li>✅ <strong>Implement real-time noise suppression for MeetingHelper</strong> — Added NoiseSuppressor class with automatic noise fingerprint calibration (first 0.5s), integrated denoising into all 5 ASR backends (Sherpa/Qwen/Whisper/Moonshine/Voxtral), made it default-on with &ndash;no-denoise opt-out</li>
+<li>✅ <strong>Implement multi-language ASR support for MeetingHelper</strong> — Added &ndash;language parameter (zh/en/zh+en) with backend-specific handling: Whisper uses initial_prompt for mixed-language, Qwen3-ASR uses language parameter, bilingual models ignore the flag. Included download-models.sh for batch pre-download of 6 ASR backend models.</li>
+<li>✅ <strong>Fix MeetingHelper operational issues</strong> — Enhanced stop.sh with SIGTERM → 3s wait → SIGKILL escalation plus pgrep cleanup, relocated transcripts/ to project root with gitignore, adjusted silence_threshold (0.008→0.02) and added compression_ratio_threshold/no_speech_threshold to prevent hallucinations</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>✅ <strong>Update MeetingHelper tutorial documentation</strong> — Completely rewrote tutorial.md with dual-layer architecture explanation (subtitle overlay + Screenpipe), Python dependency clarification, 6 ASR backend comparison table, BlackHole virtual audio setup, and updated project structure</li>
+<li>✅ <strong>Website deployment and sync</strong> — Synced bugJournal content from staging to website, restored public/.git deployment repository after accidental deletion, executed rclone sync to Google Drive</li>
+<li>❌ <strong>Fix Claude Code Opus 4.7 model configuration</strong> — Fixed ANSI escape code pollution ([1m]) in settings.json and updated model ID from 4.6 to 4.7, but encountered AWS Bedrock permission error preventing Opus 4.7 access</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-website-menu-layout-completely-broken-vertical-stacking-instead-of-horizontal-nav-bar-after-configyml-modifications">1. Website menu layout completely broken (vertical stacking instead of horizontal nav bar) after config.yml modifications<a hidden class="anchor" aria-hidden="true" href="#1-website-menu-layout-completely-broken-vertical-stacking-instead-of-horizontal-nav-bar-after-configyml-modifications">#</a></h4>
+<p><strong>Solution:</strong> Discovered custom header.html used class=&lsquo;nav&rsquo; while PaperMod theme CSS (after update) expects class=&lsquo;header-nav&rsquo; — changed template to match theme</p>
+<p><strong>Key Insight:</strong> Custom theme overrides must stay synchronized with theme updates — CSS selector mismatches cause silent layout failures without build errors</p>
+<h4 id="2-faster-whisper-running-on-cpu-only-on-macos-no-cuda-causing-slow-inference">2. faster-whisper running on CPU only on macOS (no CUDA), causing slow inference<a hidden class="anchor" aria-hidden="true" href="#2-faster-whisper-running-on-cpu-only-on-macos-no-cuda-causing-slow-inference">#</a></h4>
+<p><strong>Solution:</strong> Migrated to mlx-whisper which uses Apple Silicon&rsquo;s Metal GPU, changing from WhisperModel API to mlx_whisper.transcribe() with warmup step</p>
+<p><strong>Key Insight:</strong> CTranslate2-based models require NVIDIA CUDA; on Apple Silicon, mlx-based alternatives provide native Metal acceleration</p>
+<h4 id="3-whisper-producing-repetitive-hallucinations-meh-meh-meh-when-keyboard-typing-sounds-captured">3. Whisper producing repetitive hallucinations (&lsquo;Meh Meh Meh&hellip;&rsquo;) when keyboard typing sounds captured<a hidden class="anchor" aria-hidden="true" href="#3-whisper-producing-repetitive-hallucinations-meh-meh-meh-when-keyboard-typing-sounds-captured">#</a></h4>
+<p><strong>Solution:</strong> Adjusted silence_threshold from 0.008 to 0.02, added compression_ratio_threshold=2.4 and no_speech_threshold=0.6 to filter non-speech audio</p>
+<p><strong>Key Insight:</strong> Low silence thresholds cause ASR hallucinations on non-speech sounds; VAD pre-filtering or stricter thresholds essential for noisy environments</p>
+<h4 id="4-single-language-asr-parameter-insufficient-for-mixed-language-meetings-chineseenglish">4. Single-language ASR parameter insufficient for mixed-language meetings (Chinese+English)<a hidden class="anchor" aria-hidden="true" href="#4-single-language-asr-parameter-insufficient-for-mixed-language-meetings-chineseenglish">#</a></h4>
+<p><strong>Solution:</strong> Designed &ndash;language with three modes: zh (force Chinese), en (force English), zh+en (Whisper uses initial_prompt for mixed-language, Qwen3-ASR auto-detects)</p>
+<p><strong>Key Insight:</strong> Mixed-language support requires backend-specific strategies: initial_prompt for Whisper, language=None for Qwen3-ASR, native bilingual for Sherpa</p>
+<h4 id="5-meetinghelper-asr-accuracy-suffered-in-noisy-environments-without-pre-processing">5. MeetingHelper ASR accuracy suffered in noisy environments without pre-processing<a hidden class="anchor" aria-hidden="true" href="#5-meetinghelper-asr-accuracy-suffered-in-noisy-environments-without-pre-processing">#</a></h4>
+<p><strong>Solution:</strong> Implemented NoiseSuppressor class using noisereduce library with spectral gating (stationary=True, prop_decrease=0.8), automatic noise profile calibration during first 0.5s of capture, integrated into sd.InputStream pipeline before ASR</p>
+<p><strong>Key Insight:</strong> Real-time audio processing requires denoising between capture and ASR, not after; RMS-based silence detection should happen post-denoising for accurate thresholding</p>
+<h4 id="6-hugo-build-failures-could-produce-empty-or-partial-public-directory-but-updatesh-would-still-attempt-git-push-deployment">6. Hugo build failures could produce empty or partial public/ directory, but update.sh would still attempt git push deployment<a hidden class="anchor" aria-hidden="true" href="#6-hugo-build-failures-could-produce-empty-or-partial-public-directory-but-updatesh-would-still-attempt-git-push-deployment">#</a></h4>
+<p><strong>Solution:</strong> Added if [ ! -f &ldquo;$PUBLIC_DIR/index.html&rdquo; ]; then exit 1; fi check after hugo command</p>
+<p><strong>Key Insight:</strong> Critical build steps need sanity checks before irreversible actions like git push — exit codes alone are insufficient</p>
+<h4 id="7-compress_videopy-used-module-level-code-that-created-temp-files-without-cleanup-if-handbrakecli-failed-making-it-unsafe-to-import">7. compress_video.py used module-level code that created temp files without cleanup if HandBrakeCLI failed, making it unsafe to import<a hidden class="anchor" aria-hidden="true" href="#7-compress_videopy-used-module-level-code-that-created-temp-files-without-cleanup-if-handbrakecli-failed-making-it-unsafe-to-import">#</a></h4>
+<p><strong>Solution:</strong> Refactored into compress_video() function with try/finally for temp file cleanup, moved CLI logic to main()</p>
+<p><strong>Key Insight:</strong> Python scripts intended for both CLI and import use must separate side effects into functions and use if <strong>name</strong> == &lsquo;<strong>main</strong>&rsquo; guard</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="8-updatesh-run_translation_phase-used-shift-to-discard-first-argument-but-call-sites-passed-description-strings-creating-confusing-parameter-handling">8. update.sh run_translation_phase() used shift to discard first argument but call sites passed description strings, creating confusing parameter handling<a hidden class="anchor" aria-hidden="true" href="#8-updatesh-run_translation_phase-used-shift-to-discard-first-argument-but-call-sites-passed-description-strings-creating-confusing-parameter-handling">#</a></h4>
+<p><strong>Solution:</strong> Removed shift from function and removed description string arguments from all call sites</p>
+<p><strong>Key Insight:</strong> Shell functions don&rsquo;t need to explicitly consume description parameters — let callers pass only what the function actually uses</p>
+<h4 id="9-stopsh-failed-to-reliably-terminate-subtitle-window-processes-leaving-orphaned-python-processes">9. stop.sh failed to reliably terminate subtitle window processes, leaving orphaned Python processes<a hidden class="anchor" aria-hidden="true" href="#9-stopsh-failed-to-reliably-terminate-subtitle-window-processes-leaving-orphaned-python-processes">#</a></h4>
+<p><strong>Solution:</strong> Implemented two-stage termination: send SIGTERM, wait 3 seconds, escalate to SIGKILL if alive, plus pgrep-based cleanup for orphans</p>
+<p><strong>Key Insight:</strong> PyObjC&rsquo;s app.run() may not respond to basic signals; robust process management requires timeout + escalation + process scanning</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="performance-optimization-initiative">Performance optimization initiative<a hidden class="anchor" aria-hidden="true" href="#performance-optimization-initiative">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User noticed Whisper on CPU, proactively asked why, and suggested switching to mlx-whisper</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI implemented faster-whisper with device=&lsquo;cpu&rsquo; without questioning performance limitation until user raised it</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human demonstrated active performance awareness and domain knowledge (knew mlx-whisper exists), while AI accepted suboptimal default</p>
+<h4 id="css-loading-diagnosis">CSS loading diagnosis<a hidden class="anchor" aria-hidden="true" href="#css-loading-diagnosis">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Used browser DevTools and visual inspection (screenshots) to confirm CSS was loaded but layout rules weren&rsquo;t applying, suspected selector mismatch</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Initially suspected caching issues, port conflicts, and SRI integrity problems — spent multiple attempts clearing caches before examining CSS selectors</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human used visual debugging (browser render) to narrow hypothesis space early; AI relied on server-side verification that couldn&rsquo;t detect selector mismatch</p>
+<h4 id="whispers-condition_on_previous_text-parameter">Whisper&rsquo;s condition_on_previous_text parameter<a hidden class="anchor" aria-hidden="true" href="#whispers-condition_on_previous_text-parameter">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Keep condition_on_previous_text=True as correct default behavior</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Suggested setting condition_on_previous_text=False to prevent repetition loop</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> AI misdiagnosed the repetition problem — issue was low silence_threshold capturing keyboard noise, not the continuity parameter. Human&rsquo;s domain knowledge caught this.</p>
+<h4 id="mixed-language-meeting-scenario">Mixed-language meeting scenario<a hidden class="anchor" aria-hidden="true" href="#mixed-language-meeting-scenario">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Immediately asked &lsquo;what if there are two languages?&rsquo; when AI proposed single-language &ndash;language flag</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Initially designed &ndash;language as single-value parameter without considering bilingual meetings</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human anticipated real-world edge case that AI&rsquo;s initial design missed; demonstrates deeper understanding of user scenarios</p>
+<h4 id="configyml-menu-structure">Config.yml menu structure<a hidden class="anchor" aria-hidden="true" href="#configyml-menu-structure">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Noticed website broke after config changes, insisted problem persisted through multiple AI fix attempts, provided visual evidence via screenshots</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Initially restructured menu from top-level to per-language, then reverted after realizing Hugo&rsquo;s implicit behavior differs across versions</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human provided ground truth through persistent observation; AI made assumptions about Hugo&rsquo;s multilingual config behavior without fully understanding version-specific quirks</p>
+<h4 id="cold-start-project-scan-trigger-strategy">Cold-start project scan trigger strategy<a hidden class="anchor" aria-hidden="true" href="#cold-start-project-scan-trigger-strategy">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User insisted expensive project scan should be opt-in via explicit /checkpoint all command, not automatic</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Initially designed cold-start as automatic fallback when plan.md missing, triggered during normal save/resume flow</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human prioritized predictability and explicit control over convenience for expensive operations; AI prioritized automation without considering cost implications</p>
+<h4 id="default-behavior-for-noise-suppression-feature">Default behavior for noise suppression feature<a hidden class="anchor" aria-hidden="true" href="#default-behavior-for-noise-suppression-feature">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User immediately requested denoising be default-on with &ndash;no-denoise opt-out, prioritizing real-world usability</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI initially implemented opt-in &ndash;denoise flag, following conservative pattern of explicit feature activation</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human recognized practical UX consideration that denoising should be transparent default; AI defaulted to explicit opt-in without considering common use case</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="critical-limitations">Critical Limitations<a hidden class="anchor" aria-hidden="true" href="#critical-limitations">#</a></h3>
+<ul>
+<li>Missed theme version drift issue: custom templates (header.html) were based on old PaperMod version with class=&lsquo;nav&rsquo;, but theme CSS updated to .header-nav selector — no systematic check for theme-template synchronization</li>
+<li>Accepted CPU-only faster-whisper on macOS without recognizing performance limitation or suggesting Metal GPU alternatives</li>
+<li>Designed expensive operations (project scan, model downloads) as automatic fallbacks rather than explicit opt-in commands with progress indicators</li>
+<li>Spent many debugging rounds on CSS loading mechanics (caching, HTTP status, SRI integrity) before checking HTML/CSS selector mismatch — didn&rsquo;t prioritize front-end debugging pattern (inspect element → check selector)</li>
+<li>Failed to anticipate that Hugo multilingual menu configuration structure changes would have breaking behavior differences — treated as simple refactoring</li>
+<li>Initial &ndash;language design didn&rsquo;t account for mixed-language meetings, only considering single-language constraint</li>
+<li>Misdiagnosed Whisper repetition as condition_on_previous_text issue when root cause was low silence_threshold capturing non-speech sounds</li>
+<li>Deleted public/.git deployment repository during aggressive cache cleanup without checking if it was a separate git repository</li>
+</ul>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>Did not proactively check for missing dependencies (sounddevice) before attempting to start ASR service, and failed to surface first-time model download (1.6GB) in user-facing progress indicator</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>Custom Hugo theme overrides must be audited against upstream theme changes — CSS class renames in themes silently break custom templates with no build errors, only runtime layout failures</li>
+<li>Expensive background operations (large downloads, project scans) should be explicit user actions with progress indicators, not hidden automatic fallbacks</li>
+<li>Apple Silicon ASR optimization: CTranslate2 (faster-whisper) requires CUDA, use mlx-based alternatives for Metal GPU acceleration on macOS</li>
+<li>Audio pipeline denoising must occur post-capture, pre-ASR: inserting NoiseSuppressor after data.flatten() but before stream.accept_waveform() maximizes effectiveness. Noise fingerprint calibration using initial silent period (0.5s) enables stationary noise reduction without pre-trained models.</li>
+<li>Browser-based visual debugging (DevTools inspect → check applied styles → trace selector mismatch) is more effective for CSS layout issues than server-side file verification</li>
+<li>Mixed-language ASR requires per-backend strategies: Whisper needs initial_prompt guidance, Qwen3-ASR auto-detects with language=None, Sherpa has native bilingual models</li>
+<li>ASR hallucination (repetitive output) often stems from low silence_threshold capturing non-speech sounds; VAD pre-filtering or stricter thresholds solve this</li>
+<li>.claude/settings.json is team-shareable (should be committed), while .claude/settings.local.json is personal (should be gitignored)</li>
+<li>Bash set -e does not propagate exit codes from background jobs — must explicitly capture exit codes with wait $pid || fail_flag=1 pattern for parallel task error handling</li>
+<li>Claude Code hook system can only execute shell commands, not skills directly; use JSON output to prompt Claude for skill execution after hook triggers</li>
+</ul>
+<h3 id="practical-learnings">Practical Learnings<a hidden class="anchor" aria-hidden="true" href="#practical-learnings">#</a></h3>
+<ul>
+<li>Process termination robustness requires timeout + signal escalation (SIGTERM → wait → SIGKILL) + cleanup scanning (pgrep)</li>
+<li>ANSI terminal escape codes can pollute configuration files when values are copy-pasted from colorized CLI output, breaking parsers that expect clean strings</li>
+<li>Python scripts intended for both CLI and import must use if <strong>name</strong> == &lsquo;<strong>main</strong>&rsquo; guard and wrap side effects in functions — module-level code with resource allocation creates cleanup hazards</li>
+<li>Hugo&rsquo;s public/ directory is often a separate git repository for deployment (GitHub Pages) — rm -rf public/ during cache cleanup destroys deployment history</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<h3 id="gadget">gadget<a hidden class="anchor" aria-hidden="true" href="#gadget">#</a></h3>
+<p><strong>✅ Create /checkpoint skill for task-switching context management</strong>
+<em>14:32:49.684 | claude_code</em>
+Developed lightweight skill to save/resume/update work-in-progress context (plan.md) for rapid task switching. User refined design through iteration: changed cold-start from auto-trigger to explicit /checkpoint all command, configured PostToolUse hook to auto-run checkpoint after plan mode exits, discussed .claude/settings.json git tracking strategy. Skill created at ~/.claude/skills/checkpoint/SKILL.md with four modes (save/resume/update/all) and hook configuration added to project settings.</p>
+<h3 id="meetinghelper">MeetingHelper<a hidden class="anchor" aria-hidden="true" href="#meetinghelper">#</a></h3>
+<p><strong>✅ Multi-language ASR support and Metal GPU acceleration</strong>
+<em>15:14:58.703 | claude_code</em>
+Enhanced MeetingHelper ASR system across multiple sessions: fixed stop.sh process termination (SIGTERM → wait → SIGKILL escalation), relocated transcripts to project root, implemented &ndash;language parameter (zh/en/zh+en with backend-specific handling), created download-models.sh for batch pre-download, debugged Whisper hallucinations (adjusted silence_threshold/compression_ratio_threshold), and migrated from CPU-only faster-whisper to Metal-accelerated mlx-whisper. User proactively identified performance limitation and suggested mlx-whisper, spotted mixed-language edge case AI&rsquo;s initial design missed, and corrected AI&rsquo;s misdiagnosis of condition_on_previous_text parameter. Final system supports flexible language selection with GPU acceleration on Apple Silicon.</p>
+<p><strong>✅ Real-time noise suppression implementation and documentation update</strong>
+<em>15:33:56.474 | claude_code</em>
+User requested vocal separation research for feeding clean speech to LLM. AI researched Demucs/Spleeter/RNNoise options and proposed two pipelines; user chose real-time preprocessing approach. Implemented NoiseSuppressor class using noisereduce library with 0.5s automatic calibration, integrated across all 5 ASR backends (Sherpa/Qwen/Whisper/Moonshine/Voxtral). User requested denoising be default-on; AI refactored to &ndash;no-denoise opt-out pattern. Separately, completely rewrote tutorial.md with dual-layer architecture explanation (local subtitle overlay + Screenpipe backend), Python dependency clarification, 6 ASR backend comparison table, BlackHole virtual audio setup, and updated project structure.</p>
+<h3 id="random-test">Random Test<a hidden class="anchor" aria-hidden="true" href="#random-test">#</a></h3>
+<p><strong>🔄 Claude Code Opus 4.7 configuration debugging</strong>
+<em>01:32:34.253 | claude_code</em>
+User reported inability to use Opus 4.7 model and requested fix. AI checked Claude Code settings files and discovered two issues: model ID contained ANSI escape code [1m] from terminal formatting, and version was 4.6 not 4.7. AI corrected both settings.json and settings.bedrock.json to use clean us.anthropic.claude-opus-4-7-v1 identifier. Subsequent testing revealed AWS Bedrock permission error indicating account lacks access to Opus 4.7 model, requiring AWS Sales contact for approval.</p>
+<h3 id="gadget-website">gadget (website)<a hidden class="anchor" aria-hidden="true" href="#gadget-website">#</a></h3>
+<p><strong>✅ Comprehensive website code review and bug fixing</strong>
+<em>15:33:15.251 | claude_code</em>
+Conducted full-stack audit of Hugo website directory using parallel exploration agents. Discovered 11 bugs across build scripts (update.sh parameter handling, missing Hugo sanity check, compress_video.py resource leak), config (mainSections invalid entry, favicon gitignore, localStorage privacy hardening), and templates (CSS accessibility, parallel compression exit codes). Fixed all issues but introduced menu restructuring bug that broke site layout. After extensive debugging (cache clearing, port checks, HTTP verification), user provided screenshots showing CSS was loaded but layout rules not applying. Root cause discovered: custom header.html template used obsolete CSS class &rsquo;nav&rsquo; while updated PaperMod theme expects &lsquo;header-nav&rsquo; — theme version drift. Final fix restored full site functionality. Also synced bugJournal content via staging script and executed rclone push to Google Drive.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-04-17-usage.png"></p>
+<p><strong>Total: $45.86</strong> — 43.3M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

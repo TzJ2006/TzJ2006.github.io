@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-04-15 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Systematically debugged and resolved ErrorRecovery robotics project environment setup, fixing 5 critical bugs blocking Coffee task execution, then established full reproducibility by tracking modified dependencies and creating automated patch system for cluster deployment">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-04-15/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.cf0b8a4ea5766e865a0f381dd039eff055b3380a0a6219f355233c419877c8bd.css" integrity="sha256-zwuKTqV2boZaDzgd0Dnv8FWzOAoKYhnzVSM8QZh3yL0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-04-15/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-15/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-04-15/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-04-15">
+  <meta property="og:description" content="Systematically debugged and resolved ErrorRecovery robotics project environment setup, fixing 5 critical bugs blocking Coffee task execution, then established full reproducibility by tracking modified dependencies and creating automated patch system for cluster deployment">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-04-15T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-04-15T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-04-15">
+  <meta name="twitter:description" content="Systematically debugged and resolved ErrorRecovery robotics project environment setup, fixing 5 critical bugs blocking Coffee task execution, then established full reproducibility by tracking modified dependencies and creating automated patch system for cluster deployment">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Daily Summary",
+      "item": "https://tzj2006.github.io/bugjournal/daily/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Bug Journal 2026-04-15",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-04-15/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-04-15",
+  "name": "Bug Journal 2026-04-15",
+  "description": "Systematically debugged and resolved ErrorRecovery robotics project environment setup, fixing 5 critical bugs blocking Coffee task execution, then established full reproducibility by tracking modified dependencies and creating automated patch system for cluster deployment",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-04-15 Daily Overview What was done: Complete environment setup, debugging, and reproducibility implementation for ErrorRecovery robotics project spanning conda environment creation, systematic bug resolution, and dependency tracking How it was done: Conda environment creation with dependency resolution, methodical 5-bug diagnosis and fixes (pip shadowing, missing patches, dependencies, exception handling, assets), upstream comparison and patch generation, automated setup scripting Impact: Transformed non-functional local environment into fully operational and reproducible system deployable on any machine including remote clusters; documented entire troubleshooting process for future reference DesktopLinux What was done: Created and debugged recovery_collect conda environment for Coffee task, resolving interconnected bugs including pip editable install shadowing, missing robosuite patches (z_rotation, get_bounding_box_half_size, total_size parameters), missing robomimic dependency, silenced exception handling, and missing texture assets How it was done: Installed base dependencies (robosuite 1.4.1, mujoco 2.3.2, mimicgen), fixed version conflicts, copied XML assets, monkey-patched missing APIs, then systematically diagnosed root causes using pip show/diff/grep/traceback analysis; applied sequential fixes: removed stale directories, reapplied robosuite_recovery.patch, installed robomimic –no-deps, improved error reporting, copied ceramic.png texture; created requirements.txt baseline via import scanning Impact: Coffee_D0 environment now fully functional and passes all validation checks; TUTORIAL.md section 4 documents complete troubleshooting process with verification scripts; established reproducible dependency baseline MacBook What was done: Resolved environment reproducibility blockers by tracking modified mimicgen library (545 files) and creating patch system for robosuite (13 modified files) How it was done: Compared local copies against upstream repositories (NVlabs/mimicgen, commit c848ca84 for robosuite), filtered CRLF/LF noise using –strip-trailing-cr, generated unified diff patches, updated setup_env.sh to auto-apply patches after upstream installation, committed mimicgen fork directly and pushed to GitHub Impact: Environment now fully reproducible for cluster deployment and collaboration; avoided 587MB robosuite commit via 326-line patch file; any machine can clone and set up working environment Systematically debugged and resolved ErrorRecovery robotics project environment setup, fixing 5 critical bugs blocking Coffee task execution, then established full reproducibility by tracking modified dependencies and creating automated patch system for cluster deployment\nTasks Architecture \u0026 Strategy ✅ Fix 5 critical environment bugs blocking Coffee task — Resolved pip editable install shadowing, missing robosuite recovery patches (z_rotation, get_bounding_box_half_size, total_size parameters), missing robomimic dependency, silenced exception handling, and missing ceramic.png texture ✅ Create robosuite patch system for reproducibility — Generated unified diff patch (326 lines) for 13 modified robosuite files instead of committing 587MB source tree, updated setup_env.sh to auto-apply patches after upstream installation ✅ Document troubleshooting process in TUTORIAL.md — Added section 4 to TUTORIAL.md with detailed bug summary table, step-by-step diagnosis and fixes, patch inventory, and environment verification script ✅ Track modified mimicgen library in Git repository — Added locally modified mimicgen fork (545 files, 13MB) to shared/mimicgen_workspace/mimicgen/, removed from .gitignore, committed and pushed to GitHub ✅ Create and debug recovery_collect conda environment — Created Python 3.10 conda environment, resolved mujoco version conflict (3.7.0→2.3.2), installed mimicgen and copied XML assets, identified need for patched robosuite from cluster Implementation \u0026 Fixes ✅ Analyze modifications against upstream repositories — Compared local mimicgen with NVlabs/mimicgen upstream and robosuite against commit c848ca84, documented compatibility fixes, new tasks, and MimicGen API additions ✅ Create requirements.txt baseline — Scanned 55 project files for imports, created structured requirements.txt with 9 core dependencies and special installation notes, audited actual conda environment packages Problems \u0026 Solutions Critical Issues 1. Robosuite missing critical patches (z_rotation parameter, get_bounding_box_half_size, total_size, locations_relative_to_corner) required by MimicGen, causing environment creation failures Solution: Reapplied shared/mimicgen_workspace/robosuite_patches/robosuite_recovery.patch to installed robosuite package using patch -p1; verified all parameters exist in target class signatures\nKey Insight: MimicGen requires patched robosuite with custom APIs not present in official releases; patched dependencies must be re-patched after pip install overwrites them; cluster uses local patched copies in shared/mimicgen_workspace/ rather than upstream versions\n2. script_utils.py create_env function silently swallowed exceptions with ’except Exception: continue’, showing only generic ‘Could not create env’ error Solution: Modified exception handling to capture last_error and re-raise with original traceback context in RuntimeError, revealing the actual MuJoCo PNG loading error\nKey Insight: Exception handling with bare ’except: continue’ or ’except Exception: pass’ makes debugging extremely difficult and should never be used in diagnostic/setup code; always capture the actual exception, log it, and include it in re-raised errors\n3. Shared/ directory with critical dependencies was gitignored, making environment non-reproducible for other users or cluster deployment Solution: Tracked modified mimicgen directly in repo (13MB); created patch file system for robosuite to avoid 587MB commit; updated setup_env.sh to auto-apply patches after upstream installation\nKey Insight: External dependencies with local modifications should be tracked in-repo (if small) or via patch files (if large) rather than blindly gitignored, especially for reproducible research environments; unified diff patches minimize repository size while preserving reproducibility\n4. Pip editable install of mimicgen shadowed by residual site-packages/mimicgen/ directory from previous install, causing import failures Solution: Removed stale site-packages/mimicgen/ directory; pip editable install then correctly mapped to src/mimicgen\nKey Insight: Editable pip installs on NTFS cross-filesystem mounts can leave residual site-packages directories that take precedence over editable path mappings; always verify import resolution matches pip show location by checking path and file attributes\n5. 776 file differences between installed robosuite and upstream turned out to be mostly CRLF vs LF line ending noise, obscuring 13 real code changes Solution: Used diff –strip-trailing-cr to filter line ending differences, revealing only 13 files with actual code modifications\nKey Insight: Cross-platform development creates false positives in file comparison due to line ending differences; always use –strip-trailing-cr or -w flags when comparing across Windows/Linux platforms\nGeneral Issues 6. Pip-installed mimicgen missing XML assets (coffee_pod.xml, coffee_body.xml) required by environment definitions Solution: Cloned mimicgen repo and manually copied assets/ directory to site-packages\nKey Insight: Setup.py may not package all necessary data files; always verify critical non-Python assets are included in distribution\n7. Missing robomimic dependency caused import failures in mimicgen config modules Solution: Installed robomimic with pip install robomimic –no-deps to bypass egl_probe build failure (EGL rendering not needed for SpaceMouse collection)\nKey Insight: Use –no-deps to install packages when optional rendering dependencies fail to build but core functionality remains intact\n8. Robosuite installation upgraded mujoco to 3.7.0, breaking API compatibility with robosuite 1.4.1 Solution: Force reinstalled mujoco 2.3.2 with –no-deps flag to prevent transitive upgrades\nKey Insight: Use –no-deps when reinstalling pinned dependencies to prevent package managers from upgrading transitive dependencies\n9. MuJoCo failed to load ceramic.png texture (PNG file load error) because shared/mimicgen_workspace/mimicgen/ lacked assets/textures/ directory present in src/mimicgen upstream Solution: Copied ceramic.png from src/mimicgen/mimicgen/models/robosuite/assets/textures/ to shared/mimicgen_workspace/mimicgen/mimicgen/models/robosuite/assets/textures/\nKey Insight: When MuJoCo environments fail with asset loading errors, check both Python import paths and relative asset paths (meshes, textures) referenced in XML model definitions\nHuman vs AI Approaches Strategic Level Root cause diagnosis for Coffee environment failure Role Approach Human Suspected MuJoCo version mismatch and asked if upgrading to latest MuJoCo 3.x would solve the problem AI Identified it was not a MuJoCo version issue but missing robosuite patches and texture files; explained upgrading to MuJoCo 3.x would break robosuite 1.4.1 API compatibility Difference Analysis: Human hypothesis focused on framework version mismatch; AI traced actual error through diagnostic commands to identify missing patches and assets; upgrading MuJoCo would have been counterproductive\nSolving reproducibility problem approach Role Approach Human Immediately recognized shared/ directory not being tracked was a blocker and explicitly requested making it reproducible; pushed for concrete action (‘push to github’) AI Initially suggested three abstract options (add git URL, use submodule, or fork) without checking if local modifications existed Difference Analysis: Human had domain knowledge this was blocking deployment and correctly prioritized action over discussion; AI took academic approach of listing alternatives before diagnosis\nImplementation Level Detecting actual vs false file differences Role Approach Human Asked to check if robosuite had ‘any modifications’, implying skepticism about whether real changes existed AI Initially saw 776 file differences and tried to categorize them, eventually discovering most were line-ending artifacts Difference Analysis: User’s question implied suspicion that large diff count might be artifacts; AI initially took diff count at face value before applying proper filtering\nInstallation strategy and incremental setup Role Approach Human Prioritized conda packages first, skipped system dependencies to minimize complexity and focus on Python environment AI Attempted comprehensive setup including system packages (libhidapi-dev, libglfw3-dev) all at once Difference Analysis: Human’s incremental approach enabled faster iteration and clearer diagnosis of environment issues; AI’s all-at-once strategy would have made debugging more complex\nAI Limitations Critical Limitations Spent significant effort monkey-patching missing APIs before identifying that patched robosuite source was the actual requirement; did not recognize shared/mimicgen_workspace/ directory structure as indicator of custom patches until late in debugging Took many diagnostic commands before recognizing editable install was shadowed by residual directory; should have immediately checked site-packages when pip show and traceback paths diverged; did not immediately recognize path conflict as critical indicator Initially proposed three abstract solution options for mimicgen reproducibility without first checking whether local modifications existed or understanding their scope; wasted tool calls checking git history for never-tracked shared/ directory General Limitations Generated initial robosuite patch with absolute paths that needed regeneration with relative paths for portability Attempted upgrading to robosuite 1.5.2 without checking backward compatibility with mimicgen first Learnings Key Learnings MimicGen requires patched robosuite with custom APIs (get_bounding_box_half_size, total_size, locations_relative_to_corner, z_rotation) not present in official releases; version pinning in setup scripts may refer to local patched copies in shared/ directories rather than upstream commits Editable pip installs on NTFS cross-filesystem mounts can leave residual site-packages directories that shadow editable path mappings; always verify import resolution matches pip show location by checking both path and file attributes; patched dependencies must be re-patched after pip install overwrites them Exception handling with bare ’except: continue’ or ’except Exception: pass’ makes debugging extremely difficult and should never be used in diagnostic/setup code; always capture the actual exception, log it, and include it in re-raised errors for proper diagnosis External dependencies with local modifications should be tracked in-repo (if small) or via patch files (if large) rather than blindly gitignored; unified diff patches are the correct tool for tracking modifications to large upstream projects - they minimize repository size, document exact changes, and enable automated application Cross-platform line ending differences (CRLF vs LF) can create massive false positives in file comparisons; always use –strip-trailing-cr or -w flags when comparing across Windows/Linux platforms to reveal actual code changes When robosuite environments fail to load, check three layers: Python import paths (pip show, sys.path), robosuite registration (REGISTERED_ENVS), and MuJoCo asset file paths (textures, meshes, XML relative references) Pip packages may exclude data files (XML assets, configs); always verify critical non-Python files are packaged correctly in distribution; setup.py may miss necessary asset directories Practical Learnings Use –no-deps when reinstalling pinned dependencies or installing packages with optional rendering dependencies that fail to build but aren’t needed for core functionality Presence of .orig and .rej files indicates a patch was attempted, but empty diffs mean the patches may have already been successfully applied (artifacts weren’t cleaned up) Conversation Summaries ErrorRecovery ✅ Coffee environment setup debugging - 5 bug fix chain 04:44:49.213 | claude_code User updated patches and asked if Coffee task could now run. Systematically debugged 5 interconnected bugs blocking environment creation: pip editable install shadowed by residual site-packages directory, robosuite missing recovery patches (z_rotation parameter), missing robomimic dependency, create_env silently swallowing exceptions, and missing ceramic.png texture file. Applied fixes sequentially with verification at each step, added TUTORIAL.md section 4 documenting the entire troubleshooting process with diagnostic commands and verification scripts. Coffee_D0 environment now creates successfully and passes all validation checks.\n✅ Fix environment reproducibility by tracking modified dependencies 03:26:06.618 | claude_code User identified that shared/ directory containing modified mimicgen and robosuite wasn’t tracked in Git, blocking cluster deployment. Compared local copies against upstream (NVlabs/mimicgen, robosuite commit c848ca84), filtered CRLF/LF noise, found essential modifications in both libraries (mimicgen: compatibility fixes and new Lift_Config; robosuite: 13 patched files adding MimicGen-required APIs). Solution: committed mimicgen directly (13MB), created 326-line patch file for robosuite (avoiding 587MB commit), and updated setup_env.sh to auto-apply patches. Successfully pushed to GitHub, enabling full environment reproducibility for cluster deployment.\n🔄 Initial environment setup and dependency debugging 03:02:12.642 | claude_code Created recovery_collect conda environment and debugged multiple dependency issues. Fixed mujoco version conflict (3.7.0→2.3.2), installed mimicgen and copied missing XML assets, monkey-patched get_bounding_box_half_size into robosuite classes. Discovered root cause: pip-installed robosuite lacks patches from cluster’s shared/mimicgen_workspace/robosuite/. Initially blocked on syncing patched dependencies from cluster.\n✅ Create requirements.txt baseline for project dependencies 02:48:44.541 | claude_code User requested requirements.txt update. Scanned all Python imports across 55 non-shared project files using grep-based pattern matching, identified 9 core third-party packages (numpy, scipy, mujoco, h5py, pyyaml, opencv-python, glfw, hidapi, tqdm, imageio, numba, matplotlib), and created structured requirements.txt with sections for core dependencies, rendering tools, utilities, and analysis packages. Ran pip list on recovery_collect conda environment to audit actual installed packages, identifying discrepancies like missing imageio-ffmpeg, pynput, and PyOpenGL in requirements.txt.\nUnknown ❌ MacBook authentication failures (90+ sessions) 04:41:54.333 | claude_code Over 90 Claude Code sessions on MacBook showed identical ‘Not logged in · Please run /login’ errors with no actual work performed. These appear to be failed authentication attempts, empty connection tests, or auto-reconnect failures. No user interaction or task completion occurred in any of these sessions.\nToken Usage Total: $17.71 — 23.6M tokens\n",
+  "wordCount" : "2190",
+  "inLanguage": "en",
+  "datePublished": "2026-04-15T00:00:00-05:00",
+  "dateModified": "2026-04-15T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-04-15/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-15/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://tzj2006.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/bugjournal/daily/">Daily Summary</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-04-15
+    </h1>
+    <div class="post-meta"><span title='2026-04-15 00:00:00 -0500 -0500'>April 15, 2026</span>&nbsp;·&nbsp;<span>11 min</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="daily-report--2026-04-15">Daily Report — 2026-04-15<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-04-15">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Complete environment setup, debugging, and reproducibility implementation for ErrorRecovery robotics project spanning conda environment creation, systematic bug resolution, and dependency tracking</li>
+<li><strong>How it was done:</strong> Conda environment creation with dependency resolution, methodical 5-bug diagnosis and fixes (pip shadowing, missing patches, dependencies, exception handling, assets), upstream comparison and patch generation, automated setup scripting</li>
+<li><strong>Impact:</strong> Transformed non-functional local environment into fully operational and reproducible system deployable on any machine including remote clusters; documented entire troubleshooting process for future reference</li>
+</ul>
+<h3 id="desktoplinux">DesktopLinux<a hidden class="anchor" aria-hidden="true" href="#desktoplinux">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Created and debugged recovery_collect conda environment for Coffee task, resolving interconnected bugs including pip editable install shadowing, missing robosuite patches (z_rotation, get_bounding_box_half_size, total_size parameters), missing robomimic dependency, silenced exception handling, and missing texture assets</li>
+<li><strong>How it was done:</strong> Installed base dependencies (robosuite 1.4.1, mujoco 2.3.2, mimicgen), fixed version conflicts, copied XML assets, monkey-patched missing APIs, then systematically diagnosed root causes using pip show/diff/grep/traceback analysis; applied sequential fixes: removed stale directories, reapplied robosuite_recovery.patch, installed robomimic &ndash;no-deps, improved error reporting, copied ceramic.png texture; created requirements.txt baseline via import scanning</li>
+<li><strong>Impact:</strong> Coffee_D0 environment now fully functional and passes all validation checks; TUTORIAL.md section 4 documents complete troubleshooting process with verification scripts; established reproducible dependency baseline</li>
+</ul>
+<h3 id="macbook">MacBook<a hidden class="anchor" aria-hidden="true" href="#macbook">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Resolved environment reproducibility blockers by tracking modified mimicgen library (545 files) and creating patch system for robosuite (13 modified files)</li>
+<li><strong>How it was done:</strong> Compared local copies against upstream repositories (NVlabs/mimicgen, commit c848ca84 for robosuite), filtered CRLF/LF noise using &ndash;strip-trailing-cr, generated unified diff patches, updated setup_env.sh to auto-apply patches after upstream installation, committed mimicgen fork directly and pushed to GitHub</li>
+<li><strong>Impact:</strong> Environment now fully reproducible for cluster deployment and collaboration; avoided 587MB robosuite commit via 326-line patch file; any machine can clone and set up working environment</li>
+</ul>
+<blockquote>
+<p>Systematically debugged and resolved ErrorRecovery robotics project environment setup, fixing 5 critical bugs blocking Coffee task execution, then established full reproducibility by tracking modified dependencies and creating automated patch system for cluster deployment</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Fix 5 critical environment bugs blocking Coffee task</strong> — Resolved pip editable install shadowing, missing robosuite recovery patches (z_rotation, get_bounding_box_half_size, total_size parameters), missing robomimic dependency, silenced exception handling, and missing ceramic.png texture</li>
+<li>✅ <strong>Create robosuite patch system for reproducibility</strong> — Generated unified diff patch (326 lines) for 13 modified robosuite files instead of committing 587MB source tree, updated setup_env.sh to auto-apply patches after upstream installation</li>
+<li>✅ <strong>Document troubleshooting process in TUTORIAL.md</strong> — Added section 4 to TUTORIAL.md with detailed bug summary table, step-by-step diagnosis and fixes, patch inventory, and environment verification script</li>
+<li>✅ <strong>Track modified mimicgen library in Git repository</strong> — Added locally modified mimicgen fork (545 files, 13MB) to shared/mimicgen_workspace/mimicgen/, removed from .gitignore, committed and pushed to GitHub</li>
+<li>✅ <strong>Create and debug recovery_collect conda environment</strong> — Created Python 3.10 conda environment, resolved mujoco version conflict (3.7.0→2.3.2), installed mimicgen and copied XML assets, identified need for patched robosuite from cluster</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>✅ <strong>Analyze modifications against upstream repositories</strong> — Compared local mimicgen with NVlabs/mimicgen upstream and robosuite against commit c848ca84, documented compatibility fixes, new tasks, and MimicGen API additions</li>
+<li>✅ <strong>Create requirements.txt baseline</strong> — Scanned 55 project files for imports, created structured requirements.txt with 9 core dependencies and special installation notes, audited actual conda environment packages</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-robosuite-missing-critical-patches-z_rotation-parameter-get_bounding_box_half_size-total_size-locations_relative_to_corner-required-by-mimicgen-causing-environment-creation-failures">1. Robosuite missing critical patches (z_rotation parameter, get_bounding_box_half_size, total_size, locations_relative_to_corner) required by MimicGen, causing environment creation failures<a hidden class="anchor" aria-hidden="true" href="#1-robosuite-missing-critical-patches-z_rotation-parameter-get_bounding_box_half_size-total_size-locations_relative_to_corner-required-by-mimicgen-causing-environment-creation-failures">#</a></h4>
+<p><strong>Solution:</strong> Reapplied shared/mimicgen_workspace/robosuite_patches/robosuite_recovery.patch to installed robosuite package using patch -p1; verified all parameters exist in target class signatures</p>
+<p><strong>Key Insight:</strong> MimicGen requires patched robosuite with custom APIs not present in official releases; patched dependencies must be re-patched after pip install overwrites them; cluster uses local patched copies in shared/mimicgen_workspace/ rather than upstream versions</p>
+<h4 id="2-script_utilspy-create_env-function-silently-swallowed-exceptions-with-except-exception-continue-showing-only-generic-could-not-create-env-error">2. script_utils.py create_env function silently swallowed exceptions with &rsquo;except Exception: continue&rsquo;, showing only generic &lsquo;Could not create env&rsquo; error<a hidden class="anchor" aria-hidden="true" href="#2-script_utilspy-create_env-function-silently-swallowed-exceptions-with-except-exception-continue-showing-only-generic-could-not-create-env-error">#</a></h4>
+<p><strong>Solution:</strong> Modified exception handling to capture last_error and re-raise with original traceback context in RuntimeError, revealing the actual MuJoCo PNG loading error</p>
+<p><strong>Key Insight:</strong> Exception handling with bare &rsquo;except: continue&rsquo; or &rsquo;except Exception: pass&rsquo; makes debugging extremely difficult and should never be used in diagnostic/setup code; always capture the actual exception, log it, and include it in re-raised errors</p>
+<h4 id="3-shared-directory-with-critical-dependencies-was-gitignored-making-environment-non-reproducible-for-other-users-or-cluster-deployment">3. Shared/ directory with critical dependencies was gitignored, making environment non-reproducible for other users or cluster deployment<a hidden class="anchor" aria-hidden="true" href="#3-shared-directory-with-critical-dependencies-was-gitignored-making-environment-non-reproducible-for-other-users-or-cluster-deployment">#</a></h4>
+<p><strong>Solution:</strong> Tracked modified mimicgen directly in repo (13MB); created patch file system for robosuite to avoid 587MB commit; updated setup_env.sh to auto-apply patches after upstream installation</p>
+<p><strong>Key Insight:</strong> External dependencies with local modifications should be tracked in-repo (if small) or via patch files (if large) rather than blindly gitignored, especially for reproducible research environments; unified diff patches minimize repository size while preserving reproducibility</p>
+<h4 id="4-pip-editable-install-of-mimicgen-shadowed-by-residual-site-packagesmimicgen-directory-from-previous-install-causing-import-failures">4. Pip editable install of mimicgen shadowed by residual site-packages/mimicgen/ directory from previous install, causing import failures<a hidden class="anchor" aria-hidden="true" href="#4-pip-editable-install-of-mimicgen-shadowed-by-residual-site-packagesmimicgen-directory-from-previous-install-causing-import-failures">#</a></h4>
+<p><strong>Solution:</strong> Removed stale site-packages/mimicgen/ directory; pip editable install then correctly mapped to src/mimicgen</p>
+<p><strong>Key Insight:</strong> Editable pip installs on NTFS cross-filesystem mounts can leave residual site-packages directories that take precedence over editable path mappings; always verify import resolution matches pip show location by checking <strong>path</strong> and <strong>file</strong> attributes</p>
+<h4 id="5-776-file-differences-between-installed-robosuite-and-upstream-turned-out-to-be-mostly-crlf-vs-lf-line-ending-noise-obscuring-13-real-code-changes">5. 776 file differences between installed robosuite and upstream turned out to be mostly CRLF vs LF line ending noise, obscuring 13 real code changes<a hidden class="anchor" aria-hidden="true" href="#5-776-file-differences-between-installed-robosuite-and-upstream-turned-out-to-be-mostly-crlf-vs-lf-line-ending-noise-obscuring-13-real-code-changes">#</a></h4>
+<p><strong>Solution:</strong> Used diff &ndash;strip-trailing-cr to filter line ending differences, revealing only 13 files with actual code modifications</p>
+<p><strong>Key Insight:</strong> Cross-platform development creates false positives in file comparison due to line ending differences; always use &ndash;strip-trailing-cr or -w flags when comparing across Windows/Linux platforms</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="6-pip-installed-mimicgen-missing-xml-assets-coffee_podxml-coffee_bodyxml-required-by-environment-definitions">6. Pip-installed mimicgen missing XML assets (coffee_pod.xml, coffee_body.xml) required by environment definitions<a hidden class="anchor" aria-hidden="true" href="#6-pip-installed-mimicgen-missing-xml-assets-coffee_podxml-coffee_bodyxml-required-by-environment-definitions">#</a></h4>
+<p><strong>Solution:</strong> Cloned mimicgen repo and manually copied assets/ directory to site-packages</p>
+<p><strong>Key Insight:</strong> Setup.py may not package all necessary data files; always verify critical non-Python assets are included in distribution</p>
+<h4 id="7-missing-robomimic-dependency-caused-import-failures-in-mimicgen-config-modules">7. Missing robomimic dependency caused import failures in mimicgen config modules<a hidden class="anchor" aria-hidden="true" href="#7-missing-robomimic-dependency-caused-import-failures-in-mimicgen-config-modules">#</a></h4>
+<p><strong>Solution:</strong> Installed robomimic with pip install robomimic &ndash;no-deps to bypass egl_probe build failure (EGL rendering not needed for SpaceMouse collection)</p>
+<p><strong>Key Insight:</strong> Use &ndash;no-deps to install packages when optional rendering dependencies fail to build but core functionality remains intact</p>
+<h4 id="8-robosuite-installation-upgraded-mujoco-to-370-breaking-api-compatibility-with-robosuite-141">8. Robosuite installation upgraded mujoco to 3.7.0, breaking API compatibility with robosuite 1.4.1<a hidden class="anchor" aria-hidden="true" href="#8-robosuite-installation-upgraded-mujoco-to-370-breaking-api-compatibility-with-robosuite-141">#</a></h4>
+<p><strong>Solution:</strong> Force reinstalled mujoco 2.3.2 with &ndash;no-deps flag to prevent transitive upgrades</p>
+<p><strong>Key Insight:</strong> Use &ndash;no-deps when reinstalling pinned dependencies to prevent package managers from upgrading transitive dependencies</p>
+<h4 id="9-mujoco-failed-to-load-ceramicpng-texture-png-file-load-error-because-sharedmimicgen_workspacemimicgen-lacked-assetstextures-directory-present-in-srcmimicgen-upstream">9. MuJoCo failed to load ceramic.png texture (PNG file load error) because shared/mimicgen_workspace/mimicgen/ lacked assets/textures/ directory present in src/mimicgen upstream<a hidden class="anchor" aria-hidden="true" href="#9-mujoco-failed-to-load-ceramicpng-texture-png-file-load-error-because-sharedmimicgen_workspacemimicgen-lacked-assetstextures-directory-present-in-srcmimicgen-upstream">#</a></h4>
+<p><strong>Solution:</strong> Copied ceramic.png from src/mimicgen/mimicgen/models/robosuite/assets/textures/ to shared/mimicgen_workspace/mimicgen/mimicgen/models/robosuite/assets/textures/</p>
+<p><strong>Key Insight:</strong> When MuJoCo environments fail with asset loading errors, check both Python import paths and relative asset paths (meshes, textures) referenced in XML model definitions</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="root-cause-diagnosis-for-coffee-environment-failure">Root cause diagnosis for Coffee environment failure<a hidden class="anchor" aria-hidden="true" href="#root-cause-diagnosis-for-coffee-environment-failure">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Suspected MuJoCo version mismatch and asked if upgrading to latest MuJoCo 3.x would solve the problem</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Identified it was not a MuJoCo version issue but missing robosuite patches and texture files; explained upgrading to MuJoCo 3.x would break robosuite 1.4.1 API compatibility</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human hypothesis focused on framework version mismatch; AI traced actual error through diagnostic commands to identify missing patches and assets; upgrading MuJoCo would have been counterproductive</p>
+<h4 id="solving-reproducibility-problem-approach">Solving reproducibility problem approach<a hidden class="anchor" aria-hidden="true" href="#solving-reproducibility-problem-approach">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Immediately recognized shared/ directory not being tracked was a blocker and explicitly requested making it reproducible; pushed for concrete action (&lsquo;push to github&rsquo;)</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Initially suggested three abstract options (add git URL, use submodule, or fork) without checking if local modifications existed</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human had domain knowledge this was blocking deployment and correctly prioritized action over discussion; AI took academic approach of listing alternatives before diagnosis</p>
+<h3 id="implementation-level">Implementation Level<a hidden class="anchor" aria-hidden="true" href="#implementation-level">#</a></h3>
+<h4 id="detecting-actual-vs-false-file-differences">Detecting actual vs false file differences<a hidden class="anchor" aria-hidden="true" href="#detecting-actual-vs-false-file-differences">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Asked to check if robosuite had &lsquo;any modifications&rsquo;, implying skepticism about whether real changes existed</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Initially saw 776 file differences and tried to categorize them, eventually discovering most were line-ending artifacts</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> User&rsquo;s question implied suspicion that large diff count might be artifacts; AI initially took diff count at face value before applying proper filtering</p>
+<h4 id="installation-strategy-and-incremental-setup">Installation strategy and incremental setup<a hidden class="anchor" aria-hidden="true" href="#installation-strategy-and-incremental-setup">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Prioritized conda packages first, skipped system dependencies to minimize complexity and focus on Python environment</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Attempted comprehensive setup including system packages (libhidapi-dev, libglfw3-dev) all at once</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human&rsquo;s incremental approach enabled faster iteration and clearer diagnosis of environment issues; AI&rsquo;s all-at-once strategy would have made debugging more complex</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="critical-limitations">Critical Limitations<a hidden class="anchor" aria-hidden="true" href="#critical-limitations">#</a></h3>
+<ul>
+<li>Spent significant effort monkey-patching missing APIs before identifying that patched robosuite source was the actual requirement; did not recognize shared/mimicgen_workspace/ directory structure as indicator of custom patches until late in debugging</li>
+<li>Took many diagnostic commands before recognizing editable install was shadowed by residual directory; should have immediately checked site-packages when pip show and traceback paths diverged; did not immediately recognize path conflict as critical indicator</li>
+<li>Initially proposed three abstract solution options for mimicgen reproducibility without first checking whether local modifications existed or understanding their scope; wasted tool calls checking git history for never-tracked shared/ directory</li>
+</ul>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>Generated initial robosuite patch with absolute paths that needed regeneration with relative paths for portability</li>
+<li>Attempted upgrading to robosuite 1.5.2 without checking backward compatibility with mimicgen first</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>MimicGen requires patched robosuite with custom APIs (get_bounding_box_half_size, total_size, locations_relative_to_corner, z_rotation) not present in official releases; version pinning in setup scripts may refer to local patched copies in shared/ directories rather than upstream commits</li>
+<li>Editable pip installs on NTFS cross-filesystem mounts can leave residual site-packages directories that shadow editable path mappings; always verify import resolution matches pip show location by checking both <strong>path</strong> and <strong>file</strong> attributes; patched dependencies must be re-patched after pip install overwrites them</li>
+<li>Exception handling with bare &rsquo;except: continue&rsquo; or &rsquo;except Exception: pass&rsquo; makes debugging extremely difficult and should never be used in diagnostic/setup code; always capture the actual exception, log it, and include it in re-raised errors for proper diagnosis</li>
+<li>External dependencies with local modifications should be tracked in-repo (if small) or via patch files (if large) rather than blindly gitignored; unified diff patches are the correct tool for tracking modifications to large upstream projects - they minimize repository size, document exact changes, and enable automated application</li>
+<li>Cross-platform line ending differences (CRLF vs LF) can create massive false positives in file comparisons; always use &ndash;strip-trailing-cr or -w flags when comparing across Windows/Linux platforms to reveal actual code changes</li>
+<li>When robosuite environments fail to load, check three layers: Python import paths (pip show, sys.path), robosuite registration (REGISTERED_ENVS), and MuJoCo asset file paths (textures, meshes, XML relative references)</li>
+<li>Pip packages may exclude data files (XML assets, configs); always verify critical non-Python files are packaged correctly in distribution; setup.py may miss necessary asset directories</li>
+</ul>
+<h3 id="practical-learnings">Practical Learnings<a hidden class="anchor" aria-hidden="true" href="#practical-learnings">#</a></h3>
+<ul>
+<li>Use &ndash;no-deps when reinstalling pinned dependencies or installing packages with optional rendering dependencies that fail to build but aren&rsquo;t needed for core functionality</li>
+<li>Presence of .orig and .rej files indicates a patch was attempted, but empty diffs mean the patches may have already been successfully applied (artifacts weren&rsquo;t cleaned up)</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<h3 id="errorrecovery">ErrorRecovery<a hidden class="anchor" aria-hidden="true" href="#errorrecovery">#</a></h3>
+<p><strong>✅ Coffee environment setup debugging - 5 bug fix chain</strong>
+<em>04:44:49.213 | claude_code</em>
+User updated patches and asked if Coffee task could now run. Systematically debugged 5 interconnected bugs blocking environment creation: pip editable install shadowed by residual site-packages directory, robosuite missing recovery patches (z_rotation parameter), missing robomimic dependency, create_env silently swallowing exceptions, and missing ceramic.png texture file. Applied fixes sequentially with verification at each step, added TUTORIAL.md section 4 documenting the entire troubleshooting process with diagnostic commands and verification scripts. Coffee_D0 environment now creates successfully and passes all validation checks.</p>
+<p><strong>✅ Fix environment reproducibility by tracking modified dependencies</strong>
+<em>03:26:06.618 | claude_code</em>
+User identified that shared/ directory containing modified mimicgen and robosuite wasn&rsquo;t tracked in Git, blocking cluster deployment. Compared local copies against upstream (NVlabs/mimicgen, robosuite commit c848ca84), filtered CRLF/LF noise, found essential modifications in both libraries (mimicgen: compatibility fixes and new Lift_Config; robosuite: 13 patched files adding MimicGen-required APIs). Solution: committed mimicgen directly (13MB), created 326-line patch file for robosuite (avoiding 587MB commit), and updated setup_env.sh to auto-apply patches. Successfully pushed to GitHub, enabling full environment reproducibility for cluster deployment.</p>
+<p><strong>🔄 Initial environment setup and dependency debugging</strong>
+<em>03:02:12.642 | claude_code</em>
+Created recovery_collect conda environment and debugged multiple dependency issues. Fixed mujoco version conflict (3.7.0→2.3.2), installed mimicgen and copied missing XML assets, monkey-patched get_bounding_box_half_size into robosuite classes. Discovered root cause: pip-installed robosuite lacks patches from cluster&rsquo;s shared/mimicgen_workspace/robosuite/. Initially blocked on syncing patched dependencies from cluster.</p>
+<p><strong>✅ Create requirements.txt baseline for project dependencies</strong>
+<em>02:48:44.541 | claude_code</em>
+User requested requirements.txt update. Scanned all Python imports across 55 non-shared project files using grep-based pattern matching, identified 9 core third-party packages (numpy, scipy, mujoco, h5py, pyyaml, opencv-python, glfw, hidapi, tqdm, imageio, numba, matplotlib), and created structured requirements.txt with sections for core dependencies, rendering tools, utilities, and analysis packages. Ran pip list on recovery_collect conda environment to audit actual installed packages, identifying discrepancies like missing imageio-ffmpeg, pynput, and PyOpenGL in requirements.txt.</p>
+<h3 id="unknown">Unknown<a hidden class="anchor" aria-hidden="true" href="#unknown">#</a></h3>
+<p><strong>❌ MacBook authentication failures (90+ sessions)</strong>
+<em>04:41:54.333 | claude_code</em>
+Over 90 Claude Code sessions on MacBook showed identical &lsquo;Not logged in · Please run /login&rsquo; errors with no actual work performed. These appear to be failed authentication attempts, empty connection tests, or auto-reconnect failures. No user interaction or task completion occurred in any of these sessions.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-04-15-usage.png"></p>
+<p><strong>Total: $17.71</strong> — 23.6M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
