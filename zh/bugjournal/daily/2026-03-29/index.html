@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>漏洞日志 2026-03-29 | TzJ&#39;s Net</title>
+<title>Bug Journal 2026-03-29 | TzJ&#39;s Net</title>
 <meta name="keywords" content="Bug Journal">
 <meta name="description" content="关于在HPC集群上分析TEDDY单细胞基础模型的相关研究，已经修复了现有提取脚本中的4个重要错误，并且成功完成了DLPFC数据集的嵌入提取工作。">
 <meta name="author" content="">
@@ -84,7 +84,7 @@
 </script>
 <meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-29/">
   <meta property="og:site_name" content="TzJ&#39;s Net">
-  <meta property="og:title" content="漏洞日志 2026-03-29">
+  <meta property="og:title" content="Bug Journal 2026-03-29">
   <meta property="og:description" content="关于在HPC集群上分析TEDDY单细胞基础模型的相关研究，已经修复了现有提取脚本中的4个重要错误，并且成功完成了DLPFC数据集的嵌入提取工作。">
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
@@ -93,7 +93,7 @@
     <meta property="article:modified_time" content="2026-03-29T00:00:00-05:00">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="漏洞日志 2026-03-29">
+  <meta name="twitter:title" content="Bug Journal 2026-03-29">
   <meta name="twitter:description" content="关于在HPC集群上分析TEDDY单细胞基础模型的相关研究，已经修复了现有提取脚本中的4个重要错误，并且成功完成了DLPFC数据集的嵌入提取工作。">
 
 
@@ -117,7 +117,7 @@
     {
       "@type": "ListItem",
       "position":  3 ,
-      "name": "漏洞日志 2026-03-29",
+      "name": "Bug Journal 2026-03-29",
       "item": "https://tzj2006.github.io/zh/bugjournal/daily/2026-03-29/"
     }
   ]
@@ -127,13 +127,13 @@
 {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "漏洞日志 2026-03-29",
-  "name": "漏洞日志 2026-03-29",
+  "headline": "Bug Journal 2026-03-29",
+  "name": "Bug Journal 2026-03-29",
   "description": "关于在HPC集群上分析TEDDY单细胞基础模型的相关研究，已经修复了现有提取脚本中的4个重要错误，并且成功完成了DLPFC数据集的嵌入提取工作。",
   "keywords": [
     "Bug Journal"
   ],
-  "articleBody": "每日报告 — 2026-03-29 每日概述 **已完成的工作：**成功将TEDDY-G 400M基础模型部署到DLPFC空间转录组学数据集上。修复并验证了嵌入提取流程。 **实现方式：**通过系统的代码审查，发现现有extract_teddy()函数中存在四个错误：不正确的分词器导入、错误的模型参数名称、不正确的输出键以及缺失的基因ID映射。修复这些错误后，在teddy Conda环境中进行了验证和运行。 **影响：**将TEDDY编码器添加到MIHD项目中，为像scGPT、Geneformer和C2S这样的现有模型提供了基准测试。这有助于在多模型评估疾病状态分类任务中取得进展。 在HPC集群上分析了TEDDY单细胞基础模型论文。修复了提取脚本中的四个关键错误，并成功为DLPFC数据集提取了嵌入数据。\n任务 架构与策略 ✅ 修复了extract_teddy()脚本中的错误 — 识别并修复了四个关键错误：①不正确的分词器导入已更改为GeneTokenizer；②模型前向参数input_ids已更改为gene_ids；③输出访问last_hidden_state已更改为outputs[‘cell_emb】；④增加了基因符号与Ensembl ID之间的映射逻辑。 ✅ TEDDY论文分析 — 分析了arXiv论文2503.03485，了解了TEDDY模型架构（Teddy-G/X编码，6种变体，最多400M参数），并评估了其在疾病分类基准测试中的性能，与最先进的模型相比表现相当。 实施与修复 🔄 DLPFC嵌入提取 — 在teddy Conda环境中提取了11个DLPFC部分的1024维细胞嵌入。第151508部分已经完成（4384个位置），其余10个部分正在分批提取。通过将批量大小从32减少到8，解决了GPU内存不足的问题。 问题与解决方案 关键问题 1. extract_teddy()使用了不正确的分词器类和错误的模型API（input_ids、last_hidden_state），导致脚本完全失败。 **解决方案：**通过阅读TEDDY源代码，确认了正确的API：GeneTokenizer、gene_ids参数、outputs[‘cell_emb】输出键，并添加了Ensembl ID映射。\n**关键洞察：**TEDDY词汇表使用Ensembl ID而不是基因符号，模型前向签名与HuggingFace标准接口不同。需要直接阅读源代码，而不是依赖约定。\n一般问题 2. 当batch_size=32时（32GB内存），由于每个序列包含2048个令牌，会出现GPU内存不足的情况。 **解决方案：**将批量大小从32减少到8，以控制内存使用。\n**关键洞察：**排名值编码保留了前2048个基因作为令牌序列，这比scGPT等模型的序列要长，因此需要更多的内存。\n3. Claude无法回忆起之前的TEDDY测试对话。 **解决方案：**用户提供了新的arXiv链接，Claude重新分析了该论文。\n**关键洞察：**跨会话记忆没有正确保存，导致上下文丢失。需要在关键研究点主动保存记忆。\n人类与人工智能的方法 战略层面 如何识别脚本中的错误 角色 方法 人类 用户不知道脚本中有错误，认为它之前已经过测试。 人工智能 人工智能通过系统的代码审查主动发现了四个隐藏的错误（阅读源代码→验证API→比较实现）。用户没有参与调试。 **差异分析：**人工智能能够主动审查代码，帮助识别用户未注意到的技术障碍，从而节省调试时间。\n如何确定任务优先级和研究方向 角色 方法 人类 用户记得并询问了之前的TEDDY测试，明确希望将模型部署到DLPFC数据集上。他们提供了一个具体的arXiv链接。 人工智能 人工智能专注于技术实现：分析论文、探索环境、识别错误并修复代码。它遵循用户的指示。 **差异分析：**研究方向和项目选择完全由用户决定。人工智能将模糊的请求（“部署TEDDY”）转化为具体的工程步骤。\n人工智能的局限性 一般局限性 跨会话记忆没有保存：用户无法回忆起关于TEDDY测试的讨论，因此必须再次提供背景信息。这表明Claude的记忆系统在隔离会话方面存在局限性。 PDF解析失败：尝试从arXiv中提取PDF失败，因为二进制内容问题。只有HTML版本可以正常工作，表明其处理PDF格式的能力有限。 经验教训 关键经验 TEDDY-G的性能优于TEDDY-X（排名值编码优于分箱表达）。在保留的捐赠者多类任务中，它的性能比Nicheformer高出8%。然而，在保留的疾病二分类任务中，它与Nicheformer不相上下。线性探测比微调要好得多（RA：0.56→0.93），这表明嵌入质量很高，但微调可能会导致过拟合。 HuggingFace生态系统中的单细胞基础模型的向前接口有很大差异。不要假设标准的HuggingFace接口；必须阅读源代码以确认gene_ids参数的名称以及输出字典的结构。 实际经验 TEDDY词汇表使用Ensembl ID（43808个令牌）。在DLPFC数据集中，60%的基因（20044/33538）可以映射到词汇表中。其余的是lncRNA和其他非蛋白质编码基因——这是正常的覆盖率。 对话总结 🔄 TEDDY论文分析+修复了DLPFC嵌入提取脚本，并开始批量运行 21:19:18.201 | claude_code 用户询问了之前的TEDDY测试。由于记忆问题，Claude请求了新的arXiv链接并重新分析了论文。然后，用户指示Claude将模型部署到DLPFC数据集上。Claude探索了HPC环境，并在extract_teddy()函数中发现了四个关键错误：不正确的分词器类、错误的模型参数名称、不正确的输出键以及缺失的基因ID映射。这些错误已被修复并验证。第一部分（151508）成功提取了1024维嵌入，共4384个位置。通过将批量大小从32减少到8，解决了GPU内存不足的问题。其余10个部分正在分批处理。\n令牌使用情况 总花费：$12.15 — 2330万令牌\n",
+  "articleBody": "每日报告 — 2026-03-29 每日概述 **已完成的工作：**成功将TEDDY-G 400M基础模型部署到DLPFC空间转录组学数据集上。修复并验证了嵌入提取流程。 **实现方式：**通过系统的代码审查，发现现有的extract_teddy()函数中存在四个错误：不正确的分词器导入、错误的模型参数名称、不正确的输出键以及缺失的基因ID映射。修复这些错误后，在teddy conda环境中进行了验证和运行。 **影响：**将TEDDY编码器添加到MIHD项目中，为像scGPT、Geneformer和C2S这样的现有模型提供了基准测试。这有助于在多模型评估疾病状态分类任务中取得进展。 在HPC集群上分析了TEDDY单细胞基础模型论文。修复了提取脚本中的四个关键错误，并成功为DLPFC数据集提取了嵌入数据。\n任务 架构与策略 ✅ 修复了extract_teddy()脚本中的错误 — 识别并修复了四个关键错误：①不正确的分词器导入已更改为GeneTokenizer；②模型前向参数input_ids已更改为gene_ids；③输出访问last_hidden_state已更改为outputs[‘cell_emb’]；④增加了基因符号与Ensembl ID之间的映射逻辑。 ✅ TEDDY论文分析 — 分析了arXiv论文2503.03485，理解了TEDDY模型架构（Teddy-G/X编码，6种变体，最多400M参数），并评估了其在疾病分类基准测试中的性能，与最先进的模型相比表现相当。 实施与修复 🔄 DLPFC嵌入提取 — 在teddy conda环境中提取了11个DLPFC部分的1024维细胞嵌入。第151508部分已经完成（4384个位置），其余10个部分正在分批提取。通过将批量大小从32减少到8，解决了GPU内存不足的问题。 问题与解决方案 关键问题 1. extract_teddy()使用了不正确的分词器类和错误的模型API（input_ids、last_hidden_state），导致脚本完全失败。 **解决方案：**通过阅读Teddy源代码，确认了正确的API：GeneTokenizer、gene_ids参数、outputs[‘cell_emb’]输出键，并添加了Ensembl ID映射。\n**关键洞察：**TEDDY词汇表使用Ensembl ID而不是基因符号，模型前向签名与HuggingFace标准接口不同。需要直接阅读源代码，而不是依赖约定。\n一般问题 2. 当batch_size=32时会发生GPU内存不足的情况（32GB内存），因为每个序列包含2048个标记。 **解决方案：**将批量大小从32减少到8，以控制内存使用。\n**关键洞察：**排名值编码保留了前2048个基因作为标记序列，这比scGPT等模型的序列要长，因此需要更多的内存。\n3. Claude无法回忆起之前的Teddy测试对话。 **解决方案：**用户提供了新的arXiv链接，Claude重新分析了该论文。\n**关键洞察：**跨会话记忆没有正确保存，导致上下文丢失。需要在关键研究点主动保存记忆。\n人类与人工智能的方法 战略层面 如何识别脚本中的错误 角色 方法 人类 用户不知道脚本中有错误，认为它之前已经过测试。 人工智能 人工智能通过系统的代码审查主动发现了四个隐藏的错误（阅读源代码→验证API→比较实现）。用户没有参与调试。 **差异分析：**人工智能能够主动审查代码，帮助识别用户未意识到的技术障碍，从而节省调试时间。\n如何确定任务优先级和研究方向 角色 方法 人类 用户记得并询问了之前的Teddy测试，并明确希望将模型部署到DLPFC数据集上。他们提供了一个具体的arXiv链接。 人工智能 人工智能专注于技术实现：分析论文、探索环境、识别错误并修复代码。它遵循用户的指示。 **差异分析：**研究方向和项目选择完全由用户驱动。人工智能将模糊的请求（“部署Teddy”）转化为具体的工程步骤。\n人工智能的局限性 一般局限性 跨会话记忆没有保存：用户无法回忆起关于Teddy测试的讨论，因此必须再次提供背景信息。这表明Claude的记忆系统在隔离会话方面存在局限性。 PDF解析失败：由于二进制内容问题，尝试从arXiv中提取PDF失败。只有HTML版本可以正常工作，表明其处理PDF格式的能力有限。 经验教训 关键经验 TEDDY-G的性能优于TEDDY-X（排名值编码优于分箱表达）。在保留的捐赠者多类任务中，它的性能比Nicheformer高出8%。然而，在保留的疾病二分类任务中，它的性能与Nicheformer相当。线性探测比微调要好得多（RA：0.56→0.93），这表明嵌入质量很高，但微调可能会导致过拟合。 HuggingFace生态系统中的单细胞基础模型的向前接口有很大差异。不要假设标准的HuggingFace接口；必须阅读源代码以确认gene_ids参数的名称及输出字典的结构。 实际经验 TEDDY词汇表使用Ensembl ID（43808个标记）。在DLPFC数据集中，60%的基因（20044/33538）可以映射到词汇表中。其余的是lncRNA和其他非蛋白质编码基因——这是正常的覆盖率。 对话总结 🔄 TEDDY论文分析+修复了DLPFC嵌入提取脚本并开始批量运行 21:19:18.201 | claude_code 用户询问了之前的Teddy测试。由于记忆问题，Claude请求了新的arXiv链接并重新分析了论文。然后，用户指示Claude将模型部署到DLPFC数据集上。Claude探索了HPC环境，并在extract_teddy()函数中发现了四个关键错误：不正确的分词器类、错误的模型参数名称、不正确的输出键以及缺失的基因ID映射。这些错误已被修复并验证。第一部分（151508）成功提取了1024维嵌入，共4384个位置。通过将批量大小从32减少到8，解决了GPU内存不足的问题。其余10个部分正在分批处理。\n标记使用情况 总花费：$12.15 — 2330万标记\n",
   "wordCount" : "84",
   "inLanguage": "zh",
   "datePublished": "2026-03-29T00:00:00-05:00",
@@ -238,7 +238,7 @@
   <header class="post-header">
     <div class="breadcrumbs"><a href="https://tzj2006.github.io/zh/">主页</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/">Bug Journal</a>&nbsp;»&nbsp;<a href="https://tzj2006.github.io/zh/bugjournal/daily/">每日总结</a></div>
     <h1 class="post-title entry-hint-parent">
-      漏洞日志 2026-03-29
+      Bug Journal 2026-03-29
     </h1>
     <div class="post-meta"><span title='2026-03-29 00:00:00 -0500 -0500'>2026年3月29日</span>&nbsp;·&nbsp;<span>1 分钟</span>
 
@@ -248,7 +248,7 @@
 <h2 id="每日概述">每日概述<a hidden class="anchor" aria-hidden="true" href="#每日概述">#</a></h2>
 <ul>
 <li>**已完成的工作：**成功将TEDDY-G 400M基础模型部署到DLPFC空间转录组学数据集上。修复并验证了嵌入提取流程。</li>
-<li>**实现方式：**通过系统的代码审查，发现现有extract_teddy()函数中存在四个错误：不正确的分词器导入、错误的模型参数名称、不正确的输出键以及缺失的基因ID映射。修复这些错误后，在teddy Conda环境中进行了验证和运行。</li>
+<li>**实现方式：**通过系统的代码审查，发现现有的extract_teddy()函数中存在四个错误：不正确的分词器导入、错误的模型参数名称、不正确的输出键以及缺失的基因ID映射。修复这些错误后，在teddy conda环境中进行了验证和运行。</li>
 <li>**影响：**将TEDDY编码器添加到MIHD项目中，为像scGPT、Geneformer和C2S这样的现有模型提供了基准测试。这有助于在多模型评估疾病状态分类任务中取得进展。</li>
 </ul>
 <blockquote>
@@ -257,23 +257,23 @@
 <h2 id="任务">任务<a hidden class="anchor" aria-hidden="true" href="#任务">#</a></h2>
 <h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
 <ul>
-<li>✅ <strong>修复了extract_teddy()脚本中的错误</strong> — 识别并修复了四个关键错误：①不正确的分词器导入已更改为GeneTokenizer；②模型前向参数input_ids已更改为gene_ids；③输出访问last_hidden_state已更改为outputs[&lsquo;cell_emb】；④增加了基因符号与Ensembl ID之间的映射逻辑。</li>
-<li>✅ <strong>TEDDY论文分析</strong> — 分析了arXiv论文2503.03485，了解了TEDDY模型架构（Teddy-G/X编码，6种变体，最多400M参数），并评估了其在疾病分类基准测试中的性能，与最先进的模型相比表现相当。</li>
+<li>✅ <strong>修复了extract_teddy()脚本中的错误</strong> — 识别并修复了四个关键错误：①不正确的分词器导入已更改为GeneTokenizer；②模型前向参数input_ids已更改为gene_ids；③输出访问last_hidden_state已更改为outputs[&lsquo;cell_emb&rsquo;]；④增加了基因符号与Ensembl ID之间的映射逻辑。</li>
+<li>✅ <strong>TEDDY论文分析</strong> — 分析了arXiv论文2503.03485，理解了TEDDY模型架构（Teddy-G/X编码，6种变体，最多400M参数），并评估了其在疾病分类基准测试中的性能，与最先进的模型相比表现相当。</li>
 </ul>
 <h3 id="实施与修复">实施与修复<a hidden class="anchor" aria-hidden="true" href="#实施与修复">#</a></h3>
 <ul>
-<li>🔄 <strong>DLPFC嵌入提取</strong> — 在teddy Conda环境中提取了11个DLPFC部分的1024维细胞嵌入。第151508部分已经完成（4384个位置），其余10个部分正在分批提取。通过将批量大小从32减少到8，解决了GPU内存不足的问题。</li>
+<li>🔄 <strong>DLPFC嵌入提取</strong> — 在teddy conda环境中提取了11个DLPFC部分的1024维细胞嵌入。第151508部分已经完成（4384个位置），其余10个部分正在分批提取。通过将批量大小从32减少到8，解决了GPU内存不足的问题。</li>
 </ul>
 <h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
 <h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
 <h4 id="1-extract_teddy使用了不正确的分词器类和错误的模型apiinput_idslast_hidden_state导致脚本完全失败">1. extract_teddy()使用了不正确的分词器类和错误的模型API（input_ids、last_hidden_state），导致脚本完全失败。<a hidden class="anchor" aria-hidden="true" href="#1-extract_teddy使用了不正确的分词器类和错误的模型apiinput_idslast_hidden_state导致脚本完全失败">#</a></h4>
-<p>**解决方案：**通过阅读TEDDY源代码，确认了正确的API：GeneTokenizer、gene_ids参数、outputs[&lsquo;cell_emb】输出键，并添加了Ensembl ID映射。</p>
+<p>**解决方案：**通过阅读Teddy源代码，确认了正确的API：GeneTokenizer、gene_ids参数、outputs[&lsquo;cell_emb&rsquo;]输出键，并添加了Ensembl ID映射。</p>
 <p>**关键洞察：**TEDDY词汇表使用Ensembl ID而不是基因符号，模型前向签名与HuggingFace标准接口不同。需要直接阅读源代码，而不是依赖约定。</p>
 <h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
-<h4 id="2-当batch_size32时32gb内存由于每个序列包含2048个令牌会出现gpu内存不足的情况">2. 当batch_size=32时（32GB内存），由于每个序列包含2048个令牌，会出现GPU内存不足的情况。<a hidden class="anchor" aria-hidden="true" href="#2-当batch_size32时32gb内存由于每个序列包含2048个令牌会出现gpu内存不足的情况">#</a></h4>
+<h4 id="2-当batch_size32时会发生gpu内存不足的情况32gb内存因为每个序列包含2048个标记">2. 当batch_size=32时会发生GPU内存不足的情况（32GB内存），因为每个序列包含2048个标记。<a hidden class="anchor" aria-hidden="true" href="#2-当batch_size32时会发生gpu内存不足的情况32gb内存因为每个序列包含2048个标记">#</a></h4>
 <p>**解决方案：**将批量大小从32减少到8，以控制内存使用。</p>
-<p>**关键洞察：**排名值编码保留了前2048个基因作为令牌序列，这比scGPT等模型的序列要长，因此需要更多的内存。</p>
-<h4 id="3-claude无法回忆起之前的teddy测试对话">3. Claude无法回忆起之前的TEDDY测试对话。<a hidden class="anchor" aria-hidden="true" href="#3-claude无法回忆起之前的teddy测试对话">#</a></h4>
+<p>**关键洞察：**排名值编码保留了前2048个基因作为标记序列，这比scGPT等模型的序列要长，因此需要更多的内存。</p>
+<h4 id="3-claude无法回忆起之前的teddy测试对话">3. Claude无法回忆起之前的Teddy测试对话。<a hidden class="anchor" aria-hidden="true" href="#3-claude无法回忆起之前的teddy测试对话">#</a></h4>
 <p>**解决方案：**用户提供了新的arXiv链接，Claude重新分析了该论文。</p>
 <p>**关键洞察：**跨会话记忆没有正确保存，导致上下文丢失。需要在关键研究点主动保存记忆。</p>
 <h2 id="人类与人工智能的方法">人类与人工智能的方法<a hidden class="anchor" aria-hidden="true" href="#人类与人工智能的方法">#</a></h2>
@@ -297,7 +297,7 @@
       </tr>
   </tbody>
 </table>
-<p>**差异分析：**人工智能能够主动审查代码，帮助识别用户未注意到的技术障碍，从而节省调试时间。</p>
+<p>**差异分析：**人工智能能够主动审查代码，帮助识别用户未意识到的技术障碍，从而节省调试时间。</p>
 <h4 id="如何确定任务优先级和研究方向">如何确定任务优先级和研究方向<a hidden class="anchor" aria-hidden="true" href="#如何确定任务优先级和研究方向">#</a></h4>
 <table>
   <thead>
@@ -309,7 +309,7 @@
   <tbody>
       <tr>
           <td>人类</td>
-          <td>用户记得并询问了之前的TEDDY测试，明确希望将模型部署到DLPFC数据集上。他们提供了一个具体的arXiv链接。</td>
+          <td>用户记得并询问了之前的Teddy测试，并明确希望将模型部署到DLPFC数据集上。他们提供了一个具体的arXiv链接。</td>
       </tr>
       <tr>
           <td>人工智能</td>
@@ -317,30 +317,30 @@
       </tr>
   </tbody>
 </table>
-<p>**差异分析：**研究方向和项目选择完全由用户决定。人工智能将模糊的请求（“部署TEDDY”）转化为具体的工程步骤。</p>
+<p>**差异分析：**研究方向和项目选择完全由用户驱动。人工智能将模糊的请求（“部署Teddy”）转化为具体的工程步骤。</p>
 <h2 id="人工智能的局限性">人工智能的局限性<a hidden class="anchor" aria-hidden="true" href="#人工智能的局限性">#</a></h2>
 <h3 id="一般局限性">一般局限性<a hidden class="anchor" aria-hidden="true" href="#一般局限性">#</a></h3>
 <ul>
-<li>跨会话记忆没有保存：用户无法回忆起关于TEDDY测试的讨论，因此必须再次提供背景信息。这表明Claude的记忆系统在隔离会话方面存在局限性。</li>
-<li>PDF解析失败：尝试从arXiv中提取PDF失败，因为二进制内容问题。只有HTML版本可以正常工作，表明其处理PDF格式的能力有限。</li>
+<li>跨会话记忆没有保存：用户无法回忆起关于Teddy测试的讨论，因此必须再次提供背景信息。这表明Claude的记忆系统在隔离会话方面存在局限性。</li>
+<li>PDF解析失败：由于二进制内容问题，尝试从arXiv中提取PDF失败。只有HTML版本可以正常工作，表明其处理PDF格式的能力有限。</li>
 </ul>
 <h2 id="经验教训">经验教训<a hidden class="anchor" aria-hidden="true" href="#经验教训">#</a></h2>
 <h3 id="关键经验">关键经验<a hidden class="anchor" aria-hidden="true" href="#关键经验">#</a></h3>
 <ul>
-<li>TEDDY-G的性能优于TEDDY-X（排名值编码优于分箱表达）。在保留的捐赠者多类任务中，它的性能比Nicheformer高出8%。然而，在保留的疾病二分类任务中，它与Nicheformer不相上下。线性探测比微调要好得多（RA：0.56→0.93），这表明嵌入质量很高，但微调可能会导致过拟合。</li>
-<li>HuggingFace生态系统中的单细胞基础模型的向前接口有很大差异。不要假设标准的HuggingFace接口；必须阅读源代码以确认gene_ids参数的名称以及输出字典的结构。</li>
+<li>TEDDY-G的性能优于TEDDY-X（排名值编码优于分箱表达）。在保留的捐赠者多类任务中，它的性能比Nicheformer高出8%。然而，在保留的疾病二分类任务中，它的性能与Nicheformer相当。线性探测比微调要好得多（RA：0.56→0.93），这表明嵌入质量很高，但微调可能会导致过拟合。</li>
+<li>HuggingFace生态系统中的单细胞基础模型的向前接口有很大差异。不要假设标准的HuggingFace接口；必须阅读源代码以确认gene_ids参数的名称及输出字典的结构。</li>
 </ul>
 <h3 id="实际经验">实际经验<a hidden class="anchor" aria-hidden="true" href="#实际经验">#</a></h3>
 <ul>
-<li>TEDDY词汇表使用Ensembl ID（43808个令牌）。在DLPFC数据集中，60%的基因（20044/33538）可以映射到词汇表中。其余的是lncRNA和其他非蛋白质编码基因——这是正常的覆盖率。</li>
+<li>TEDDY词汇表使用Ensembl ID（43808个标记）。在DLPFC数据集中，60%的基因（20044/33538）可以映射到词汇表中。其余的是lncRNA和其他非蛋白质编码基因——这是正常的覆盖率。</li>
 </ul>
 <h2 id="对话总结">对话总结<a hidden class="anchor" aria-hidden="true" href="#对话总结">#</a></h2>
-<p><strong>🔄 TEDDY论文分析+修复了DLPFC嵌入提取脚本，并开始批量运行</strong>
+<p><strong>🔄 TEDDY论文分析+修复了DLPFC嵌入提取脚本并开始批量运行</strong>
 <em>21:19:18.201 | claude_code</em>
-用户询问了之前的TEDDY测试。由于记忆问题，Claude请求了新的arXiv链接并重新分析了论文。然后，用户指示Claude将模型部署到DLPFC数据集上。Claude探索了HPC环境，并在extract_teddy()函数中发现了四个关键错误：不正确的分词器类、错误的模型参数名称、不正确的输出键以及缺失的基因ID映射。这些错误已被修复并验证。第一部分（151508）成功提取了1024维嵌入，共4384个位置。通过将批量大小从32减少到8，解决了GPU内存不足的问题。其余10个部分正在分批处理。</p>
-<h2 id="令牌使用情况">令牌使用情况<a hidden class="anchor" aria-hidden="true" href="#令牌使用情况">#</a></h2>
-<p><img alt="令牌使用情况" loading="lazy" src="2026-03-29-usage.png"></p>
-<p><strong>总花费：$12.15</strong> — 2330万令牌</p>
+用户询问了之前的Teddy测试。由于记忆问题，Claude请求了新的arXiv链接并重新分析了论文。然后，用户指示Claude将模型部署到DLPFC数据集上。Claude探索了HPC环境，并在extract_teddy()函数中发现了四个关键错误：不正确的分词器类、错误的模型参数名称、不正确的输出键以及缺失的基因ID映射。这些错误已被修复并验证。第一部分（151508）成功提取了1024维嵌入，共4384个位置。通过将批量大小从32减少到8，解决了GPU内存不足的问题。其余10个部分正在分批处理。</p>
+<h2 id="标记使用情况">标记使用情况<a hidden class="anchor" aria-hidden="true" href="#标记使用情况">#</a></h2>
+<p><img alt="标记使用情况" loading="lazy" src="https://tzj2006.github.io/images/daily/2026-03-29-usage.png"></p>
+<p><strong>总花费：$12.15</strong> — 2330万标记</p>
 
 
   </div>

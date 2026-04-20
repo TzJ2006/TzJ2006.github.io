@@ -451,7 +451,7 @@
 <em>2026-04-09（多会话）| claude_code</em>
 一天内进行了四次调试/优化工作。会话1：npm run tauri dev失败，因为“tauri”未被识别。诊断出缺少Windows原生绑定(@tauri-apps/cli-win32-x64-msvc)，删除node_modules和package-lock.json，重新安装以触发正确的平台依赖解析。会话2：npm run tauri dev失败，因为Vite的“端口1420已被占用”。使用netstat找到PID 42676（残留的node.exe 101MB），建议使用taskkill终止。会话3：实现了针对SSH远程服务器的时区感知日期过滤。根本问题是：远程JSONL时间戳携带服务器时区偏移量（RFC 3339 FixedOffset），但日期过滤使用了date_naive()提取服务器日期而非本地日期，导致误差。解决方案分为4个步骤：（1）添加了parse_remote_ts_to_local_date辅助函数，带有.with_timezone(&amp;Local)转换，修改了4个日期提取位置；（2）修复Codex中的since_iso_filter，包含UTC偏移量；（3）在提取脚本中添加TZ_OFFSET检测，并在.timezone文件中持久化存储，在DevicesView中显示；（4）编写了8个新的单元测试。优化后消除了重复解析问题。所有307个Rust测试和219个前端测试都通过了。会话4：修复了浮球折叠动画中的两个UI缺陷。第一个缺陷：只有在方向为‘左’时才会出现视觉闪烁现象。根本原因：SetWindowPos同时移动窗口并缩小它，但WebView2渲染是异步的。解决方案：仅在折叠时将SetWindowPos包裹在ShowWindow(SW_HIDE/SW_SHOWNOACTIVATE)中。第二个缺陷（在测试中发现）：在折叠过程中，球体先向左然后向右移动。根本原因：展开=false会移除.class.shell.expanded，在250毫秒的CSS过渡期间，justify-content会跳转到中心。解决方案：从基于方向的justify-content规则中移除.expanded条件。此外，通过git checkout恢复了意外删除的index.html文件，解决了开发服务器404错误问题。</p>
 <h2 id="令牌使用情况">令牌使用情况<a hidden class="anchor" aria-hidden="true" href="#令牌使用情况">#</a></h2>
-<p><img alt="令牌使用情况" loading="lazy" src="2026-04-09-usage.png"></p>
+<p><img alt="令牌使用情况" loading="lazy" src="https://tzj2006.github.io/images/daily/2026-04-09-usage.png"></p>
 <p><strong>总用量：$9.91</strong> — 930万令牌</p>
 
 
