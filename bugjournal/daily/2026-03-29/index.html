@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-29 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="分析了TEDDY单细胞基础模型论文中涉及的内容，修复了现有提取脚本中的4个重要错误，并成功完成了DLPFC数据集的嵌入提取部署工作。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-29/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-29/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-29/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-29/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-29">
+  <meta property="og:description" content="分析了TEDDY单细胞基础模型论文中涉及的内容，修复了现有提取脚本中的4个重要错误，并成功完成了DLPFC数据集的嵌入提取部署工作。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-29T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-29T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-29">
+  <meta name="twitter:description" content="分析了TEDDY单细胞基础模型论文中涉及的内容，修复了现有提取脚本中的4个重要错误，并成功完成了DLPFC数据集的嵌入提取部署工作。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-03-29",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-03-29/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-29",
+  "name": "Bug Journal 2026-03-29",
+  "description": "分析了TEDDY单细胞基础模型论文中涉及的内容，修复了现有提取脚本中的4个重要错误，并成功完成了DLPFC数据集的嵌入提取部署工作。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-03-29 Daily Overview What was done: Successfully deployed the TEDDY-G 400M base model to the DLPFC spatial transcriptomics dataset. Fixed and verified the embedding extraction pipeline. How it was done: Through systematic code review, four bugs were identified in the existing extract_teddy() function: incorrect tokenizer import, wrong model parameter names, incorrect output key, and missing gene ID mapping. After fixing these bugs, they were verified and run in the teddy conda environment. Impact: Added the TEDDY encoder to the MIHD project, providing a benchmark against existing models like scGPT, Geneformer, and C2S. This promotes multi-model evaluation for disease state classification tasks. Analyzed the TEDDY single-cell base model paper on the HPC cluster. Fixed four critical bugs in the extraction script and successfully deployed the embedding extraction for the DLPFC dataset.\nTasks Architecture \u0026 Strategy ✅ Fixed extract_teddy() script bugs — Identified and fixed four critical bugs: ① Corrected the incorrect tokenizer import to GeneTokenizer; ② Changed the model forward parameter input_ids to gene_ids; ③ Changed the output access from last_hidden_state to outputs[‘cell_emb’]; ④ Added mapping logic for gene symbols to Ensembl IDs. ✅ TEDDY paper analysis — Analyzed the arXiv paper 2503.03485, understood the TEDDY model architecture (Teddy-G/X encoding, 6 variants, up to 400M parameters), and evaluated its performance on disease classification benchmarks compared to SOTA models. Implementation \u0026 Fixes 🔄 DLPFC embedding extraction — Extracted 1024-dimensional cell embeddings for 11 DLPFC sections in the teddy conda environment. Section 151508 has been completed (4384 spots), and the remaining 10 sections are being extracted in batches. The GPU OOM issue was resolved by reducing the batch size from 32 to 8. Problems \u0026 Solutions Critical Issues 1. extract_teddy() used an incorrect tokenizer class and wrong model API (input_ids, last_hidden_state), causing the script to fail entirely. Solution: Confirmed the correct API by reviewing the Teddy source code: GeneTokenizer, gene_ids parameter, outputs[‘cell_emb’] output key, and added Ensembl ID mapping.\nKey Insight: TEDDY vocab uses Ensembl IDs instead of gene symbols, and the model forward signature differs from HuggingFace’s standard interface. It’s necessary to read the source code directly rather than relying on conventions.\nGeneral Issues 2. GPU OOM occurred when batch_size=32 (32GB memory), as each sequence contains 2048 tokens. Solution: Reduced the batch size from 32 to 8 to control memory usage.\nKey Insight: The rank-value encoding retains the top 2048 genes as token sequences, which is longer than sequences in models like scGPT, resulting in higher memory requirements.\n3. Claude could not recall the previous Teddy test conversation. Solution: The user provided a new arXiv link, and Claude re-analyzed the paper.\nKey Insight: Cross-session memory wasn’t properly saved, leading to context loss. Memory should be actively saved at key research points.\nHuman vs AI Approaches Strategic Level Ways to identify script bugs Role Approach Human The user didn’t know there were bugs in the script and assumed it had been tested before. AI AI discovered four hidden bugs through systematic code review (reading source code → verifying APIs → comparing implementations). The user wasn’t involved in debugging. Difference Analysis: AI’s proactive code review helped identify technical obstacles the user wasn’t aware of, saving debugging time.\nDetermining task priorities and research directions Role Approach Human The user recalled the progress of the previous Teddy test and explicitly requested deploying the model to the DLPFC dataset, providing a specific arXiv link. AI AI focused on technical implementation: analyzing papers, exploring environments, locating bugs, and fixing code. It followed the user’s instructions. Difference Analysis: The research direction and project selection were completely driven by the user. AI translated vague requests into executable steps.\nAI Limitations General Limitations Cross-session memory isn’t persisted: The user couldn’t recall discussions about Teddy tests, requiring them to provide background information again. This reflects Claude’s limitations in maintaining session isolation. PDF parsing failure: Attempts to extract the arXiv PDF failed due to binary content issues. Only HTML version worked, indicating limited ability to process PDF formats. Learnings Key Learnings TEDDY-G outperforms TEDDY-X (rank-value encoding is better than binned expressions). It performs 8% better in multi-class tasks with held-out donors than Nicheformer, but competes with Nicheformer in binary classification tasks. Linear probing is much better than fine-tuning (RA: 0.56→0.93), indicating high embedding quality but potential overfitting in fine-tuning. Forward interfaces of single-cell base models in the HuggingFace ecosystem vary significantly. Don’t assume standard HuggingFace interfaces; verify gene_id parameter names and output dictionary structures by reading the source code. Practical Learnings TEDDY vocab uses Ensembl IDs (43808 tokens). In the DLPFC dataset, 60% of genes (20044/33538) can be mapped to the vocab. The rest are non-protein-coding genes like lncRNAs—this is a normal coverage rate. Conversation Summaries 🔄 TEDDY paper analysis + fixed DLPFC embedding extraction script and started batch execution 21:19:18.201 | claude_code The user asked about the progress of previous Teddy tests. Claude asked for a new arXiv link due to memory loss and re-analyzed the paper. Then, the user instructed Claude to deploy the model to the DLPFC dataset using the ccplan command. Claude explored the HPC environment and found four critical bugs in the extract_teddy() function (incorrect tokenizer class name, wrong model parameter names, incorrect output key, missing gene ID mapping). These bugs were fixed and verified. The first section (151508) successfully extracted 1024-dimensional embeddings for 4384 spots. The GPU OOM issue was resolved by reducing the batch size from 32 to 8. The remaining 10 sections are being processed in batches.\nToken Usage Total: $12.15 — 23.3M tokens\n",
+  "wordCount" : "912",
+  "inLanguage": "en",
+  "datePublished": "2026-03-29T00:00:00-05:00",
+  "dateModified": "2026-03-29T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-03-29/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-29/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/'>Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-29
+    </h1>
+    <div class="post-meta"><span title='2026-03-29 00:00:00 -0500 -0500'>March 29, 2026</span>&nbsp;·&nbsp;<span>5 min</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="daily-report--2026-03-29">Daily Report — 2026-03-29<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-03-29">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Successfully deployed the TEDDY-G 400M base model to the DLPFC spatial transcriptomics dataset. Fixed and verified the embedding extraction pipeline.</li>
+<li><strong>How it was done:</strong> Through systematic code review, four bugs were identified in the existing extract_teddy() function: incorrect tokenizer import, wrong model parameter names, incorrect output key, and missing gene ID mapping. After fixing these bugs, they were verified and run in the teddy conda environment.</li>
+<li><strong>Impact:</strong> Added the TEDDY encoder to the MIHD project, providing a benchmark against existing models like scGPT, Geneformer, and C2S. This promotes multi-model evaluation for disease state classification tasks.</li>
+</ul>
+<blockquote>
+<p>Analyzed the TEDDY single-cell base model paper on the HPC cluster. Fixed four critical bugs in the extraction script and successfully deployed the embedding extraction for the DLPFC dataset.</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Fixed extract_teddy() script bugs</strong> — Identified and fixed four critical bugs: ① Corrected the incorrect tokenizer import to GeneTokenizer; ② Changed the model forward parameter input_ids to gene_ids; ③ Changed the output access from last_hidden_state to outputs[&lsquo;cell_emb&rsquo;]; ④ Added mapping logic for gene symbols to Ensembl IDs.</li>
+<li>✅ <strong>TEDDY paper analysis</strong> — Analyzed the arXiv paper 2503.03485, understood the TEDDY model architecture (Teddy-G/X encoding, 6 variants, up to 400M parameters), and evaluated its performance on disease classification benchmarks compared to SOTA models.</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>🔄 <strong>DLPFC embedding extraction</strong> — Extracted 1024-dimensional cell embeddings for 11 DLPFC sections in the teddy conda environment. Section 151508 has been completed (4384 spots), and the remaining 10 sections are being extracted in batches. The GPU OOM issue was resolved by reducing the batch size from 32 to 8.</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-extract_teddy-used-an-incorrect-tokenizer-class-and-wrong-model-api-input_ids-last_hidden_state-causing-the-script-to-fail-entirely">1. extract_teddy() used an incorrect tokenizer class and wrong model API (input_ids, last_hidden_state), causing the script to fail entirely.<a hidden class="anchor" aria-hidden="true" href="#1-extract_teddy-used-an-incorrect-tokenizer-class-and-wrong-model-api-input_ids-last_hidden_state-causing-the-script-to-fail-entirely">#</a></h4>
+<p><strong>Solution:</strong> Confirmed the correct API by reviewing the Teddy source code: GeneTokenizer, gene_ids parameter, outputs[&lsquo;cell_emb&rsquo;] output key, and added Ensembl ID mapping.</p>
+<p><strong>Key Insight:</strong> TEDDY vocab uses Ensembl IDs instead of gene symbols, and the model forward signature differs from HuggingFace&rsquo;s standard interface. It&rsquo;s necessary to read the source code directly rather than relying on conventions.</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="2-gpu-oom-occurred-when-batch_size32-32gb-memory-as-each-sequence-contains-2048-tokens">2. GPU OOM occurred when batch_size=32 (32GB memory), as each sequence contains 2048 tokens.<a hidden class="anchor" aria-hidden="true" href="#2-gpu-oom-occurred-when-batch_size32-32gb-memory-as-each-sequence-contains-2048-tokens">#</a></h4>
+<p><strong>Solution:</strong> Reduced the batch size from 32 to 8 to control memory usage.</p>
+<p><strong>Key Insight:</strong> The rank-value encoding retains the top 2048 genes as token sequences, which is longer than sequences in models like scGPT, resulting in higher memory requirements.</p>
+<h4 id="3-claude-could-not-recall-the-previous-teddy-test-conversation">3. Claude could not recall the previous Teddy test conversation.<a hidden class="anchor" aria-hidden="true" href="#3-claude-could-not-recall-the-previous-teddy-test-conversation">#</a></h4>
+<p><strong>Solution:</strong> The user provided a new arXiv link, and Claude re-analyzed the paper.</p>
+<p><strong>Key Insight:</strong> Cross-session memory wasn&rsquo;t properly saved, leading to context loss. Memory should be actively saved at key research points.</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="ways-to-identify-script-bugs">Ways to identify script bugs<a hidden class="anchor" aria-hidden="true" href="#ways-to-identify-script-bugs">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>The user didn&rsquo;t know there were bugs in the script and assumed it had been tested before.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI discovered four hidden bugs through systematic code review (reading source code → verifying APIs → comparing implementations). The user wasn&rsquo;t involved in debugging.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> AI&rsquo;s proactive code review helped identify technical obstacles the user wasn&rsquo;t aware of, saving debugging time.</p>
+<h4 id="determining-task-priorities-and-research-directions">Determining task priorities and research directions<a hidden class="anchor" aria-hidden="true" href="#determining-task-priorities-and-research-directions">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>The user recalled the progress of the previous Teddy test and explicitly requested deploying the model to the DLPFC dataset, providing a specific arXiv link.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI focused on technical implementation: analyzing papers, exploring environments, locating bugs, and fixing code. It followed the user&rsquo;s instructions.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> The research direction and project selection were completely driven by the user. AI translated vague requests into executable steps.</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>Cross-session memory isn&rsquo;t persisted: The user couldn&rsquo;t recall discussions about Teddy tests, requiring them to provide background information again. This reflects Claude&rsquo;s limitations in maintaining session isolation.</li>
+<li>PDF parsing failure: Attempts to extract the arXiv PDF failed due to binary content issues. Only HTML version worked, indicating limited ability to process PDF formats.</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>TEDDY-G outperforms TEDDY-X (rank-value encoding is better than binned expressions). It performs 8% better in multi-class tasks with held-out donors than Nicheformer, but competes with Nicheformer in binary classification tasks. Linear probing is much better than fine-tuning (RA: 0.56→0.93), indicating high embedding quality but potential overfitting in fine-tuning.</li>
+<li>Forward interfaces of single-cell base models in the HuggingFace ecosystem vary significantly. Don&rsquo;t assume standard HuggingFace interfaces; verify gene_id parameter names and output dictionary structures by reading the source code.</li>
+</ul>
+<h3 id="practical-learnings">Practical Learnings<a hidden class="anchor" aria-hidden="true" href="#practical-learnings">#</a></h3>
+<ul>
+<li>TEDDY vocab uses Ensembl IDs (43808 tokens). In the DLPFC dataset, 60% of genes (20044/33538) can be mapped to the vocab. The rest are non-protein-coding genes like lncRNAs—this is a normal coverage rate.</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<p><strong>🔄 TEDDY paper analysis + fixed DLPFC embedding extraction script and started batch execution</strong>
+<em>21:19:18.201 | claude_code</em>
+The user asked about the progress of previous Teddy tests. Claude asked for a new arXiv link due to memory loss and re-analyzed the paper. Then, the user instructed Claude to deploy the model to the DLPFC dataset using the ccplan command. Claude explored the HPC environment and found four critical bugs in the extract_teddy() function (incorrect tokenizer class name, wrong model parameter names, incorrect output key, missing gene ID mapping). These bugs were fixed and verified. The first section (151508) successfully extracted 1024-dimensional embeddings for 4384 spots. The GPU OOM issue was resolved by reducing the batch size from 32 to 8. The remaining 10 sections are being processed in batches.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-03-29-usage.png"></p>
+<p><strong>Total: $12.15</strong> — 23.3M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

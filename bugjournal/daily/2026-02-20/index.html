@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-20 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Deep infrastructure work on two projects: spatial transcriptomics caching system and robotics error recovery data generation pipeline">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-02-20/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-02-20/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-20/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-02-20/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-20">
+  <meta property="og:description" content="Deep infrastructure work on two projects: spatial transcriptomics caching system and robotics error recovery data generation pipeline">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-20T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-20T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-20">
+  <meta name="twitter:description" content="Deep infrastructure work on two projects: spatial transcriptomics caching system and robotics error recovery data generation pipeline">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-20",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-02-20/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-20",
+  "name": "Bug Journal 2026-02-20",
+  "description": "Deep infrastructure work on two projects: spatial transcriptomics caching system and robotics error recovery data generation pipeline",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-02-20 Daily Overview What was done: Built embedding cache infrastructure for MIHD spatial transcriptomics pipeline and launched large-scale robotic error scene generation for benchmark dataset expansion How it was done: Integrated CacheManager into run_benchmark.py for instant embedding reuse, debugged multi-policy rollout observation mismatches, and parallelized 5 data generation jobs across GPUs Impact: MIHD evaluations now skip hours of re-encoding via cache; error recovery benchmark scaled from 454→2000+ target scenes with 4 strategies running in parallel DCC What was done: Architected and implemented embedding cache system for MIHD spatial transcriptomics benchmark pipeline How it was done: Added CacheManager integration to run_benchmark.py with gene/vision embedding cache read/write, variant support (standard/freq/staig_strict), and override flag propagation across two call sites Impact: Eliminated redundant UNI2/SCAN encoder instantiation—evaluations now load cached 1536-dim embeddings instantly instead of re-extracting from images; enables rapid experimentation with 9 fusion methods tianhe What was done: Fixed observation pipeline bugs and launched parallel GPU jobs for error recovery benchmark M12 dataset scaling (454→2000+ scenes) How it was done: Debugged BC-RNN 65-vs-37-dim mismatch by fixing _to_robosuite_obs() mapping; patched both injection and natural capture paths; started 3 BC-RNN + 2 VLA server jobs across 5 GPUs Impact: Unblocked large-scale data generation—BC-RNN injection (200 rollouts), natural capture (200 rollouts), demo-based generation, and Pi0/Pi0.5 VLA captures now running in parallel Deep infrastructure work on two projects: spatial transcriptomics caching system and robotics error recovery data generation pipeline\nTasks Architecture \u0026 Strategy ✅ Add embedding cache support to run_benchmark.py — Integrated CacheManager into MIHD’s run_benchmark.py to check/load/save gene and vision embeddings before encoder instantiation, with variant support and override flag 🔄 Launch parallel M12 data generation jobs — Started BC-RNN injection (GPU0), BC-RNN natural capture (GPU1), demo-based generation (GPU2), Pi0 server (GPU4), Pi0.5 server (GPU5) for scaling error scene dataset from 454 to 2000+ ✅ Fix BC-RNN observation dimension mismatch — Fixed 65-vs-37-dim error by mapping object-state→object in _to_robosuite_obs() and using raw robosuite obs in both injection and natural capture rollout paths Implementation \u0026 Fixes ✅ Implement save_images for M15 training data — Added save_images=True option to RecoveryDataCollector for saving camera frames alongside successful recovery trajectories ❌ Fix MimicGen robomimic compatibility — Updated robomimic_utils.py to filter kwargs for robomimic 0.3.0 API, but blocked by mujoco_py dependency conflict—decided to skip and compensate with more BC-RNN rollouts Problems \u0026 Solutions Critical Issues 1. run_benchmark.py re-instantiated encoders and extracted embeddings every run, wasting hours on already-computed UNI2/SCAN features Solution: Integrated CacheManager with has/load/save_*_embedding() methods; added cache checks before encoder instantiation with variant support (standard/freq/staig_strict); propagated override flag to both call sites\nKey Insight: User’s expectation was correct—run_benchmark.py should have had caching like pipeline does. AI initially proposed workarounds (separate eval script, manual caching) instead of fixing the root cause.\n2. BC-RNN policy expected input_size=65 but environment provided 37 dimensions, causing RuntimeError Solution: Root cause was object count mismatch (trained with 8 objects=56 dims, eval env has 4 objects=28 dims). Fixed _to_robosuite_obs() to map ‘object-state’→‘object’ key and use raw robosuite obs from env._env._get_observations() instead of StateExtractor\nKey Insight: Initial fix only covered injection path (_generate_from_single_rollout); natural capture path (_capture_single_rollout) had same issue. Need to check all code paths when fixing obs flow.\n3. eval_scan_fusion.py had staig_fusion ARI~0.39 result that seemed lower than expected Solution: Investigation revealed double normalization bug—didn’t pass staig_alignment_config, so STAIGTrainer applied StandardScaler after upstream preprocessing already did sc.pp.scale(). Also found no prior 151673 staig_fusion baseline existed to compare against\nKey Insight: “Lower than expected” without baseline data is speculation. Always verify baseline exists before assuming regression. Also: independent eval scripts easily miss config details that canonical pipelines handle correctly.\nGeneral Issues 4. MimicGen dataset augmentation failed with ’env_class unexpected keyword argument’ error Solution: Fixed robomimic_utils.py to filter kwargs based on robomimic 0.3.0 API signature using inspect.signature(), but still blocked by mujoco_py dependency in pip-installed robomimic. Decided to skip MimicGen and scale via more BC-RNN/VLA rollouts instead\nKey Insight: Environment isolation issues require deep dependency analysis. When blocked, pivot to alternative approaches rather than forcing incompatible dependencies.\nHuman vs AI Approaches Strategic Level Embedding cache architecture decision Role Approach Human Questioned why run_benchmark.py would re-instantiate encoders when embeddings already exist; expected pipeline-style caching to already be there; pushed to fix run_benchmark.py itself rather than build workarounds AI Initially proposed separate eval_scan_fusion.py script, then suggested using pipeline mode, then proposed manually caching SCAN embeddings—multiple workarounds before accepting the need to fix run_benchmark.py Difference Analysis: Human identified the real problem (missing cache support in canonical tool) and insisted on fixing root cause. AI defaulted to creating new scripts and workarounds rather than modifying existing infrastructure.\nImplementation Level Observation pipeline debugging strategy Role Approach Human Not explicitly shown in this session, but human asked for detailed explanation of STAIG fusion pipeline and obs flow AI Fixed injection path first, then discovered natural capture path had same issue—incomplete fix requiring second iteration Difference Analysis: AI’s incremental debugging missed that same obs flow issue existed in two code paths. More thorough code analysis upfront would have caught both.\nPrioritization during long-running experiments Role Approach Human Asked to handle STAIG fusion first when 2-hour eval_scan_fusion.py run was taking too long; wanted incremental results rather than waiting for full suite AI Continued waiting on full suite run, checking progress every 10-15 minutes with TaskOutput timeouts Difference Analysis: Human recognized diminishing returns and pivoted to focused experiments. AI exhibited patience/persistence where agility would have been better.\nAI Limitations Critical Limitations Proposed multiple workarounds (separate eval script, pipeline mode switch, manual SCAN caching) before accepting need to fix run_benchmark.py’s missing cache support—resistance to modifying existing canonical tooling Fixed BC-RNN obs mismatch in injection path but missed identical issue in natural capture path, requiring second fix iteration—incomplete code analysis when debugging General Limitations Claimed staig_fusion result was ’lower than expected’ without verifying baseline existed—speculation without evidence Continued long TaskOutput waits on 2-hour evaluation instead of recognizing when to pivot to incremental testing approach Initial MimicGen fix only addressed API signature mismatch, missed deeper mujoco_py dependency conflict that would require environment rebuild Learnings Key Learnings When user questions redundant work (“why re-instantiate if embeddings exist?”), they’re often identifying missing infrastructure that should be there—investigate the expectation before proposing workarounds Observation pipeline bugs in multi-path codebases (injection vs natural capture) require exhaustive analysis—fix in one path doesn’t guarantee fix in all paths; grep for all uses of the pattern Cache variants (standard/freq/staig_strict) prevent collisions when same encoder produces different embeddings based on preprocessing flags—variant system is more robust than separate encoder names Practical Learnings Large-scale GPU jobs benefit from parallel launch across devices with distinct logs (m12_bc_rnn_injection.log, m12_bc_rnn_natural.log) for independent monitoring Environment dependency issues (mujoco_py in robomimic 0.3.0) may be showstoppers—when blocked, pivot to alternative data sources rather than forcing incompatible deps Conversation Summaries MIHD Spatial Transcriptomics ✅ Implement embedding cache support in run_benchmark.py 21:22:59.238 | claude_code Executed plan to add CacheManager to run_benchmark.py. Added cache check/load/save for gene and vision embeddings with variant support (standard/freq/staig_strict). Relaxed vision_encoder argparse to allow custom cached names. Added override param to run_evaluation() and propagated to both call sites. Verified Python syntax.\n🔍 SCAN vs UNI2 fusion comparison investigation and cache bug discovery 18:06:33.022 | claude_code Started running eval_scan_fusion.py to compare 9 fusion methods with SCAN-enhanced vs raw UNI2 embeddings on section 151673. User prioritized STAIG fusion. Investigation revealed no prior 151673 staig_fusion baseline existed, and eval script had double normalization bug (missing staig_alignment_config). Discussed whether to use run_benchmark.py vs pipeline for proper caching.\nError Recovery Benchmark 🔄 M12 large-scale data generation: BC-RNN pipeline fixes 02:39:21.482 | claude_code Attempted MimicGen augmentation (10→200 demos) and BC-RNN rollouts but hit bugs. Fixed BC-RNN obs dimension mismatch (65 vs 37) by correcting object-state→object mapping in _to_robosuite_obs() and using raw robosuite obs. Fixed MimicGen robomimic 0.3.0 compatibility but blocked by mujoco_py—pivoted to scale via more BC-RNN. Launched 3 parallel jobs: BC-RNN injection (GPU0), natural capture (GPU1), demo-based (GPU2). Started Pi0 (GPU4) and Pi0.5 (GPU5) VLA servers. Fixed natural capture obs issue and restarted.\n✅ M12-M14 preparation: save_images feature and doc check 19:00:40.046 | claude_code Read project summary document (v4.10) to understand M12-M14 scope. Added save_images option to RecoveryDataCollector for M15 training data. Verified MimicGen augment config and taxonomy justification doc already existed. Prepared tasks for M14 evaluation run.\n❌ Script request for Pi0.5 and MimicGen baseline (interrupted) 21:01:10.311 | claude_code User requested a script to run everything for pi0.5 and mimicgen baseline models but interrupted before response.\nToken Usage Total: $35.78 — 48.7M tokens\n",
+  "wordCount" : "1398",
+  "inLanguage": "en",
+  "datePublished": "2026-02-20T00:00:00-05:00",
+  "dateModified": "2026-02-20T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-02-20/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-20/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/'>Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-20
+    </h1>
+    <div class="post-meta"><span title='2026-02-20 00:00:00 -0500 EST'>February 20, 2026</span>&nbsp;·&nbsp;<span>7 min</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="daily-report--2026-02-20">Daily Report — 2026-02-20<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-02-20">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Built embedding cache infrastructure for MIHD spatial transcriptomics pipeline and launched large-scale robotic error scene generation for benchmark dataset expansion</li>
+<li><strong>How it was done:</strong> Integrated CacheManager into run_benchmark.py for instant embedding reuse, debugged multi-policy rollout observation mismatches, and parallelized 5 data generation jobs across GPUs</li>
+<li><strong>Impact:</strong> MIHD evaluations now skip hours of re-encoding via cache; error recovery benchmark scaled from 454→2000+ target scenes with 4 strategies running in parallel</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Architected and implemented embedding cache system for MIHD spatial transcriptomics benchmark pipeline</li>
+<li><strong>How it was done:</strong> Added CacheManager integration to run_benchmark.py with gene/vision embedding cache read/write, variant support (standard/freq/staig_strict), and override flag propagation across two call sites</li>
+<li><strong>Impact:</strong> Eliminated redundant UNI2/SCAN encoder instantiation—evaluations now load cached 1536-dim embeddings instantly instead of re-extracting from images; enables rapid experimentation with 9 fusion methods</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Fixed observation pipeline bugs and launched parallel GPU jobs for error recovery benchmark M12 dataset scaling (454→2000+ scenes)</li>
+<li><strong>How it was done:</strong> Debugged BC-RNN 65-vs-37-dim mismatch by fixing _to_robosuite_obs() mapping; patched both injection and natural capture paths; started 3 BC-RNN + 2 VLA server jobs across 5 GPUs</li>
+<li><strong>Impact:</strong> Unblocked large-scale data generation—BC-RNN injection (200 rollouts), natural capture (200 rollouts), demo-based generation, and Pi0/Pi0.5 VLA captures now running in parallel</li>
+</ul>
+<blockquote>
+<p>Deep infrastructure work on two projects: spatial transcriptomics caching system and robotics error recovery data generation pipeline</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Add embedding cache support to run_benchmark.py</strong> — Integrated CacheManager into MIHD&rsquo;s run_benchmark.py to check/load/save gene and vision embeddings before encoder instantiation, with variant support and override flag</li>
+<li>🔄 <strong>Launch parallel M12 data generation jobs</strong> — Started BC-RNN injection (GPU0), BC-RNN natural capture (GPU1), demo-based generation (GPU2), Pi0 server (GPU4), Pi0.5 server (GPU5) for scaling error scene dataset from 454 to 2000+</li>
+<li>✅ <strong>Fix BC-RNN observation dimension mismatch</strong> — Fixed 65-vs-37-dim error by mapping object-state→object in _to_robosuite_obs() and using raw robosuite obs in both injection and natural capture rollout paths</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>✅ <strong>Implement save_images for M15 training data</strong> — Added save_images=True option to RecoveryDataCollector for saving camera frames alongside successful recovery trajectories</li>
+<li>❌ <strong>Fix MimicGen robomimic compatibility</strong> — Updated robomimic_utils.py to filter kwargs for robomimic 0.3.0 API, but blocked by mujoco_py dependency conflict—decided to skip and compensate with more BC-RNN rollouts</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-run_benchmarkpy-re-instantiated-encoders-and-extracted-embeddings-every-run-wasting-hours-on-already-computed-uni2scan-features">1. run_benchmark.py re-instantiated encoders and extracted embeddings every run, wasting hours on already-computed UNI2/SCAN features<a hidden class="anchor" aria-hidden="true" href="#1-run_benchmarkpy-re-instantiated-encoders-and-extracted-embeddings-every-run-wasting-hours-on-already-computed-uni2scan-features">#</a></h4>
+<p><strong>Solution:</strong> Integrated CacheManager with has/load/save_*_embedding() methods; added cache checks before encoder instantiation with variant support (standard/freq/staig_strict); propagated override flag to both call sites</p>
+<p><strong>Key Insight:</strong> User&rsquo;s expectation was correct—run_benchmark.py <em>should</em> have had caching like pipeline does. AI initially proposed workarounds (separate eval script, manual caching) instead of fixing the root cause.</p>
+<h4 id="2-bc-rnn-policy-expected-input_size65-but-environment-provided-37-dimensions-causing-runtimeerror">2. BC-RNN policy expected input_size=65 but environment provided 37 dimensions, causing RuntimeError<a hidden class="anchor" aria-hidden="true" href="#2-bc-rnn-policy-expected-input_size65-but-environment-provided-37-dimensions-causing-runtimeerror">#</a></h4>
+<p><strong>Solution:</strong> Root cause was object count mismatch (trained with 8 objects=56 dims, eval env has 4 objects=28 dims). Fixed _to_robosuite_obs() to map &lsquo;object-state&rsquo;→&lsquo;object&rsquo; key and use raw robosuite obs from env._env._get_observations() instead of StateExtractor</p>
+<p><strong>Key Insight:</strong> Initial fix only covered injection path (_generate_from_single_rollout); natural capture path (_capture_single_rollout) had same issue. Need to check all code paths when fixing obs flow.</p>
+<h4 id="3-eval_scan_fusionpy-had-staig_fusion-ari039-result-that-seemed-lower-than-expected">3. eval_scan_fusion.py had staig_fusion ARI~0.39 result that seemed lower than expected<a hidden class="anchor" aria-hidden="true" href="#3-eval_scan_fusionpy-had-staig_fusion-ari039-result-that-seemed-lower-than-expected">#</a></h4>
+<p><strong>Solution:</strong> Investigation revealed double normalization bug—didn&rsquo;t pass staig_alignment_config, so STAIGTrainer applied StandardScaler after upstream preprocessing already did sc.pp.scale(). Also found no prior 151673 staig_fusion baseline existed to compare against</p>
+<p><strong>Key Insight:</strong> &ldquo;Lower than expected&rdquo; without baseline data is speculation. Always verify baseline exists before assuming regression. Also: independent eval scripts easily miss config details that canonical pipelines handle correctly.</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="4-mimicgen-dataset-augmentation-failed-with-env_class-unexpected-keyword-argument-error">4. MimicGen dataset augmentation failed with &rsquo;env_class unexpected keyword argument&rsquo; error<a hidden class="anchor" aria-hidden="true" href="#4-mimicgen-dataset-augmentation-failed-with-env_class-unexpected-keyword-argument-error">#</a></h4>
+<p><strong>Solution:</strong> Fixed robomimic_utils.py to filter kwargs based on robomimic 0.3.0 API signature using inspect.signature(), but still blocked by mujoco_py dependency in pip-installed robomimic. Decided to skip MimicGen and scale via more BC-RNN/VLA rollouts instead</p>
+<p><strong>Key Insight:</strong> Environment isolation issues require deep dependency analysis. When blocked, pivot to alternative approaches rather than forcing incompatible dependencies.</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="embedding-cache-architecture-decision">Embedding cache architecture decision<a hidden class="anchor" aria-hidden="true" href="#embedding-cache-architecture-decision">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Questioned why run_benchmark.py would re-instantiate encoders when embeddings already exist; expected pipeline-style caching to already be there; pushed to fix run_benchmark.py itself rather than build workarounds</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Initially proposed separate eval_scan_fusion.py script, then suggested using pipeline mode, then proposed manually caching SCAN embeddings—multiple workarounds before accepting the need to fix run_benchmark.py</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human identified the real problem (missing cache support in canonical tool) and insisted on fixing root cause. AI defaulted to creating new scripts and workarounds rather than modifying existing infrastructure.</p>
+<h3 id="implementation-level">Implementation Level<a hidden class="anchor" aria-hidden="true" href="#implementation-level">#</a></h3>
+<h4 id="observation-pipeline-debugging-strategy">Observation pipeline debugging strategy<a hidden class="anchor" aria-hidden="true" href="#observation-pipeline-debugging-strategy">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Not explicitly shown in this session, but human asked for detailed explanation of STAIG fusion pipeline and obs flow</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Fixed injection path first, then discovered natural capture path had same issue—incomplete fix requiring second iteration</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> AI&rsquo;s incremental debugging missed that same obs flow issue existed in two code paths. More thorough code analysis upfront would have caught both.</p>
+<h4 id="prioritization-during-long-running-experiments">Prioritization during long-running experiments<a hidden class="anchor" aria-hidden="true" href="#prioritization-during-long-running-experiments">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Asked to handle STAIG fusion first when 2-hour eval_scan_fusion.py run was taking too long; wanted incremental results rather than waiting for full suite</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Continued waiting on full suite run, checking progress every 10-15 minutes with TaskOutput timeouts</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human recognized diminishing returns and pivoted to focused experiments. AI exhibited patience/persistence where agility would have been better.</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="critical-limitations">Critical Limitations<a hidden class="anchor" aria-hidden="true" href="#critical-limitations">#</a></h3>
+<ul>
+<li>Proposed multiple workarounds (separate eval script, pipeline mode switch, manual SCAN caching) before accepting need to fix run_benchmark.py&rsquo;s missing cache support—resistance to modifying existing canonical tooling</li>
+<li>Fixed BC-RNN obs mismatch in injection path but missed identical issue in natural capture path, requiring second fix iteration—incomplete code analysis when debugging</li>
+</ul>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>Claimed staig_fusion result was &rsquo;lower than expected&rsquo; without verifying baseline existed—speculation without evidence</li>
+<li>Continued long TaskOutput waits on 2-hour evaluation instead of recognizing when to pivot to incremental testing approach</li>
+<li>Initial MimicGen fix only addressed API signature mismatch, missed deeper mujoco_py dependency conflict that would require environment rebuild</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>When user questions redundant work (&ldquo;why re-instantiate if embeddings exist?&rdquo;), they&rsquo;re often identifying missing infrastructure that <em>should</em> be there—investigate the expectation before proposing workarounds</li>
+<li>Observation pipeline bugs in multi-path codebases (injection vs natural capture) require exhaustive analysis—fix in one path doesn&rsquo;t guarantee fix in all paths; grep for all uses of the pattern</li>
+<li>Cache variants (standard/freq/staig_strict) prevent collisions when same encoder produces different embeddings based on preprocessing flags—variant system is more robust than separate encoder names</li>
+</ul>
+<h3 id="practical-learnings">Practical Learnings<a hidden class="anchor" aria-hidden="true" href="#practical-learnings">#</a></h3>
+<ul>
+<li>Large-scale GPU jobs benefit from parallel launch across devices with distinct logs (m12_bc_rnn_injection.log, m12_bc_rnn_natural.log) for independent monitoring</li>
+<li>Environment dependency issues (mujoco_py in robomimic 0.3.0) may be showstoppers—when blocked, pivot to alternative data sources rather than forcing incompatible deps</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<h3 id="mihd-spatial-transcriptomics">MIHD Spatial Transcriptomics<a hidden class="anchor" aria-hidden="true" href="#mihd-spatial-transcriptomics">#</a></h3>
+<p><strong>✅ Implement embedding cache support in run_benchmark.py</strong>
+<em>21:22:59.238 | claude_code</em>
+Executed plan to add CacheManager to run_benchmark.py. Added cache check/load/save for gene and vision embeddings with variant support (standard/freq/staig_strict). Relaxed vision_encoder argparse to allow custom cached names. Added override param to run_evaluation() and propagated to both call sites. Verified Python syntax.</p>
+<p><strong>🔍 SCAN vs UNI2 fusion comparison investigation and cache bug discovery</strong>
+<em>18:06:33.022 | claude_code</em>
+Started running eval_scan_fusion.py to compare 9 fusion methods with SCAN-enhanced vs raw UNI2 embeddings on section 151673. User prioritized STAIG fusion. Investigation revealed no prior 151673 staig_fusion baseline existed, and eval script had double normalization bug (missing staig_alignment_config). Discussed whether to use run_benchmark.py vs pipeline for proper caching.</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 M12 large-scale data generation: BC-RNN pipeline fixes</strong>
+<em>02:39:21.482 | claude_code</em>
+Attempted MimicGen augmentation (10→200 demos) and BC-RNN rollouts but hit bugs. Fixed BC-RNN obs dimension mismatch (65 vs 37) by correcting object-state→object mapping in _to_robosuite_obs() and using raw robosuite obs. Fixed MimicGen robomimic 0.3.0 compatibility but blocked by mujoco_py—pivoted to scale via more BC-RNN. Launched 3 parallel jobs: BC-RNN injection (GPU0), natural capture (GPU1), demo-based (GPU2). Started Pi0 (GPU4) and Pi0.5 (GPU5) VLA servers. Fixed natural capture obs issue and restarted.</p>
+<p><strong>✅ M12-M14 preparation: save_images feature and doc check</strong>
+<em>19:00:40.046 | claude_code</em>
+Read project summary document (v4.10) to understand M12-M14 scope. Added save_images option to RecoveryDataCollector for M15 training data. Verified MimicGen augment config and taxonomy justification doc already existed. Prepared tasks for M14 evaluation run.</p>
+<p><strong>❌ Script request for Pi0.5 and MimicGen baseline (interrupted)</strong>
+<em>21:01:10.311 | claude_code</em>
+User requested a script to run everything for pi0.5 and mimicgen baseline models but interrupted before response.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-02-20-usage.png"></p>
+<p><strong>Total: $35.78</strong> — 48.7M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

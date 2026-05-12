@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-16 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="已经完成了针对错误恢复基准测试（版本4.3至4.5）的VLA集成流程优化；诊断并分析了MIHD聚类结构崩溃问题；为设备每日报告设计了对话摘要功能。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-16/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-02-16/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-16/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-16/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-16">
+  <meta property="og:description" content="已经完成了针对错误恢复基准测试（版本4.3至4.5）的VLA集成流程优化；诊断并分析了MIHD聚类结构崩溃问题；为设备每日报告设计了对话摘要功能。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-16T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-16T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-16">
+  <meta name="twitter:description" content="已经完成了针对错误恢复基准测试（版本4.3至4.5）的VLA集成流程优化；诊断并分析了MIHD聚类结构崩溃问题；为设备每日报告设计了对话摘要功能。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-16",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/2026-02-16/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-16",
+  "name": "Bug Journal 2026-02-16",
+  "description": "已经完成了针对错误恢复基准测试（版本4.3至4.5）的VLA集成流程优化；诊断并分析了MIHD聚类结构崩溃问题；为设备每日报告设计了对话摘要功能。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "每日报告 — 2026-02-16 每日概述 已完成的工作： 执行了三个主要的并行任务：(1) 诊断出MIHD空间嵌入崩溃问题，并修正了错误恢复文档；(2) 实现了完整的VLA集成基础设施，并验证了其性能，生成了150多种场景；(3) 为Gadget摘要工具设计了对话摘要功能 完成方式： 采用系统化的工程方法处理各个设备的问题：DCC对64维嵌入瓶颈进行了根本原因分析；天合服务器完成了VLA政策集成（v4.4版）、错误分类系统（v4.3版）、API修复、GPU加速部署验证，以及自然错误生成架构（v4.5版）；Windows桌面端设计了对话摘要的JSON结构和提示修改 影响： 将错误恢复基准从合成注入转变为自然政策失败捕获（271种场景，8种错误类型，达到了M5/M9/M10里程碑）；识别出导致91%集群崩溃的关键MIHD维度瓶颈；为增强每日报告的可读性奠定了基础，每个对话都有相应的叙述 DCC 已完成的工作： 诊断出STAIG融合模型在DLPFC部分出现崩溃问题，追溯到64维嵌入瓶颈与空间多数投票相结合的原因 完成方式： 进行嵌入检查（标准值为0.12），KMeans重新聚类验证，空间细化分析显示通过半径15的多数投票消除了少数簇，跨方法的维度比较（串联：1586，注意力：256，STAIG：64） 影响： 发现由于维度压缩导致的94-96%的信息丢失；解释了为什么5个簇的mclust只能产生2个有效簇；提出了维度消融研究（64/128/256/512）以系统地解决崩溃问题 TzJsDesktop 已完成的工作： 为Gadget/摘要工具设计了对话摘要功能，规划了JSON结构、提示修改以及Markdown渲染逻辑 完成方式： 通过代码审查和规划代理设计方法实现：定义了每个对话的摘要结构（项目/来源/时间戳/主题/摘要/结果），采用单文件修改策略，进行了4处针对性编辑（SUMMARY_PROMPT、Anthropic工具模式、generate_markdown、max_tokens） 影响： 完成了向后兼容的架构设计，为每个AI对话提供了叙述性摘要，提高了每日报告的可读性和完整性 天合 已完成的工作： 实现了VLA集成基础设施（v4.4版）、政策错误分类系统（v4.3版），修复了关键API问题，通过全面的测试和150多种自然错误场景验证了其性能，设计了自然错误生成系统架构（v4.5版） 完成方式： 分多阶段开发：通过基于注册表的验证修正了15多个文档错误；实现了30多个文件（约3000行代码）用于VLA/分类；修复了openpi API调用、观测数据预处理、相机键映射等问题；执行了GPU加速部署（8xA800集群）；探索了VLA检查点，并为v4.5版本设计了7步实施计划 影响： 建立了具有Pi0模型的VLA流程（尽管100%的PickPlace任务失败揭示了泛化限制）；生成了271种总场景（121→271），涉及8种错误类型；达到了M5/M9/M10里程碑；识别出joint_limit_approach（47%）和grasp_wrong_pose（30%）是主要的自然故障模式；完成了使用预训练编码器+基于规则的离线分析来生成v4.5自然错误的架构设计 完成了全面的VLA集成流程，用于错误恢复基准测试（v4.3-v4.5版），诊断并分析了MIHD聚类崩溃问题，并为Gadget每日报告设计了对话摘要功能\n任务 架构与策略 ✅ VLA政策部署验证和自然错误捕获 — 修复了_get_current_obs()中的关键图像传递错误；在GPU上使用Pi0模型进行了10次注入模式和50次自然捕获部署；生成了153个新场景（3次注入+150次自然捕获）；更新了里程碑状态M5/M9/M10。总场景数：121→271，错误类型：4→8。 ✅ 诊断DLPFC 151672上的STAIG融合聚类崩溃 — 研究了为什么uni+staig_fusion只产生了2个簇而不是5个。发现嵌入维度瓶颈（64维，标准值0.12）与空间细化相结合，通过多数投票消除了少数簇。 ✅ VLA模型集成基础设施（v4.4版） — 实现了完整的VLA集成：vla_server.py（TCP服务器）、PolicyServerAdapter（客户端）、相机观测支持、PolicyErrorDetector、capture_natural_errors()方法。修复了API调用，使用了create_trained_policy()，修正了图像键映射，解决了观测数据预处理格式问题。所有79个单元测试都通过了。 ✅ 政策错误检测与分类系统（v4.3版） — 实现了3类分类器（操作/规划/进展），错误分类体系（25种类型），PolicyErrorMonitor协调器，VLM分析器（Gemini + Claude Code CLI），错误分析模块，收集器集成。所有73个单元测试都通过了。 ✅ VLA自然错误生成系统架构设计（v4.5版） — 探索了v4.4版本的基础设施，确认了VLA检查点（Pi0/Pi0.5/Phoenix），设计了7步实施计划，包括BC-RNN检查点下载，使用预训练编码器（DINOv2/SigLIP）+基于规则的分析进行离线视觉错误检测。 ✅ Gadget/摘要对话摘要功能设计 — 设计了JSON结构（每个对话的详细程度，包括项目/来源/时间戳/主题/摘要/结果字段），提示修改，Anthropic工具模式更新，Markdown渲染逻辑（按项目分组，带有结果表情符号图标）。采用单文件向后兼容的修改策略。 🔄 设计STAIG的维度消融实验 — 计划支持可配置的hidden_dim（64/128/256/512）用于staig_fusion。用户拒绝执行该计划，未给出解释。 ✅ 修复错误恢复基准测试文档错误 — 修正了CLAUDE.md、项目全景总结.md和error_taxonomy.py中的事实错误：检测器数量（6→5），分类器数量（19→20），错误类型（25→24），类别（10→8），测试数量（73→79），场景数量（30→118）。添加了缺失的模块和开发命令。 实施与修复 🔄 下载VLA检查点和BC-RNN模型 — 确认下载了Pi0/Pi0.5/Phoenix模型（250GB的HuggingFace缓存存储在zhaoganlong目录中）。BC-RNN检查点部分缺失（成功提升，但斯坦福URL下的lift/square/transport存在404错误）。MimicGen数据集的下载状态未知。 问题与解决方案 关键问题 1. STAIG融合仅产生2个簇，ARI为0.1149，表明严重崩溃解决方案： 已确定根本原因：64维的嵌入瓶颈可以将1536维的UNI特征压缩96%（标准差为0.12），然后通过空间细化算法的半径15的多数投票机制消除少数簇。建议进行维度消融研究，以测试其他融合方法下的128/256/512维替代方案。 关键洞察： 级联故障逐渐累积：GCN训练产生的嵌入几乎完全重叠，而空间平滑处理则完全消除了剩余的小簇。64维的瓶颈至关重要——使用256-512维的其他融合方法并未出现此类问题。\n2. VLA服务器初始观测数据缺少摄像头图像，导致“observation/image” KeyError 解决方案： 修改了rollout_generator.py中的_get_current_obs()函数，添加了include_images参数；在_generate_from_single_rollout()和capture_natural_errors()函数中检测PolicyServerAdapter类型，并在camera_names中包含[‘agentview’,‘robot0_eye_in-hand’]时传递include_images=True参数。\n关键洞察： VLA政策需要视觉输入，但state_extractor.extract()默认不包含图像；需要明确检测策略类型并设置include_images标志。这是一个普遍问题，影响所有依赖摄像头的政策（如VLA、VisuoMotor BC）。\n3. VLA服务器使用了错误的openpi API——手动加载norm_stats导致模型初始化失败 解决方案： 用openpi的create_trained_policy函数替换手动加载方式（train_config=get_config(config_name），checkpoint_dir=…），该函数可以自动处理norm_stats、转换和模型架构。增加了–config_name命令行参数和IMAGE_KEY_MAP以正确映射摄像头键。\n关键洞察： openpi库提供了高级的create_trained_policy函数，封装了所有模型加载的复杂性。手动使用低级API容易出错，且随着库的升级而失效。\n4. Pi0（LIBERO检查点）在natural_capture演练期间在PickPlace任务上实现了100%的失败率 解决方案： 识别出失败模式分布（joint_limit_approach占47%，grasp_wrong_pose占30%，misalignment_pre_grasp占17%，overshoot占5%，premature_release占1%）；将其记录为自然错误数据；确定需要针对PickPlace特定检查点或领域适应性来实际使用。\n关键洞察： 预训练的VLA泛化能力有限；跨任务分布（LIBERO→robosuite PickPlace）会导致显著的性能下降。然而，这些失败模式是自然错误数据的宝贵来源，符合基准测试的自然错误捕获目标。\n5. VLA集成看起来已经完成（代码和测试通过），但在实际部署时发现无法运行 解决方案： 深入调查发现了障碍：错误的openpi API使用、缺失的norm_stats.json处理、不完整的检查点路径、不支持的–policy vla_server标志。制定了详细的修复计划，并系统地实施了所有修正。\n关键洞察： “测试通过”并不等于“系统可运行”——在声称完成之前，需要对真实依赖项（如模型检查点、外部API）进行集成测试。合成单元测试可以验证代码的正确性，但不能保证端到端的功能性。\n6. _preprocess_obs()在StateExtractor返回state_info字典时失败（与raw robosuite obs的格式不同） 解决方案： 重构了_preprocess_obs()函数，使其能够检测输入格式并将其规范化为常见的结构{“state”: […], “images”: {…}]。添加了强大的键查找功能，并实现了正确的float到uint8的图像转换。\n关键洞察： 观察字典的格式取决于来源：StateExtractor.extract()返回以EEF为中心的键，而env.step()返回带有robot0_前缀的raw robosuite obs。需要统一的预处理方式。\n7. 文档中包含了15多个与代码实际状态相矛盾的事实错误，这些错误出现在多个文件中 解决方案： 进行了系统的基于注册表的验证（DETECTOR_REGISTRY, CLASSIFIER_REGISTRY, ErrorType枚举），通过针对3个文件进行针对性编辑来纠正所有错误，并运行测试套件以确认没有破坏（79/79通过）。\n关键洞察： 甚至代码本身的文档字符串也有错误。真实的来源是注册过的代码，而不是文档。验证工作流程是在编辑后使用grep来确保所有旧值都被清除。\n人类与人工智能的方法 战略层面 VLA集成的操作准备评估 角色 方法 人类 用户询问“我们现在可以部署Pi0了吗？”——隐含地检查了不仅仅是代码完成的端到端准备情况 人工智能 人工智能最初认为一旦编写了代码并且测试通过，VLA集成就“完成了”，假设系统可以运行，而没有验证实际的模型加载和推理流程 差异分析： 人类正确地意识到“实现完成”并不等于“系统可运行”。人工智能过于乐观地认为通过单元测试就等同于部署准备，忽略了需要与真实依赖项进行集成验证的需求。\n识别聚类崩溃的根本原因 角色 方法 人类 用户在看到可视化结果后质疑64维嵌入是否太小，然后指示人工智能调查具体部分 人工智能 人工智能进行了系统的调查：加载嵌入文件，计算统计数据（标准差为0.12），重新运行KMeans来验证崩溃现象，追踪细化逻辑，比较所有融合方法的维度 差异分析： 人类根据领域知识对维度大小有直觉认识；人工智能遵循机械化的调查流程。人类的假设是正确的，并且有效地指导了调查工作。\n错误定位策略 角色 方法 人类 人类没有直接指出错误，而是让人工智能运行端到端测试，通过运行时错误发现问题 人工智能 人工智能通过实际执行失败（VLA服务器错误：“observation/image”）来发现错误，追溯到policy_adapter.py中的-preprocess_obs()，然后追溯到rollout_generator.py中的-get_current_obs()以确定根本原因 差异分析： 人类采用“边做边学”的策略，让人工智能发现错误；人工智能通过错误堆栈跟踪和代码分析来进行系统性的调试；这种方法导致了更深入的理解，而不仅仅是表面的修复。\nVLA模型选择和实施优先级 角色 方法 人类 人类通过问答形式明确表示：跳过Flare模型（未找到），下载所有4个BC-RNN检查点（can/square/transport），采用预训练的编码器加上基于规则的离线分析，选择离线方式而非实时检测 人工智能 人工智能向用户提出了4个开放式问题，供其决策：Flare的来源，BC-RNN检查点的范围，视觉检测器的方法（三个选项），实时检测与离线检测，为每个选项提供了详细的权衡分析 VLM后端类型说明 角色 方法 人类 人类明确表明希望使用Claude Code CLI（本地交互工具），而不是Claude API（云API调用），强调这两种使用模式是不同的 AI AI最初将Claude Code CLI误解为Claude API，直到通过AskUserQuestion发现Claude Code CLI是通过‘claude -p’命令作为本地工具调用的 差异分析： 人类区分了Claude Code CLI（交互式+脚本化本地工具）和Claude API（云HTTP API）；AI最初将这两个概念混淆在一起，需要明确纠正。\n对话摘要的粒度设计 角色 方法 人类 人类最初的要求是“我需要在最终文件中加入一部分来总结我与AI的对话”，但没有具体说明结构细节 AI AI通过规划代理系统地分析了三种粒度选项（项目聚合、时间线聚合、每次对话独立），最终推荐每次对话摘要的方法，以完整保留上下文、灵活呈现以及向后兼容性 差异分析： 人类提供了高层次的需求；AI将其转化为具体的架构设计决策，考虑了可读性、可维护性和向后兼容性工程约束。\nAI局限性 关键局限性- 对“完成”的定义过于乐观——将通过单元测试等同于运行准备就绪，忽略了VLA集成需要实际模型检查点验证和API集成测试，而不仅仅是模拟测试。 最初没有注意到openpi配置使用repack_transform来重命名键，导致对输入键格式的错误假设。只有在检查了实际的LiberoInputs源代码和make_libero示例后，才发现了这个问题。 在编写VLA集成代码时，没有预料到需要包含images的要求；需要运行时错误才能发现这个问题；缺乏对VLA政策输入格式要求的先验知识检查。 生成了维度消融计划，但用户在没有执行的情况下就拒绝了。AI不知道为什么计划被拒绝，也不知道用户希望如何继续。 ",
+  "wordCount" : "211",
+  "inLanguage": "zh",
+  "datePublished": "2026-02-16T00:00:00-05:00",
+  "dateModified": "2026-02-16T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/daily/2026-02-16/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="zh"
+                        data-translation-url="https://tzj2006.github.io/bugjournal/daily/2026-02-16/">EN
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/zh/'>主页</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/zh/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-16
+    </h1>
+    <div class="post-meta"><span title='2026-02-16 00:00:00 -0500 EST'>2026年2月16日</span>&nbsp;·&nbsp;<span>1 分钟</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="每日报告--2026-02-16">每日报告 — 2026-02-16<a hidden class="anchor" aria-hidden="true" href="#每日报告--2026-02-16">#</a></h1>
+<h2 id="每日概述">每日概述<a hidden class="anchor" aria-hidden="true" href="#每日概述">#</a></h2>
+<ul>
+<li><strong>已完成的工作：</strong> 执行了三个主要的并行任务：(1) 诊断出MIHD空间嵌入崩溃问题，并修正了错误恢复文档；(2) 实现了完整的VLA集成基础设施，并验证了其性能，生成了150多种场景；(3) 为Gadget摘要工具设计了对话摘要功能</li>
+<li><strong>完成方式：</strong> 采用系统化的工程方法处理各个设备的问题：DCC对64维嵌入瓶颈进行了根本原因分析；天合服务器完成了VLA政策集成（v4.4版）、错误分类系统（v4.3版）、API修复、GPU加速部署验证，以及自然错误生成架构（v4.5版）；Windows桌面端设计了对话摘要的JSON结构和提示修改</li>
+<li><strong>影响：</strong> 将错误恢复基准从合成注入转变为自然政策失败捕获（271种场景，8种错误类型，达到了M5/M9/M10里程碑）；识别出导致91%集群崩溃的关键MIHD维度瓶颈；为增强每日报告的可读性奠定了基础，每个对话都有相应的叙述</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>已完成的工作：</strong> 诊断出STAIG融合模型在DLPFC部分出现崩溃问题，追溯到64维嵌入瓶颈与空间多数投票相结合的原因</li>
+<li><strong>完成方式：</strong> 进行嵌入检查（标准值为0.12），KMeans重新聚类验证，空间细化分析显示通过半径15的多数投票消除了少数簇，跨方法的维度比较（串联：1586，注意力：256，STAIG：64）</li>
+<li><strong>影响：</strong> 发现由于维度压缩导致的94-96%的信息丢失；解释了为什么5个簇的mclust只能产生2个有效簇；提出了维度消融研究（64/128/256/512）以系统地解决崩溃问题</li>
+</ul>
+<h3 id="tzjsdesktop">TzJsDesktop<a hidden class="anchor" aria-hidden="true" href="#tzjsdesktop">#</a></h3>
+<ul>
+<li><strong>已完成的工作：</strong> 为Gadget/摘要工具设计了对话摘要功能，规划了JSON结构、提示修改以及Markdown渲染逻辑</li>
+<li><strong>完成方式：</strong> 通过代码审查和规划代理设计方法实现：定义了每个对话的摘要结构（项目/来源/时间戳/主题/摘要/结果），采用单文件修改策略，进行了4处针对性编辑（SUMMARY_PROMPT、Anthropic工具模式、generate_markdown、max_tokens）</li>
+<li><strong>影响：</strong> 完成了向后兼容的架构设计，为每个AI对话提供了叙述性摘要，提高了每日报告的可读性和完整性</li>
+</ul>
+<h3 id="天合">天合<a hidden class="anchor" aria-hidden="true" href="#天合">#</a></h3>
+<ul>
+<li><strong>已完成的工作：</strong> 实现了VLA集成基础设施（v4.4版）、政策错误分类系统（v4.3版），修复了关键API问题，通过全面的测试和150多种自然错误场景验证了其性能，设计了自然错误生成系统架构（v4.5版）</li>
+<li><strong>完成方式：</strong> 分多阶段开发：通过基于注册表的验证修正了15多个文档错误；实现了30多个文件（约3000行代码）用于VLA/分类；修复了openpi API调用、观测数据预处理、相机键映射等问题；执行了GPU加速部署（8xA800集群）；探索了VLA检查点，并为v4.5版本设计了7步实施计划</li>
+<li><strong>影响：</strong> 建立了具有Pi0模型的VLA流程（尽管100%的PickPlace任务失败揭示了泛化限制）；生成了271种总场景（121→271），涉及8种错误类型；达到了M5/M9/M10里程碑；识别出joint_limit_approach（47%）和grasp_wrong_pose（30%）是主要的自然故障模式；完成了使用预训练编码器+基于规则的离线分析来生成v4.5自然错误的架构设计</li>
+</ul>
+<blockquote>
+<p>完成了全面的VLA集成流程，用于错误恢复基准测试（v4.3-v4.5版），诊断并分析了MIHD聚类崩溃问题，并为Gadget每日报告设计了对话摘要功能</p>
+</blockquote>
+<h2 id="任务">任务<a hidden class="anchor" aria-hidden="true" href="#任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>VLA政策部署验证和自然错误捕获</strong> — 修复了_get_current_obs()中的关键图像传递错误；在GPU上使用Pi0模型进行了10次注入模式和50次自然捕获部署；生成了153个新场景（3次注入+150次自然捕获）；更新了里程碑状态M5/M9/M10。总场景数：121→271，错误类型：4→8。</li>
+<li>✅ <strong>诊断DLPFC 151672上的STAIG融合聚类崩溃</strong> — 研究了为什么uni+staig_fusion只产生了2个簇而不是5个。发现嵌入维度瓶颈（64维，标准值0.12）与空间细化相结合，通过多数投票消除了少数簇。</li>
+<li>✅ <strong>VLA模型集成基础设施（v4.4版）</strong> — 实现了完整的VLA集成：vla_server.py（TCP服务器）、PolicyServerAdapter（客户端）、相机观测支持、PolicyErrorDetector、capture_natural_errors()方法。修复了API调用，使用了create_trained_policy()，修正了图像键映射，解决了观测数据预处理格式问题。所有79个单元测试都通过了。</li>
+<li>✅ <strong>政策错误检测与分类系统（v4.3版）</strong> — 实现了3类分类器（操作/规划/进展），错误分类体系（25种类型），PolicyErrorMonitor协调器，VLM分析器（Gemini + Claude Code CLI），错误分析模块，收集器集成。所有73个单元测试都通过了。</li>
+<li>✅ <strong>VLA自然错误生成系统架构设计（v4.5版）</strong> — 探索了v4.4版本的基础设施，确认了VLA检查点（Pi0/Pi0.5/Phoenix），设计了7步实施计划，包括BC-RNN检查点下载，使用预训练编码器（DINOv2/SigLIP）+基于规则的分析进行离线视觉错误检测。</li>
+<li>✅ <strong>Gadget/摘要对话摘要功能设计</strong> — 设计了JSON结构（每个对话的详细程度，包括项目/来源/时间戳/主题/摘要/结果字段），提示修改，Anthropic工具模式更新，Markdown渲染逻辑（按项目分组，带有结果表情符号图标）。采用单文件向后兼容的修改策略。</li>
+<li>🔄 <strong>设计STAIG的维度消融实验</strong> — 计划支持可配置的hidden_dim（64/128/256/512）用于staig_fusion。用户拒绝执行该计划，未给出解释。</li>
+<li>✅ <strong>修复错误恢复基准测试文档错误</strong> — 修正了CLAUDE.md、项目全景总结.md和error_taxonomy.py中的事实错误：检测器数量（6→5），分类器数量（19→20），错误类型（25→24），类别（10→8），测试数量（73→79），场景数量（30→118）。添加了缺失的模块和开发命令。</li>
+</ul>
+<h3 id="实施与修复">实施与修复<a hidden class="anchor" aria-hidden="true" href="#实施与修复">#</a></h3>
+<ul>
+<li>🔄 <strong>下载VLA检查点和BC-RNN模型</strong> — 确认下载了Pi0/Pi0.5/Phoenix模型（250GB的HuggingFace缓存存储在zhaoganlong目录中）。BC-RNN检查点部分缺失（成功提升，但斯坦福URL下的lift/square/transport存在404错误）。MimicGen数据集的下载状态未知。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-staig融合仅产生2个簇ari为01149表明严重崩溃解决方案-已确定根本原因64维的嵌入瓶颈可以将1536维的uni特征压缩96标准差为012然后通过空间细化算法的半径15的多数投票机制消除少数簇建议进行维度消融研究以测试其他融合方法下的128256512维替代方案">1. STAIG融合仅产生2个簇，ARI为0.1149，表明严重崩溃<strong>解决方案：</strong> 已确定根本原因：64维的嵌入瓶颈可以将1536维的UNI特征压缩96%（标准差为0.12），然后通过空间细化算法的半径15的多数投票机制消除少数簇。建议进行维度消融研究，以测试其他融合方法下的128/256/512维替代方案。<a hidden class="anchor" aria-hidden="true" href="#1-staig融合仅产生2个簇ari为01149表明严重崩溃解决方案-已确定根本原因64维的嵌入瓶颈可以将1536维的uni特征压缩96标准差为012然后通过空间细化算法的半径15的多数投票机制消除少数簇建议进行维度消融研究以测试其他融合方法下的128256512维替代方案">#</a></h4>
+<p><strong>关键洞察：</strong> 级联故障逐渐累积：GCN训练产生的嵌入几乎完全重叠，而空间平滑处理则完全消除了剩余的小簇。64维的瓶颈至关重要——使用256-512维的其他融合方法并未出现此类问题。</p>
+<h4 id="2-vla服务器初始观测数据缺少摄像头图像导致observationimage-keyerror">2. VLA服务器初始观测数据缺少摄像头图像，导致“observation/image” KeyError<a hidden class="anchor" aria-hidden="true" href="#2-vla服务器初始观测数据缺少摄像头图像导致observationimage-keyerror">#</a></h4>
+<p><strong>解决方案：</strong> 修改了rollout_generator.py中的_get_current_obs()函数，添加了include_images参数；在_generate_from_single_rollout()和capture_natural_errors()函数中检测PolicyServerAdapter类型，并在camera_names中包含[&lsquo;agentview&rsquo;,&lsquo;robot0_eye_in-hand&rsquo;]时传递include_images=True参数。</p>
+<p><strong>关键洞察：</strong> VLA政策需要视觉输入，但state_extractor.extract()默认不包含图像；需要明确检测策略类型并设置include_images标志。这是一个普遍问题，影响所有依赖摄像头的政策（如VLA、VisuoMotor BC）。</p>
+<h4 id="3-vla服务器使用了错误的openpi-api手动加载norm_stats导致模型初始化失败">3. VLA服务器使用了错误的openpi API——手动加载norm_stats导致模型初始化失败<a hidden class="anchor" aria-hidden="true" href="#3-vla服务器使用了错误的openpi-api手动加载norm_stats导致模型初始化失败">#</a></h4>
+<p><strong>解决方案：</strong> 用openpi的create_trained_policy函数替换手动加载方式（train_config=get_config(config_name），checkpoint_dir=&hellip;），该函数可以自动处理norm_stats、转换和模型架构。增加了&ndash;config_name命令行参数和IMAGE_KEY_MAP以正确映射摄像头键。</p>
+<p><strong>关键洞察：</strong> openpi库提供了高级的create_trained_policy函数，封装了所有模型加载的复杂性。手动使用低级API容易出错，且随着库的升级而失效。</p>
+<h4 id="4-pi0libero检查点在natural_capture演练期间在pickplace任务上实现了100的失败率">4. Pi0（LIBERO检查点）在natural_capture演练期间在PickPlace任务上实现了100%的失败率<a hidden class="anchor" aria-hidden="true" href="#4-pi0libero检查点在natural_capture演练期间在pickplace任务上实现了100的失败率">#</a></h4>
+<p><strong>解决方案：</strong> 识别出失败模式分布（joint_limit_approach占47%，grasp_wrong_pose占30%，misalignment_pre_grasp占17%，overshoot占5%，premature_release占1%）；将其记录为自然错误数据；确定需要针对PickPlace特定检查点或领域适应性来实际使用。</p>
+<p><strong>关键洞察：</strong> 预训练的VLA泛化能力有限；跨任务分布（LIBERO→robosuite PickPlace）会导致显著的性能下降。然而，这些失败模式是自然错误数据的宝贵来源，符合基准测试的自然错误捕获目标。</p>
+<h4 id="5-vla集成看起来已经完成代码和测试通过但在实际部署时发现无法运行">5. VLA集成看起来已经完成（代码和测试通过），但在实际部署时发现无法运行<a hidden class="anchor" aria-hidden="true" href="#5-vla集成看起来已经完成代码和测试通过但在实际部署时发现无法运行">#</a></h4>
+<p><strong>解决方案：</strong> 深入调查发现了障碍：错误的openpi API使用、缺失的norm_stats.json处理、不完整的检查点路径、不支持的&ndash;policy vla_server标志。制定了详细的修复计划，并系统地实施了所有修正。</p>
+<p><strong>关键洞察：</strong> “测试通过”并不等于“系统可运行”——在声称完成之前，需要对真实依赖项（如模型检查点、外部API）进行集成测试。合成单元测试可以验证代码的正确性，但不能保证端到端的功能性。</p>
+<h4 id="6-_preprocess_obs在stateextractor返回state_info字典时失败与raw-robosuite-obs的格式不同">6. _preprocess_obs()在StateExtractor返回state_info字典时失败（与raw robosuite obs的格式不同）<a hidden class="anchor" aria-hidden="true" href="#6-_preprocess_obs在stateextractor返回state_info字典时失败与raw-robosuite-obs的格式不同">#</a></h4>
+<p><strong>解决方案：</strong> 重构了_preprocess_obs()函数，使其能够检测输入格式并将其规范化为常见的结构{&ldquo;state&rdquo;: [&hellip;], &ldquo;images&rdquo;: {&hellip;}]。添加了强大的键查找功能，并实现了正确的float到uint8的图像转换。</p>
+<p><strong>关键洞察：</strong> 观察字典的格式取决于来源：StateExtractor.extract()返回以EEF为中心的键，而env.step()返回带有robot0_前缀的raw robosuite obs。需要统一的预处理方式。</p>
+<h4 id="7-文档中包含了15多个与代码实际状态相矛盾的事实错误这些错误出现在多个文件中">7. 文档中包含了15多个与代码实际状态相矛盾的事实错误，这些错误出现在多个文件中<a hidden class="anchor" aria-hidden="true" href="#7-文档中包含了15多个与代码实际状态相矛盾的事实错误这些错误出现在多个文件中">#</a></h4>
+<p><strong>解决方案：</strong> 进行了系统的基于注册表的验证（DETECTOR_REGISTRY, CLASSIFIER_REGISTRY, ErrorType枚举），通过针对3个文件进行针对性编辑来纠正所有错误，并运行测试套件以确认没有破坏（79/79通过）。</p>
+<p><strong>关键洞察：</strong> 甚至代码本身的文档字符串也有错误。真实的来源是注册过的代码，而不是文档。验证工作流程是在编辑后使用grep来确保所有旧值都被清除。</p>
+<h2 id="人类与人工智能的方法">人类与人工智能的方法<a hidden class="anchor" aria-hidden="true" href="#人类与人工智能的方法">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="vla集成的操作准备评估">VLA集成的操作准备评估<a hidden class="anchor" aria-hidden="true" href="#vla集成的操作准备评估">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户询问“我们现在可以部署Pi0了吗？”——隐含地检查了不仅仅是代码完成的端到端准备情况</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>人工智能最初认为一旦编写了代码并且测试通过，VLA集成就“完成了”，假设系统可以运行，而没有验证实际的模型加载和推理流程</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析：</strong> 人类正确地意识到“实现完成”并不等于“系统可运行”。人工智能过于乐观地认为通过单元测试就等同于部署准备，忽略了需要与真实依赖项进行集成验证的需求。</p>
+<h4 id="识别聚类崩溃的根本原因">识别聚类崩溃的根本原因<a hidden class="anchor" aria-hidden="true" href="#识别聚类崩溃的根本原因">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户在看到可视化结果后质疑64维嵌入是否太小，然后指示人工智能调查具体部分</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>人工智能进行了系统的调查：加载嵌入文件，计算统计数据（标准差为0.12），重新运行KMeans来验证崩溃现象，追踪细化逻辑，比较所有融合方法的维度</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析：</strong> 人类根据领域知识对维度大小有直觉认识；人工智能遵循机械化的调查流程。人类的假设是正确的，并且有效地指导了调查工作。</p>
+<h4 id="错误定位策略">错误定位策略<a hidden class="anchor" aria-hidden="true" href="#错误定位策略">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类没有直接指出错误，而是让人工智能运行端到端测试，通过运行时错误发现问题</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>人工智能通过实际执行失败（VLA服务器错误：“observation/image”）来发现错误，追溯到policy_adapter.py中的-preprocess_obs()，然后追溯到rollout_generator.py中的-get_current_obs()以确定根本原因</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析：</strong> 人类采用“边做边学”的策略，让人工智能发现错误；人工智能通过错误堆栈跟踪和代码分析来进行系统性的调试；这种方法导致了更深入的理解，而不仅仅是表面的修复。</p>
+<h4 id="vla模型选择和实施优先级">VLA模型选择和实施优先级<a hidden class="anchor" aria-hidden="true" href="#vla模型选择和实施优先级">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类通过问答形式明确表示：跳过Flare模型（未找到），下载所有4个BC-RNN检查点（can/square/transport），采用预训练的编码器加上基于规则的离线分析，选择离线方式而非实时检测</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>人工智能向用户提出了4个开放式问题，供其决策：Flare的来源，BC-RNN检查点的范围，视觉检测器的方法（三个选项），实时检测与离线检测，为每个选项提供了详细的权衡分析</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="vlm后端类型说明">VLM后端类型说明<a hidden class="anchor" aria-hidden="true" href="#vlm后端类型说明">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类明确表明希望使用Claude Code CLI（本地交互工具），而不是Claude API（云API调用），强调这两种使用模式是不同的</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI最初将Claude Code CLI误解为Claude API，直到通过AskUserQuestion发现Claude Code CLI是通过‘claude -p’命令作为本地工具调用的</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析：</strong> 人类区分了Claude Code CLI（交互式+脚本化本地工具）和Claude API（云HTTP API）；AI最初将这两个概念混淆在一起，需要明确纠正。</p>
+<h4 id="对话摘要的粒度设计">对话摘要的粒度设计<a hidden class="anchor" aria-hidden="true" href="#对话摘要的粒度设计">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>人类最初的要求是“我需要在最终文件中加入一部分来总结我与AI的对话”，但没有具体说明结构细节</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI通过规划代理系统地分析了三种粒度选项（项目聚合、时间线聚合、每次对话独立），最终推荐每次对话摘要的方法，以完整保留上下文、灵活呈现以及向后兼容性</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>差异分析：</strong> 人类提供了高层次的需求；AI将其转化为具体的架构设计决策，考虑了可读性、可维护性和向后兼容性工程约束。</p>
+<h2 id="ai局限性">AI局限性<a hidden class="anchor" aria-hidden="true" href="#ai局限性">#</a></h2>
+<h3 id="关键局限性--对完成的定义过于乐观将通过单元测试等同于运行准备就绪忽略了vla集成需要实际模型检查点验证和api集成测试而不仅仅是模拟测试">关键局限性- 对“完成”的定义过于乐观——将通过单元测试等同于运行准备就绪，忽略了VLA集成需要实际模型检查点验证和API集成测试，而不仅仅是模拟测试。<a hidden class="anchor" aria-hidden="true" href="#关键局限性--对完成的定义过于乐观将通过单元测试等同于运行准备就绪忽略了vla集成需要实际模型检查点验证和api集成测试而不仅仅是模拟测试">#</a></h3>
+<ul>
+<li>最初没有注意到openpi配置使用repack_transform来重命名键，导致对输入键格式的错误假设。只有在检查了实际的LiberoInputs源代码和make_libero示例后，才发现了这个问题。</li>
+<li>在编写VLA集成代码时，没有预料到需要包含images的要求；需要运行时错误才能发现这个问题；缺乏对VLA政策输入格式要求的先验知识检查。</li>
+<li>生成了维度消融计划，但用户在没有执行的情况下就拒绝了。AI不知道为什么计划被拒绝，也不知道用户希望如何继续。</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

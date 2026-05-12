@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-22 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="已经完成了W05-W12历史周报告的批量生成工作，修复了网站部署过程中出现的严重问题（例如PaperMod主题的更新、update.sh脚本的可靠性提升）。同时，对Gadget在Hugo中的部署架构进行了重构，实现了统一的输出/站点测试区域、bugJournal下拉导航功能，并整合了基准测试报告发布机制。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-22/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-22/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-22/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-22/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-22">
+  <meta property="og:description" content="已经完成了W05-W12历史周报告的批量生成工作，修复了网站部署过程中出现的严重问题（例如PaperMod主题的更新、update.sh脚本的可靠性提升）。同时，对Gadget在Hugo中的部署架构进行了重构，实现了统一的输出/站点测试区域、bugJournal下拉导航功能，并整合了基准测试报告发布机制。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-22T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-22T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-22">
+  <meta name="twitter:description" content="已经完成了W05-W12历史周报告的批量生成工作，修复了网站部署过程中出现的严重问题（例如PaperMod主题的更新、update.sh脚本的可靠性提升）。同时，对Gadget在Hugo中的部署架构进行了重构，实现了统一的输出/站点测试区域、bugJournal下拉导航功能，并整合了基准测试报告发布机制。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-03-22",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/2026-03-22/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-22",
+  "name": "Bug Journal 2026-03-22",
+  "description": "已经完成了W05-W12历史周报告的批量生成工作，修复了网站部署过程中出现的严重问题（例如PaperMod主题的更新、update.sh脚本的可靠性提升）。同时，对Gadget在Hugo中的部署架构进行了重构，实现了统一的输出/站点测试区域、bugJournal下拉导航功能，并整合了基准测试报告发布机制。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "每日报告 — 2026-03-22 每日概述 已完成的工作： 建立了完整的每周报告存档（W05-W12），解决了网站部署中的阻塞问题，并通过将所有自动生成的内容（摘要、研究、基准测试）集中到一个具有层次导航的统一测试目录中，重新组织了整个Hugo部署流程。 实现方式： 通过LLM批量生成了8周的结构化报告；更新了PaperMod主题，并增强了update.sh脚本以应对异常情况（无更改提交、查找竞态条件）；构建了common.site_staging基础设施，实现了链接或复制同步功能，将所有工具部署逻辑迁移到测试环境，创建了website/sync_staging.py文件以进行引导迁移，并实现了带有悬停下拉CSS的自定义Hugo头部部分。 影响： 创建了全面的项目历史文档；消除了三个部署阻塞问题，使系统具备生产就绪能力；为自动生成的内容建立了单一来源，避免了双重写入的不一致性问题，实现了原子式更新，并自动实现了跨平台回退，同时提供了更清晰的内容组织结构，具有多层次的导航功能。 完成了W05-W12历史每周报告的批量生成，修复了关键的网站部署错误（PaperMod主题更新、update.sh脚本的健壮性改进），并重构了gadget的Hugo部署架构，实现了统一的输出/测试环境、bugJournal下拉导航，并集成了基准测试报告发布功能。\n任务 架构与策略 ✅ 设计和实现统一的测试环境架构 — 创建了common/site_staging.py文件，包含了resolve_site_staging_root、write_site_content、copy_site_static等辅助函数；定义了outputs/site/{content,static}作为规范的测试根目录；将paths.SITE_OUTPUTS_DIR添加到common/paths.py中。 ✅ 构建website/sync_staging.py同步脚本 — 创建了Python脚本，实现了链接或复制功能，并使用os.link作为后备方案替代shutil.copytree；包括了bootstrap_source，用于首次从网站/迁移现有内容到outputs/site；管理bugJournal/{daily,weekly,monthly}、research、benchmark.md以及static/{images,benchmark-report}。 ✅ 解决网站部署中的阻塞问题，并将网站部署到GitHub Pages — 更新了PaperMod主题至最新版本，解决了缺失的部分问题，解决了合并冲突，保留了MathJax和复选框的自定义设置，增强了update.sh脚本的处理能力，以处理无更改情况并查找竞态条件，成功完成了全面部署。 ✅ 将总结部署迁移到测试环境 — 重构了daily_summary.py、weekly_summary.py、monthly_summary.py，使其输出到outputs/site而不是website/content；更新了部署检测逻辑，以检查测试环境路径；保留了现有的CLI界面。 ✅ 将研究部署迁移到测试环境 — 更新了research/output.py中的deploy_to_hugo和research_scout.py中的generate_hugo_post，以使用common.site_staging辅助函数；将研究人员档案和每日报告整合到单一的研究部分中。 ✅ 添加基准测试Hugo发布层 — 创建了test/benchmark/publish.py文件，其中包含了stage_benchmark_report函数；在基准测试CLI中添加–deploy标志；生成/benchmark/包装页面，并使用iframe嵌入/benchmark-report/report.html，使用固定的过去日期以避免Hugo跳过未来内容；添加了基准测试菜单项。 ✅ 添加bugJournal层次下拉导航 — 在Hugo config.yml中实现父子菜单结构，创建了自定义布局/部分/header.html，包含子菜单渲染和悬停下拉CSS，更新了section _index.md文件，添加了描述性文本，将所有URL小写化，以防止主机识别时出现大小写问题。 实施与修复 ✅ 更新网站构建脚本（update.sh和update.ps1） — 修改了两个脚本，使其在Hugo构建步骤之前运行python sync_staging.py；保留了现有的增量图像/视频压缩和git推送工作流程；更新了sync.py中的rclone配置，以同步outputs/site/而不是website/content。 ✅ 批量生成历史每周报告（W05-W12） — 生成了2026年第5至第12周的结构化每周报告，涵盖了MIHD、错误恢复基准测试、CalendarPro、RoboBrain、Life Copilot以及其他多个设备的并行项目。 ✅ 验证端到端测试环境同步和Hugo构建 — 在所有修改过的文件上验证了py_compile，执行了sync_staging.py以确认引导程序和链接或复制逻辑的正确性，运行了hugo –destination .verify-public3以确认/benchmark/index.html、/benchmark-report/report.html以及所有bugjournal部分的渲染是否正确；没有执行最终推送到GitHub Pages的操作。 问题与解决方案 关键问题 1. 首次测试环境同步会覆盖数月积累的网站/content历史记录 解决方案： 在sync_staging.py中实现了bootstrap_source：如果测试环境路径不存在但网站路径存在，则先将网站内容移动到测试环境，然后再进行正常的同步操作；一次性迁移可以保留所有历史记录。\n关键见解： 切换真理源需要迁移路径来保留现有数据；首次运行的模式使得安全切换成为可能，无需手动迁移或担心数据丢失的风险。\n2. PaperMod主题过时，导致Hugo v0.157.0构建失败，因为缺少get-page-images部分 解决方案： 清理了macOS资源文件夹文件（._pack-*），这些文件会导致Git损坏，将本地更改存储起来，并拉取最新的主题，手动解决了head.html的合并冲突，保留了上游的主题切换以及本地MathJax和复选框脚本。\n关键见解： macOS资源文件夹文件（._前缀）会损坏跨平台项目的Git仓库；主题更新需要小心地保留本地自定义设置，通过手动解决冲突来实现。\n3. update.sh脚本在git提交返回非零退出码时中止 解决方案： 在提交前添加了git diff –cached –quiet检查；当检测到无更改时，跳过提交并发送友好消息。\n关键见解： 使用set -e的Shell脚本必须明确处理所有正常故障情况；依赖命令退出码而不进行状态检查会导致自动化过程变得脆弱。\n4. /benchmark/包装页面无法渲染：Hugo识别了内容/benchmark.md，但没有生成/benchmark/index.html 解决方案： 将包装页面的日期从datetime.now()改为固定的2025-01-01过去日期；将/content/benchmark/_index.md部分移动到/content/benchmark.md部分，以避免与静态/benchmark目录发生冲突。\n关键见解： Hugo默认会忽略未来的内容；与静态目录同名的部分会产生模糊的输出路径——单个页面更适合作为包装内容的路径。\n一般问题 5. 在递归清理过程中删除父目录后访问子目录时，update.sh中的find命令失败 解决方案： 在find … -exec rm -rf {} +之后添加了2\u003e/dev/null || true，以优雅地忽略预期的竞态条件错误。**关键洞察：**递归删除操作会导致竞态条件，因为find会遍历被删除的路径；为了实现这种预期行为，需要显式地抑制错误。\n6. Hugo URL大小写规范化：config.yml中使用了/bugJournal/，但Hugo生成的路径为/bugjournal/，这可能会导致GitHub Pages上的404错误。 **解决方案：**在config.yml和内容前言部分对所有bugJournal引用进行规范化处理，将其改为小写/bugjournal/，以符合Hugo的规范化行为。\n**关键洞察：**Hugo的canonifyURLs和slug生成会自动将部分名称转换为小写；而config中的混合大小写URL则会在注重大小写的静态主机上造成不一致性。\n7. Windows PowerShell执行策略阻止了py_compile和验证脚本的运行 **解决方案：**直接使用python -m py_compile，或者将Python代码嵌入到PowerShell字符串中，从而绕过脚本文件的执行限制。\n**关键洞察：**环境执行策略可能会阻止即使是非破坏性的验证命令；通过stdin传入的Python代码可以绕过基于文件的限制，而无需提升权限。\n人类与人工智能的方法论 战略层面 部署架构：统一的测试目录作为唯一的数据来源 角色 方法 人类 用户发现了双重写入问题（工具同时写入输出和网站），并提出了清洁的架构解决方案：将所有工具的输出集中存储在outputs/site中，然后自动链接或复制到最终位置，然后再进行Hugo构建 人工智能 人工智能首先检查了网站上分散的每款工具的部署路径，寻找可以在现有结构内进行逐步重构的机会，而不需要质疑基本的架构 **差异分析：**人类能够提前发现系统的设计缺陷并提出架构解决方案；而人工智能则依赖于现有的代码模式，可能会继续逐步进行重构，而不需要明确的架构指导。\n网站部署系统修复迭代过程 角色 方法 人类 用户在人工智能修复后执行脚本以验证结果，通过实际测试发现新的问题，并在多阶段修复过程中保持对整个系统完整性的监控 人工智能 人工智能采用逐步修复的策略，只解决当前可见的问题，需要多次用户反馈才能在所有边缘情况下实现完全的稳定性 **差异分析：**用户的经验性测试确保了修复的完整性；人工智能的初始解决方案解决了表面问题，但在实际执行过程中才发现了更深层次的边缘情况。\n实施层面 基准发布策略：带有嵌入式iframe的包装页面 角色 方法 人类 用户没有指定具体的实施细节；在人工智能遇到Hugo路径冲突时，接受了其基于iframe的提案 人工智能 人工智能最初尝试基于章节的发布方式（content/benchmark/_index.md与static/benchmark/report.html），但遇到了Hugo渲染冲突，随后改为使用页面+独立静态目录的模式，并嵌入iframe **差异分析：**人工智能通过试错的方式探索了多种Hugo内容模型选项（章节、页面、静态文件）；用户信任人工智能能够找到正确的Hugo模式，而没有事先提出技术解决方案。\n人工智能的局限性 关键局限性 在修复update.sh时未能预见所有shell脚本的边缘情况，需要多次用户测试反馈才能解决无更改提交处理和顺序处理竞态条件的问题 一般局限性 需要三次迭代才能诊断出Hugo /benchmark/渲染失败的问题：最初怀疑是测试路径问题，然后是章节与页面的混淆，最后确定是date:datetime.now()导致的内容问题 没有主动验证Hugo的URL大小写规范化行为，也没有警告关于注重大小写的托管的影响；用户不得不自己发现/bugJournal/与/bugjournal/的不一致 在解决git合并冲突时，正确保留了双方的关键代码（theme-toggle和本地自定义设置），但这种判断依赖于对代码功能的理解——复杂的场景可能需要人工审查 经验教训 关键经验教训 对于从分散的部署目标向集中测试目录迁移的情况，可以使用引导迁移策略：在从分散的部署目标向集中测试目录迁移时，首先运行检测，并自动重新定位内容（将现有的网站/移动到outputs/site），这样可以避免数据丢失，并消除迁移前的手动操作负担 更新Hugo主题时需要采用三层方法：①git仓库的完整性（清理损坏的资源文件夹文件），②依赖项的对齐（主题版本与Hugo版本的兼容性），③本地自定义设置的保存（手动解决head.html和配置覆盖的问题） Hugo内容模型的边缘情况：相同名称的章节(_index.md)与静态目录发生冲突，导致路径不明确；单个页面(foo.md)更适合作为包装内容；未来的内容如果没有使用–buildFuture标志，则会自动跳过 Shell脚本的健壮性原则：①在操作之前检查git状态，而不是依赖退出码，②为文件系统操作添加错误处理（对于预期失败的情况，使用2\u003e/dev/null || true），③在使用set -e时明确排除正常失败的情况 链接或复制同步模式：当文件系统支持硬链接时，os.link提供零拷贝的原子更新；自动回退到shirley.copytree可以确保跨平台兼容性（Windows FAT32、网络驱动器），无需人工干预或用户配置 对话总结 gadget/summarize ✅ 批量生成W05-W12历史周报 19:30:00.000 | claude_code 使用dailySummary.py工具生成了2026年第5至第12周的结构化周报。报告涵盖了MIHD空间转录组学（STAIG对齐修复、scGPT融合、Harmony实验）、错误恢复基准测试（错误注入框架、三池架构）、CalendarPro（意图分类升级）、RoboBrain（任务完成检测）、Life Copilot（多意图重构）以及Pi0.5 LoRA训练在DCC、tianhe、MacBook、TzJsDesktop设备上的表现。强调了多个高密度并行项目的进展。✅ 解决了部署中的阻塞问题，已成功部署到GitHub Pages 20:55:34.064 | claude_code 诊断出由过时的PaperMod主题引起的构建失败问题，该主题缺少get-page-images部分。更新了主题至最新版本，解决了head.html合并冲突的问题，同时保留了本地MathJax和复选框的自定义设置。修复了两个update.sh中的稳定性问题：处理无更改提交的方式（添加了git diff –cached –quiet检查）以及find函数中的竞态条件问题（添加了2\u003e/dev/null || true语句）。成功完成了整个部署流程，部署到了GitHub Pages。\n小工具 ✅ 重构了Hugo导航结构，并统一了部署架构 01:21:42.819 | codex 实现了基于自定义头部部分的分层bugJournal下拉导航功能，并添加了每日/每周/每月子菜单。用户建议将所有工具的输出内容集中放在outputs/site staging目录下，以避免重复写入导致的不一致问题。AI对summarize、research和test工具的部署逻辑进行了重构，使用common.site_staging辅助函数；创建了website/sync_staging.py文件，支持链接复制和Bootstrap迁移功能；添加了带有iframe包裹的基准测试Hugo发布层；更新了构建脚本，确保在Hugo构建前同步staging目录。通过Hugo构建验证，/benchmark/、/bugjournal/{daily,weekly,monthly/}、/research/均正确显示。解决了Hugo URL案例规范化、未来内容日期以及章节/静态路径冲突等问题。\n总用量：8.07美元 — 1700万个令牌\n",
+  "wordCount" : "199",
+  "inLanguage": "zh",
+  "datePublished": "2026-03-22T00:00:00-05:00",
+  "dateModified": "2026-03-22T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/daily/2026-03-22/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="zh"
+                        data-translation-url="https://tzj2006.github.io/bugjournal/daily/2026-03-22/">EN
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/zh/'>主页</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/zh/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-22
+    </h1>
+    <div class="post-meta"><span title='2026-03-22 00:00:00 -0500 -0500'>2026年3月22日</span>&nbsp;·&nbsp;<span>1 分钟</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="每日报告--2026-03-22">每日报告 — 2026-03-22<a hidden class="anchor" aria-hidden="true" href="#每日报告--2026-03-22">#</a></h1>
+<h2 id="每日概述">每日概述<a hidden class="anchor" aria-hidden="true" href="#每日概述">#</a></h2>
+<ul>
+<li><strong>已完成的工作：</strong> 建立了完整的每周报告存档（W05-W12），解决了网站部署中的阻塞问题，并通过将所有自动生成的内容（摘要、研究、基准测试）集中到一个具有层次导航的统一测试目录中，重新组织了整个Hugo部署流程。</li>
+<li><strong>实现方式：</strong> 通过LLM批量生成了8周的结构化报告；更新了PaperMod主题，并增强了update.sh脚本以应对异常情况（无更改提交、查找竞态条件）；构建了common.site_staging基础设施，实现了链接或复制同步功能，将所有工具部署逻辑迁移到测试环境，创建了website/sync_staging.py文件以进行引导迁移，并实现了带有悬停下拉CSS的自定义Hugo头部部分。</li>
+<li><strong>影响：</strong> 创建了全面的项目历史文档；消除了三个部署阻塞问题，使系统具备生产就绪能力；为自动生成的内容建立了单一来源，避免了双重写入的不一致性问题，实现了原子式更新，并自动实现了跨平台回退，同时提供了更清晰的内容组织结构，具有多层次的导航功能。</li>
+</ul>
+<blockquote>
+<p>完成了W05-W12历史每周报告的批量生成，修复了关键的网站部署错误（PaperMod主题更新、update.sh脚本的健壮性改进），并重构了gadget的Hugo部署架构，实现了统一的输出/测试环境、bugJournal下拉导航，并集成了基准测试报告发布功能。</p>
+</blockquote>
+<h2 id="任务">任务<a hidden class="anchor" aria-hidden="true" href="#任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>设计和实现统一的测试环境架构</strong> — 创建了common/site_staging.py文件，包含了resolve_site_staging_root、write_site_content、copy_site_static等辅助函数；定义了outputs/site/{content,static}作为规范的测试根目录；将paths.SITE_OUTPUTS_DIR添加到common/paths.py中。</li>
+<li>✅ <strong>构建website/sync_staging.py同步脚本</strong> — 创建了Python脚本，实现了链接或复制功能，并使用os.link作为后备方案替代shutil.copytree；包括了bootstrap_source，用于首次从网站/迁移现有内容到outputs/site；管理bugJournal/{daily,weekly,monthly}、research、benchmark.md以及static/{images,benchmark-report}。</li>
+<li>✅ <strong>解决网站部署中的阻塞问题，并将网站部署到GitHub Pages</strong> — 更新了PaperMod主题至最新版本，解决了缺失的部分问题，解决了合并冲突，保留了MathJax和复选框的自定义设置，增强了update.sh脚本的处理能力，以处理无更改情况并查找竞态条件，成功完成了全面部署。</li>
+<li>✅ <strong>将总结部署迁移到测试环境</strong> — 重构了daily_summary.py、weekly_summary.py、monthly_summary.py，使其输出到outputs/site而不是website/content；更新了部署检测逻辑，以检查测试环境路径；保留了现有的CLI界面。</li>
+<li>✅ <strong>将研究部署迁移到测试环境</strong> — 更新了research/output.py中的deploy_to_hugo和research_scout.py中的generate_hugo_post，以使用common.site_staging辅助函数；将研究人员档案和每日报告整合到单一的研究部分中。</li>
+<li>✅ <strong>添加基准测试Hugo发布层</strong> — 创建了test/benchmark/publish.py文件，其中包含了stage_benchmark_report函数；在基准测试CLI中添加&ndash;deploy标志；生成/benchmark/包装页面，并使用iframe嵌入/benchmark-report/report.html，使用固定的过去日期以避免Hugo跳过未来内容；添加了基准测试菜单项。</li>
+<li>✅ <strong>添加bugJournal层次下拉导航</strong> — 在Hugo config.yml中实现父子菜单结构，创建了自定义布局/部分/header.html，包含子菜单渲染和悬停下拉CSS，更新了section _index.md文件，添加了描述性文本，将所有URL小写化，以防止主机识别时出现大小写问题。</li>
+</ul>
+<h3 id="实施与修复">实施与修复<a hidden class="anchor" aria-hidden="true" href="#实施与修复">#</a></h3>
+<ul>
+<li>✅ <strong>更新网站构建脚本（update.sh和update.ps1）</strong> — 修改了两个脚本，使其在Hugo构建步骤之前运行python sync_staging.py；保留了现有的增量图像/视频压缩和git推送工作流程；更新了sync.py中的rclone配置，以同步outputs/site/<em>而不是website/content</em>。</li>
+<li>✅ <strong>批量生成历史每周报告（W05-W12）</strong> — 生成了2026年第5至第12周的结构化每周报告，涵盖了MIHD、错误恢复基准测试、CalendarPro、RoboBrain、Life Copilot以及其他多个设备的并行项目。</li>
+<li>✅ <strong>验证端到端测试环境同步和Hugo构建</strong> — 在所有修改过的文件上验证了py_compile，执行了sync_staging.py以确认引导程序和链接或复制逻辑的正确性，运行了hugo &ndash;destination .verify-public3以确认/benchmark/index.html、/benchmark-report/report.html以及所有bugjournal部分的渲染是否正确；没有执行最终推送到GitHub Pages的操作。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-首次测试环境同步会覆盖数月积累的网站content历史记录">1. 首次测试环境同步会覆盖数月积累的网站/content历史记录<a hidden class="anchor" aria-hidden="true" href="#1-首次测试环境同步会覆盖数月积累的网站content历史记录">#</a></h4>
+<p><strong>解决方案：</strong> 在sync_staging.py中实现了bootstrap_source：如果测试环境路径不存在但网站路径存在，则先将网站内容移动到测试环境，然后再进行正常的同步操作；一次性迁移可以保留所有历史记录。</p>
+<p><strong>关键见解：</strong> 切换真理源需要迁移路径来保留现有数据；首次运行的模式使得安全切换成为可能，无需手动迁移或担心数据丢失的风险。</p>
+<h4 id="2-papermod主题过时导致hugo-v01570构建失败因为缺少get-page-images部分">2. PaperMod主题过时，导致Hugo v0.157.0构建失败，因为缺少get-page-images部分<a hidden class="anchor" aria-hidden="true" href="#2-papermod主题过时导致hugo-v01570构建失败因为缺少get-page-images部分">#</a></h4>
+<p><strong>解决方案：</strong> 清理了macOS资源文件夹文件（._pack-*），这些文件会导致Git损坏，将本地更改存储起来，并拉取最新的主题，手动解决了head.html的合并冲突，保留了上游的主题切换以及本地MathJax和复选框脚本。</p>
+<p><strong>关键见解：</strong> macOS资源文件夹文件（._前缀）会损坏跨平台项目的Git仓库；主题更新需要小心地保留本地自定义设置，通过手动解决冲突来实现。</p>
+<h4 id="3-updatesh脚本在git提交返回非零退出码时中止">3. update.sh脚本在git提交返回非零退出码时中止<a hidden class="anchor" aria-hidden="true" href="#3-updatesh脚本在git提交返回非零退出码时中止">#</a></h4>
+<p><strong>解决方案：</strong> 在提交前添加了git diff &ndash;cached &ndash;quiet检查；当检测到无更改时，跳过提交并发送友好消息。</p>
+<p><strong>关键见解：</strong> 使用set -e的Shell脚本必须明确处理所有正常故障情况；依赖命令退出码而不进行状态检查会导致自动化过程变得脆弱。</p>
+<h4 id="4-benchmark包装页面无法渲染hugo识别了内容benchmarkmd但没有生成benchmarkindexhtml">4. /benchmark/包装页面无法渲染：Hugo识别了内容/benchmark.md，但没有生成/benchmark/index.html<a hidden class="anchor" aria-hidden="true" href="#4-benchmark包装页面无法渲染hugo识别了内容benchmarkmd但没有生成benchmarkindexhtml">#</a></h4>
+<p><strong>解决方案：</strong> 将包装页面的日期从datetime.now()改为固定的2025-01-01过去日期；将/content/benchmark/_index.md部分移动到/content/benchmark.md部分，以避免与静态/benchmark目录发生冲突。</p>
+<p><strong>关键见解：</strong> Hugo默认会忽略未来的内容；与静态目录同名的部分会产生模糊的输出路径——单个页面更适合作为包装内容的路径。</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="5-在递归清理过程中删除父目录后访问子目录时updatesh中的find命令失败">5. 在递归清理过程中删除父目录后访问子目录时，update.sh中的find命令失败<a hidden class="anchor" aria-hidden="true" href="#5-在递归清理过程中删除父目录后访问子目录时updatesh中的find命令失败">#</a></h4>
+<p><strong>解决方案：</strong> 在find &hellip; -exec rm -rf {} +之后添加了2&gt;/dev/null || true，以优雅地忽略预期的竞态条件错误。**关键洞察：**递归删除操作会导致竞态条件，因为find会遍历被删除的路径；为了实现这种预期行为，需要显式地抑制错误。</p>
+<h4 id="6-hugo-url大小写规范化configyml中使用了bugjournal但hugo生成的路径为bugjournal这可能会导致github-pages上的404错误">6. Hugo URL大小写规范化：config.yml中使用了/bugJournal/，但Hugo生成的路径为/bugjournal/，这可能会导致GitHub Pages上的404错误。<a hidden class="anchor" aria-hidden="true" href="#6-hugo-url大小写规范化configyml中使用了bugjournal但hugo生成的路径为bugjournal这可能会导致github-pages上的404错误">#</a></h4>
+<p>**解决方案：**在config.yml和内容前言部分对所有bugJournal引用进行规范化处理，将其改为小写/bugjournal/，以符合Hugo的规范化行为。</p>
+<p>**关键洞察：**Hugo的canonifyURLs和slug生成会自动将部分名称转换为小写；而config中的混合大小写URL则会在注重大小写的静态主机上造成不一致性。</p>
+<h4 id="7-windows-powershell执行策略阻止了py_compile和验证脚本的运行">7. Windows PowerShell执行策略阻止了py_compile和验证脚本的运行<a hidden class="anchor" aria-hidden="true" href="#7-windows-powershell执行策略阻止了py_compile和验证脚本的运行">#</a></h4>
+<p>**解决方案：**直接使用python -m py_compile，或者将Python代码嵌入到PowerShell字符串中，从而绕过脚本文件的执行限制。</p>
+<p>**关键洞察：**环境执行策略可能会阻止即使是非破坏性的验证命令；通过stdin传入的Python代码可以绕过基于文件的限制，而无需提升权限。</p>
+<h2 id="人类与人工智能的方法论">人类与人工智能的方法论<a hidden class="anchor" aria-hidden="true" href="#人类与人工智能的方法论">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="部署架构统一的测试目录作为唯一的数据来源">部署架构：统一的测试目录作为唯一的数据来源<a hidden class="anchor" aria-hidden="true" href="#部署架构统一的测试目录作为唯一的数据来源">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户发现了双重写入问题（工具同时写入输出和网站），并提出了清洁的架构解决方案：将所有工具的输出集中存储在outputs/site中，然后自动链接或复制到最终位置，然后再进行Hugo构建</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>人工智能首先检查了网站上分散的每款工具的部署路径，寻找可以在现有结构内进行逐步重构的机会，而不需要质疑基本的架构</td>
+      </tr>
+  </tbody>
+</table>
+<p>**差异分析：**人类能够提前发现系统的设计缺陷并提出架构解决方案；而人工智能则依赖于现有的代码模式，可能会继续逐步进行重构，而不需要明确的架构指导。</p>
+<h4 id="网站部署系统修复迭代过程">网站部署系统修复迭代过程<a hidden class="anchor" aria-hidden="true" href="#网站部署系统修复迭代过程">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户在人工智能修复后执行脚本以验证结果，通过实际测试发现新的问题，并在多阶段修复过程中保持对整个系统完整性的监控</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>人工智能采用逐步修复的策略，只解决当前可见的问题，需要多次用户反馈才能在所有边缘情况下实现完全的稳定性</td>
+      </tr>
+  </tbody>
+</table>
+<p>**差异分析：**用户的经验性测试确保了修复的完整性；人工智能的初始解决方案解决了表面问题，但在实际执行过程中才发现了更深层次的边缘情况。</p>
+<h3 id="实施层面">实施层面<a hidden class="anchor" aria-hidden="true" href="#实施层面">#</a></h3>
+<h4 id="基准发布策略带有嵌入式iframe的包装页面">基准发布策略：带有嵌入式iframe的包装页面<a hidden class="anchor" aria-hidden="true" href="#基准发布策略带有嵌入式iframe的包装页面">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户没有指定具体的实施细节；在人工智能遇到Hugo路径冲突时，接受了其基于iframe的提案</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>人工智能最初尝试基于章节的发布方式（content/benchmark/_index.md与static/benchmark/report.html），但遇到了Hugo渲染冲突，随后改为使用页面+独立静态目录的模式，并嵌入iframe</td>
+      </tr>
+  </tbody>
+</table>
+<p>**差异分析：**人工智能通过试错的方式探索了多种Hugo内容模型选项（章节、页面、静态文件）；用户信任人工智能能够找到正确的Hugo模式，而没有事先提出技术解决方案。</p>
+<h2 id="人工智能的局限性">人工智能的局限性<a hidden class="anchor" aria-hidden="true" href="#人工智能的局限性">#</a></h2>
+<h3 id="关键局限性">关键局限性<a hidden class="anchor" aria-hidden="true" href="#关键局限性">#</a></h3>
+<ul>
+<li>在修复update.sh时未能预见所有shell脚本的边缘情况，需要多次用户测试反馈才能解决无更改提交处理和顺序处理竞态条件的问题</li>
+</ul>
+<h3 id="一般局限性">一般局限性<a hidden class="anchor" aria-hidden="true" href="#一般局限性">#</a></h3>
+<ul>
+<li>需要三次迭代才能诊断出Hugo /benchmark/渲染失败的问题：最初怀疑是测试路径问题，然后是章节与页面的混淆，最后确定是date:datetime.now()导致的内容问题</li>
+<li>没有主动验证Hugo的URL大小写规范化行为，也没有警告关于注重大小写的托管的影响；用户不得不自己发现/bugJournal/与/bugjournal/的不一致</li>
+<li>在解决git合并冲突时，正确保留了双方的关键代码（theme-toggle和本地自定义设置），但这种判断依赖于对代码功能的理解——复杂的场景可能需要人工审查</li>
+</ul>
+<h2 id="经验教训">经验教训<a hidden class="anchor" aria-hidden="true" href="#经验教训">#</a></h2>
+<h3 id="关键经验教训">关键经验教训<a hidden class="anchor" aria-hidden="true" href="#关键经验教训">#</a></h3>
+<ul>
+<li>对于从分散的部署目标向集中测试目录迁移的情况，可以使用引导迁移策略：在从分散的部署目标向集中测试目录迁移时，首先运行检测，并自动重新定位内容（将现有的网站/移动到outputs/site），这样可以避免数据丢失，并消除迁移前的手动操作负担</li>
+<li>更新Hugo主题时需要采用三层方法：①git仓库的完整性（清理损坏的资源文件夹文件），②依赖项的对齐（主题版本与Hugo版本的兼容性），③本地自定义设置的保存（手动解决head.html和配置覆盖的问题）</li>
+<li>Hugo内容模型的边缘情况：相同名称的章节(_index.md)与静态目录发生冲突，导致路径不明确；单个页面(foo.md)更适合作为包装内容；未来的内容如果没有使用&ndash;buildFuture标志，则会自动跳过</li>
+<li>Shell脚本的健壮性原则：①在操作之前检查git状态，而不是依赖退出码，②为文件系统操作添加错误处理（对于预期失败的情况，使用2&gt;/dev/null || true），③在使用set -e时明确排除正常失败的情况</li>
+<li>链接或复制同步模式：当文件系统支持硬链接时，os.link提供零拷贝的原子更新；自动回退到shirley.copytree可以确保跨平台兼容性（Windows FAT32、网络驱动器），无需人工干预或用户配置</li>
+</ul>
+<h2 id="对话总结">对话总结<a hidden class="anchor" aria-hidden="true" href="#对话总结">#</a></h2>
+<h3 id="gadgetsummarize">gadget/summarize<a hidden class="anchor" aria-hidden="true" href="#gadgetsummarize">#</a></h3>
+<p><strong>✅ 批量生成W05-W12历史周报</strong>
+<em>19:30:00.000 | claude_code</em>
+使用dailySummary.py工具生成了2026年第5至第12周的结构化周报。报告涵盖了MIHD空间转录组学（STAIG对齐修复、scGPT融合、Harmony实验）、错误恢复基准测试（错误注入框架、三池架构）、CalendarPro（意图分类升级）、RoboBrain（任务完成检测）、Life Copilot（多意图重构）以及Pi0.5 LoRA训练在DCC、tianhe、MacBook、TzJsDesktop设备上的表现。强调了多个高密度并行项目的进展。<strong>✅ 解决了部署中的阻塞问题，已成功部署到GitHub Pages</strong>
+<em>20:55:34.064 | claude_code</em>
+诊断出由过时的PaperMod主题引起的构建失败问题，该主题缺少get-page-images部分。更新了主题至最新版本，解决了head.html合并冲突的问题，同时保留了本地MathJax和复选框的自定义设置。修复了两个update.sh中的稳定性问题：处理无更改提交的方式（添加了git diff &ndash;cached &ndash;quiet检查）以及find函数中的竞态条件问题（添加了2&gt;/dev/null || true语句）。成功完成了整个部署流程，部署到了GitHub Pages。</p>
+<h3 id="小工具">小工具<a hidden class="anchor" aria-hidden="true" href="#小工具">#</a></h3>
+<p><strong>✅ 重构了Hugo导航结构，并统一了部署架构</strong>
+<em>01:21:42.819 | codex</em>
+实现了基于自定义头部部分的分层bugJournal下拉导航功能，并添加了每日/每周/每月子菜单。用户建议将所有工具的输出内容集中放在outputs/site staging目录下，以避免重复写入导致的不一致问题。AI对summarize、research和test工具的部署逻辑进行了重构，使用common.site_staging辅助函数；创建了website/sync_staging.py文件，支持链接复制和Bootstrap迁移功能；添加了带有iframe包裹的基准测试Hugo发布层；更新了构建脚本，确保在Hugo构建前同步staging目录。通过Hugo构建验证，/benchmark/、/bugjournal/{daily,weekly,monthly/}、/research/均正确显示。解决了Hugo URL案例规范化、未来内容日期以及章节/静态路径冲突等问题。<img alt="令牌使用情况" loading="lazy" src="2026-03-22-usage.png"></p>
+<p><strong>总用量：8.07美元</strong> — 1700万个令牌</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

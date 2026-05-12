@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-04-11 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="在四台设备上进行的高强度技术工作：完成了BetterSSH全栈项目的从零到生产的开发过程，优化了多项目开发工具链，对MimicGen扩展系统进行了深度重构，构建了适用于NeurIPS学术写作的框架，并扩展了语音识别后端功能。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-04-11/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-04-11/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-11/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-04-11/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-04-11">
+  <meta property="og:description" content="在四台设备上进行的高强度技术工作：完成了BetterSSH全栈项目的从零到生产的开发过程，优化了多项目开发工具链，对MimicGen扩展系统进行了深度重构，构建了适用于NeurIPS学术写作的框架，并扩展了语音识别后端功能。">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-04-11T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-04-11T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-04-11">
+  <meta name="twitter:description" content="在四台设备上进行的高强度技术工作：完成了BetterSSH全栈项目的从零到生产的开发过程，优化了多项目开发工具链，对MimicGen扩展系统进行了深度重构，构建了适用于NeurIPS学术写作的框架，并扩展了语音识别后端功能。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-04-11",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-04-11/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-04-11",
+  "name": "Bug Journal 2026-04-11",
+  "description": "在四台设备上进行的高强度技术工作：完成了BetterSSH全栈项目的从零到生产的开发过程，优化了多项目开发工具链，对MimicGen扩展系统进行了深度重构，构建了适用于NeurIPS学术写作的框架，并扩展了语音识别后端功能。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Tianhe What was done: Resolved git proxy issues and synchronized 42 files from the gadget repository. Reconstructed the augmentation system architecture for MimicGen. Repackaged the portable collection. How it was done: Diagnosed proxy configuration mismatches using per-command overrides. Created ErrorSceneVariantGenerator to implement reset-based variants. Introduced augmentable-only quota rules. Completed metadata supplementation for MimicGen. Ran pytest unit tests. Impact: Synchronized latest translation support in the cluster development environment. Aligned the augmentation process with the original paper design. Fixed bugs in success_demos.hdf5 (5/5 verification passed). Exposed human demo data quality issues (24 issues, only 3 reproducible, 0 augmentable). tianhe What was done: Completed BetterSSH full-stack project from scratch to production readiness. Standardized workspace permissions configuration. Implemented TokenMonitor using a data archiving system. How it was done: Used the superpowers skill chain (brainstorming needs analysis → ECL-driven implementation → code optimization). Implemented independent modules with 5 subagents in parallel. Simplified permission rules with tool-level wildcards. Implemented time-bound partitioning for deduplication archiving. Impact: Developed a production-ready SSH terminal multiplexer (Node.js+Fastify+React+xterm.js, 195 tests passed). Reduced 13 configuration files from 100 lines to 30 lines. Established an usage-archive layer to prevent data loss. Fixed pricing cache version control bugs. tianhe What was done: Fixed git proxy issues and synchronized 42 files from the gadget repository. Reconstructed the augmentation system architecture for MimicGen. Repackaged the portable collection. How it was done: Diagnosed proxy configuration mismatches using per-command overrides. Created ErrorSceneVariantGenerator to implement reset-based variants. Introduced augmentable-only quota rules. Completed metadata supplementation for MimicGen. Ran pytest unit tests. Impact: Synchronized latest translation support in the cluster development environment. Aligned the augmentation process with the original paper design. Fixed bugs in success_demos.hdf5 (5/5 verification passed). Exposed human demo data quality issues (24 issues, only 3 reproducible, 0 augmentable). tianhe What was done: Fixed git proxy issues and synchronized 42 files from the gadget repository. Reconstructed the augmentation system architecture for MimicGen. Repackaged the portable collection. How it was done: Diagnosed proxy configuration mismatches using per-command overrides. Created ErrorSceneVariantGenerator to implement reset-based variants. Introduced augmentable-only quota rules. Completed metadata supplementation for MimicGen. Ran pytest unit tests. Impact: Synchronized latest translation support in the cluster development environment. Aligned the augmentation process with the original paper design. Fixed bugs in success_demos.hdf5 (5/5 verification passed). Exposed human demo data quality issues (24 issues, only 3 reproducible, 0 augmentable).Solution: The diagnostic proxy configuration is inconsistent: the global Git configuration points to 172.16.31.200:3138, while the environment variable (from proxy_on) uses 127.0.0.1:10087. Using the git -c http.proxy=http://127.0.0.1:10087 -c https.proxy=http://127.0.0.1:10087 command covers each proxy setting, successfully pulling data. Key Insight: Git has two independent proxy configuration layers (global configuration vs environment variable) that may conflict. Using the -c flag for per-command overrides provides an immediate solution without modifying the persistent configuration.\nHuman vs AI Approaches Strategic Level MimicGen Augmentation Strategy – Repeated error injection vs Fixed error scene + Reset randomization Role Approach Human Humans identify the fundamental problem with the current logic: re-injecting errors into each target scene for diversity, which does not conform to the original MimicGen design. An error scene should be treated as a fixed base scenario, and variants should be generated through env.reset() with random objects. AI AI initially only examines the code implementation details (_replay_with_mimicgen_targets) and does not question the design from the ‘augmentation strategy’ perspective. It takes humans to point out the problem before AI understands that the original MimicGen’s reset logic should be applied to the error scene. Difference Analysis: Humans consider ‘what constitutes reasonable augmentation’ from a system design perspective, while AI tends to accept the existing implementation and optimize within its framework. This reflects a difference between strategic and tactical levels of thinking.\nWhether to Research Existing Solutions Role Approach Human After completing the design presentation, humans actively suggest ‘I need you to search online for existing solutions’, avoiding duplicating efforts. AI AI initially prepares to proceed directly to the implementation phase (writing design documents → assigning writing plans), without suggesting research. Difference Analysis: Humans demonstrate pragmatic engineering thinking (reusing is better than rewriting), while AI tends to fall into the habit of ‘building from scratch’ when not prompted. This is one of AI’s blind spots.\nClarification of NeurIPS Writing Skill Scope Role Approach Human After initial exploration, users clarify: ‘I want to refine the writing methodology—how they complete their work and how they present highlights. I hope to output a nuwa-skill format to help me write papers for the NeurIPS 2026 dataset track.’ They specifically request focus on Oral/Highlight papers (not all 544 papers). AI AI initially interprets the request as refining the paper’s theme/topic. After clarification, it shifts to analyzing the writing structure (chapter organization), narrative strategy (narrative tension), review psychology, and contribution presentation patterns. Difference Analysis: Users have a clear meta-cognitive goal (learning the writing process itself), while AI initially focuses on domain knowledge. The nuwa-skill reference guides the abstraction at the correct level—extracting cognitive frameworks rather than mere facts summaries. This highlights the importance of example-driven specifications for complex creative tasks.\nLocal Session Support (Not Initially Considered) Role Approach Human During the design process, humans realize the need for a local session in addition to remote SSH. AI AI initially designed only to cover remote SSH sessions, but expanded it to include local sessions after human suggestion. Difference Analysis: Humans discover an implicit requirement during the design process (local session), while AI fails to infer the need for a local scenario due to its reluctance to switch windows. AI needs stronger ability to infer requirements.\nSimplification Strategy for Permission Configuration Role Approach Human Users recognize that frequent confirmation is a major friction point in exploratory projects and propose retaining only the confirmation requirement for deletion operations. AI AI provides a technical solution: using tool-level wildcards like “Bash” to replace individual enumeration, changing the deletion command from “deny” to “ask”. Difference Analysis: Users define their requirements and boundaries (exploratory projects vs production projects, deletion operations require confirmation). AI provides technical solutions and optimization suggestions (using tool-level wildcards).\nDecision on Archive Scope Role Approach Human Choosing ’local + SSH remote devices’, although SSH already has a remote-cache mechanism, prioritizing additional security with a unified archive layer. AI Recommending ‘only local’ to avoid duplication, as SSH already has a remote-cache mechanism. Difference Analysis: Humans prioritize redundancy and consistency (all data in a single archive system) over technical efficiency (avoiding duplicate mechanisms).\nJudgment on Terminal UX Quality Role Approach Human Intuitive evaluation based on intuition: ‘It doesn’t look like a terminal at all, something is wrong’—using real terminals for immediate pattern recognition. AI Technical checklist: identifying missing WebGL renderers, Unicode11, appropriate themes, resize synchronization—the system diagnoses the root cause. Difference Analysis: Humans are good at overall UX evaluation, while AI excels at breaking down technical gaps. Humans identify problems immediately, while AI provides diagnosis and solutions.\nAI Limitations Critical Limitations Failure to Propose Technical Research: AI is ready to implement the design but does not suggest researching existing solutions first. Engineers lack the awareness that ‘reusing is better than rewriting’. Inadequate Inferring Implicit Requirements: When users say ‘unwilling to switch windows’, AI only focuses on remote SSH scenarios and fails to infer that local CLI also requires unified management. Stronger scenario completeness reasoning is needed. It took 6 rounds of diagnostics to locate all MimicGen bugs: subtask fragmentation → retract not warp → gripper detects errors → insufficient interpolation steps → parallel path bugs → cache cleanup. AI cannot anticipate all issues at once. First attempt to access the OpenReview API failed, unaware of recent authentication policy changes. All 30+ attempts (API v1/v2, different endpoints, guest login, various headers) returned a 403, until the user provided credentials. The system lacks the latest knowledge of OpenReview authentication requirements for 2026. Failed to detect that SessionManager was never instantiated during the initial architecture scan—it took a lot of time to debug port conflicts and WebSocket issues before the root cause was identified as an empty onMessage handler. AI initially fails to question the rationality of ‘repeated error injection’ design. Humans need to explicitly state ’error scenes should be fixed + reset randomization’ to start refactoring. Incorrect Path Assumption: The Agent initially assumed files were edited under recovery_collection_portable/, but the user had moved to another level. All edits were lost and need to be reapplied in the new path. Not initially recognizing that outdated pricing caching could prevent OpenRouter data loading—it took the litellm.rs cache logic to explicitly trace the version control gap. General Limitations Triggering OpenReview nginx rate limiting, resulting in temporary IP ban (152.3.43.42) after approximately 30 consecutive requests during the diagnostic phase. Exponential backoff or diagnostic authentication requirements should be implemented earlier. Subagent execution process is not transparent: When 5 backend agents run in parallel, users cannot see the intermediate progress (only ‘waiting for completion notification’), lacking real-time visibility. Progress tracking is a UX pain point for large tasks. Learnings Key Learnings The power of the Superpowers skill chain: Brainstorming (requirement analysis) → ccplan (ECL-driven implementation) → optimize (quality improvement) forms a complete software lifecycle. ECL documents serve as cross-session persistent ‘design contracts’, ensuring context consistency across multiple dialogues, agents, and even different models. The value of adversarial review: Among the 9 issues discovered by the Critic agent, 2 are CRITICAL (no authenticated PTY writing, SSH parameter injection) and 4 are HIGH (token brute-force cracking, prototype contamination), exposing them in a production environment would cause a security disaster. Repairs in the requirement phase cost less than in the code phase and production phase. The essence of object-centric warping: EEF relative to object motion patterns is an invariant. This invariant is maintained through coordinate transformation T_eef_new = T_obj_target × T_obj_src⁻¹ × T_eef_source. Two-step understanding: (1) eliminating the absolute position of the source object (2) remapping with the new object’s position. The wisdom behind the original MimicGen design: (1) minimizing the number of subtasks (only 2) (2) having a post-grasp buffer of 10-20 frames to ensure stable capture (3) reducing pose gaps with env.reset() to home position (4) quasi-closed-loop execution (calculating delta for target_pose_to_action step by step). The core design of MimicGen is source demo + env.reset() randomization: Error scenes should be treated as fixed ‘initial states’, and variants should be generated using placement_initializer, rather than injecting errors into each target again. Priority of NeurIPS DB Track reviews (based on 61 reviews): The most valued qualities are ‘comprehensive’ (mentioned 17 times), ‘community’, ’novel’, ‘clear’, and ‘well-designed’ (mentioned 13 times). The most common criticisms are ’lack of comparison’ (insufficient baseline), ‘insufficient detail’ (inadequate methodology), and ’limited scope’ (restricted application). The best paper (Artificial Hivemind) has an average score of 4.75 among Oral papers—AC decides beyond the review scores. The average for Oral (5.00) \u003c Spotlight average (5.16), confirming that scoring is not the only acceptance factor. Parallel agent scheduling mode: Independent modules (Config/Parser/LocalPTY) are assigned to different subagents for parallel implementation, then combined for verification, increasing development efficiency by 3-5 times. The key is identifying nodes in the DAG that are not dependent on each other, maximizing parallelism. Claude Code –output-format stream-json: Through research, it was found that Claude natively supports structured output (JSON separated by line breaks), eliminating the need for regular expression parsing of PTYs. This improves the reliability of the Parser from ‘heuristic’ to ‘deterministic’. Always research before reinventing. Return on Investment for TypeScript strict mode: 195 tests + 0 type errors = production-ready code. The type system is particularly useful during refactoring (after extracting parsed-state-utils, all call points automatically get type checked). Spending 20% more time on typing in the early stages saves 80% of debugging time later. xterm.js is the industry-standard browser terminal (used by VS Code, Replit, Vercel, ttyd). Its quality depends on the complete plugin stack: WebGL for GPU rendering, Unicode11 for CJK, Fit for resizing, SearchAddon, WebLinksAddon. Basic xterm.js alone is not sufficient for production use. MimicGen-ready datasets require specific metadata structure: Each demo_*/datagen_info must contain env_interface_name and env_interface_type, otherwise DataGenerator cannot correctly initialize the environment. Human demonstration data quality verification should be done before collection: Simply achieving teleop success is not enough; replay stability and augmentability must also be verified. Otherwise, a large amount of data will be collected that cannot be used for training. Time boundary partitioning (archive covers completed hours, live source covers current hours) elegantly solves deduplication without explicit level tracking—zero overlap means zero duplicate counts. Claude Code’s permission system supports tool-level wildcards (such as “Bash” matching all Bash commands), allowing minimal configuration instead of dozens of individual rules. Cost of Subtask Fragmentation: Each subtask boundary involves independently checking object poses, re-warp, and 5-step interpolation, with errors accumulating. 6 subtasks = 5 error sources, far more than the original 1. OpenReview API authentication architecture (2026): All data endpoints require login with a token; only the /login endpoint allows anonymous access (returning a verification error). The web frontend uses server-side credentials through Next.js RSC. Rate limits are operated at the nginx layer (based on IP), triggering approximately 30 requests in a short period. The academic paper review API is increasingly locked down, requiring institutional or personal credentials. Terminal resize synchronization requires full-chain coordination: ResizeObserver (frontend) → term.onResize → WebSocket message → SessionManager → PTY.resize(). Mismatches result in lines being broken in the error column. Anti-drag prevents flooding when resizing. Terminal instances should not be destroyed during session switching—they save a rollback buffer (10000 lines). The correct approach is to create once and reuse it through clear() + backend RingBuffer (2MB) across sessions. Cache systems must include explicit version fields when data sources can evolve—just TTL expiration is not enough to handle changes in patterns/sources. The three-layer permission configuration allow/deny/ask can balance security and efficiency: Allow implements automation, ask retains confirmation for dangerous operations, deny is for absolute prohibitions. Claude Code configuration does not inherit automatically (each project requires independent configuration), but can be standardized through automated scripts (such as init-claude.sh) for standardized initialization processes. Documentation for complex robot systems should distinguish between developers and operators: Clearly define the target audience, structure, language, and content retention through structured questions to avoid ambiguity. React closure trap ref pattern: Registers third-party library callbacks (xterm.js onData) in useEffect, which captures expired props, a common bug. Common solution: props → ref, useEffect synchronizes ref.current, and the callback reads ref.current. This is the best practice in the React ecosystem. Three key elements for WebSocket robustness: Redundancy (exponential backoff), backpressure (checking bufferedAmount), and heartbeat (not implemented but should be considered). Distributed system network layers must assume ‘connections may disconnect’ rather than ‘connections should be stable’. Importance of continuous closure detection: Robot grabs may attempt multiple times, and the first gripperClosed \u003e threshold may fail. Continuous closure (≥10 frames) must be detected to confirm a successful grab. Complexity of multi-process debugging: (1) Each worker requires an independent env and augmenter instance (2) Path resolution is more prone to errors (relative paths may miss levels) (3) Absolute paths like demos_dir must be explicitly passed (4) Robosuite WARNINGs need to be suppressed separately in worker functions. Quota counting logic must reflect actual availability: augmentable_only is stricter than replay_only but more reasonable, as non-augmentable demos cannot be expanded even if they can be replayed. State of the art ASR models (2026): True streaming models are rare. Moonshine v2 (73-107ms latency, 34-245M parameters) and Voxtral-Mini-4B-Realtime (480ms, 4B parameters) represent the most advanced. Moonshine uses a callback-based API suitable for real-time transcription; Voxtral requires manual chunking but offers higher accuracy. Both support native acceleration for Apple Silicon (Moonshine uses CoreML, Voxtral uses MLX). Permission requirements differ for exploratory and production projects: Exploratory projects prioritize efficiency (lenient permissions), while production projects prioritize security (strict confirmation). Gradually accumulating configurations can lead to inconsistencies (e.g., 80+ long rules, different project styles), and regularly using templates can improve maintainability. Practical Learnings Git proxy configuration operates at two independent levels: global configuration (git config –global http.proxy) and environment variables (http_proxy, HTTP_PROXY). Inconsistent configurations lead to cryptic TLS errors; using the -c flag for per-command overrides provides an immediate solution while preserving existing configurations.✅ Building NeurIPS 2025 DB Track Paper Writing Skills (nuwa-skill Format)\n19:50:53.430 | claude_code\nThe user wants to use the nuwa-skill framework to extract the paper writing methodology from the NeurIPS 2025 dataset track, including feedback from OpenReview reviews. The AI performs multi-stage research: (1) Crawls the NeurIPS virtual site and identifies 7 Oral+56 Spotlight papers from approximately 544 DB Track papers; (2) encounters a 403 API error due to authentication requirements and rate limits; (3) the user provides credentials, and the AI successfully retrieves 61 reviews (29 Oral, 32 Spotlight); (4) deeply analyzes the review process (rating patterns, pros and cons keywords); (5) studies the full text structure of 3 ArXiv papers; (6) creates a complete SKILL.md document (453 lines) with 5 mental models, 10 decision heuristics, review insights, and chapter-level guidelines. Six reference documents with original review JSONs are also created. Key findings: The best paper received the lowest score (4.75), and the average score for Oral papers was lower than that for Spotlight papers—AC judgment surpassed scores.) MeetingHelper ✅ Integrating Moonshine v2 and Voxtral Streaming ASR Backends\n02:13:58.742 | claude_code\nThe user requested the addition of a Whisper streaming model (previously completed in the previous session) and then sought other streaming ASR options. The AI researched and recommended Moonshine v2 (extremely lightweight, 73ms latency) and Voxtral-Mini-4B-Realtime (highest accuracy, 4B parameters). The user approved both options. The AI verified the APIs through source code inspection, installed dependencies (moonshine-voice, voxmlx), and implemented MoonshineTranscriber and VoxtralTranscriber classes. The start.sh/health-check.sh files were updated accordingly. Final verification: AST parsing was correct, shell syntax was valid, and imports were successful.)\nalgorithms ✅ Configuring Claude Code Permissions for the algorithms Directory\n04:36:45.682 | claude_code\nThe user noticed that Claude Code frequently prompted unnecessary confirmations during its exploration of the algorithms folder. The user requested the creation of local settings to skip these unnecessary confirmations and asked the AI to traverse subfolders to identify complete projects. The AI explored the directory structure and found 13 projects (7 first-level and 5 gadget subprojects). A unified .claude/settings.json file was created for all projects: automatically allowing Read/Edit/Write/Glob/Grep/Bash/Agent/WebFetch/Skill operations; only asking about destructive operations (rm, git reset –hard, git push –force). All 13 files were confirmed to be created successfully.)\nMIHD 🔍 Project Progress Review and Task Priorities\n05:55:20.759 | claude_code\nThe user asked what else needed to be done based on the plans.md document. The AI read the 36K token plan document and extracted a list of priority tasks: 3 P0 blocking items (HD GPU tasks, published baseline data, DE analysis pipeline), 4 P1 core tasks (query validation, method comparison, cross-section analysis, bootstrap CI), and 3 P2 enhancements. The verification list showed that none of the items were selected. The user did not choose any next actions during this session.)\nError Recovery Benchmark ✅ Creating CLAUDE.md and Updating TUTORIAL.md Completely\n08:18:03.956 | claude_code\nThe user started the init command to create a CLAUDE.md guide for the error recovery bot code repository. After completion, the user requested an update to the TUTORIAL.md document to cover all files. The Agent used the ccplan skill to clarify the requirements through AskUserQuestion (target audience, structure, language), confirming that the target readers were new members and operators, while retaining the existing content in Chinese. A detailed document was generated, including system architecture, 12 error skills classification methods, 5 RBG groups, a complete list of files (approximately 50 modules across frameworks/configs/scripts directories), instructions for using SpaceMouse, and explanations for the augmentation pipeline. The user expressed impatience during the generation process but accepted the final deliverable.)\ngadget ✅ Using a Proxy to Configure Git Pull\n07:09:09.908 | claude_code\nThe user requested enabling a proxy (proxy_on) for git pull on the tianhe cluster. The initial attempt failed due to a TLS connection error. The Agent diagnosed that the proxy configuration did not match: the global git configuration used an outdated 172.16.31.200:3138, while the environment variable pointed to 127.0.0.1:10087. The git -c flag was used to override the proxy settings for each command, successfully pulling 42 files, including new Ollama translation support (common/ollama.py, common/translation.py), bilingual website functionality (website/translate_site_batch.py), and test suites. It was recommended to update the global git proxy configuration to match the environment variables to maintain consistency in the future.)\nError Recovery MimicGen 🔄 Running the Collection Script and Diagnosing Augmentation Failures\n04:18:28.819 | claude_code\nThe user ran the stack task collection script, and human operation was successful, but the validation failed completely (0/10 scenes). The Agent added a diagnostic mode and modified 5 return None points to return diagnostic information. After running again, it was found that cubeA was not lifted (0.82 desktop height), and re_grasp failed. The issue was identified as a subtask fragmentation problem.)\n🔄 Reconstructing the Subtask Segmentation Logic and Fixing Gripper Detection Bugs\n04:18:28.819 | claude_code\nThe RecoverySegmenter was rewritten according to the original MimicGen method. RBG_A/B/D were simplified from 6-subtasks to 2-subtasks, and a post_grasp_buffer of 15 frames was added. Four files were modified (recovery_types.py, recovery_mimicgen.py, recovery_segmenter.py, recovery_collection.yaml). Running the test still failed, and a gripper detection bug was identified (looking for the first closure instead of continuous closures). The bug was fixed, but the test still failed.)\n✅ Understanding MimicGen Detection Mechanism and Object-Centric Warping Principles\n04:18:28.819 | claude_code\nThe user asked how MimicGen detection was implemented. The Agent explained the four core steps (task phase detection, scene stability, source demonstration verification, object reference parsing). Then, the mathematical principles of warping and why data could be augmented were explained. The user raised questions about the source of scene changes, and the Agent clarified that the entire scene was different (not just one object). Finally, the user requested a comparison with the original MimicGen.)\n✅ Researching the Original MimicGen and Proposing New Architectural Ideas\n04:18:28.819 | claude_code\nThe Agent sent two research agents (searching for papers online + reading source code locally) to investigate. It was found that the original Stack had only 2 subtasks, and the scene source was env.reset() randomization. The user proposed a new idea: using error scenes as base scenarios and applying the original randomization logic. The Agent verified the feasibility and analyzed the advantages and disadvantages. Then, the latest code was downloaded from Tianhe and decompressed to update the version.)\n✅ Implementing Multiprocess Parallelization and Fixing Path Bugs\n04:18:28.819 | claude_code\nThe Agent implemented ProcessPoolExecutor parallel verification (10 workers), with each worker creating an independent env+augmenter. After running, all 10 workers threw a ValueError. The path parsing bug was identified (scenes_dir.parent.parent was missing one level), and the demos_dir parameter was added to fix it. At the same time, the robosuite warnings were suppressed (creating macros_private.py, modifying mimicgen init.py, and deleting.pyc caches.)\nerror_recovery_benchmark ✅ Reconstructing MimicGen Recovery Augmentation System + Improving Human Demonstration Collection Quality\n04:46:32.733 | codex\nHumans pointed out current MimicGen logic issues (repetitive error injections instead of fixed scenes + reset randomization). The AI implemented architectural restructuring: creating ErrorSceneVariantGenerator to implement reset-based variants, and modifying recovery augmentation and validation logic. During the verification phase, two key issues were identified: (1) success_demos.hdf5 lacked the metadata required by MimicGen, preventing secondary augmentation; (2) the quality of the existing 24 human demos was insufficient (3/24 could be replayed, 0/24 could be augmented). The AI fixed the metadata issue (adding ensure_env_interface attrs) and improved the collection process (introducing augmentable_only quota + settle gate), repackaging the portable collection (197M). All 11 unit tests verified the correctness of the new logic.)\nGitHub Workspace Configuration ✅ Optimizing Exploratory Projects’ Claude Code Permissions\n05:57:02.260 | claude_code\nDue to the exploratory nature of the project, the user requested simplifying the permissions confirmation for the entire GitHub workspace. The AI systematically optimized 13.claude/settings.local.json files across 7 main projects and 5 gadget subprojects, replacing over 80 individual Bash command permissions with a single “Bash” wildcard. Deletion operations were moved from deny to ask. The init-claude.sh script was created to standardize future project initialization. The configuration files were reduced from approximately 100 lines per file to about 30 lines.)\nBetterSSH ✅ Designing and Implementing BetterSSH from Scratch: Unified Management of AI Agent CLI Sessions on SSH Servers\n04:08:26.234 | claude_code\nAfter the user raised the request, the AI used the brainstorming skill to clarify the requirements through 9 structured questions (2-5 servers, real-time output + status + alerts, direct interaction, cross-platform), and proposed 3 technical solutions, recommending a Node.js+web progressive architecture. Seven design modules were presented section by section (overall architecture, SSH configuration, Session management, dual-mode parser, front-end UI, project structure), and the user confirmed them. The user actively requested technical research, and the AI discovered Claude stream-json support and Glissa’s three-layer detection strategy. The ECL document was created using the ccplan skill, and 9 defects were fixed through adversarial review (including 2 CRITICAL security issues). In Phase 10, 5 parallel subagents were launched, completing 41 TS files, 195 tests, and pushing to GitHub. Finally, the optimize skill was used to implement 8 code optimizations (WebSocket reconnection, type validation, DRY refactoring, etc.), all of which passed the verification (195/195 tests + 0 type errors.)\n✅ Implementing Server Selection Panel Using ccplan\n2026-04-11 (Session 2) | claude_code\nThe user wanted two changes: prioritizing the terminal over the Claude window and enabling SSH server selection (not just local). The ccplan workflow was executed. In Phase 0, the system was calibrated to use the pop-up server selector. In Phases 1-9, 6 files were redesigned (backend added local to servers list, frontend added useSessionStore.servers, useControlWs.get_servers, new ServerPicker component). All changes were implemented, and 4 HIGH issues were found during code review (outdated closures, lack of a11y). All issues were fixed. The service was launched for verification, and the user requested to close it.)\n✅ Fully Upgrading the Terminal Component to Production Quality\n2026-04-11 (Session 2 continued) | claude_code\nThe user reported that the terminal “looked bad, not like a terminal.” The issue was diagnosed as lacking WebGL (slow, blurry), no Unicode11 (CJK corruption), terminal destruction during session switching (loss of rollback), and no resize synchronization (line break corruption). An alternative was investigated—xterm.js was found to be industry-standard (used by VS Code, Replit). The implementation included installing the unicode11 plugin, rewriting Terminal.tsx with WebGL + Catppuccin theme + ResizeObserver + instance pooling, adding end-to-end messages for resize, and subscribing to RingBuffer on the backend. Type checking passed, and the service was successfully launched.)\n🔄 Initial Project Onboarding and Debugging Session\n07:20:07.628 | claude_code\nThe user asked how to use BetterSSH (unified Claude Code/Codex session manager). The architecture was explained (Fastify backend with dual WebSocket, React frontend xterm.js). Attempting to launch resulted in “button not responding.” The root cause was identified as SessionManager never being instantiated, and onMessage returned null. The ESM import issue (ssh-config LineType) was resolved, and SessionManager was connected to the WebSocket handler. The user interrupted before completion.)\n✅ Service Restart and Verification\n07:35:35.274 | claude_code\nThe user requested a clean restart of the frontend and backend. Old processes (PID 6016, 7300) were killed, and both services were successfully restarted. The backend was verified at 127.0.0.1:18790, and the frontend at localhost:5173. The user confirmed that the service was running and requested to close it.)\nTokenMonitor ✅ Implementing usage-data-archive Using ccplan Workflow\n07:58:31.978 | claude_code\nThe user requested a data persistence layer to prevent JSONL logs from being lost during deletion. The ccplan workflow was executed: aligning intentions (local + SSH device hourly aggregation), generating solutions (archive-primary with time-bound partitions). The user approved, and the archive.rs core module, parser.rs integration, background loop triggering, and SSH device support were implemented. All 321 tests passed.)\n✅ Diagnosing and Fixing GLM/DeepSeek Pricing Display Bugs\n07:41:45.881 | claude_code\nThe user reported GLM5.1 and DeepSeek-Reasoner displaying $0 despite OpenRouter support. The pricing lookup chain was traced through pricing.rs/litellm.rs/openrouter.rs, and the root cause was identified as the PricingCache lacking a version field, allowing old cached data (before OpenRouter) to remain valid for 7 days and preventing new data from being processed. The version field was added with CACHE_VERSION=2 to automatically invalidate old cached data on the next startup.)\n✅ Optimizing Archive Implementation Using /optimize Skill\n07:58:31.978 | claude_code\nAfter compression, the newly implemented archive function was tested using the /optimize skill. Five optimizations were applied: extracting frontier checks into ArchiveFrontier::is_up_to_date() (eliminating approximately 40 lines of duplication), adding boundary checks for string slicing, refactoring 3 match patterns to let…else, adding timestamp parsing failure logs, and pre-allocating collections. All 325 tests passed, with zero clippy warnings.)\nToken Usage Total: $126.59 — 159.5M tokens\n",
+  "wordCount" : "4722",
+  "inLanguage": "en",
+  "datePublished": "2026-04-11T00:00:00-05:00",
+  "dateModified": "2026-04-11T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-04-11/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-11/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/'>Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-04-11
+    </h1>
+    <div class="post-meta"><span title='2026-04-11 00:00:00 -0500 -0500'>April 11, 2026</span>&nbsp;·&nbsp;<span>23 min</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h3 id="tianhe">Tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Resolved git proxy issues and synchronized 42 files from the gadget repository. Reconstructed the augmentation system architecture for MimicGen. Repackaged the portable collection.</li>
+<li><strong>How it was done:</strong> Diagnosed proxy configuration mismatches using per-command overrides. Created ErrorSceneVariantGenerator to implement reset-based variants. Introduced augmentable-only quota rules. Completed metadata supplementation for MimicGen. Ran pytest unit tests.</li>
+<li><strong>Impact:</strong> Synchronized latest translation support in the cluster development environment. Aligned the augmentation process with the original paper design. Fixed bugs in success_demos.hdf5 (5/5 verification passed). Exposed human demo data quality issues (24 issues, only 3 reproducible, 0 augmentable).</li>
+</ul>
+<h3 id="tianhe-1">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe-1">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Completed BetterSSH full-stack project from scratch to production readiness. Standardized workspace permissions configuration. Implemented TokenMonitor using a data archiving system.</li>
+<li><strong>How it was done:</strong> Used the superpowers skill chain (brainstorming needs analysis → ECL-driven implementation → code optimization). Implemented independent modules with 5 subagents in parallel. Simplified permission rules with tool-level wildcards. Implemented time-bound partitioning for deduplication archiving.</li>
+<li><strong>Impact:</strong> Developed a production-ready SSH terminal multiplexer (Node.js+Fastify+React+xterm.js, 195 tests passed). Reduced 13 configuration files from 100 lines to 30 lines. Established an usage-archive layer to prevent data loss. Fixed pricing cache version control bugs.</li>
+</ul>
+<h3 id="tianhe-2">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe-2">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Fixed git proxy issues and synchronized 42 files from the gadget repository. Reconstructed the augmentation system architecture for MimicGen. Repackaged the portable collection.</li>
+<li><strong>How it was done:</strong> Diagnosed proxy configuration mismatches using per-command overrides. Created ErrorSceneVariantGenerator to implement reset-based variants. Introduced augmentable-only quota rules. Completed metadata supplementation for MimicGen. Ran pytest unit tests.</li>
+<li><strong>Impact:</strong> Synchronized latest translation support in the cluster development environment. Aligned the augmentation process with the original paper design. Fixed bugs in success_demos.hdf5 (5/5 verification passed). Exposed human demo data quality issues (24 issues, only 3 reproducible, 0 augmentable).</li>
+</ul>
+<h3 id="tianhe-3">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe-3">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Fixed git proxy issues and synchronized 42 files from the gadget repository. Reconstructed the augmentation system architecture for MimicGen. Repackaged the portable collection.</li>
+<li><strong>How it was done:</strong> Diagnosed proxy configuration mismatches using per-command overrides. Created ErrorSceneVariantGenerator to implement reset-based variants. Introduced augmentable-only quota rules. Completed metadata supplementation for MimicGen. Ran pytest unit tests.</li>
+<li><strong>Impact:</strong> Synchronized latest translation support in the cluster development environment. Aligned the augmentation process with the original paper design. Fixed bugs in success_demos.hdf5 (5/5 verification passed). Exposed human demo data quality issues (24 issues, only 3 reproducible, 0 augmentable).<strong>Solution:</strong> The diagnostic proxy configuration is inconsistent: the global Git configuration points to 172.16.31.200:3138, while the environment variable (from proxy_on) uses 127.0.0.1:10087. Using the <code>git -c http.proxy=http://127.0.0.1:10087 -c https.proxy=http://127.0.0.1:10087</code> command covers each proxy setting, successfully pulling data.</li>
+</ul>
+<p><strong>Key Insight:</strong> Git has two independent proxy configuration layers (global configuration vs environment variable) that may conflict. Using the <code>-c</code> flag for per-command overrides provides an immediate solution without modifying the persistent configuration.</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="mimicgen-augmentation-strategy--repeated-error-injection-vs-fixed-error-scene--reset-randomization">MimicGen Augmentation Strategy – Repeated error injection vs Fixed error scene + Reset randomization<a hidden class="anchor" aria-hidden="true" href="#mimicgen-augmentation-strategy--repeated-error-injection-vs-fixed-error-scene--reset-randomization">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Humans identify the fundamental problem with the current logic: re-injecting errors into each target scene for diversity, which does not conform to the original MimicGen design. An error scene should be treated as a fixed base scenario, and variants should be generated through <code>env.reset()</code> with random objects.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI initially only examines the code implementation details (<code>_replay_with_mimicgen_targets</code>) and does not question the design from the &lsquo;augmentation strategy&rsquo; perspective. It takes humans to point out the problem before AI understands that the original MimicGen&rsquo;s reset logic should be applied to the error scene.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Humans consider &lsquo;what constitutes reasonable augmentation&rsquo; from a system design perspective, while AI tends to accept the existing implementation and optimize within its framework. This reflects a difference between strategic and tactical levels of thinking.</p>
+<h4 id="whether-to-research-existing-solutions">Whether to Research Existing Solutions<a hidden class="anchor" aria-hidden="true" href="#whether-to-research-existing-solutions">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>After completing the design presentation, humans actively suggest &lsquo;I need you to search online for existing solutions&rsquo;, avoiding duplicating efforts.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI initially prepares to proceed directly to the implementation phase (writing design documents → assigning writing plans), without suggesting research.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Humans demonstrate pragmatic engineering thinking (reusing is better than rewriting), while AI tends to fall into the habit of &lsquo;building from scratch&rsquo; when not prompted. This is one of AI&rsquo;s blind spots.</p>
+<h4 id="clarification-of-neurips-writing-skill-scope">Clarification of NeurIPS Writing Skill Scope<a hidden class="anchor" aria-hidden="true" href="#clarification-of-neurips-writing-skill-scope">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>After initial exploration, users clarify: &lsquo;I want to refine the writing methodology—how they complete their work and how they present highlights. I hope to output a nuwa-skill format to help me write papers for the NeurIPS 2026 dataset track.&rsquo; They specifically request focus on Oral/Highlight papers (not all 544 papers).</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI initially interprets the request as refining the paper&rsquo;s theme/topic. After clarification, it shifts to analyzing the writing structure (chapter organization), narrative strategy (narrative tension), review psychology, and contribution presentation patterns.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Users have a clear meta-cognitive goal (learning the writing process itself), while AI initially focuses on domain knowledge. The nuwa-skill reference guides the abstraction at the correct level—extracting cognitive frameworks rather than mere facts summaries. This highlights the importance of example-driven specifications for complex creative tasks.</p>
+<h4 id="local-session-support-not-initially-considered">Local Session Support (Not Initially Considered)<a hidden class="anchor" aria-hidden="true" href="#local-session-support-not-initially-considered">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>During the design process, humans realize the need for a local session in addition to remote SSH.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI initially designed only to cover remote SSH sessions, but expanded it to include local sessions after human suggestion.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Humans discover an implicit requirement during the design process (local session), while AI fails to infer the need for a local scenario due to its reluctance to switch windows. AI needs stronger ability to infer requirements.</p>
+<h4 id="simplification-strategy-for-permission-configuration">Simplification Strategy for Permission Configuration<a hidden class="anchor" aria-hidden="true" href="#simplification-strategy-for-permission-configuration">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Users recognize that frequent confirmation is a major friction point in exploratory projects and propose retaining only the confirmation requirement for deletion operations.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI provides a technical solution: using tool-level wildcards like &ldquo;Bash&rdquo; to replace individual enumeration, changing the deletion command from &ldquo;deny&rdquo; to &ldquo;ask&rdquo;.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Users define their requirements and boundaries (exploratory projects vs production projects, deletion operations require confirmation). AI provides technical solutions and optimization suggestions (using tool-level wildcards).</p>
+<h4 id="decision-on-archive-scope">Decision on Archive Scope<a hidden class="anchor" aria-hidden="true" href="#decision-on-archive-scope">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Choosing &rsquo;local + SSH remote devices&rsquo;, although SSH already has a remote-cache mechanism, prioritizing additional security with a unified archive layer.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Recommending &lsquo;only local&rsquo; to avoid duplication, as SSH already has a remote-cache mechanism.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Humans prioritize redundancy and consistency (all data in a single archive system) over technical efficiency (avoiding duplicate mechanisms).</p>
+<h4 id="judgment-on-terminal-ux-quality">Judgment on Terminal UX Quality<a hidden class="anchor" aria-hidden="true" href="#judgment-on-terminal-ux-quality">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Intuitive evaluation based on intuition: &lsquo;It doesn&rsquo;t look like a terminal at all, something is wrong&rsquo;—using real terminals for immediate pattern recognition.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Technical checklist: identifying missing WebGL renderers, Unicode11, appropriate themes, resize synchronization—the system diagnoses the root cause.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Humans are good at overall UX evaluation, while AI excels at breaking down technical gaps. Humans identify problems immediately, while AI provides diagnosis and solutions.</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="critical-limitations">Critical Limitations<a hidden class="anchor" aria-hidden="true" href="#critical-limitations">#</a></h3>
+<ul>
+<li>Failure to Propose Technical Research: AI is ready to implement the design but does not suggest researching existing solutions first. Engineers lack the awareness that &lsquo;reusing is better than rewriting&rsquo;.</li>
+<li>Inadequate Inferring Implicit Requirements: When users say &lsquo;unwilling to switch windows&rsquo;, AI only focuses on remote SSH scenarios and fails to infer that local CLI also requires unified management. Stronger scenario completeness reasoning is needed.</li>
+<li>It took 6 rounds of diagnostics to locate all MimicGen bugs: subtask fragmentation → retract not warp → gripper detects errors → insufficient interpolation steps → parallel path bugs → cache cleanup. AI cannot anticipate all issues at once.</li>
+<li>First attempt to access the OpenReview API failed, unaware of recent authentication policy changes. All 30+ attempts (API v1/v2, different endpoints, guest login, various headers) returned a 403, until the user provided credentials. The system lacks the latest knowledge of OpenReview authentication requirements for 2026.</li>
+<li>Failed to detect that SessionManager was never instantiated during the initial architecture scan—it took a lot of time to debug port conflicts and WebSocket issues before the root cause was identified as an empty onMessage handler.</li>
+<li>AI initially fails to question the rationality of &lsquo;repeated error injection&rsquo; design. Humans need to explicitly state &rsquo;error scenes should be fixed + reset randomization&rsquo; to start refactoring.</li>
+<li>Incorrect Path Assumption: The Agent initially assumed files were edited under recovery_collection_portable/, but the user had moved to another level. All edits were lost and need to be reapplied in the new path.</li>
+<li>Not initially recognizing that outdated pricing caching could prevent OpenRouter data loading—it took the litellm.rs cache logic to explicitly trace the version control gap.</li>
+</ul>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>Triggering OpenReview nginx rate limiting, resulting in temporary IP ban (152.3.43.42) after approximately 30 consecutive requests during the diagnostic phase. Exponential backoff or diagnostic authentication requirements should be implemented earlier.</li>
+<li>Subagent execution process is not transparent: When 5 backend agents run in parallel, users cannot see the intermediate progress (only &lsquo;waiting for completion notification&rsquo;), lacking real-time visibility. Progress tracking is a UX pain point for large tasks.</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>The power of the Superpowers skill chain: Brainstorming (requirement analysis) → ccplan (ECL-driven implementation) → optimize (quality improvement) forms a complete software lifecycle. ECL documents serve as cross-session persistent &lsquo;design contracts&rsquo;, ensuring context consistency across multiple dialogues, agents, and even different models.</li>
+<li>The value of adversarial review: Among the 9 issues discovered by the Critic agent, 2 are CRITICAL (no authenticated PTY writing, SSH parameter injection) and 4 are HIGH (token brute-force cracking, prototype contamination), exposing them in a production environment would cause a security disaster. Repairs in the requirement phase cost less than in the code phase and production phase.</li>
+<li>The essence of object-centric warping: EEF relative to object motion patterns is an invariant. This invariant is maintained through coordinate transformation T_eef_new = T_obj_target × T_obj_src⁻¹ × T_eef_source. Two-step understanding: (1) eliminating the absolute position of the source object (2) remapping with the new object&rsquo;s position.</li>
+<li>The wisdom behind the original MimicGen design: (1) minimizing the number of subtasks (only 2) (2) having a post-grasp buffer of 10-20 frames to ensure stable capture (3) reducing pose gaps with env.reset() to home position (4) quasi-closed-loop execution (calculating delta for target_pose_to_action step by step).</li>
+<li>The core design of MimicGen is source demo + env.reset() randomization: Error scenes should be treated as fixed &lsquo;initial states&rsquo;, and variants should be generated using placement_initializer, rather than injecting errors into each target again.</li>
+<li>Priority of NeurIPS DB Track reviews (based on 61 reviews): The most valued qualities are &lsquo;comprehensive&rsquo; (mentioned 17 times), &lsquo;community&rsquo;, &rsquo;novel&rsquo;, &lsquo;clear&rsquo;, and &lsquo;well-designed&rsquo; (mentioned 13 times). The most common criticisms are &rsquo;lack of comparison&rsquo; (insufficient baseline), &lsquo;insufficient detail&rsquo; (inadequate methodology), and &rsquo;limited scope&rsquo; (restricted application). The best paper (Artificial Hivemind) has an average score of 4.75 among Oral papers—AC decides beyond the review scores. The average for Oral (5.00) &lt; Spotlight average (5.16), confirming that scoring is not the only acceptance factor.</li>
+<li>Parallel agent scheduling mode: Independent modules (Config/Parser/LocalPTY) are assigned to different subagents for parallel implementation, then combined for verification, increasing development efficiency by 3-5 times. The key is identifying nodes in the DAG that are not dependent on each other, maximizing parallelism.</li>
+<li>Claude Code &ndash;output-format stream-json: Through research, it was found that Claude natively supports structured output (JSON separated by line breaks), eliminating the need for regular expression parsing of PTYs. This improves the reliability of the Parser from &lsquo;heuristic&rsquo; to &lsquo;deterministic&rsquo;. Always research before reinventing.</li>
+<li>Return on Investment for TypeScript strict mode: 195 tests + 0 type errors = production-ready code. The type system is particularly useful during refactoring (after extracting parsed-state-utils, all call points automatically get type checked). Spending 20% more time on typing in the early stages saves 80% of debugging time later.</li>
+<li>xterm.js is the industry-standard browser terminal (used by VS Code, Replit, Vercel, ttyd). Its quality depends on the complete plugin stack: WebGL for GPU rendering, Unicode11 for CJK, Fit for resizing, SearchAddon, WebLinksAddon. Basic xterm.js alone is not sufficient for production use.</li>
+<li>MimicGen-ready datasets require specific metadata structure: Each demo_*/datagen_info must contain env_interface_name and env_interface_type, otherwise DataGenerator cannot correctly initialize the environment.</li>
+<li>Human demonstration data quality verification should be done before collection: Simply achieving teleop success is not enough; replay stability and augmentability must also be verified. Otherwise, a large amount of data will be collected that cannot be used for training.</li>
+<li>Time boundary partitioning (archive covers completed hours, live source covers current hours) elegantly solves deduplication without explicit level tracking—zero overlap means zero duplicate counts.</li>
+<li>Claude Code&rsquo;s permission system supports tool-level wildcards (such as &ldquo;Bash&rdquo; matching all Bash commands), allowing minimal configuration instead of dozens of individual rules.</li>
+<li>Cost of Subtask Fragmentation: Each subtask boundary involves independently checking object poses, re-warp, and 5-step interpolation, with errors accumulating. 6 subtasks = 5 error sources, far more than the original 1.</li>
+<li>OpenReview API authentication architecture (2026): All data endpoints require login with a token; only the /login endpoint allows anonymous access (returning a verification error). The web frontend uses server-side credentials through Next.js RSC. Rate limits are operated at the nginx layer (based on IP), triggering approximately 30 requests in a short period. The academic paper review API is increasingly locked down, requiring institutional or personal credentials.</li>
+<li>Terminal resize synchronization requires full-chain coordination: ResizeObserver (frontend) → term.onResize → WebSocket message → SessionManager → PTY.resize(). Mismatches result in lines being broken in the error column. Anti-drag prevents flooding when resizing.</li>
+<li>Terminal instances should not be destroyed during session switching—they save a rollback buffer (10000 lines). The correct approach is to create once and reuse it through clear() + backend RingBuffer (2MB) across sessions.</li>
+<li>Cache systems must include explicit version fields when data sources can evolve—just TTL expiration is not enough to handle changes in patterns/sources.</li>
+<li>The three-layer permission configuration allow/deny/ask can balance security and efficiency: Allow implements automation, ask retains confirmation for dangerous operations, deny is for absolute prohibitions.</li>
+<li>Claude Code configuration does not inherit automatically (each project requires independent configuration), but can be standardized through automated scripts (such as init-claude.sh) for standardized initialization processes.</li>
+<li>Documentation for complex robot systems should distinguish between developers and operators: Clearly define the target audience, structure, language, and content retention through structured questions to avoid ambiguity.</li>
+<li>React closure trap ref pattern: Registers third-party library callbacks (xterm.js onData) in useEffect, which captures expired props, a common bug. Common solution: props → ref, useEffect synchronizes ref.current, and the callback reads ref.current. This is the best practice in the React ecosystem.</li>
+<li>Three key elements for WebSocket robustness: Redundancy (exponential backoff), backpressure (checking bufferedAmount), and heartbeat (not implemented but should be considered). Distributed system network layers must assume &lsquo;connections may disconnect&rsquo; rather than &lsquo;connections should be stable&rsquo;.</li>
+<li>Importance of continuous closure detection: Robot grabs may attempt multiple times, and the first gripperClosed &gt; threshold may fail. Continuous closure (≥10 frames) must be detected to confirm a successful grab.</li>
+<li>Complexity of multi-process debugging: (1) Each worker requires an independent env and augmenter instance (2) Path resolution is more prone to errors (relative paths may miss levels) (3) Absolute paths like demos_dir must be explicitly passed (4) Robosuite WARNINGs need to be suppressed separately in worker functions.</li>
+<li>Quota counting logic must reflect actual availability: augmentable_only is stricter than replay_only but more reasonable, as non-augmentable demos cannot be expanded even if they can be replayed.</li>
+<li>State of the art ASR models (2026): True streaming models are rare. Moonshine v2 (73-107ms latency, 34-245M parameters) and Voxtral-Mini-4B-Realtime (480ms, 4B parameters) represent the most advanced. Moonshine uses a callback-based API suitable for real-time transcription; Voxtral requires manual chunking but offers higher accuracy. Both support native acceleration for Apple Silicon (Moonshine uses CoreML, Voxtral uses MLX).</li>
+<li>Permission requirements differ for exploratory and production projects: Exploratory projects prioritize efficiency (lenient permissions), while production projects prioritize security (strict confirmation).</li>
+<li>Gradually accumulating configurations can lead to inconsistencies (e.g., 80+ long rules, different project styles), and regularly using templates can improve maintainability.</li>
+</ul>
+<h3 id="practical-learnings">Practical Learnings<a hidden class="anchor" aria-hidden="true" href="#practical-learnings">#</a></h3>
+<ul>
+<li>Git proxy configuration operates at two independent levels: global configuration (git config &ndash;global http.proxy) and environment variables (http_proxy, HTTP_PROXY). Inconsistent configurations lead to cryptic TLS errors; using the <code>-c</code> flag for per-command overrides provides an immediate solution while preserving existing configurations.<strong>✅ Building NeurIPS 2025 DB Track Paper Writing Skills (nuwa-skill Format)</strong><br>
+<em>19:50:53.430 | claude_code</em><br>
+The user wants to use the nuwa-skill framework to extract the paper writing methodology from the NeurIPS 2025 dataset track, including feedback from OpenReview reviews. The AI performs multi-stage research: (1) Crawls the NeurIPS virtual site and identifies 7 Oral+56 Spotlight papers from approximately 544 DB Track papers; (2) encounters a 403 API error due to authentication requirements and rate limits; (3) the user provides credentials, and the AI successfully retrieves 61 reviews (29 Oral, 32 Spotlight); (4) deeply analyzes the review process (rating patterns, pros and cons keywords); (5) studies the full text structure of 3 ArXiv papers; (6) creates a complete SKILL.md document (453 lines) with 5 mental models, 10 decision heuristics, review insights, and chapter-level guidelines. Six reference documents with original review JSONs are also created. Key findings: The best paper received the lowest score (4.75), and the average score for Oral papers was lower than that for Spotlight papers—AC judgment surpassed scores.)</li>
+</ul>
+<h3 id="meetinghelper">MeetingHelper<a hidden class="anchor" aria-hidden="true" href="#meetinghelper">#</a></h3>
+<p><strong>✅ Integrating Moonshine v2 and Voxtral Streaming ASR Backends</strong><br>
+<em>02:13:58.742 | claude_code</em><br>
+The user requested the addition of a Whisper streaming model (previously completed in the previous session) and then sought other streaming ASR options. The AI researched and recommended Moonshine v2 (extremely lightweight, 73ms latency) and Voxtral-Mini-4B-Realtime (highest accuracy, 4B parameters). The user approved both options. The AI verified the APIs through source code inspection, installed dependencies (moonshine-voice, voxmlx), and implemented MoonshineTranscriber and VoxtralTranscriber classes. The start.sh/health-check.sh files were updated accordingly. Final verification: AST parsing was correct, shell syntax was valid, and imports were successful.)</p>
+<h3 id="algorithms">algorithms<a hidden class="anchor" aria-hidden="true" href="#algorithms">#</a></h3>
+<p><strong>✅ Configuring Claude Code Permissions for the algorithms Directory</strong><br>
+<em>04:36:45.682 | claude_code</em><br>
+The user noticed that Claude Code frequently prompted unnecessary confirmations during its exploration of the algorithms folder. The user requested the creation of local settings to skip these unnecessary confirmations and asked the AI to traverse subfolders to identify complete projects. The AI explored the directory structure and found 13 projects (7 first-level and 5 gadget subprojects). A unified .claude/settings.json file was created for all projects: automatically allowing Read/Edit/Write/Glob/Grep/Bash/Agent/WebFetch/Skill operations; only asking about destructive operations (rm, git reset &ndash;hard, git push &ndash;force). All 13 files were confirmed to be created successfully.)</p>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>🔍 Project Progress Review and Task Priorities</strong><br>
+<em>05:55:20.759 | claude_code</em><br>
+The user asked what else needed to be done based on the plans.md document. The AI read the 36K token plan document and extracted a list of priority tasks: 3 P0 blocking items (HD GPU tasks, published baseline data, DE analysis pipeline), 4 P1 core tasks (query validation, method comparison, cross-section analysis, bootstrap CI), and 3 P2 enhancements. The verification list showed that none of the items were selected. The user did not choose any next actions during this session.)</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>✅ Creating CLAUDE.md and Updating TUTORIAL.md Completely</strong><br>
+<em>08:18:03.956 | claude_code</em><br>
+The user started the init command to create a CLAUDE.md guide for the error recovery bot code repository. After completion, the user requested an update to the TUTORIAL.md document to cover all files. The Agent used the ccplan skill to clarify the requirements through AskUserQuestion (target audience, structure, language), confirming that the target readers were new members and operators, while retaining the existing content in Chinese. A detailed document was generated, including system architecture, 12 error skills classification methods, 5 RBG groups, a complete list of files (approximately 50 modules across frameworks/configs/scripts directories), instructions for using SpaceMouse, and explanations for the augmentation pipeline. The user expressed impatience during the generation process but accepted the final deliverable.)</p>
+<h3 id="gadget">gadget<a hidden class="anchor" aria-hidden="true" href="#gadget">#</a></h3>
+<p><strong>✅ Using a Proxy to Configure Git Pull</strong><br>
+<em>07:09:09.908 | claude_code</em><br>
+The user requested enabling a proxy (proxy_on) for git pull on the tianhe cluster. The initial attempt failed due to a TLS connection error. The Agent diagnosed that the proxy configuration did not match: the global git configuration used an outdated 172.16.31.200:3138, while the environment variable pointed to 127.0.0.1:10087. The git -c flag was used to override the proxy settings for each command, successfully pulling 42 files, including new Ollama translation support (common/ollama.py, common/translation.py), bilingual website functionality (website/translate_site_batch.py), and test suites. It was recommended to update the global git proxy configuration to match the environment variables to maintain consistency in the future.)</p>
+<h3 id="error-recovery-mimicgen">Error Recovery MimicGen<a hidden class="anchor" aria-hidden="true" href="#error-recovery-mimicgen">#</a></h3>
+<p><strong>🔄 Running the Collection Script and Diagnosing Augmentation Failures</strong><br>
+<em>04:18:28.819 | claude_code</em><br>
+The user ran the stack task collection script, and human operation was successful, but the validation failed completely (0/10 scenes). The Agent added a diagnostic mode and modified 5 return None points to return diagnostic information. After running again, it was found that cubeA was not lifted (0.82 desktop height), and re_grasp failed. The issue was identified as a subtask fragmentation problem.)</p>
+<p><strong>🔄 Reconstructing the Subtask Segmentation Logic and Fixing Gripper Detection Bugs</strong><br>
+<em>04:18:28.819 | claude_code</em><br>
+The RecoverySegmenter was rewritten according to the original MimicGen method. RBG_A/B/D were simplified from 6-subtasks to 2-subtasks, and a post_grasp_buffer of 15 frames was added. Four files were modified (recovery_types.py, recovery_mimicgen.py, recovery_segmenter.py, recovery_collection.yaml). Running the test still failed, and a gripper detection bug was identified (looking for the first closure instead of continuous closures). The bug was fixed, but the test still failed.)</p>
+<p><strong>✅ Understanding MimicGen Detection Mechanism and Object-Centric Warping Principles</strong><br>
+<em>04:18:28.819 | claude_code</em><br>
+The user asked how MimicGen detection was implemented. The Agent explained the four core steps (task phase detection, scene stability, source demonstration verification, object reference parsing). Then, the mathematical principles of warping and why data could be augmented were explained. The user raised questions about the source of scene changes, and the Agent clarified that the entire scene was different (not just one object). Finally, the user requested a comparison with the original MimicGen.)</p>
+<p><strong>✅ Researching the Original MimicGen and Proposing New Architectural Ideas</strong><br>
+<em>04:18:28.819 | claude_code</em><br>
+The Agent sent two research agents (searching for papers online + reading source code locally) to investigate. It was found that the original Stack had only 2 subtasks, and the scene source was env.reset() randomization. The user proposed a new idea: using error scenes as base scenarios and applying the original randomization logic. The Agent verified the feasibility and analyzed the advantages and disadvantages. Then, the latest code was downloaded from Tianhe and decompressed to update the version.)</p>
+<p><strong>✅ Implementing Multiprocess Parallelization and Fixing Path Bugs</strong><br>
+<em>04:18:28.819 | claude_code</em><br>
+The Agent implemented ProcessPoolExecutor parallel verification (10 workers), with each worker creating an independent env+augmenter. After running, all 10 workers threw a ValueError. The path parsing bug was identified (scenes_dir.parent.parent was missing one level), and the demos_dir parameter was added to fix it. At the same time, the robosuite warnings were suppressed (creating macros_private.py, modifying mimicgen <strong>init</strong>.py, and deleting.pyc caches.)</p>
+<h3 id="error_recovery_benchmark">error_recovery_benchmark<a hidden class="anchor" aria-hidden="true" href="#error_recovery_benchmark">#</a></h3>
+<p><strong>✅ Reconstructing MimicGen Recovery Augmentation System + Improving Human Demonstration Collection Quality</strong><br>
+<em>04:46:32.733 | codex</em><br>
+Humans pointed out current MimicGen logic issues (repetitive error injections instead of fixed scenes + reset randomization). The AI implemented architectural restructuring: creating ErrorSceneVariantGenerator to implement reset-based variants, and modifying recovery augmentation and validation logic. During the verification phase, two key issues were identified: (1) success_demos.hdf5 lacked the metadata required by MimicGen, preventing secondary augmentation; (2) the quality of the existing 24 human demos was insufficient (3/24 could be replayed, 0/24 could be augmented). The AI fixed the metadata issue (adding ensure_env_interface attrs) and improved the collection process (introducing augmentable_only quota + settle gate), repackaging the portable collection (197M). All 11 unit tests verified the correctness of the new logic.)</p>
+<h3 id="github-workspace-configuration">GitHub Workspace Configuration<a hidden class="anchor" aria-hidden="true" href="#github-workspace-configuration">#</a></h3>
+<p><strong>✅ Optimizing Exploratory Projects’ Claude Code Permissions</strong><br>
+<em>05:57:02.260 | claude_code</em><br>
+Due to the exploratory nature of the project, the user requested simplifying the permissions confirmation for the entire GitHub workspace. The AI systematically optimized 13.claude/settings.local.json files across 7 main projects and 5 gadget subprojects, replacing over 80 individual Bash command permissions with a single “Bash” wildcard. Deletion operations were moved from deny to ask. The init-claude.sh script was created to standardize future project initialization. The configuration files were reduced from approximately 100 lines per file to about 30 lines.)</p>
+<h3 id="betterssh">BetterSSH<a hidden class="anchor" aria-hidden="true" href="#betterssh">#</a></h3>
+<p><strong>✅ Designing and Implementing BetterSSH from Scratch: Unified Management of AI Agent CLI Sessions on SSH Servers</strong><br>
+<em>04:08:26.234 | claude_code</em><br>
+After the user raised the request, the AI used the brainstorming skill to clarify the requirements through 9 structured questions (2-5 servers, real-time output + status + alerts, direct interaction, cross-platform), and proposed 3 technical solutions, recommending a Node.js+web progressive architecture. Seven design modules were presented section by section (overall architecture, SSH configuration, Session management, dual-mode parser, front-end UI, project structure), and the user confirmed them. The user actively requested technical research, and the AI discovered Claude stream-json support and Glissa’s three-layer detection strategy. The ECL document was created using the ccplan skill, and 9 defects were fixed through adversarial review (including 2 CRITICAL security issues). In Phase 10, 5 parallel subagents were launched, completing 41 TS files, 195 tests, and pushing to GitHub. Finally, the optimize skill was used to implement 8 code optimizations (WebSocket reconnection, type validation, DRY refactoring, etc.), all of which passed the verification (195/195 tests + 0 type errors.)</p>
+<p><strong>✅ Implementing Server Selection Panel Using ccplan</strong><br>
+<em>2026-04-11 (Session 2) | claude_code</em><br>
+The user wanted two changes: prioritizing the terminal over the Claude window and enabling SSH server selection (not just local). The ccplan workflow was executed. In Phase 0, the system was calibrated to use the pop-up server selector. In Phases 1-9, 6 files were redesigned (backend added local to servers list, frontend added useSessionStore.servers, useControlWs.get_servers, new ServerPicker component). All changes were implemented, and 4 HIGH issues were found during code review (outdated closures, lack of a11y). All issues were fixed. The service was launched for verification, and the user requested to close it.)</p>
+<p><strong>✅ Fully Upgrading the Terminal Component to Production Quality</strong><br>
+<em>2026-04-11 (Session 2 continued) | claude_code</em><br>
+The user reported that the terminal “looked bad, not like a terminal.” The issue was diagnosed as lacking WebGL (slow, blurry), no Unicode11 (CJK corruption), terminal destruction during session switching (loss of rollback), and no resize synchronization (line break corruption). An alternative was investigated—xterm.js was found to be industry-standard (used by VS Code, Replit). The implementation included installing the unicode11 plugin, rewriting Terminal.tsx with WebGL + Catppuccin theme + ResizeObserver + instance pooling, adding end-to-end messages for resize, and subscribing to RingBuffer on the backend. Type checking passed, and the service was successfully launched.)</p>
+<p><strong>🔄 Initial Project Onboarding and Debugging Session</strong><br>
+<em>07:20:07.628 | claude_code</em><br>
+The user asked how to use BetterSSH (unified Claude Code/Codex session manager). The architecture was explained (Fastify backend with dual WebSocket, React frontend xterm.js). Attempting to launch resulted in “button not responding.” The root cause was identified as SessionManager never being instantiated, and onMessage returned null. The ESM import issue (ssh-config LineType) was resolved, and SessionManager was connected to the WebSocket handler. The user interrupted before completion.)</p>
+<p><strong>✅ Service Restart and Verification</strong><br>
+<em>07:35:35.274 | claude_code</em><br>
+The user requested a clean restart of the frontend and backend. Old processes (PID 6016, 7300) were killed, and both services were successfully restarted. The backend was verified at 127.0.0.1:18790, and the frontend at localhost:5173. The user confirmed that the service was running and requested to close it.)</p>
+<h3 id="tokenmonitor">TokenMonitor<a hidden class="anchor" aria-hidden="true" href="#tokenmonitor">#</a></h3>
+<p><strong>✅ Implementing usage-data-archive Using ccplan Workflow</strong><br>
+<em>07:58:31.978 | claude_code</em><br>
+The user requested a data persistence layer to prevent JSONL logs from being lost during deletion. The ccplan workflow was executed: aligning intentions (local + SSH device hourly aggregation), generating solutions (archive-primary with time-bound partitions). The user approved, and the archive.rs core module, parser.rs integration, background loop triggering, and SSH device support were implemented. All 321 tests passed.)</p>
+<p><strong>✅ Diagnosing and Fixing GLM/DeepSeek Pricing Display Bugs</strong><br>
+<em>07:41:45.881 | claude_code</em><br>
+The user reported GLM5.1 and DeepSeek-Reasoner displaying $0 despite OpenRouter support. The pricing lookup chain was traced through pricing.rs/litellm.rs/openrouter.rs, and the root cause was identified as the PricingCache lacking a version field, allowing old cached data (before OpenRouter) to remain valid for 7 days and preventing new data from being processed. The version field was added with CACHE_VERSION=2 to automatically invalidate old cached data on the next startup.)</p>
+<p><strong>✅ Optimizing Archive Implementation Using /optimize Skill</strong><br>
+<em>07:58:31.978 | claude_code</em><br>
+After compression, the newly implemented archive function was tested using the /optimize skill. Five optimizations were applied: extracting frontier checks into ArchiveFrontier::is_up_to_date() (eliminating approximately 40 lines of duplication), adding boundary checks for string slicing, refactoring 3 match patterns to let&hellip;else, adding timestamp parsing failure logs, and pre-allocating collections. All 325 tests passed, with zero clippy warnings.)</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-04-11-usage.png"></p>
+<p><strong>Total: $126.59</strong> — 159.5M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

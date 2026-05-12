@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-14 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Completed major architectural refactoring of MIHD benchmarking pipeline (two-phase extraction-evaluation architecture), fixed critical error recovery benchmark bugs (force injection mechanism, detector triggering, per-detector cooldown), enhanced CalendarPro with batch delete and Google Calendar permission fixes, and upgraded gadget/summarize tool with config system, rclone cloud sync, and multi-API backend support">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-02-14/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-02-14/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-14/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-02-14/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-14">
+  <meta property="og:description" content="Completed major architectural refactoring of MIHD benchmarking pipeline (two-phase extraction-evaluation architecture), fixed critical error recovery benchmark bugs (force injection mechanism, detector triggering, per-detector cooldown), enhanced CalendarPro with batch delete and Google Calendar permission fixes, and upgraded gadget/summarize tool with config system, rclone cloud sync, and multi-API backend support">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-14T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-14T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-14">
+  <meta name="twitter:description" content="Completed major architectural refactoring of MIHD benchmarking pipeline (two-phase extraction-evaluation architecture), fixed critical error recovery benchmark bugs (force injection mechanism, detector triggering, per-detector cooldown), enhanced CalendarPro with batch delete and Google Calendar permission fixes, and upgraded gadget/summarize tool with config system, rclone cloud sync, and multi-API backend support">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-14",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-02-14/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-14",
+  "name": "Bug Journal 2026-02-14",
+  "description": "Completed major architectural refactoring of MIHD benchmarking pipeline (two-phase extraction-evaluation architecture), fixed critical error recovery benchmark bugs (force injection mechanism, detector triggering, per-detector cooldown), enhanced CalendarPro with batch delete and Google Calendar permission fixes, and upgraded gadget/summarize tool with config system, rclone cloud sync, and multi-API backend support",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-02-14 Daily Overview What was done: Delivered major improvements across four projects: (1) MIHD: architectural refactoring to eliminate redundant computation, (2) error recovery benchmark: fixed force injection and detector triggering bugs, (3) CalendarPro: added batch delete with interactive confirmation UI and fixed 403 permission errors, (4) gadget/summarize: implemented config system, rclone sync, and Claude CLI backend How it was done: Through architectural redesign (two-phase pipeline separation), deep debugging (force mechanics, task phase detection), feature development (batch operations with safety confirmations), infrastructure improvements (config files, cloud sync, multi-API support), and systematic code quality enhancements Impact: MIHD: reduced embedding computation by 62% (286→110 deduplicated tasks), enabled model reuse across sections. Error recovery: successfully generated PreGrasp scenes, implemented per-detector cooldown. CalendarPro: eliminated 403 warnings, enabled pattern-based multi-event operations. Gadget/summarize: established cross-device workflow with automatic cloud synchronization DCC What was done: Deep work on MIHD project: monitored benchmarks, designed and implemented complete two-phase pipeline refactoring (extract embeddings → evaluate fusions), analyzed vision encoding bottlenecks, created optimization plans How it was done: Tracked benchmark progress and timeouts, removed inefficient strategies. Implemented 11 pipeline modules with 3 entry scripts. Ran end-to-end tests. Analyzed code to identify bottlenecks: serial patch extraction, excessive GPU cache clearing, lack of encoder-level caching Impact: Transformed architecture from O(encoders × fusions × sections) to O(encoders × sections + fusions × sections). Cut UNI2 embedding computation from ~77 times to 11 times (86% reduction). Identified concrete optimization targets for 2-5x speedup MacBook What was done: Quick maintenance on gadgets toolkit: ran /init to update CLAUDE.md, then cleaned up documentation after user deleted obsolete tools How it was done: Analyzed codebase structure, rewrote CLAUDE.md to reflect current state (only summarize/ and benchmark/ remain), removed references to 6 deleted tool categories Impact: Synchronized documentation with actual codebase, future Claude instances will have accurate project overview tianhe What was done: Fixed error recovery benchmark: force injection mechanism bugs, PreGrasp detector triggering, per-detector cooldown implementation, force visualization enhancements How it was done: Root cause analysis (task_phase stub, body name mismatch, global cooldown blocking), code refactoring (get_task_phase, rollout_generator cooldown tracking, visualizer force override), iterative testing with scene generation and video rendering Impact: PreGrasp detector now functional (generates scenes successfully), force injection mechanism works correctly (施加到正确body), per-detector cooldown prevents interference. Force visibility issue remains under investigation (30N insufficient against OSC controller) TzJsDesktop What was done: Two major feature developments: (1) CalendarPro improvements (Google Calendar 403 fix, batch delete with interactive Discord UI, code quality), (2) gadget/summarize tool upgrades (config system, rclone sync, Claude CLI backend, ccusage fixes, documentation) How it was done: CalendarPro: modified API calls (settings vs calendarList), extended data models for batch operations, created Discord button confirmation views, added fallback logic for LLM failures. Gadget/summarize: implemented config file system, integrated rclone CLI, added claude_cli backend via subprocess, fixed Windows/nested environment issues, enhanced JSON parsing robustness Impact: CalendarPro: eliminated recurring 403 errors, enabled users to delete multiple events at once with safety confirmations. Gadget/summarize: established complete cross-device workflow (export → sync → merge → deploy) with automatic cloud synchronization, no API key required for default Claude CLI backend Completed major architectural refactoring of MIHD benchmarking pipeline (two-phase extraction-evaluation architecture), fixed critical error recovery benchmark bugs (force injection mechanism, detector triggering, per-detector cooldown), enhanced CalendarPro with batch delete and Google Calendar permission fixes, and upgraded gadget/summarize tool with config system, rclone cloud sync, and multi-API backend support\nTasks Architecture \u0026 Strategy ✅ MIHD two-phase pipeline architecture implementation — Designed and implemented complete pipeline refactoring: created 11 pipeline modules and 3 entry scripts with pipeline_config.yaml. Phase 1: extract and cache all encoder embeddings (deduplicated). Phase 2: load cached embeddings and run fusion+evaluation. Tested successfully on section 151508 across 4 fusion strategies. ✅ Fix error recovery benchmark force injection mechanism — Fixed critical bug where force was applied to wrong body (bin2 instead of gripper EEF). Root cause: _get_eef_body_name() missing ‘gripper0_eef’ in possible_names list. Also implemented persistent force mechanism to fix MuJoCo xfrc_applied auto-clearing issue. ✅ Fix PreGrasp detector not triggering — Root cause: get_task_phase() always returned ‘unknown’ due to stub _check_phase_condition(). Fixed by using get_task_completion_stages() for phase detection. Also fixed lookahead to use demo actions, proximity gate bypass, per-detector cooldown, and target body naming. Simplified detection logic to check N-step-ahead state change instead of continuous approaching. 🔄 Investigate force visibility issue in error recovery benchmark — Even with 30N force override, robot arm shows no visible movement in videos. Requires force mechanics investigation (OSC control loop dominance, force duration too short, or injection mechanism issue). ✅ Implement batch delete functionality for CalendarPro — Extended DeleteData model with date_from/date_until/batch fields, updated LLM prompts, modified search_events to accept custom time ranges, rewrote _handle_delete handler, created BatchDeleteApprovalView with Discord buttons, added batch delete utterances to semantic router. ✅ Implement gadget/summarize config system — Created ~/.config/summarize/config.json configuration system supporting device_name, logs_dir, reports_dir, rclone_remote. Implemented config –show and –init subcommands. Resolution order: CLI flag \u003e env var \u003e config file \u003e default. ✅ Implement rclone cloud sync for gadget/summarize — Integrated rclone CLI tool for automatic cloud upload after export/merge. Supports headless server scenario. Added rclone_path config for no-sudo environments. ✅ MIHD vision encoding performance analysis — Analyzed vision encoding bottlenecks: identified serial patch extraction (10-30s), excessive torch.cuda.empty_cache() calls (~100 times), and lack of encoder-level caching. Created detailed three-part optimization plan. ✅ Implement per-detector cooldown for error recovery benchmark — Changed from global cooldown_counter to per-detector cooldown_counters dict so one detector’s cooldown doesn’t block others (proximity cooldown was blocking pregrasp). ✅ Fix Google Calendar 403 insufficientPermissions error — Changed get_user_timezone() from calendarList().get() API to settings().get() API which only requires calendar.events scope, eliminating 403 errors that appeared on every user message. ✅ Add fallback logic for batch delete when LLM fails — When LLM times out (due to nested Claude Code environment), added _raw_input passthrough and _extract_delete_query() regex extraction to parse search keywords, date ranges, and batch flags from raw user input. ✅ Add Claude CLI as default API backend for summarize — Implemented summarize_with_claude_cli function via subprocess calling ‘claude –print’. No API key required. Set as default backend replacing anthropic. ✅ Fix Windows subprocess and nested Claude Code issues — Added shell=True for npx and claude calls to support Windows .cmd files. Removed CLAUDECODE environment variable to avoid nested session detection. ✅ Implement export merge on existing files — Added deduplication logic based on (source, project, timestamp) tuple. Multiple exports of same day/device won’t lose previous conversation records. 🔄 Improve Discord response details in CalendarPro — Enhanced delete operation responses to show event names with dates/times, but other intents still lack sufficient detail (e.g., schedule confirmations should specify what was scheduled at what time). ✅ Fix ccusage Opus fee calculation bug — Discovered –offline mode showed Opus 4.6 pricing as $0. Removed –offline parameter to fetch latest pricing online. Fixed fee display from $0 to $19.11. ✅ Optimize ccusage timing and data format — Moved fetch_ccusage after AI summary to include summary’s own token consumption. Stored ccusage raw JSON format directly. Rewrote _merge_token_usages to support per_device details. ✅ Enhance JSON parsing robustness for summarize — Rewrote _parse_json_response with three-step fallback: direct parse → extract code block → find {to} substring. Handles LLM adding explanatory text before/after JSON. Implementation \u0026 Fixes ✅ MIHD benchmark monitoring and timeout configuration — Monitored slow-running training-based fusion methods. Increased timeout from 1 hour to 2 hours. Removed staig_fusion_e2e from configuration after user decision. ✅ Add force override and update config force ranges — Added –force_override parameter to visualizer for dynamic force testing. Increased force_norm_range from [3.0, 15.0] to [15.0, 45.0], force_clip to 60.0. ✅ Fix empty message crash in Discord bot — Added ‘if response:’ check before sending messages to prevent Discord API errors when handlers return empty strings after sending messages via channel directly. ✅ Update gadget/summarize documentation — Rewrote tutorial.md and README.md, added config file, cloud sync, rclone no-sudo installation, three API backend explanations. Created requirements.txt. ✅ CalendarPro code quality fixes — Added default replies for 4 new intents in dual_verify.py; changed bare except to except (ValueError, TypeError) in executor.py; moved Scheduler instantiation outside loop in periodic_checker.py. ✅ Gadgets project documentation cleanup — Updated CLAUDE.md via /init command, then cleaned up documentation after deletion of 6 tool categories. Updated both README.md and CLAUDE.md to reflect current state (only summarize/ and benchmark/). ✅ Clean up dead rejection tracking code — Removed add_rejected_candidate(), get_rejected_candidates(), analyze_rejected() from database.py; removed total_rejected/rejection_stats from DatabaseMeta; updated all references. Problems \u0026 Solutions Critical Issues 1. MIHD benchmark: Redundant embedding computation - same gene/vision encoders run hundreds of times for different fusion strategies (e.g., PCA computed 55 times, UNI2 computed 77 times) Solution: Designed and implemented two-phase pipeline: Phase 1 extracts and caches all encoder embeddings (deduplicated, 110 tasks for 286 experiments = 62% reduction), Phase 2 loads cached embeddings and only runs fusion+clustering+evaluation. UNI2 model now loads once for all 11 sections instead of 77 times.\nKey Insight: Current caching uses {gene}{vision}{fusion}/{section}_embeddings.npz as key, including fusion name, so changing fusion forces re-extraction. Encoder-level caching (gene_cache/{encoder}/{section}.npz, vision_cache/{encoder}/{section}.npz) enables massive reuse. Model instance reuse across sections provides additional speedup.\n2. Error recovery benchmark: Force applied to wrong body (bin2 instead of gripper EEF), causing no visible robot disturbance in videos Solution: Through detailed logging discovered force was applied to bin2. Root cause: _get_eef_body_name() missing ‘gripper0_eef’ in possible_names list, fallback geom search matched robot0_screen_collision (contains ’ee’) → bin2. Fixed by adding ‘gripper0_eef’, ‘robot0_right_hand’, ‘gripper0_gripper_base’ to possible_names.\nKey Insight: EEF body names vary across robots (Sawyer uses gripper0_eef, not generic gripper_link), need explicit inclusion in possible names list. Fallback to geom search can mismatch strings containing ’ee’ with unrelated geoms.\n3. Error recovery benchmark: PreGrasp detector never triggered despite being registered - get_task_phase() always returned ‘unknown’ Solution: Root cause: get_task_phase() called _check_phase_condition() which is a stub always returning False. All task_phase-dependent detectors (PreGrasp, GraspPrecond) were affected. Complete phase detection logic exists in get_task_completion_stages(). Fixed by rewriting get_task_phase() to use sensor-based detection. Also fixed multiple chained bugs: lookahead using neutral actions instead of demo actions, proximity gate blocking pre-contact detectors, global cooldown preventing simultaneous detection, MuJoCo body name mismatch.\nKey Insight: Codebase had functional implementation (get_task_completion_stages) and always-fail stub (_check_phase_condition) coexisting, caller used wrong method. Symptom is detector not triggering, root cause is infrastructure-layer dead code. When observing logical contradictions (no reject but no output), prioritize infrastructure audit over symptom debugging.\n4. Error recovery benchmark: duration_steps config parameter not working - all forces last only 1 step (0.05 seconds) Solution: MuJoCo automatically clears xfrc_applied after each sim.step(). Solution: modified collect_rollout_stats() to loop-call injector.apply() during first duration_steps of validation rollout, call injector.clear() after duration ends.\nKey Insight: MuJoCo’s xfrc_applied is persistent field but gets auto-cleared, requiring application layer to explicitly reapply each step for sustained force. This is systemic bug affecting all error types.\n5. Error recovery benchmark: 30N force shows no visible robot arm movement in visualization videos Solution: Added –force_override parameter to test larger forces without regeneration; updated config force ranges to 15-45N. Issue persists at 30N - requires force mechanics investigation (possibly OSC control loop too strong, force duration too short at 1 step, or xfrc_applied not correctly applied).\nKey Insight: Force injection mechanism works (xfrc_applied is set/cleared) but 30N may be insufficient against OSC controller’s 150 N/m stiffness, or 1-step duration (~20ms) too short for visible effect. OSC control loop may suppress external forces within one control cycle.\n6. CalendarPro: Users couldn’t delete multiple calendar events matching a pattern (e.g., ‘cancel all GB teacher meetings before March 1st’) - bot would only say ‘Please specify which event to delete’ Solution: Extended data model to support date ranges and batch operations, updated LLM prompt to extract these fields, modified search to accept custom time windows, and added interactive confirmation UI with Discord buttons showing preview + explicit approval.\nKey Insight: Single-item CRUD operations are insufficient for productivity tools - batch operations with safety confirmations (preview + explicit user approval) are essential for user workflows involving patterns.\n7. Gadget/summarize: Headless server cannot install cloud drive app for automatic sync Solution: Researched and integrated rclone CLI tool, supports token copy authentication method (rclone authorize on machine with browser, copy token to headless server).\nKey Insight: rclone supports 70+ cloud providers, headless authentication via token copy, is best cross-platform cloud CLI choice.\n8. Error recovery benchmark: Global cooldown blocks pregrasp detector when proximity triggers first Solution: Implemented per-detector cooldown tracking (cooldown_counters dict) so each detector has independent cooldown periods. Filter detection_results to remove detectors still in cooldown.\nKey Insight: Global cooldown is inappropriate for multi-detector systems where different detectors target different phases/conditions. Multi-detector systems need per-detector cooldown tracking.\n9. CalendarPro: Google Calendar API returned 403 insufficientPermissions on every user message, causing console warnings Solution: Switched from calendarList().get() API to settings().get(setting=‘timezone’) API which only requires calendar.events scope instead of broader calendar access.\nKey Insight: Different Google Calendar API endpoints require different OAuth scopes - settings API has lower permission requirements than calendarList API for timezone retrieval.\n10. CalendarPro: When LLM timed out (nested Claude Code environment), batch delete failed because intent.data was empty - semantic router correctly classified intent but no structured data was extracted Solution: Added _raw_input passthrough to handlers, implemented _extract_delete_query() with regex patterns to parse search keywords from Chinese/English phrases, and added date extraction patterns to identify ranges like ‘3月1号前’.\nKey Insight: Dual-verification systems need independent extraction capabilities in both paths - SR-only fallback cannot rely solely on LLM-generated structured data.\n11. Gadget/summarize: ccusage –offline mode showed Opus 4.6 fee as $0 Solution: Removed –offline parameter, switched to online mode to fetch latest model pricing.\nKey Insight: Offline mode’s pricing table doesn’t include latest models (like Opus 4.6), need online fetch for accurate billing. Though online mode slightly slower, data accuracy more important.\n12. Error recovery benchmark: Proximity gate (max_eef_object_distance=0.05m) blocks pregrasp which operates at 0.05-0.1m Solution: Added detector names to bypass list for gate check - detectors with their own distance validation (pregrasp, grasp_precond) skip the gate.\nKey Insight: Proximity gate was designed for contact-based detectors but incorrectly applied to all detectors regardless of their operating distance. Detector-specific constraints should not be overridden by global gates.\n13. CalendarPro \u0026 gadget/summarize: Nested Claude Code sessions block Claude CLI subprocess calls, causing LLM classification to always time out during development Solution: CalendarPro: attempted to unset CLAUDECODE environment variable when spawning subprocess, but still failed - ultimate solution was to test outside nested environment. Gadget/summarize: successfully unset CLAUDECODE and CLAUDE_CODE_ENTRY in subprocess env.\nKey Insight: Development environment tooling can interfere with the system under test in non-obvious ways - subprocess-based AI provider calls are particularly fragile to environment contamination. Subprocess inherits parent environment variables, need explicit removal.\n14. Gadget/summarize: Windows subprocess couldn’t find npx (.cmd file) Solution: Added shell=True parameter in subprocess.run calls.\nKey Insight: Windows npm global commands are actually .cmd files, Python subprocess doesn’t parse by default, need execution through shell.\n15. Gadget/summarize: LLM-returned JSON may include code blocks or have explanatory text before/after Solution: Implemented three-step JSON parsing: direct parse → extract ```json code block → find {to} substring.\nKey Insight: LLM output format is unstable, need multi-layer fallback to ensure robustness.\n16. Gadget/summarize: Multiple exports of same day/device would overwrite existing conversation records Solution: When detecting existing file, read and merge after deduplication based on (source, project, timestamp) tuple.\nKey Insight: Deduplication key should be minimal field combination uniquely identifying conversation. device_summary and token_usage use latest value as they are cumulative statistics.\nGeneral Issues 17. CalendarPro: BatchDeleteApprovalView returned empty string after sending confirmation via channel.send(), causing main loop to attempt Discord API call with empty message which fails Solution: Added ‘if response:’ check before message.channel.send(response) to skip sending when response is empty.\nKey Insight: When handlers use channel directly to send messages (e.g., interactive views), they should return empty string to signal ‘already handled’ - the main loop needs to respect this signal.\n18. MIHD benchmark: basic_contrastive fusion timing out with 1-hour limit, actually needs ~77 minutes per section Solution: Increased timeout to 2 hours (7200s) in run_all_benchmarks.py\nKey Insight: Training-based fusion strategies require significantly more time than simple fusion strategies due to 300-550 epoch training loops\nHuman vs AI Approaches Strategic Level MIHD pipeline architecture decision Role Approach Human User immediately identified core inefficiency (redundant embedding computation) from high-level understanding and proposed solution: ‘for each slide, first you need to get the embedding of every slide… store them into a file, and then do the fusion for the same embeddings.’ User insisted on ‘complete rewrite’ rather than incremental patches. AI AI explored existing codebase in detail to understand exact implementation, then designed detailed module structure and wrote all code. AI focused on maintaining backward compatibility and reusing existing encoder implementations. Difference Analysis: User had architectural vision and made strategic decision (two-phase separation, complete rewrite). AI translated this into detailed technical plan with proper abstractions, handled edge cases, wrote implementation, and debugged issues. User drove ‘what’ and ‘why’, AI executed ‘how’ with technical depth.\nError recovery benchmark: Problem root cause tracing strategy Role Approach Human User questioned: ‘Why are candidates rejected? If no reject, why no output? Since this part not written, please delete dead code’. AI AI spent significant time debugging at symptom level (adding logs, adjusting parameters, analyzing trajectories), didn’t directly question infrastructure code correctness. Difference Analysis: User through logical reasoning quickly located contradiction (no reject but no output = infrastructure bug), while AI tends to assume existing code correct and look for causes at parameter/config level. User’s questioning drove discovery of STUB root cause.\nCalendarPro: Recognizing need for batch delete functionality Role Approach Human User immediately identified current delete workflow was inadequate when they said ‘在3月1号前都没有GB老师组会了，请帮我取消这些日程’ and it failed - they understood users need to operate on patterns, not single items. AI AI’s initial implementation only supported single-item delete, requiring exact specification - didn’t anticipate batch operations as core requirement. Difference Analysis: Human recognized real-world usage patterns require bulk operations with date ranges; AI started with CRUD-style single-item paradigm.\nError recovery benchmark: PreGrasp detector logic simplification Role Approach Human User pointed out: if it’s a step change process, just check if current gripper in 0.0-0.3 range and changes after 10 steps, no need for complex ‘approaching’ logic (consecutive frame distance decreasing). AI AI initially implemented complex _check_approaching() method requiring consecutive frame distance decrease, maintained _prev_distance and _approaching_count state. Difference Analysis: User’s simplification is more robust: for step-change gripper actions, continuity checks fail; directly checking N-step-ahead state change is more essential criterion. AI tends to over-engineer, introducing unnecessary state tracking.\nCalendarPro: Identifying 403 permission error root cause Role Approach Human User provided exact log line and immediately recognized it as OAuth scope mismatch, pointing to calendarList API call as culprit. AI AI initially proposed a fix plan but didn’t verify if fix actually addressed the specific API call causing 403. Difference Analysis: Human had domain knowledge of Google Calendar API scope requirements and could pinpoint exact API endpoint mismatch; AI followed more general debugging process.\nGadget/summarize: Cross-device sync requirements Role Approach Human User proposed constraints ‘don’t want to push to GitHub but want automatic cross-device transfer’ and proactively asked about headless server CLI upload solutions. AI AI through AskUserQuestion confirmed device environment (Windows+Mac+Linux) and preferences (cloud sync), researched rclone and other tools, provided complete solution. Difference Analysis: User clearly defined problem and constraints; AI filled details through research and technical solution design. User’s emphasis on headless scenario avoided solution defects.\nMIHD timeout and fusion strategy selection Role Approach Human User observed training-based fusions are too slow and made pragmatic decisions: increase timeout to 2 hours, skip staig_fusion_e2e entirely, reduce Q-Former epochs from 200 to 50. User balanced completeness vs. runtime. AI AI monitored progress, reported timing statistics, and asked user for decision when Q-Former was blocking other experiments. AI provided options but deferred decision to user. Difference Analysis: User made resource allocation decisions based on domain priorities. AI provided data and options but recognized these are research judgment calls, not pure technical problems.\nCalendarPro: Need for detailed confirmation messages Role Approach Human User requested more details in Discord responses, specifically wanting to see what tasks were scheduled at what times - they value transparency and verification. AI AI initially provided minimal success/failure messages without specifics. Difference Analysis: Human understands users need to verify system actions through detailed feedback; AI defaulted to terse confirmations.\nGadget/summarize: ccusage Opus billing issue diagnosis Role Approach Human User manually executed npx ccusage daily –json and found Opus fee displays normally, but script output incorrect, directly pointed out –offline might be the problem. AI AI first investigated from code logic, checked ccusage call and output handling, then compared with/without –offline output differences, finally located pricing table issue. Difference Analysis: User’s experience-based intuition quickly located issue; AI through systematic comparison verified hypothesis. User’s domain knowledge accelerated problem diagnosis.\nGadget/summarize: ccusage data format Role Approach Human User proposed ‘ccusage can export json, should be more convenient’, ‘want to see detailed ccusage analysis’, ‘when aggregating, aggregate all ccusage for the day’. AI AI changed fetch_ccusage to directly store raw JSON, rewrote _merge_token_usages to support per_device details, added cache hit rate and model cost breakdown in markdown. Difference Analysis: User provided requirements from usage perspective (detailed, complete, readable); AI translated requirements into technical implementation (preserve raw data, enhance rendering).\nAI Limitations Critical Limitations Did not proactively suggest the two-phase architecture for MIHD despite analyzing the codebase. User had to identify the inefficiency and propose the solution. AI should have spotted the redundant computation pattern during initial exploration. Error recovery benchmark: Did not initially recognize get_task_phase() is STUB, spent significant time debugging at symptom level (adjusting detector parameters, analyzing trajectory data) rather than directly auditing infrastructure code correctness. CalendarPro: Didn’t initially recognize single-item delete operations were insufficient for real user workflows - required user to explicitly point out limitation with concrete example. Error recovery benchmark: Initially didn’t identify possibility of force applied to wrong body, first tried increasing force magnitude and duration, took detour before using debug logs to locate root cause. Error recovery benchmark: Didn’t recognize that 30N force showing no movement indicates fundamental mechanism issue (OSC control loop dominance, insufficient duration, or injection bug) rather than just needing more force. CalendarPro: When implementing first fix for 403 error, didn’t verify solution actually worked - user had to come back and point out bug still occurring. CalendarPro: Defaulted to minimal confirmation messages instead of detailed ones - didn’t anticipate users’ need for verification through comprehensive feedback. Gadget/summarize: Didn’t proactively discover ccusage should be called after AI summary (modified only after user pointed out). Gadget/summarize: Insufficient understanding of Claude CLI behavior in nested environments, only cleared environment variables which didn’t fully solve problem, didn’t proactively check stderr output or try other debugging methods. Gadget/summarize: Initial JSON parsing not robust enough, didn’t consider LLM output containing markdown code blocks or surrounding text. Gadget/summarize: Config file solution didn’t consider CLI tools like rclone until user explicitly raised headless requirements. General Limitations Error recovery benchmark: Repeatedly made same SSH command formatting error 40+ times despite multiple corrections - failed to internalize that SSH commands need explicit ‘cd’ before running scripts. Gadget/summarize: Grep tool frequently timed out, needed to rely on Bash grep or Read tool as replacement. Learnings Key Learnings Two-phase pipeline pattern for experiment matrices: When running M encoders × N fusions × K sections, split into Phase 1 (M × K encoding tasks with caching) + Phase 2 (M × N × K evaluation tasks loading from cache). Reduces O(M × N × K) redundant computation to O(M × K + M × N × K) with shared encoding. Cache key design matters: encoder-level caching enables cross-fusion sharing. MuJoCo xfrc_applied behavior: Though documentation says xfrc_applied persists between calls, mj_step() automatically clears it. Implementing sustained force requires application layer to explicitly reapply each step. Must explicitly clear via injector.clear() after duration_steps to implement true impulse behavior. STUB methods and complete implementations coexisting is code smell: When complete logic exists in one function but caller uses always-fail stub, should immediately audit calling relationships rather than debug parameters. When observing logical contradictions (no reject but no output), prioritize infrastructure audit over symptom debugging. Force injection visualization balance: OSC controllers with kp=150 N/m need forces ≥25N for visible displacement, but OSC control loop may suppress external forces within one control cycle (~20ms). Need careful balance between force magnitude and duration. Productivity tools need batch operations with safety mechanisms: (1) pattern matching to find multiple items, (2) preview of what will be affected, (3) explicit user confirmation before executing. Single-item CRUD operations insufficient for real workflows. rclone is best cross-platform cloud CLI choice, supports 70+ providers, headless authentication via token copy (rclone authorize on machine with browser, copy token to headless server). Model reuse across batches: For vision encoders processing multiple sections, load model once and reuse across sections instead of reload per section. Moves model initialization cost from O(sections) to O(1). Critical for large transformers like UNI2. Fallback mechanism mismatch risks: When primary method fails, falling back to looser matching (like geom name search) may produce wrong results (’ee’ matches screen not end-effector). Need additional validation in fallback path. EEF body names vary across robots (Sawyer uses gripper0_eef, not generic gripper_link), need explicit inclusion. Detection logic simplification for step-change systems: For discrete state systems (like gripper 0→1 step change), continuity-based detection (distance decreasing, approaching) is unreliable; should directly check state change (is it different after N steps). Multi-detector systems need per-detector cooldown tracking - global cooldown inappropriately blocks simultaneous detection from different sources. Detector-specific constraints (distance thresholds, phase requirements) should not be overridden by global gates - let detectors self-validate. OAuth scope requirements vary significantly between Google Calendar API endpoints - settings API requires lower permissions than calendarList API for same information (timezone). Dual-verification systems (semantic router + LLM) need independent extraction capabilities in both paths - can’t assume LLM will always succeed in producing structured output. ccusage offline mode’s pricing table doesn’t include latest models (like Opus 4.6), need online fetch for accurate billing. Though online mode slightly slower, data accuracy more important. Windows subprocess calling .cmd files needs shell=True, otherwise can’t find npm globally installed commands. Vision encoding bottlenecks: (1) Serial patch extraction loops are CPU-bound (3000-4000 iterations). (2) torch.cuda.empty_cache() after every batch (~100 times) adds significant overhead. (3) Hardcoded batch_size=32 may be suboptimal. Profile before optimize. Subprocess-based environment switching: When dependencies require different conda environments, use subprocess to invoke scripts in target environment rather than trying to switch within Python. User feedback should be detailed and specific - for calendar operations, always include: what action was taken, which event(s) were affected, and when they occur. Development environment can interfere with system under test - nested Claude Code sessions block subprocess-based AI provider calls. Subprocess inherits parent environment variables, need explicit removal of specific variables (like CLAUDECODE) to avoid nested detection. JSON parsing needs multi-layer fallback to handle LLM output various formats: direct parse → extract code block → find {to} substring. LLM output format unstable, need robustness. Config file priority should be: CLI parameter \u003e environment variable \u003e config file \u003e default value, ensuring flexibility and overridability. Deduplication key selection should be minimal field combination uniquely identifying entity. For conversations: (source, project, timestamp). Practical Learnings When handlers send messages directly via channel (for interactive UI), they should return empty string to signal ‘already handled’ and main loop must check ‘if response:’ before sending. Conversation Summaries MIHD ✅ Two-phase pipeline architecture implementation 21:52:14.896 | claude_code User provided detailed plan for two-phase pipeline refactoring. Implemented complete solution: created pipeline/ package with 8 modules and 3 entry scripts with pipeline_config.yaml. Successfully tested end-to-end on section 151508. Fixed two bugs: save_comparison_csv method error and mclust ImportError handling. Test results: concat ARI=0.1810, mean ARI=0.2805, attention ARI=0.1403, staig_fusion ARI=0.4208.\n✅ Pipeline redesign planning discussion 20:36:10.094 | claude_code User asked about current benchmarking logic and proposed better architecture: extract embeddings once per encoder×section, reuse for all fusions. Explained current inefficiency: PCA computed 55 times, UNI2 computed 55 times due to cache key including fusion name. User decided to ‘completely rewrite pipeline’ rather than incremental fixes. This planning discussion led to implementation in previous session.\n✅ Vision encoding performance analysis 00:51:22.137 | claude_code User asked to analyze vision encoding bottlenecks. Explored run_benchmark.py in depth. Identified three major issues: (1) serial patch extraction loop (10-30s for 3000-4000 spots), (2) torch.cuda.empty_cache() called ~100 times during batch inference, (3) no encoder-level caching. Explained current caching logic. User wants three optimizations: encoder-level caching, patch extraction parallelization, GPU inference tuning.\n🔄 Benchmark progress monitoring and timeout configuration 00:07:35.904 | claude_code Monitored long-running benchmark progress across 11 DLPFC sections. Found basic_contrastive fusion timing out at 1-hour limit (actually needs ~77 min/section). Increased timeout to 2 hours. After observing slow training-based fusions, user decided to skip staig_fusion_e2e entirely. Removed it from config and restarted benchmark.\ngadgets ✅ Documentation update after codebase cleanup 00:58:36.268 | claude_code User ran /init command to update CLAUDE.md. Found existing version was outdated (referenced deleted tools). Updated CLAUDE.md to reflect current state (only summarize/ and benchmark/ remain). User then deleted more tools. Updated both README.md and CLAUDE.md to remove all references to 6 deleted tool categories.\nerror-recovery-benchmark 🔍 Debug PreGrasp not triggering, locate task phase STUB root cause 22:05:14.643 | claude_code User requested simplifying PreGrasp logic (remove ‘approaching’ detection, change to check N-step-ahead state change), implemented but still didn’t trigger. Deep investigation found get_task_phase() calls always-return-False _check_phase_condition() stub, causing all task_phase-dependent detectors to fail. Also found rejection logging not integrated into database.\n✅ Fix visualization Phase 3 and locate force injection error 00:45:39.241 | claude_code Modified visualization script Phase 3 from static to continue demo actions. Testing revealed no robot disturbance. Through detailed debug logs located force applied to bin2 instead of gripper EEF. Root cause: _get_eef_body_name() missing ‘gripper0_eef’. Fixed and generated 30N and inf force videos for verification.\n🔄 Implement persistent force mechanism and PreGrasp detector 21:27:34.381 | claude_code Implemented three goals: fix duration_steps not working (MuJoCo auto-clear bug), create PreGrasp detector to detect gripper about to close, configure 10-20 step sustained force. Completed all code modifications, but PreGrasp didn’t trigger during testing. Debug script found demo_1 had candidates meeting conditions but still didn’t trigger.\nerror_recovery_benchmark ✅ Fix PreGrasp detector not triggering + dead code cleanup 22:56:34.002 | claude_code Implemented two-part plan: (1) Rewrote get_task_phase() to use get_task_completion_stages() instead of stub, enabling phase detection. (2) Removed dead rejection tracking code. Fixed additional bugs: PreGrasp lookahead using neutral actions instead of demo, proximity gate blocking pre-contact detectors, global cooldown preventing simultaneous detection, MuJoCo body name mismatch. All 41 unit tests pass. PreGrasp now triggers and generates 2/30 scenes.\n🔄 Increase injection force for visible robot arm movement 01:35:54.517 | claude_code User reported even with 30N force override (10x original 3N), robot arm shows no visible movement. Developed plan: (1) add –force_override parameter, (2) update config force ranges to [15.0, 45.0] and clip to 60.0, (3) implement duration_steps cleanup. Theoretical calculation shows ≥25N needed for 3cm displacement. Implemented all changes and generated video with 30N override, but visibility issue persists - suggests OSC control loop may suppress external forces too quickly, or 1-step duration insufficient.\n✅ Investigate post-injection behavior: neutral vs demo actions 00:38:54.892 | claude_code User questioned whether robot staying still after error injection (using get_neutral_action) was intended design or bug. Explained three different post-injection stages use different actions. User opted to change visualization to continue demo actions for more intuitive demonstration of how errors disrupt task completion.\nCalendarPro ✅ Implement batch calendar event deletion 20:08:24.708 | claude_code User requested ability to delete multiple events matching pattern. Extended data model with date_from/date_until/batch fields, updated LLM prompts, modified search_events, rewrote _handle_delete for batch operations, created BatchDeleteApprovalView with Discord confirmation buttons. Added fallback logic to extract query/dates from raw input when LLM fails (nested Claude environment issue). Fixed empty message crash. User tested and requested more detailed responses. All 68 tests passed.\n✅ Fix Google Calendar 403 permission error 00:50:22.155 | claude_code User identified get_user_timezone() causing 403 errors due to using calendarList API requiring broader OAuth scope. Modified to use settings().get(setting=‘timezone’) API working within existing calendar.events scope. Change eliminates console warnings on every user message.\n✅ Verify 403 fix actually worked 00:47:55.337 | claude_code User reported 403 errors still appearing after initial fix attempt. Together analyzed logs to confirm fix was properly implemented. Short verification session.\n✅ Code quality improvements (3 fixes) 01:42:23.751 | claude_code Implemented three code quality fixes: (1) added default replies for 4 new intents when LLM times out, (2) changed bare except to specific exception types in executor.py, (3) moved Scheduler instantiation outside loop to avoid repeated Google authentication. All tests passed.\ngadget ✅ Fix ccusage statistics and add merge functionality 23:26:16.140 | claude_code User requested changing Claude Code call to sonnet model. AI added –model parameter. User discovered ccusage Opus fee was 0, AI through comparison testing found –offline caused issue, fixed by removing it. User requested merge detection on existing files, AI implemented deduplication logic based on triple tuple.\n🔍 Test report generation functionality 21:34:24.819 | claude_code User used summarize tool to generate 2026-02-13 CalendarPro project report, verified report generation format and content.\n🔍 Test report generation functionality 23:51:07.602 | claude_code Tested report generation again, verified format and field completeness.\n🔍 Test report generation functionality 23:24:58.955 | claude_code Continued testing report generation, verified multi-session merge logic.\n🔍 Test report generation functionality 22:51:43.654 | claude_code Tested 2026-02-14 report generation covering CalendarPro and gadget projects content.\n🔍 Test report generation functionality 23:47:19.175 | claude_code Final report generation test, verified complete workflow.\ngadget-summarize ✅ Implement config file, rclone sync and machine identification 22:14:06.675 | claude_code Implemented ~/.config/summarize/config.json config system supporting device_name, cloud paths and rclone_remote. Added utility functions. Modified commands to use config. Added config –show and –init subcommands. Updated documentation. Subsequently fixed ccusage timing, unified rclone upload paths, enhanced JSON parsing robustness.\n✅ Add Claude CLI backend support 21:29:22.461 | claude_code User requested adding Claude Code CLI support to replace API key. AI implemented summarize_with_claude_cli function, updated all –api parameters to add claude_cli option and set as default, updated documentation and created requirements.txt. Testing found Windows subprocess couldn’t find npx and Claude CLI nested detection issues, fixed by adding shell=True and clearing CLAUDECODE environment variable. Successfully generated 2026-02-14 report.\nToken Usage Total: $55.38 — 82.2M tokens\n",
+  "wordCount" : "5692",
+  "inLanguage": "en",
+  "datePublished": "2026-02-14T00:00:00-05:00",
+  "dateModified": "2026-02-14T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-02-14/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-14/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/'>Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-14
+    </h1>
+    <div class="post-meta"><span title='2026-02-14 00:00:00 -0500 EST'>February 14, 2026</span>&nbsp;·&nbsp;<span>27 min</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="daily-report--2026-02-14">Daily Report — 2026-02-14<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-02-14">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Delivered major improvements across four projects: (1) MIHD: architectural refactoring to eliminate redundant computation, (2) error recovery benchmark: fixed force injection and detector triggering bugs, (3) CalendarPro: added batch delete with interactive confirmation UI and fixed 403 permission errors, (4) gadget/summarize: implemented config system, rclone sync, and Claude CLI backend</li>
+<li><strong>How it was done:</strong> Through architectural redesign (two-phase pipeline separation), deep debugging (force mechanics, task phase detection), feature development (batch operations with safety confirmations), infrastructure improvements (config files, cloud sync, multi-API support), and systematic code quality enhancements</li>
+<li><strong>Impact:</strong> MIHD: reduced embedding computation by 62% (286→110 deduplicated tasks), enabled model reuse across sections. Error recovery: successfully generated PreGrasp scenes, implemented per-detector cooldown. CalendarPro: eliminated 403 warnings, enabled pattern-based multi-event operations. Gadget/summarize: established cross-device workflow with automatic cloud synchronization</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Deep work on MIHD project: monitored benchmarks, designed and implemented complete two-phase pipeline refactoring (extract embeddings → evaluate fusions), analyzed vision encoding bottlenecks, created optimization plans</li>
+<li><strong>How it was done:</strong> Tracked benchmark progress and timeouts, removed inefficient strategies. Implemented 11 pipeline modules with 3 entry scripts. Ran end-to-end tests. Analyzed code to identify bottlenecks: serial patch extraction, excessive GPU cache clearing, lack of encoder-level caching</li>
+<li><strong>Impact:</strong> Transformed architecture from O(encoders × fusions × sections) to O(encoders × sections + fusions × sections). Cut UNI2 embedding computation from ~77 times to 11 times (86% reduction). Identified concrete optimization targets for 2-5x speedup</li>
+</ul>
+<h3 id="macbook">MacBook<a hidden class="anchor" aria-hidden="true" href="#macbook">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Quick maintenance on gadgets toolkit: ran /init to update CLAUDE.md, then cleaned up documentation after user deleted obsolete tools</li>
+<li><strong>How it was done:</strong> Analyzed codebase structure, rewrote CLAUDE.md to reflect current state (only summarize/ and benchmark/ remain), removed references to 6 deleted tool categories</li>
+<li><strong>Impact:</strong> Synchronized documentation with actual codebase, future Claude instances will have accurate project overview</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Fixed error recovery benchmark: force injection mechanism bugs, PreGrasp detector triggering, per-detector cooldown implementation, force visualization enhancements</li>
+<li><strong>How it was done:</strong> Root cause analysis (task_phase stub, body name mismatch, global cooldown blocking), code refactoring (get_task_phase, rollout_generator cooldown tracking, visualizer force override), iterative testing with scene generation and video rendering</li>
+<li><strong>Impact:</strong> PreGrasp detector now functional (generates scenes successfully), force injection mechanism works correctly (施加到正确body), per-detector cooldown prevents interference. Force visibility issue remains under investigation (30N insufficient against OSC controller)</li>
+</ul>
+<h3 id="tzjsdesktop">TzJsDesktop<a hidden class="anchor" aria-hidden="true" href="#tzjsdesktop">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Two major feature developments: (1) CalendarPro improvements (Google Calendar 403 fix, batch delete with interactive Discord UI, code quality), (2) gadget/summarize tool upgrades (config system, rclone sync, Claude CLI backend, ccusage fixes, documentation)</li>
+<li><strong>How it was done:</strong> CalendarPro: modified API calls (settings vs calendarList), extended data models for batch operations, created Discord button confirmation views, added fallback logic for LLM failures. Gadget/summarize: implemented config file system, integrated rclone CLI, added claude_cli backend via subprocess, fixed Windows/nested environment issues, enhanced JSON parsing robustness</li>
+<li><strong>Impact:</strong> CalendarPro: eliminated recurring 403 errors, enabled users to delete multiple events at once with safety confirmations. Gadget/summarize: established complete cross-device workflow (export → sync → merge → deploy) with automatic cloud synchronization, no API key required for default Claude CLI backend</li>
+</ul>
+<blockquote>
+<p>Completed major architectural refactoring of MIHD benchmarking pipeline (two-phase extraction-evaluation architecture), fixed critical error recovery benchmark bugs (force injection mechanism, detector triggering, per-detector cooldown), enhanced CalendarPro with batch delete and Google Calendar permission fixes, and upgraded gadget/summarize tool with config system, rclone cloud sync, and multi-API backend support</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>MIHD two-phase pipeline architecture implementation</strong> — Designed and implemented complete pipeline refactoring: created 11 pipeline modules and 3 entry scripts with pipeline_config.yaml. Phase 1: extract and cache all encoder embeddings (deduplicated). Phase 2: load cached embeddings and run fusion+evaluation. Tested successfully on section 151508 across 4 fusion strategies.</li>
+<li>✅ <strong>Fix error recovery benchmark force injection mechanism</strong> — Fixed critical bug where force was applied to wrong body (bin2 instead of gripper EEF). Root cause: _get_eef_body_name() missing &lsquo;gripper0_eef&rsquo; in possible_names list. Also implemented persistent force mechanism to fix MuJoCo xfrc_applied auto-clearing issue.</li>
+<li>✅ <strong>Fix PreGrasp detector not triggering</strong> — Root cause: get_task_phase() always returned &lsquo;unknown&rsquo; due to stub _check_phase_condition(). Fixed by using get_task_completion_stages() for phase detection. Also fixed lookahead to use demo actions, proximity gate bypass, per-detector cooldown, and target body naming. Simplified detection logic to check N-step-ahead state change instead of continuous approaching.</li>
+<li>🔄 <strong>Investigate force visibility issue in error recovery benchmark</strong> — Even with 30N force override, robot arm shows no visible movement in videos. Requires force mechanics investigation (OSC control loop dominance, force duration too short, or injection mechanism issue).</li>
+<li>✅ <strong>Implement batch delete functionality for CalendarPro</strong> — Extended DeleteData model with date_from/date_until/batch fields, updated LLM prompts, modified search_events to accept custom time ranges, rewrote _handle_delete handler, created BatchDeleteApprovalView with Discord buttons, added batch delete utterances to semantic router.</li>
+<li>✅ <strong>Implement gadget/summarize config system</strong> — Created ~/.config/summarize/config.json configuration system supporting device_name, logs_dir, reports_dir, rclone_remote. Implemented config &ndash;show and &ndash;init subcommands. Resolution order: CLI flag &gt; env var &gt; config file &gt; default.</li>
+<li>✅ <strong>Implement rclone cloud sync for gadget/summarize</strong> — Integrated rclone CLI tool for automatic cloud upload after export/merge. Supports headless server scenario. Added rclone_path config for no-sudo environments.</li>
+<li>✅ <strong>MIHD vision encoding performance analysis</strong> — Analyzed vision encoding bottlenecks: identified serial patch extraction (10-30s), excessive torch.cuda.empty_cache() calls (~100 times), and lack of encoder-level caching. Created detailed three-part optimization plan.</li>
+<li>✅ <strong>Implement per-detector cooldown for error recovery benchmark</strong> — Changed from global cooldown_counter to per-detector cooldown_counters dict so one detector&rsquo;s cooldown doesn&rsquo;t block others (proximity cooldown was blocking pregrasp).</li>
+<li>✅ <strong>Fix Google Calendar 403 insufficientPermissions error</strong> — Changed get_user_timezone() from calendarList().get() API to settings().get() API which only requires calendar.events scope, eliminating 403 errors that appeared on every user message.</li>
+<li>✅ <strong>Add fallback logic for batch delete when LLM fails</strong> — When LLM times out (due to nested Claude Code environment), added _raw_input passthrough and _extract_delete_query() regex extraction to parse search keywords, date ranges, and batch flags from raw user input.</li>
+<li>✅ <strong>Add Claude CLI as default API backend for summarize</strong> — Implemented summarize_with_claude_cli function via subprocess calling &lsquo;claude &ndash;print&rsquo;. No API key required. Set as default backend replacing anthropic.</li>
+<li>✅ <strong>Fix Windows subprocess and nested Claude Code issues</strong> — Added shell=True for npx and claude calls to support Windows .cmd files. Removed CLAUDECODE environment variable to avoid nested session detection.</li>
+<li>✅ <strong>Implement export merge on existing files</strong> — Added deduplication logic based on (source, project, timestamp) tuple. Multiple exports of same day/device won&rsquo;t lose previous conversation records.</li>
+<li>🔄 <strong>Improve Discord response details in CalendarPro</strong> — Enhanced delete operation responses to show event names with dates/times, but other intents still lack sufficient detail (e.g., schedule confirmations should specify what was scheduled at what time).</li>
+<li>✅ <strong>Fix ccusage Opus fee calculation bug</strong> — Discovered &ndash;offline mode showed Opus 4.6 pricing as $0. Removed &ndash;offline parameter to fetch latest pricing online. Fixed fee display from $0 to $19.11.</li>
+<li>✅ <strong>Optimize ccusage timing and data format</strong> — Moved fetch_ccusage after AI summary to include summary&rsquo;s own token consumption. Stored ccusage raw JSON format directly. Rewrote _merge_token_usages to support per_device details.</li>
+<li>✅ <strong>Enhance JSON parsing robustness for summarize</strong> — Rewrote _parse_json_response with three-step fallback: direct parse → extract code block → find {to} substring. Handles LLM adding explanatory text before/after JSON.</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>✅ <strong>MIHD benchmark monitoring and timeout configuration</strong> — Monitored slow-running training-based fusion methods. Increased timeout from 1 hour to 2 hours. Removed staig_fusion_e2e from configuration after user decision.</li>
+<li>✅ <strong>Add force override and update config force ranges</strong> — Added &ndash;force_override parameter to visualizer for dynamic force testing. Increased force_norm_range from [3.0, 15.0] to [15.0, 45.0], force_clip to 60.0.</li>
+<li>✅ <strong>Fix empty message crash in Discord bot</strong> — Added &lsquo;if response:&rsquo; check before sending messages to prevent Discord API errors when handlers return empty strings after sending messages via channel directly.</li>
+<li>✅ <strong>Update gadget/summarize documentation</strong> — Rewrote tutorial.md and README.md, added config file, cloud sync, rclone no-sudo installation, three API backend explanations. Created requirements.txt.</li>
+<li>✅ <strong>CalendarPro code quality fixes</strong> — Added default replies for 4 new intents in dual_verify.py; changed bare except to except (ValueError, TypeError) in executor.py; moved Scheduler instantiation outside loop in periodic_checker.py.</li>
+<li>✅ <strong>Gadgets project documentation cleanup</strong> — Updated CLAUDE.md via /init command, then cleaned up documentation after deletion of 6 tool categories. Updated both README.md and CLAUDE.md to reflect current state (only summarize/ and benchmark/).</li>
+<li>✅ <strong>Clean up dead rejection tracking code</strong> — Removed add_rejected_candidate(), get_rejected_candidates(), analyze_rejected() from database.py; removed total_rejected/rejection_stats from DatabaseMeta; updated all references.</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-mihd-benchmark-redundant-embedding-computation---same-genevision-encoders-run-hundreds-of-times-for-different-fusion-strategies-eg-pca-computed-55-times-uni2-computed-77-times">1. MIHD benchmark: Redundant embedding computation - same gene/vision encoders run hundreds of times for different fusion strategies (e.g., PCA computed 55 times, UNI2 computed 77 times)<a hidden class="anchor" aria-hidden="true" href="#1-mihd-benchmark-redundant-embedding-computation---same-genevision-encoders-run-hundreds-of-times-for-different-fusion-strategies-eg-pca-computed-55-times-uni2-computed-77-times">#</a></h4>
+<p><strong>Solution:</strong> Designed and implemented two-phase pipeline: Phase 1 extracts and caches all encoder embeddings (deduplicated, 110 tasks for 286 experiments = 62% reduction), Phase 2 loads cached embeddings and only runs fusion+clustering+evaluation. UNI2 model now loads once for all 11 sections instead of 77 times.</p>
+<p><strong>Key Insight:</strong> Current caching uses {gene}<em>{vision}</em>{fusion}/{section}_embeddings.npz as key, including fusion name, so changing fusion forces re-extraction. Encoder-level caching (gene_cache/{encoder}/{section}.npz, vision_cache/{encoder}/{section}.npz) enables massive reuse. Model instance reuse across sections provides additional speedup.</p>
+<h4 id="2-error-recovery-benchmark-force-applied-to-wrong-body-bin2-instead-of-gripper-eef-causing-no-visible-robot-disturbance-in-videos">2. Error recovery benchmark: Force applied to wrong body (bin2 instead of gripper EEF), causing no visible robot disturbance in videos<a hidden class="anchor" aria-hidden="true" href="#2-error-recovery-benchmark-force-applied-to-wrong-body-bin2-instead-of-gripper-eef-causing-no-visible-robot-disturbance-in-videos">#</a></h4>
+<p><strong>Solution:</strong> Through detailed logging discovered force was applied to bin2. Root cause: _get_eef_body_name() missing &lsquo;gripper0_eef&rsquo; in possible_names list, fallback geom search matched robot0_screen_collision (contains &rsquo;ee&rsquo;) → bin2. Fixed by adding &lsquo;gripper0_eef&rsquo;, &lsquo;robot0_right_hand&rsquo;, &lsquo;gripper0_gripper_base&rsquo; to possible_names.</p>
+<p><strong>Key Insight:</strong> EEF body names vary across robots (Sawyer uses gripper0_eef, not generic gripper_link), need explicit inclusion in possible names list. Fallback to geom search can mismatch strings containing &rsquo;ee&rsquo; with unrelated geoms.</p>
+<h4 id="3-error-recovery-benchmark-pregrasp-detector-never-triggered-despite-being-registered---get_task_phase-always-returned-unknown">3. Error recovery benchmark: PreGrasp detector never triggered despite being registered - get_task_phase() always returned &lsquo;unknown&rsquo;<a hidden class="anchor" aria-hidden="true" href="#3-error-recovery-benchmark-pregrasp-detector-never-triggered-despite-being-registered---get_task_phase-always-returned-unknown">#</a></h4>
+<p><strong>Solution:</strong> Root cause: get_task_phase() called _check_phase_condition() which is a stub always returning False. All task_phase-dependent detectors (PreGrasp, GraspPrecond) were affected. Complete phase detection logic exists in get_task_completion_stages(). Fixed by rewriting get_task_phase() to use sensor-based detection. Also fixed multiple chained bugs: lookahead using neutral actions instead of demo actions, proximity gate blocking pre-contact detectors, global cooldown preventing simultaneous detection, MuJoCo body name mismatch.</p>
+<p><strong>Key Insight:</strong> Codebase had functional implementation (get_task_completion_stages) and always-fail stub (_check_phase_condition) coexisting, caller used wrong method. Symptom is detector not triggering, root cause is infrastructure-layer dead code. When observing logical contradictions (no reject but no output), prioritize infrastructure audit over symptom debugging.</p>
+<h4 id="4-error-recovery-benchmark-duration_steps-config-parameter-not-working---all-forces-last-only-1-step-005-seconds">4. Error recovery benchmark: duration_steps config parameter not working - all forces last only 1 step (0.05 seconds)<a hidden class="anchor" aria-hidden="true" href="#4-error-recovery-benchmark-duration_steps-config-parameter-not-working---all-forces-last-only-1-step-005-seconds">#</a></h4>
+<p><strong>Solution:</strong> MuJoCo automatically clears xfrc_applied after each sim.step(). Solution: modified collect_rollout_stats() to loop-call injector.apply() during first duration_steps of validation rollout, call injector.clear() after duration ends.</p>
+<p><strong>Key Insight:</strong> MuJoCo&rsquo;s xfrc_applied is persistent field but gets auto-cleared, requiring application layer to explicitly reapply each step for sustained force. This is systemic bug affecting all error types.</p>
+<h4 id="5-error-recovery-benchmark-30n-force-shows-no-visible-robot-arm-movement-in-visualization-videos">5. Error recovery benchmark: 30N force shows no visible robot arm movement in visualization videos<a hidden class="anchor" aria-hidden="true" href="#5-error-recovery-benchmark-30n-force-shows-no-visible-robot-arm-movement-in-visualization-videos">#</a></h4>
+<p><strong>Solution:</strong> Added &ndash;force_override parameter to test larger forces without regeneration; updated config force ranges to 15-45N. Issue persists at 30N - requires force mechanics investigation (possibly OSC control loop too strong, force duration too short at 1 step, or xfrc_applied not correctly applied).</p>
+<p><strong>Key Insight:</strong> Force injection mechanism works (xfrc_applied is set/cleared) but 30N may be insufficient against OSC controller&rsquo;s 150 N/m stiffness, or 1-step duration (~20ms) too short for visible effect. OSC control loop may suppress external forces within one control cycle.</p>
+<h4 id="6-calendarpro-users-couldnt-delete-multiple-calendar-events-matching-a-pattern-eg-cancel-all-gb-teacher-meetings-before-march-1st---bot-would-only-say-please-specify-which-event-to-delete">6. CalendarPro: Users couldn&rsquo;t delete multiple calendar events matching a pattern (e.g., &lsquo;cancel all GB teacher meetings before March 1st&rsquo;) - bot would only say &lsquo;Please specify which event to delete&rsquo;<a hidden class="anchor" aria-hidden="true" href="#6-calendarpro-users-couldnt-delete-multiple-calendar-events-matching-a-pattern-eg-cancel-all-gb-teacher-meetings-before-march-1st---bot-would-only-say-please-specify-which-event-to-delete">#</a></h4>
+<p><strong>Solution:</strong> Extended data model to support date ranges and batch operations, updated LLM prompt to extract these fields, modified search to accept custom time windows, and added interactive confirmation UI with Discord buttons showing preview + explicit approval.</p>
+<p><strong>Key Insight:</strong> Single-item CRUD operations are insufficient for productivity tools - batch operations with safety confirmations (preview + explicit user approval) are essential for user workflows involving patterns.</p>
+<h4 id="7-gadgetsummarize-headless-server-cannot-install-cloud-drive-app-for-automatic-sync">7. Gadget/summarize: Headless server cannot install cloud drive app for automatic sync<a hidden class="anchor" aria-hidden="true" href="#7-gadgetsummarize-headless-server-cannot-install-cloud-drive-app-for-automatic-sync">#</a></h4>
+<p><strong>Solution:</strong> Researched and integrated rclone CLI tool, supports token copy authentication method (rclone authorize on machine with browser, copy token to headless server).</p>
+<p><strong>Key Insight:</strong> rclone supports 70+ cloud providers, headless authentication via token copy, is best cross-platform cloud CLI choice.</p>
+<h4 id="8-error-recovery-benchmark-global-cooldown-blocks-pregrasp-detector-when-proximity-triggers-first">8. Error recovery benchmark: Global cooldown blocks pregrasp detector when proximity triggers first<a hidden class="anchor" aria-hidden="true" href="#8-error-recovery-benchmark-global-cooldown-blocks-pregrasp-detector-when-proximity-triggers-first">#</a></h4>
+<p><strong>Solution:</strong> Implemented per-detector cooldown tracking (cooldown_counters dict) so each detector has independent cooldown periods. Filter detection_results to remove detectors still in cooldown.</p>
+<p><strong>Key Insight:</strong> Global cooldown is inappropriate for multi-detector systems where different detectors target different phases/conditions. Multi-detector systems need per-detector cooldown tracking.</p>
+<h4 id="9-calendarpro-google-calendar-api-returned-403-insufficientpermissions-on-every-user-message-causing-console-warnings">9. CalendarPro: Google Calendar API returned 403 insufficientPermissions on every user message, causing console warnings<a hidden class="anchor" aria-hidden="true" href="#9-calendarpro-google-calendar-api-returned-403-insufficientpermissions-on-every-user-message-causing-console-warnings">#</a></h4>
+<p><strong>Solution:</strong> Switched from calendarList().get() API to settings().get(setting=&lsquo;timezone&rsquo;) API which only requires calendar.events scope instead of broader calendar access.</p>
+<p><strong>Key Insight:</strong> Different Google Calendar API endpoints require different OAuth scopes - settings API has lower permission requirements than calendarList API for timezone retrieval.</p>
+<h4 id="10-calendarpro-when-llm-timed-out-nested-claude-code-environment-batch-delete-failed-because-intentdata-was-empty---semantic-router-correctly-classified-intent-but-no-structured-data-was-extracted">10. CalendarPro: When LLM timed out (nested Claude Code environment), batch delete failed because intent.data was empty - semantic router correctly classified intent but no structured data was extracted<a hidden class="anchor" aria-hidden="true" href="#10-calendarpro-when-llm-timed-out-nested-claude-code-environment-batch-delete-failed-because-intentdata-was-empty---semantic-router-correctly-classified-intent-but-no-structured-data-was-extracted">#</a></h4>
+<p><strong>Solution:</strong> Added _raw_input passthrough to handlers, implemented _extract_delete_query() with regex patterns to parse search keywords from Chinese/English phrases, and added date extraction patterns to identify ranges like &lsquo;3月1号前&rsquo;.</p>
+<p><strong>Key Insight:</strong> Dual-verification systems need independent extraction capabilities in both paths - SR-only fallback cannot rely solely on LLM-generated structured data.</p>
+<h4 id="11-gadgetsummarize-ccusage-offline-mode-showed-opus-46-fee-as-0">11. Gadget/summarize: ccusage &ndash;offline mode showed Opus 4.6 fee as $0<a hidden class="anchor" aria-hidden="true" href="#11-gadgetsummarize-ccusage-offline-mode-showed-opus-46-fee-as-0">#</a></h4>
+<p><strong>Solution:</strong> Removed &ndash;offline parameter, switched to online mode to fetch latest model pricing.</p>
+<p><strong>Key Insight:</strong> Offline mode&rsquo;s pricing table doesn&rsquo;t include latest models (like Opus 4.6), need online fetch for accurate billing. Though online mode slightly slower, data accuracy more important.</p>
+<h4 id="12-error-recovery-benchmark-proximity-gate-max_eef_object_distance005m-blocks-pregrasp-which-operates-at-005-01m">12. Error recovery benchmark: Proximity gate (max_eef_object_distance=0.05m) blocks pregrasp which operates at 0.05-0.1m<a hidden class="anchor" aria-hidden="true" href="#12-error-recovery-benchmark-proximity-gate-max_eef_object_distance005m-blocks-pregrasp-which-operates-at-005-01m">#</a></h4>
+<p><strong>Solution:</strong> Added detector names to bypass list for gate check - detectors with their own distance validation (pregrasp, grasp_precond) skip the gate.</p>
+<p><strong>Key Insight:</strong> Proximity gate was designed for contact-based detectors but incorrectly applied to all detectors regardless of their operating distance. Detector-specific constraints should not be overridden by global gates.</p>
+<h4 id="13-calendarpro--gadgetsummarize-nested-claude-code-sessions-block-claude-cli-subprocess-calls-causing-llm-classification-to-always-time-out-during-development">13. CalendarPro &amp; gadget/summarize: Nested Claude Code sessions block Claude CLI subprocess calls, causing LLM classification to always time out during development<a hidden class="anchor" aria-hidden="true" href="#13-calendarpro--gadgetsummarize-nested-claude-code-sessions-block-claude-cli-subprocess-calls-causing-llm-classification-to-always-time-out-during-development">#</a></h4>
+<p><strong>Solution:</strong> CalendarPro: attempted to unset CLAUDECODE environment variable when spawning subprocess, but still failed - ultimate solution was to test outside nested environment. Gadget/summarize: successfully unset CLAUDECODE and CLAUDE_CODE_ENTRY in subprocess env.</p>
+<p><strong>Key Insight:</strong> Development environment tooling can interfere with the system under test in non-obvious ways - subprocess-based AI provider calls are particularly fragile to environment contamination. Subprocess inherits parent environment variables, need explicit removal.</p>
+<h4 id="14-gadgetsummarize-windows-subprocess-couldnt-find-npx-cmd-file">14. Gadget/summarize: Windows subprocess couldn&rsquo;t find npx (.cmd file)<a hidden class="anchor" aria-hidden="true" href="#14-gadgetsummarize-windows-subprocess-couldnt-find-npx-cmd-file">#</a></h4>
+<p><strong>Solution:</strong> Added shell=True parameter in subprocess.run calls.</p>
+<p><strong>Key Insight:</strong> Windows npm global commands are actually .cmd files, Python subprocess doesn&rsquo;t parse by default, need execution through shell.</p>
+<h4 id="15-gadgetsummarize-llm-returned-json-may-include-code-blocks-or-have-explanatory-text-beforeafter">15. Gadget/summarize: LLM-returned JSON may include code blocks or have explanatory text before/after<a hidden class="anchor" aria-hidden="true" href="#15-gadgetsummarize-llm-returned-json-may-include-code-blocks-or-have-explanatory-text-beforeafter">#</a></h4>
+<p><strong>Solution:</strong> Implemented three-step JSON parsing: direct parse → extract ```json code block → find {to} substring.</p>
+<p><strong>Key Insight:</strong> LLM output format is unstable, need multi-layer fallback to ensure robustness.</p>
+<h4 id="16-gadgetsummarize-multiple-exports-of-same-daydevice-would-overwrite-existing-conversation-records">16. Gadget/summarize: Multiple exports of same day/device would overwrite existing conversation records<a hidden class="anchor" aria-hidden="true" href="#16-gadgetsummarize-multiple-exports-of-same-daydevice-would-overwrite-existing-conversation-records">#</a></h4>
+<p><strong>Solution:</strong> When detecting existing file, read and merge after deduplication based on (source, project, timestamp) tuple.</p>
+<p><strong>Key Insight:</strong> Deduplication key should be minimal field combination uniquely identifying conversation. device_summary and token_usage use latest value as they are cumulative statistics.</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="17-calendarpro-batchdeleteapprovalview-returned-empty-string-after-sending-confirmation-via-channelsend-causing-main-loop-to-attempt-discord-api-call-with-empty-message-which-fails">17. CalendarPro: BatchDeleteApprovalView returned empty string after sending confirmation via channel.send(), causing main loop to attempt Discord API call with empty message which fails<a hidden class="anchor" aria-hidden="true" href="#17-calendarpro-batchdeleteapprovalview-returned-empty-string-after-sending-confirmation-via-channelsend-causing-main-loop-to-attempt-discord-api-call-with-empty-message-which-fails">#</a></h4>
+<p><strong>Solution:</strong> Added &lsquo;if response:&rsquo; check before message.channel.send(response) to skip sending when response is empty.</p>
+<p><strong>Key Insight:</strong> When handlers use channel directly to send messages (e.g., interactive views), they should return empty string to signal &lsquo;already handled&rsquo; - the main loop needs to respect this signal.</p>
+<h4 id="18-mihd-benchmark-basic_contrastive-fusion-timing-out-with-1-hour-limit-actually-needs-77-minutes-per-section">18. MIHD benchmark: basic_contrastive fusion timing out with 1-hour limit, actually needs ~77 minutes per section<a hidden class="anchor" aria-hidden="true" href="#18-mihd-benchmark-basic_contrastive-fusion-timing-out-with-1-hour-limit-actually-needs-77-minutes-per-section">#</a></h4>
+<p><strong>Solution:</strong> Increased timeout to 2 hours (7200s) in run_all_benchmarks.py</p>
+<p><strong>Key Insight:</strong> Training-based fusion strategies require significantly more time than simple fusion strategies due to 300-550 epoch training loops</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="mihd-pipeline-architecture-decision">MIHD pipeline architecture decision<a hidden class="anchor" aria-hidden="true" href="#mihd-pipeline-architecture-decision">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User immediately identified core inefficiency (redundant embedding computation) from high-level understanding and proposed solution: &lsquo;for each slide, first you need to get the embedding of every slide&hellip; store them into a file, and then do the fusion for the same embeddings.&rsquo; User insisted on &lsquo;complete rewrite&rsquo; rather than incremental patches.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI explored existing codebase in detail to understand exact implementation, then designed detailed module structure and wrote all code. AI focused on maintaining backward compatibility and reusing existing encoder implementations.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> User had architectural vision and made strategic decision (two-phase separation, complete rewrite). AI translated this into detailed technical plan with proper abstractions, handled edge cases, wrote implementation, and debugged issues. User drove &lsquo;what&rsquo; and &lsquo;why&rsquo;, AI executed &lsquo;how&rsquo; with technical depth.</p>
+<h4 id="error-recovery-benchmark-problem-root-cause-tracing-strategy">Error recovery benchmark: Problem root cause tracing strategy<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark-problem-root-cause-tracing-strategy">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User questioned: &lsquo;Why are candidates rejected? If no reject, why no output? Since this part not written, please delete dead code&rsquo;.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI spent significant time debugging at symptom level (adding logs, adjusting parameters, analyzing trajectories), didn&rsquo;t directly question infrastructure code correctness.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> User through logical reasoning quickly located contradiction (no reject but no output = infrastructure bug), while AI tends to assume existing code correct and look for causes at parameter/config level. User&rsquo;s questioning drove discovery of STUB root cause.</p>
+<h4 id="calendarpro-recognizing-need-for-batch-delete-functionality">CalendarPro: Recognizing need for batch delete functionality<a hidden class="anchor" aria-hidden="true" href="#calendarpro-recognizing-need-for-batch-delete-functionality">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User immediately identified current delete workflow was inadequate when they said &lsquo;在3月1号前都没有GB老师组会了，请帮我取消这些日程&rsquo; and it failed - they understood users need to operate on patterns, not single items.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI&rsquo;s initial implementation only supported single-item delete, requiring exact specification - didn&rsquo;t anticipate batch operations as core requirement.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human recognized real-world usage patterns require bulk operations with date ranges; AI started with CRUD-style single-item paradigm.</p>
+<h4 id="error-recovery-benchmark-pregrasp-detector-logic-simplification">Error recovery benchmark: PreGrasp detector logic simplification<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark-pregrasp-detector-logic-simplification">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User pointed out: if it&rsquo;s a step change process, just check if current gripper in 0.0-0.3 range and changes after 10 steps, no need for complex &lsquo;approaching&rsquo; logic (consecutive frame distance decreasing).</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI initially implemented complex _check_approaching() method requiring consecutive frame distance decrease, maintained _prev_distance and _approaching_count state.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> User&rsquo;s simplification is more robust: for step-change gripper actions, continuity checks fail; directly checking N-step-ahead state change is more essential criterion. AI tends to over-engineer, introducing unnecessary state tracking.</p>
+<h4 id="calendarpro-identifying-403-permission-error-root-cause">CalendarPro: Identifying 403 permission error root cause<a hidden class="anchor" aria-hidden="true" href="#calendarpro-identifying-403-permission-error-root-cause">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User provided exact log line and immediately recognized it as OAuth scope mismatch, pointing to calendarList API call as culprit.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI initially proposed a fix plan but didn&rsquo;t verify if fix actually addressed the specific API call causing 403.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human had domain knowledge of Google Calendar API scope requirements and could pinpoint exact API endpoint mismatch; AI followed more general debugging process.</p>
+<h4 id="gadgetsummarize-cross-device-sync-requirements">Gadget/summarize: Cross-device sync requirements<a hidden class="anchor" aria-hidden="true" href="#gadgetsummarize-cross-device-sync-requirements">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User proposed constraints &lsquo;don&rsquo;t want to push to GitHub but want automatic cross-device transfer&rsquo; and proactively asked about headless server CLI upload solutions.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI through AskUserQuestion confirmed device environment (Windows+Mac+Linux) and preferences (cloud sync), researched rclone and other tools, provided complete solution.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> User clearly defined problem and constraints; AI filled details through research and technical solution design. User&rsquo;s emphasis on headless scenario avoided solution defects.</p>
+<h4 id="mihd-timeout-and-fusion-strategy-selection">MIHD timeout and fusion strategy selection<a hidden class="anchor" aria-hidden="true" href="#mihd-timeout-and-fusion-strategy-selection">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User observed training-based fusions are too slow and made pragmatic decisions: increase timeout to 2 hours, skip staig_fusion_e2e entirely, reduce Q-Former epochs from 200 to 50. User balanced completeness vs. runtime.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI monitored progress, reported timing statistics, and asked user for decision when Q-Former was blocking other experiments. AI provided options but deferred decision to user.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> User made resource allocation decisions based on domain priorities. AI provided data and options but recognized these are research judgment calls, not pure technical problems.</p>
+<h4 id="calendarpro-need-for-detailed-confirmation-messages">CalendarPro: Need for detailed confirmation messages<a hidden class="anchor" aria-hidden="true" href="#calendarpro-need-for-detailed-confirmation-messages">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User requested more details in Discord responses, specifically wanting to see what tasks were scheduled at what times - they value transparency and verification.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI initially provided minimal success/failure messages without specifics.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human understands users need to verify system actions through detailed feedback; AI defaulted to terse confirmations.</p>
+<h4 id="gadgetsummarize-ccusage-opus-billing-issue-diagnosis">Gadget/summarize: ccusage Opus billing issue diagnosis<a hidden class="anchor" aria-hidden="true" href="#gadgetsummarize-ccusage-opus-billing-issue-diagnosis">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User manually executed npx ccusage daily &ndash;json and found Opus fee displays normally, but script output incorrect, directly pointed out &ndash;offline might be the problem.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI first investigated from code logic, checked ccusage call and output handling, then compared with/without &ndash;offline output differences, finally located pricing table issue.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> User&rsquo;s experience-based intuition quickly located issue; AI through systematic comparison verified hypothesis. User&rsquo;s domain knowledge accelerated problem diagnosis.</p>
+<h4 id="gadgetsummarize-ccusage-data-format">Gadget/summarize: ccusage data format<a hidden class="anchor" aria-hidden="true" href="#gadgetsummarize-ccusage-data-format">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User proposed &lsquo;ccusage can export json, should be more convenient&rsquo;, &lsquo;want to see detailed ccusage analysis&rsquo;, &lsquo;when aggregating, aggregate all ccusage for the day&rsquo;.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI changed fetch_ccusage to directly store raw JSON, rewrote _merge_token_usages to support per_device details, added cache hit rate and model cost breakdown in markdown.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> User provided requirements from usage perspective (detailed, complete, readable); AI translated requirements into technical implementation (preserve raw data, enhance rendering).</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="critical-limitations">Critical Limitations<a hidden class="anchor" aria-hidden="true" href="#critical-limitations">#</a></h3>
+<ul>
+<li>Did not proactively suggest the two-phase architecture for MIHD despite analyzing the codebase. User had to identify the inefficiency and propose the solution. AI should have spotted the redundant computation pattern during initial exploration.</li>
+<li>Error recovery benchmark: Did not initially recognize get_task_phase() is STUB, spent significant time debugging at symptom level (adjusting detector parameters, analyzing trajectory data) rather than directly auditing infrastructure code correctness.</li>
+<li>CalendarPro: Didn&rsquo;t initially recognize single-item delete operations were insufficient for real user workflows - required user to explicitly point out limitation with concrete example.</li>
+<li>Error recovery benchmark: Initially didn&rsquo;t identify possibility of force applied to wrong body, first tried increasing force magnitude and duration, took detour before using debug logs to locate root cause.</li>
+<li>Error recovery benchmark: Didn&rsquo;t recognize that 30N force showing no movement indicates fundamental mechanism issue (OSC control loop dominance, insufficient duration, or injection bug) rather than just needing more force.</li>
+<li>CalendarPro: When implementing first fix for 403 error, didn&rsquo;t verify solution actually worked - user had to come back and point out bug still occurring.</li>
+<li>CalendarPro: Defaulted to minimal confirmation messages instead of detailed ones - didn&rsquo;t anticipate users&rsquo; need for verification through comprehensive feedback.</li>
+<li>Gadget/summarize: Didn&rsquo;t proactively discover ccusage should be called after AI summary (modified only after user pointed out).</li>
+<li>Gadget/summarize: Insufficient understanding of Claude CLI behavior in nested environments, only cleared environment variables which didn&rsquo;t fully solve problem, didn&rsquo;t proactively check stderr output or try other debugging methods.</li>
+<li>Gadget/summarize: Initial JSON parsing not robust enough, didn&rsquo;t consider LLM output containing markdown code blocks or surrounding text.</li>
+<li>Gadget/summarize: Config file solution didn&rsquo;t consider CLI tools like rclone until user explicitly raised headless requirements.</li>
+</ul>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>Error recovery benchmark: Repeatedly made same SSH command formatting error 40+ times despite multiple corrections - failed to internalize that SSH commands need explicit &lsquo;cd&rsquo; before running scripts.</li>
+<li>Gadget/summarize: Grep tool frequently timed out, needed to rely on Bash grep or Read tool as replacement.</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>Two-phase pipeline pattern for experiment matrices: When running M encoders × N fusions × K sections, split into Phase 1 (M × K encoding tasks with caching) + Phase 2 (M × N × K evaluation tasks loading from cache). Reduces O(M × N × K) redundant computation to O(M × K + M × N × K) with shared encoding. Cache key design matters: encoder-level caching enables cross-fusion sharing.</li>
+<li>MuJoCo xfrc_applied behavior: Though documentation says xfrc_applied persists between calls, mj_step() automatically clears it. Implementing sustained force requires application layer to explicitly reapply each step. Must explicitly clear via injector.clear() after duration_steps to implement true impulse behavior.</li>
+<li>STUB methods and complete implementations coexisting is code smell: When complete logic exists in one function but caller uses always-fail stub, should immediately audit calling relationships rather than debug parameters. When observing logical contradictions (no reject but no output), prioritize infrastructure audit over symptom debugging.</li>
+<li>Force injection visualization balance: OSC controllers with kp=150 N/m need forces ≥25N for visible displacement, but OSC control loop may suppress external forces within one control cycle (~20ms). Need careful balance between force magnitude and duration.</li>
+<li>Productivity tools need batch operations with safety mechanisms: (1) pattern matching to find multiple items, (2) preview of what will be affected, (3) explicit user confirmation before executing. Single-item CRUD operations insufficient for real workflows.</li>
+<li>rclone is best cross-platform cloud CLI choice, supports 70+ providers, headless authentication via token copy (rclone authorize on machine with browser, copy token to headless server).</li>
+<li>Model reuse across batches: For vision encoders processing multiple sections, load model once and reuse across sections instead of reload per section. Moves model initialization cost from O(sections) to O(1). Critical for large transformers like UNI2.</li>
+<li>Fallback mechanism mismatch risks: When primary method fails, falling back to looser matching (like geom name search) may produce wrong results (&rsquo;ee&rsquo; matches screen not end-effector). Need additional validation in fallback path. EEF body names vary across robots (Sawyer uses gripper0_eef, not generic gripper_link), need explicit inclusion.</li>
+<li>Detection logic simplification for step-change systems: For discrete state systems (like gripper 0→1 step change), continuity-based detection (distance decreasing, approaching) is unreliable; should directly check state change (is it different after N steps).</li>
+<li>Multi-detector systems need per-detector cooldown tracking - global cooldown inappropriately blocks simultaneous detection from different sources. Detector-specific constraints (distance thresholds, phase requirements) should not be overridden by global gates - let detectors self-validate.</li>
+<li>OAuth scope requirements vary significantly between Google Calendar API endpoints - settings API requires lower permissions than calendarList API for same information (timezone).</li>
+<li>Dual-verification systems (semantic router + LLM) need independent extraction capabilities in both paths - can&rsquo;t assume LLM will always succeed in producing structured output.</li>
+<li>ccusage offline mode&rsquo;s pricing table doesn&rsquo;t include latest models (like Opus 4.6), need online fetch for accurate billing. Though online mode slightly slower, data accuracy more important.</li>
+<li>Windows subprocess calling .cmd files needs shell=True, otherwise can&rsquo;t find npm globally installed commands.</li>
+<li>Vision encoding bottlenecks: (1) Serial patch extraction loops are CPU-bound (3000-4000 iterations). (2) torch.cuda.empty_cache() after every batch (~100 times) adds significant overhead. (3) Hardcoded batch_size=32 may be suboptimal. Profile before optimize.</li>
+<li>Subprocess-based environment switching: When dependencies require different conda environments, use subprocess to invoke scripts in target environment rather than trying to switch within Python.</li>
+<li>User feedback should be detailed and specific - for calendar operations, always include: what action was taken, which event(s) were affected, and when they occur.</li>
+<li>Development environment can interfere with system under test - nested Claude Code sessions block subprocess-based AI provider calls. Subprocess inherits parent environment variables, need explicit removal of specific variables (like CLAUDECODE) to avoid nested detection.</li>
+<li>JSON parsing needs multi-layer fallback to handle LLM output various formats: direct parse → extract code block → find {to} substring. LLM output format unstable, need robustness.</li>
+<li>Config file priority should be: CLI parameter &gt; environment variable &gt; config file &gt; default value, ensuring flexibility and overridability.</li>
+<li>Deduplication key selection should be minimal field combination uniquely identifying entity. For conversations: (source, project, timestamp).</li>
+</ul>
+<h3 id="practical-learnings">Practical Learnings<a hidden class="anchor" aria-hidden="true" href="#practical-learnings">#</a></h3>
+<ul>
+<li>When handlers send messages directly via channel (for interactive UI), they should return empty string to signal &lsquo;already handled&rsquo; and main loop must check &lsquo;if response:&rsquo; before sending.</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<h3 id="mihd">MIHD<a hidden class="anchor" aria-hidden="true" href="#mihd">#</a></h3>
+<p><strong>✅ Two-phase pipeline architecture implementation</strong>
+<em>21:52:14.896 | claude_code</em>
+User provided detailed plan for two-phase pipeline refactoring. Implemented complete solution: created pipeline/ package with 8 modules and 3 entry scripts with pipeline_config.yaml. Successfully tested end-to-end on section 151508. Fixed two bugs: save_comparison_csv method error and mclust ImportError handling. Test results: concat ARI=0.1810, mean ARI=0.2805, attention ARI=0.1403, staig_fusion ARI=0.4208.</p>
+<p><strong>✅ Pipeline redesign planning discussion</strong>
+<em>20:36:10.094 | claude_code</em>
+User asked about current benchmarking logic and proposed better architecture: extract embeddings once per encoder×section, reuse for all fusions. Explained current inefficiency: PCA computed 55 times, UNI2 computed 55 times due to cache key including fusion name. User decided to &lsquo;completely rewrite pipeline&rsquo; rather than incremental fixes. This planning discussion led to implementation in previous session.</p>
+<p><strong>✅ Vision encoding performance analysis</strong>
+<em>00:51:22.137 | claude_code</em>
+User asked to analyze vision encoding bottlenecks. Explored run_benchmark.py in depth. Identified three major issues: (1) serial patch extraction loop (10-30s for 3000-4000 spots), (2) torch.cuda.empty_cache() called ~100 times during batch inference, (3) no encoder-level caching. Explained current caching logic. User wants three optimizations: encoder-level caching, patch extraction parallelization, GPU inference tuning.</p>
+<p><strong>🔄 Benchmark progress monitoring and timeout configuration</strong>
+<em>00:07:35.904 | claude_code</em>
+Monitored long-running benchmark progress across 11 DLPFC sections. Found basic_contrastive fusion timing out at 1-hour limit (actually needs ~77 min/section). Increased timeout to 2 hours. After observing slow training-based fusions, user decided to skip staig_fusion_e2e entirely. Removed it from config and restarted benchmark.</p>
+<h3 id="gadgets">gadgets<a hidden class="anchor" aria-hidden="true" href="#gadgets">#</a></h3>
+<p><strong>✅ Documentation update after codebase cleanup</strong>
+<em>00:58:36.268 | claude_code</em>
+User ran /init command to update CLAUDE.md. Found existing version was outdated (referenced deleted tools). Updated CLAUDE.md to reflect current state (only summarize/ and benchmark/ remain). User then deleted more tools. Updated both README.md and CLAUDE.md to remove all references to 6 deleted tool categories.</p>
+<h3 id="error-recovery-benchmark">error-recovery-benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔍 Debug PreGrasp not triggering, locate task phase STUB root cause</strong>
+<em>22:05:14.643 | claude_code</em>
+User requested simplifying PreGrasp logic (remove &lsquo;approaching&rsquo; detection, change to check N-step-ahead state change), implemented but still didn&rsquo;t trigger. Deep investigation found get_task_phase() calls always-return-False _check_phase_condition() stub, causing all task_phase-dependent detectors to fail. Also found rejection logging not integrated into database.</p>
+<p><strong>✅ Fix visualization Phase 3 and locate force injection error</strong>
+<em>00:45:39.241 | claude_code</em>
+Modified visualization script Phase 3 from static to continue demo actions. Testing revealed no robot disturbance. Through detailed debug logs located force applied to bin2 instead of gripper EEF. Root cause: _get_eef_body_name() missing &lsquo;gripper0_eef&rsquo;. Fixed and generated 30N and inf force videos for verification.</p>
+<p><strong>🔄 Implement persistent force mechanism and PreGrasp detector</strong>
+<em>21:27:34.381 | claude_code</em>
+Implemented three goals: fix duration_steps not working (MuJoCo auto-clear bug), create PreGrasp detector to detect gripper about to close, configure 10-20 step sustained force. Completed all code modifications, but PreGrasp didn&rsquo;t trigger during testing. Debug script found demo_1 had candidates meeting conditions but still didn&rsquo;t trigger.</p>
+<h3 id="error_recovery_benchmark">error_recovery_benchmark<a hidden class="anchor" aria-hidden="true" href="#error_recovery_benchmark">#</a></h3>
+<p><strong>✅ Fix PreGrasp detector not triggering + dead code cleanup</strong>
+<em>22:56:34.002 | claude_code</em>
+Implemented two-part plan: (1) Rewrote get_task_phase() to use get_task_completion_stages() instead of stub, enabling phase detection. (2) Removed dead rejection tracking code. Fixed additional bugs: PreGrasp lookahead using neutral actions instead of demo, proximity gate blocking pre-contact detectors, global cooldown preventing simultaneous detection, MuJoCo body name mismatch. All 41 unit tests pass. PreGrasp now triggers and generates 2/30 scenes.</p>
+<p><strong>🔄 Increase injection force for visible robot arm movement</strong>
+<em>01:35:54.517 | claude_code</em>
+User reported even with 30N force override (10x original 3N), robot arm shows no visible movement. Developed plan: (1) add &ndash;force_override parameter, (2) update config force ranges to [15.0, 45.0] and clip to 60.0, (3) implement duration_steps cleanup. Theoretical calculation shows ≥25N needed for 3cm displacement. Implemented all changes and generated video with 30N override, but visibility issue persists - suggests OSC control loop may suppress external forces too quickly, or 1-step duration insufficient.</p>
+<p><strong>✅ Investigate post-injection behavior: neutral vs demo actions</strong>
+<em>00:38:54.892 | claude_code</em>
+User questioned whether robot staying still after error injection (using get_neutral_action) was intended design or bug. Explained three different post-injection stages use different actions. User opted to change visualization to continue demo actions for more intuitive demonstration of how errors disrupt task completion.</p>
+<h3 id="calendarpro">CalendarPro<a hidden class="anchor" aria-hidden="true" href="#calendarpro">#</a></h3>
+<p><strong>✅ Implement batch calendar event deletion</strong>
+<em>20:08:24.708 | claude_code</em>
+User requested ability to delete multiple events matching pattern. Extended data model with date_from/date_until/batch fields, updated LLM prompts, modified search_events, rewrote _handle_delete for batch operations, created BatchDeleteApprovalView with Discord confirmation buttons. Added fallback logic to extract query/dates from raw input when LLM fails (nested Claude environment issue). Fixed empty message crash. User tested and requested more detailed responses. All 68 tests passed.</p>
+<p><strong>✅ Fix Google Calendar 403 permission error</strong>
+<em>00:50:22.155 | claude_code</em>
+User identified get_user_timezone() causing 403 errors due to using calendarList API requiring broader OAuth scope. Modified to use settings().get(setting=&lsquo;timezone&rsquo;) API working within existing calendar.events scope. Change eliminates console warnings on every user message.</p>
+<p><strong>✅ Verify 403 fix actually worked</strong>
+<em>00:47:55.337 | claude_code</em>
+User reported 403 errors still appearing after initial fix attempt. Together analyzed logs to confirm fix was properly implemented. Short verification session.</p>
+<p><strong>✅ Code quality improvements (3 fixes)</strong>
+<em>01:42:23.751 | claude_code</em>
+Implemented three code quality fixes: (1) added default replies for 4 new intents when LLM times out, (2) changed bare except to specific exception types in executor.py, (3) moved Scheduler instantiation outside loop to avoid repeated Google authentication. All tests passed.</p>
+<h3 id="gadget">gadget<a hidden class="anchor" aria-hidden="true" href="#gadget">#</a></h3>
+<p><strong>✅ Fix ccusage statistics and add merge functionality</strong>
+<em>23:26:16.140 | claude_code</em>
+User requested changing Claude Code call to sonnet model. AI added &ndash;model parameter. User discovered ccusage Opus fee was 0, AI through comparison testing found &ndash;offline caused issue, fixed by removing it. User requested merge detection on existing files, AI implemented deduplication logic based on triple tuple.</p>
+<p><strong>🔍 Test report generation functionality</strong>
+<em>21:34:24.819 | claude_code</em>
+User used summarize tool to generate 2026-02-13 CalendarPro project report, verified report generation format and content.</p>
+<p><strong>🔍 Test report generation functionality</strong>
+<em>23:51:07.602 | claude_code</em>
+Tested report generation again, verified format and field completeness.</p>
+<p><strong>🔍 Test report generation functionality</strong>
+<em>23:24:58.955 | claude_code</em>
+Continued testing report generation, verified multi-session merge logic.</p>
+<p><strong>🔍 Test report generation functionality</strong>
+<em>22:51:43.654 | claude_code</em>
+Tested 2026-02-14 report generation covering CalendarPro and gadget projects content.</p>
+<p><strong>🔍 Test report generation functionality</strong>
+<em>23:47:19.175 | claude_code</em>
+Final report generation test, verified complete workflow.</p>
+<h3 id="gadget-summarize">gadget-summarize<a hidden class="anchor" aria-hidden="true" href="#gadget-summarize">#</a></h3>
+<p><strong>✅ Implement config file, rclone sync and machine identification</strong>
+<em>22:14:06.675 | claude_code</em>
+Implemented ~/.config/summarize/config.json config system supporting device_name, cloud paths and rclone_remote. Added utility functions. Modified commands to use config. Added config &ndash;show and &ndash;init subcommands. Updated documentation. Subsequently fixed ccusage timing, unified rclone upload paths, enhanced JSON parsing robustness.</p>
+<p><strong>✅ Add Claude CLI backend support</strong>
+<em>21:29:22.461 | claude_code</em>
+User requested adding Claude Code CLI support to replace API key. AI implemented summarize_with_claude_cli function, updated all &ndash;api parameters to add claude_cli option and set as default, updated documentation and created requirements.txt. Testing found Windows subprocess couldn&rsquo;t find npx and Claude CLI nested detection issues, fixed by adding shell=True and clearing CLAUDECODE environment variable. Successfully generated 2026-02-14 report.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-02-14-usage.png"></p>
+<p><strong>Total: $55.38</strong> — 82.2M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

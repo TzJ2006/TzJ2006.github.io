@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-01 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Debugged and fixed MIHD spatial transcriptomics model performance degradation (ARI 0.4→0.13), implemented STAIG GCN alignment, and identified environment/clustering method as critical factors">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-02-01/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-02-01/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-01/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-02-01/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-01">
+  <meta property="og:description" content="Debugged and fixed MIHD spatial transcriptomics model performance degradation (ARI 0.4→0.13), implemented STAIG GCN alignment, and identified environment/clustering method as critical factors">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-01T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-01T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-01">
+  <meta name="twitter:description" content="Debugged and fixed MIHD spatial transcriptomics model performance degradation (ARI 0.4→0.13), implemented STAIG GCN alignment, and identified environment/clustering method as critical factors">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-01",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-02-01/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-01",
+  "name": "Bug Journal 2026-02-01",
+  "description": "Debugged and fixed MIHD spatial transcriptomics model performance degradation (ARI 0.4→0.13), implemented STAIG GCN alignment, and identified environment/clustering method as critical factors",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-02-01 Daily Overview What was done: Fixed critical MIHD model performance regression and aligned GCN implementation with original STAIG paper How it was done: Root cause analysis through version comparison, parameter tracing, and systematic code fixes; parallel agent exploration for cross-project comparison Impact: Restored model performance from ARI 0.09 to 0.28-0.45; established clear understanding of STAIG vs MIHD architectural differences for future development Debugged and fixed MIHD spatial transcriptomics model performance degradation (ARI 0.4→0.13), implemented STAIG GCN alignment, and identified environment/clustering method as critical factors\nTasks Architecture \u0026 Strategy ✅ Debug MIHD ARI performance degradation (0.4 → 0.13) — Traced root cause through parameter analysis, version comparison, and discovered wrong gene feature dimension (3000D raw vs 50D PCA) was being used ✅ Fix STAIGTrainer parameter handling — Corrected num_epochs, edge_weight_method, and removed erroneous raw_gene_expr logic; restored default parameters (num_layers=2, tau=30.0, learning_rate=0.001) ✅ Implement STAIG GCN alignment in MIHD — Added apply_activation_to_last_layer parameter to GCNGeneEncoder, updated edge weight methods, and CLI support for gcn encoder ✅ Cross-project GCN implementation analysis — Deployed parallel exploration agents to systematically compare STAIG vs MIHD GCN architectures across 6 dimensions Implementation \u0026 Fixes ✅ Benchmark GCN + UNI2 + STAIG fusion — Ran comparative tests on Section 151676 with multiple configurations using kmeans clustering ✅ Install dependencies (torch_geometric, scikit-misc) — Set up required packages for GCN testing in current environment Problems \u0026 Solutions Critical Issues 1. ARI dropped from 0.4+ to 0.13, unclear why previous configuration succeeded Solution: Version comparison revealed code had been modified to pass 3000D raw gene expression instead of 50D PCA embeddings to STAIG training; reverted to using PCA embeddings\nKey Insight: run_benchmark_core.py contained an erroneous ‘fix’ that passed raw_gene_expr (3000D) when gene_encoder=‘pca’, breaking the original workflow that used 50D PCA features\n2. Test results show ARI=0.13 instead of expected 0.4 even after fixes Solution: Identified that tests ran in base/AI environment with kmeans clustering; historical success used General environment with rpy2+mclust clustering\nKey Insight: Clustering method (mclust vs kmeans) has massive impact on downstream metrics; environment configuration is critical for reproducibility\n3. Configuration file parameters (num_epochs, learning_rate, num_hidden) not being read correctly Solution: Updated STAIGFusionTrainer.init to read all training parameters from staig_alignment_config, not just tau and num_layers\nKey Insight: Incomplete config parsing caused training with wrong hyperparameters despite correct YAML configuration\n4. edge_weight_method defaulted to wrong value (‘softmax_log’ vs ‘softmax_neglog’) Solution: Changed default from ‘softmax_log’ (distance large → weight large) to ‘softmax_neglog’ (distance small → weight large) to match proven high-performance configuration\nKey Insight: Edge weight directionality significantly impacts graph-based learning; STAIG uses log(distance) while optimal MIHD config uses -log(distance)\n5. MIHD GCNGeneEncoder architecture diverged from original STAIG implementation Solution: Added apply_activation_to_last_layer parameter (default True) to align with STAIG’s design where all layers including the last apply activation\nKey Insight: Subtle architectural differences (last layer activation) can accumulate and cause divergence from reference implementations\nHuman vs AI Approaches Strategic Level Root cause diagnosis strategy Role Approach Human Suspected environment and clustering method difference immediately based on historical knowledge of General environment having rpy2 AI Started with parameter-level debugging, traced through code versions, and eventually discovered environment issue after exhausting code-level fixes Difference Analysis: Human leveraged domain memory and pattern recognition to hypothesize environment issue early; AI followed systematic bottom-up debugging from code to environment\nUnderstanding the 50D vs 3000D dimension mismatch Role Approach Human Recognized immediately that passing raw gene expression (3000D) instead of PCA embeddings (50D) was breaking STAIG training AI Identified the dimension difference through log analysis but needed to test old version to confirm this was the root cause Difference Analysis: Human understood domain-specific dimensionality requirements; AI verified through empirical testing\nWhen to compare with git history Role Approach Human Requested git diff comparison with successful version (2a9a4b1) to find what changed AI Initially focused on fixing current code parameters; only checked git history after user prompted, which revealed critical default parameter changes Difference Analysis: Human recognized value of version control archaeology earlier; AI needed explicit direction to leverage git history for debugging regression\nAI Limitations Critical Limitations AI didn’t immediately recognize that kmeans vs mclust clustering method could cause such large metric differences (ARI 0.13 vs 0.4), requiring user to point out the environment issue AI attempted to fix code extensively before checking if tests were running in wrong environment, wasting debugging cycles on non-issues General Limitations AI didn’t proactively suggest using git blame/log to find when regression was introduced, only using version control after explicit user direction AI’s parallel exploration agents provided comprehensive architectural comparison but didn’t initially prioritize the activation function difference as the most critical divergence point Learnings Key Learnings In machine learning regression debugging, environment configuration (conda environment, clustering libraries) can dominate code-level fixes; always verify execution environment matches historical success When debugging performance regressions, git history comparison with last known good version is often faster than forward-fixing current code; version archaeology should be early in the workflow Input dimensionality mismatches (50D PCA vs 3000D raw features) can cause catastrophic performance degradation in graph neural networks; always validate feature dimensions match model expectations Seemingly minor architectural differences (last layer activation, edge weight direction) accumulate to cause significant divergence when replicating research implementations; exhaustive parameter alignment is critical Clustering method choice (mclust vs kmeans) has first-order impact on spatial transcriptomics evaluation metrics; R integration via rpy2 is often necessary for reproducing bioinformatics paper results Parallel agent deployment for cross-codebase comparison is highly effective for systematic architectural analysis; two agents exploring STAIG and MIHD simultaneously provided comprehensive comparison in one round Conversation Summaries MIHD Spatial Transcriptomics ✅ Debug ARI performance regression (0.4 → 0.13) and fix STAIG trainer 05:23:52.274 | claude_code Investigated why ARI dropped from 0.4+ to 0.13 through systematic debugging. Discovered root cause was erroneous code change that passed 3000D raw gene expression instead of 50D PCA embeddings to STAIG training. Fixed parameter reading logic, restored correct defaults (num_epochs=550, tau=30.0, edge_weight_method=‘softmax_neglog’), and removed raw_gene_expr logic. Verified fixes restored ARI to 0.28-0.45 range. Identified that optimal results require General conda environment with rpy2+mclust, not base environment with kmeans.\nMIHD vs STAIG Architecture Comparison ✅ GCN implementation alignment and comparative benchmarking 05:24:33.554 | claude_code Deployed parallel exploration agents to systematically compare STAIG and MIHD GCN implementations. Identified six key architectural differences: activation on last layer, graph building efficiency (O(n²) vs O(n log n)), edge weight direction, temperature parameter, default layer count, and pseudo-label generation. Implemented alignment by adding apply_activation_to_last_layer parameter to GCNGeneEncoder, updating edge weight methods, and adding CLI support. Ran benchmark tests showing GCN+UNI2+STAIG achieving ARI=0.1325 with kmeans (expected 0.4+ with mclust in correct environment).\nToken Usage Total: $2.19 — 1.7M tokens\n",
+  "wordCount" : "1102",
+  "inLanguage": "en",
+  "datePublished": "2026-02-01T00:00:00-05:00",
+  "dateModified": "2026-02-01T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-02-01/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-01/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/'>Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-01
+    </h1>
+    <div class="post-meta"><span title='2026-02-01 00:00:00 -0500 EST'>February 1, 2026</span>&nbsp;·&nbsp;<span>6 min</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="daily-report--2026-02-01">Daily Report — 2026-02-01<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-02-01">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Fixed critical MIHD model performance regression and aligned GCN implementation with original STAIG paper</li>
+<li><strong>How it was done:</strong> Root cause analysis through version comparison, parameter tracing, and systematic code fixes; parallel agent exploration for cross-project comparison</li>
+<li><strong>Impact:</strong> Restored model performance from ARI 0.09 to 0.28-0.45; established clear understanding of STAIG vs MIHD architectural differences for future development</li>
+</ul>
+<blockquote>
+<p>Debugged and fixed MIHD spatial transcriptomics model performance degradation (ARI 0.4→0.13), implemented STAIG GCN alignment, and identified environment/clustering method as critical factors</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Debug MIHD ARI performance degradation (0.4 → 0.13)</strong> — Traced root cause through parameter analysis, version comparison, and discovered wrong gene feature dimension (3000D raw vs 50D PCA) was being used</li>
+<li>✅ <strong>Fix STAIGTrainer parameter handling</strong> — Corrected num_epochs, edge_weight_method, and removed erroneous raw_gene_expr logic; restored default parameters (num_layers=2, tau=30.0, learning_rate=0.001)</li>
+<li>✅ <strong>Implement STAIG GCN alignment in MIHD</strong> — Added apply_activation_to_last_layer parameter to GCNGeneEncoder, updated edge weight methods, and CLI support for gcn encoder</li>
+<li>✅ <strong>Cross-project GCN implementation analysis</strong> — Deployed parallel exploration agents to systematically compare STAIG vs MIHD GCN architectures across 6 dimensions</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>✅ <strong>Benchmark GCN + UNI2 + STAIG fusion</strong> — Ran comparative tests on Section 151676 with multiple configurations using kmeans clustering</li>
+<li>✅ <strong>Install dependencies (torch_geometric, scikit-misc)</strong> — Set up required packages for GCN testing in current environment</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-ari-dropped-from-04-to-013-unclear-why-previous-configuration-succeeded">1. ARI dropped from 0.4+ to 0.13, unclear why previous configuration succeeded<a hidden class="anchor" aria-hidden="true" href="#1-ari-dropped-from-04-to-013-unclear-why-previous-configuration-succeeded">#</a></h4>
+<p><strong>Solution:</strong> Version comparison revealed code had been modified to pass 3000D raw gene expression instead of 50D PCA embeddings to STAIG training; reverted to using PCA embeddings</p>
+<p><strong>Key Insight:</strong> run_benchmark_core.py contained an erroneous &lsquo;fix&rsquo; that passed raw_gene_expr (3000D) when gene_encoder=&lsquo;pca&rsquo;, breaking the original workflow that used 50D PCA features</p>
+<h4 id="2-test-results-show-ari013-instead-of-expected-04-even-after-fixes">2. Test results show ARI=0.13 instead of expected 0.4 even after fixes<a hidden class="anchor" aria-hidden="true" href="#2-test-results-show-ari013-instead-of-expected-04-even-after-fixes">#</a></h4>
+<p><strong>Solution:</strong> Identified that tests ran in base/AI environment with kmeans clustering; historical success used General environment with rpy2+mclust clustering</p>
+<p><strong>Key Insight:</strong> Clustering method (mclust vs kmeans) has massive impact on downstream metrics; environment configuration is critical for reproducibility</p>
+<h4 id="3-configuration-file-parameters-num_epochs-learning_rate-num_hidden-not-being-read-correctly">3. Configuration file parameters (num_epochs, learning_rate, num_hidden) not being read correctly<a hidden class="anchor" aria-hidden="true" href="#3-configuration-file-parameters-num_epochs-learning_rate-num_hidden-not-being-read-correctly">#</a></h4>
+<p><strong>Solution:</strong> Updated STAIGFusionTrainer.<strong>init</strong> to read all training parameters from staig_alignment_config, not just tau and num_layers</p>
+<p><strong>Key Insight:</strong> Incomplete config parsing caused training with wrong hyperparameters despite correct YAML configuration</p>
+<h4 id="4-edge_weight_method-defaulted-to-wrong-value-softmax_log-vs-softmax_neglog">4. edge_weight_method defaulted to wrong value (&lsquo;softmax_log&rsquo; vs &lsquo;softmax_neglog&rsquo;)<a hidden class="anchor" aria-hidden="true" href="#4-edge_weight_method-defaulted-to-wrong-value-softmax_log-vs-softmax_neglog">#</a></h4>
+<p><strong>Solution:</strong> Changed default from &lsquo;softmax_log&rsquo; (distance large → weight large) to &lsquo;softmax_neglog&rsquo; (distance small → weight large) to match proven high-performance configuration</p>
+<p><strong>Key Insight:</strong> Edge weight directionality significantly impacts graph-based learning; STAIG uses log(distance) while optimal MIHD config uses -log(distance)</p>
+<h4 id="5-mihd-gcngeneencoder-architecture-diverged-from-original-staig-implementation">5. MIHD GCNGeneEncoder architecture diverged from original STAIG implementation<a hidden class="anchor" aria-hidden="true" href="#5-mihd-gcngeneencoder-architecture-diverged-from-original-staig-implementation">#</a></h4>
+<p><strong>Solution:</strong> Added apply_activation_to_last_layer parameter (default True) to align with STAIG&rsquo;s design where all layers including the last apply activation</p>
+<p><strong>Key Insight:</strong> Subtle architectural differences (last layer activation) can accumulate and cause divergence from reference implementations</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="root-cause-diagnosis-strategy">Root cause diagnosis strategy<a hidden class="anchor" aria-hidden="true" href="#root-cause-diagnosis-strategy">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Suspected environment and clustering method difference immediately based on historical knowledge of General environment having rpy2</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Started with parameter-level debugging, traced through code versions, and eventually discovered environment issue after exhausting code-level fixes</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human leveraged domain memory and pattern recognition to hypothesize environment issue early; AI followed systematic bottom-up debugging from code to environment</p>
+<h4 id="understanding-the-50d-vs-3000d-dimension-mismatch">Understanding the 50D vs 3000D dimension mismatch<a hidden class="anchor" aria-hidden="true" href="#understanding-the-50d-vs-3000d-dimension-mismatch">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Recognized immediately that passing raw gene expression (3000D) instead of PCA embeddings (50D) was breaking STAIG training</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Identified the dimension difference through log analysis but needed to test old version to confirm this was the root cause</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human understood domain-specific dimensionality requirements; AI verified through empirical testing</p>
+<h4 id="when-to-compare-with-git-history">When to compare with git history<a hidden class="anchor" aria-hidden="true" href="#when-to-compare-with-git-history">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Requested git diff comparison with successful version (2a9a4b1) to find what changed</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Initially focused on fixing current code parameters; only checked git history after user prompted, which revealed critical default parameter changes</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human recognized value of version control archaeology earlier; AI needed explicit direction to leverage git history for debugging regression</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="critical-limitations">Critical Limitations<a hidden class="anchor" aria-hidden="true" href="#critical-limitations">#</a></h3>
+<ul>
+<li>AI didn&rsquo;t immediately recognize that kmeans vs mclust clustering method could cause such large metric differences (ARI 0.13 vs 0.4), requiring user to point out the environment issue</li>
+<li>AI attempted to fix code extensively before checking if tests were running in wrong environment, wasting debugging cycles on non-issues</li>
+</ul>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>AI didn&rsquo;t proactively suggest using git blame/log to find when regression was introduced, only using version control after explicit user direction</li>
+<li>AI&rsquo;s parallel exploration agents provided comprehensive architectural comparison but didn&rsquo;t initially prioritize the activation function difference as the most critical divergence point</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>In machine learning regression debugging, environment configuration (conda environment, clustering libraries) can dominate code-level fixes; always verify execution environment matches historical success</li>
+<li>When debugging performance regressions, git history comparison with last known good version is often faster than forward-fixing current code; version archaeology should be early in the workflow</li>
+<li>Input dimensionality mismatches (50D PCA vs 3000D raw features) can cause catastrophic performance degradation in graph neural networks; always validate feature dimensions match model expectations</li>
+<li>Seemingly minor architectural differences (last layer activation, edge weight direction) accumulate to cause significant divergence when replicating research implementations; exhaustive parameter alignment is critical</li>
+<li>Clustering method choice (mclust vs kmeans) has first-order impact on spatial transcriptomics evaluation metrics; R integration via rpy2 is often necessary for reproducing bioinformatics paper results</li>
+<li>Parallel agent deployment for cross-codebase comparison is highly effective for systematic architectural analysis; two agents exploring STAIG and MIHD simultaneously provided comprehensive comparison in one round</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<h3 id="mihd-spatial-transcriptomics">MIHD Spatial Transcriptomics<a hidden class="anchor" aria-hidden="true" href="#mihd-spatial-transcriptomics">#</a></h3>
+<p><strong>✅ Debug ARI performance regression (0.4 → 0.13) and fix STAIG trainer</strong>
+<em>05:23:52.274 | claude_code</em>
+Investigated why ARI dropped from 0.4+ to 0.13 through systematic debugging. Discovered root cause was erroneous code change that passed 3000D raw gene expression instead of 50D PCA embeddings to STAIG training. Fixed parameter reading logic, restored correct defaults (num_epochs=550, tau=30.0, edge_weight_method=&lsquo;softmax_neglog&rsquo;), and removed raw_gene_expr logic. Verified fixes restored ARI to 0.28-0.45 range. Identified that optimal results require General conda environment with rpy2+mclust, not base environment with kmeans.</p>
+<h3 id="mihd-vs-staig-architecture-comparison">MIHD vs STAIG Architecture Comparison<a hidden class="anchor" aria-hidden="true" href="#mihd-vs-staig-architecture-comparison">#</a></h3>
+<p><strong>✅ GCN implementation alignment and comparative benchmarking</strong>
+<em>05:24:33.554 | claude_code</em>
+Deployed parallel exploration agents to systematically compare STAIG and MIHD GCN implementations. Identified six key architectural differences: activation on last layer, graph building efficiency (O(n²) vs O(n log n)), edge weight direction, temperature parameter, default layer count, and pseudo-label generation. Implemented alignment by adding apply_activation_to_last_layer parameter to GCNGeneEncoder, updating edge weight methods, and adding CLI support. Ran benchmark tests showing GCN+UNI2+STAIG achieving ARI=0.1325 with kmeans (expected 0.4+ with mclust in correct environment).</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-02-01-usage.png"></p>
+<p><strong>Total: $2.19</strong> — 1.7M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

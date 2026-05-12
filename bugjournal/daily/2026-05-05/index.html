@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-05-05 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Diagnosed and fixed RTX 5090 PCIe crash, developed gadget toolkit documentation, resolved multiple TypeScript/Rust bugs in TokenMonitor, and released v0.13.0 with upstream conflict resolution">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-05-05/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-05-05/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-05-05/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-05-05/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-05-05">
+  <meta property="og:description" content="Diagnosed and fixed RTX 5090 PCIe crash, developed gadget toolkit documentation, resolved multiple TypeScript/Rust bugs in TokenMonitor, and released v0.13.0 with upstream conflict resolution">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-05-05T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-05-05T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-05-05">
+  <meta name="twitter:description" content="Diagnosed and fixed RTX 5090 PCIe crash, developed gadget toolkit documentation, resolved multiple TypeScript/Rust bugs in TokenMonitor, and released v0.13.0 with upstream conflict resolution">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-05-05",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-05-05/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-05-05",
+  "name": "Bug Journal 2026-05-05",
+  "description": "Diagnosed and fixed RTX 5090 PCIe crash, developed gadget toolkit documentation, resolved multiple TypeScript/Rust bugs in TokenMonitor, and released v0.13.0 with upstream conflict resolution",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-05-05 Daily Overview What was done: Diagnosed HP OMEN RTX 5090 blue-screen crashes, generated Python toolkit technical documentation, fixed multiple TokenMonitor bugs (Svelte tag mismatch, Rust test race condition, Codex credits display, CI formatting), communicated architectural resolutions to upstream maintainer, and released v0.13.0 How it was done: Analyzed Windows event logs to pinpoint PCIe power-state root cause, explored codebase structure via MCP tools, fixed Svelte/Rust bugs through targeted edits and race-condition analysis, applied auto-formatting, and documented merge strategy in comprehensive PR comment Impact: Eliminated system crash risk (reduced WHEA errors from dozens/day to 2 boot-time events), completed project documentation, improved TokenMonitor UI accuracy and CI reliability, maintained upstream fork relationship, and published stable release with statusline integration Diagnosed and fixed RTX 5090 PCIe crash, developed gadget toolkit documentation, resolved multiple TypeScript/Rust bugs in TokenMonitor, and released v0.13.0 with upstream conflict resolution\nTasks Architecture \u0026 Strategy ✅ Diagnose Windows BSOD crashes on HP OMEN 45L with RTX 5090 — Investigated 3 blue-screens (0xA IRQL_NOT_LESS_OR_EQUAL, 0x133 DPC_WATCHDOG_VIOLATION) and 1010 WHEA PCIe errors, identified NVIDIA driver Gen5↔Gen1 link-state switching as root cause, applied fix (NVIDIA Power Management → Prefer Maximum Performance) ✅ Tag and publish v0.13.0 release — Created v0.13.0 tag on commit 004d3f6 and pushed to TzJ2006/TokenMonitor, triggering release workflow ✅ Write PR comment to upstream maintainer explaining architectural resolutions — Documented on PR #16 that statusline rewrite and OAuth/Keychain removal conflicts were already merged, Codex/Cursor rate limits don’t depend on removed pipeline ✅ Fix Codex credits display unit bug — Changed UsageBars.svelte:234 from formatUsdAmount() to integer formatting with ‘credits’ suffix, as Codex uses credits not USD ✅ Fix Rust CI test failure and compiler warnings — Resolved oauth_token_prefers_credentials_file_on_macos race condition (different mutex locks for CLAUDE_CONFIG_DIR across test modules), removed unused import, suppressed dead_code warning, fixed cargo fmt import ordering ✅ Verify SSH remote deduplication logic implementation — Confirmed two-layer deduplication: remote Python script uses ‘seen’ set by message_id:requestId, local cache uses HashSet before append Implementation \u0026 Fixes ✅ Generate gadget project technical overview — Created 6-section paper-style documentation covering Python 3.10+ toolkit (summarize/research/benchmark/website), shared common/ infrastructure, two-phase LLM pipeline, and Hugo deployment workflow ✅ Fix Svelte HiddenModelsSettings.svelte closing tag mismatch — Removed extra at line 151 causing Vite pre-transform error, verified no other hardcoded max-height constraints that could clip content ✅ Fix cargo fmt CI formatting failures — Ran cargo fmt on tray.rs, usage_query.rs, mod.rs to resolve formatting violations in vec! macro and whitespace Problems \u0026 Solutions Critical Issues 1. NVIDIA RTX 5090 producing 1010 WHEA PCIe AER Unsupported Request errors over 5 months, causing intermittent blue-screens. Errors concentrated during idle periods and boot-time, not during GPU stress tests. Solution: Identified root cause as NVIDIA driver’s PCIe link-state power management (Gen5 → Gen1 downshift when idle). During re-negotiation, GPU sends memory-mapped I/O requests before address space fully restored, triggering UR. Fixed by setting NVIDIA Control Panel → Power Management Mode → Prefer Maximum Performance. Verified fix: zero new errors during 19-minute runtime after reboot, only 2 boot-time errors (hardware initialization, unavoidable). Also resolved 5-second HDMI audio delay (same root cause: audio controller D3cold sleep).\nKey Insight: Windows ASPM Off setting only affects OS-level PCIe power policy; NVIDIA driver and BIOS can still perform link-state switching independently. The ‘corrected error’ designation in WHEA masks severity—累积 UR errors eventually destabilize driver state and trigger kernel bugchecks. Community research confirmed this is a known RTX 5090 + PCIe Gen5 compatibility issue across multiple motherboard vendors.\n2. Upstream maintainer concerned about architectural conflicts from statusline rewrite and OAuth/Keychain removal affecting Codex/Cursor rate limits Solution: Documented that conflicts were already resolved via merge commits f6e0982 and 4492d2f, Codex uses CLI scraping (not OAuth), Cursor doesn’t need keychain prompts\nKey Insight: Incremental merge strategy with explicit feature restoration commits preserves downstream innovations while adopting upstream architecture changes\n3. Codex credits balance displayed as USD ($2,116.02) instead of credits unit, causing user confusion Solution: Replaced formatUsdAmount() with Math.round().toLocaleString() + ’ credits’ suffix in UsageBars.svelte; confirmed fix doesn’t affect Cursor’s extra_usage which correctly uses USD\nKey Insight: Multi-provider systems require per-provider unit handling - Codex uses ‘credits’, Cursor uses USD; cannot assume uniform currency formatting across providers\n4. Rust test oauth_token_prefers_credentials_file_on_macos failed in CI with ‘Claude credentials file unavailable (/var/folders/…/tmp/.claude/.credentials.json)’. Test writes file to tmp/.credentials.json but lookup resolves to tmp/.claude/.credentials.json, indicating CLAUDE_CONFIG_DIR env var not respected. Solution: Root cause: rate_limits/claude.rs and statusline/install.rs tests use separate mutex locks (ENV_LOCK vs. env_lock()) to guard CLAUDE_CONFIG_DIR manipulation. Parallel test execution caused statusline test to overwrite claude test’s env value. Fixed by changing test to call read_token_from_credentials_file() directly instead of get_claude_oauth_token(), eliminating dependency on env var resolution and macOS keychain fallback complexity. Also fixed unused import ‘Local’ (test module re-imported it separately) and dead_code warning for claude_settings_file (changed #[cfg_attr(not(test), allow(dead_code))] to unconditional #[allow(dead_code)]).\nKey Insight: Unsafe environment variable manipulation in parallel tests requires a single global lock shared across all test modules—local per-module locks create false safety. #[cfg(test)] imports can confuse rustc when test submodule does use super::* then re-imports the same item. cargo fmt requires #[cfg(test)] imports to sort after regular imports.\nGeneral Issues 5. CI cargo fmt check failing on 3 Rust files due to formatting violations (vec! macro line breaks, trailing whitespace) Solution: Ran cargo fmt to auto-fix formatting, committed as 004d3f6\nKey Insight: Automated formatting enforcement catches style inconsistencies early and maintains codebase consistency\nHuman vs AI Approaches Strategic Level PCIe ‘Memory Read Request’ error interpretation Role Approach Human User questioned whether ‘GPU memory read request failure’ indicates bad RAM sticks rather than GPU/PCIe issue, correctly identifying potential ambiguity in terminology. AI AI initially used shorthand ‘memory read’ without clarifying MMIO vs. physical memory distinction, required user prompt to explain that PCIe Memory Read targets memory-mapped I/O address space (GPU BAR regions) not system DRAM. Difference Analysis: User demonstrated domain knowledge by challenging terminology; AI assumed shared understanding of PCIe address spaces. User’s question forced more precise technical explanation with diagram showing GPU ↔ Root Complex communication.\nVerification approach for PCIe error diagnosis Role Approach Human User proactively ran GPU stress test to check if errors occur under load, then reported ’no new WHEA errors during test’—empirically validating the idle-state switching hypothesis before AI suggested formal verification steps. AI AI initially recommended diagnostics sequence (DDU driver reinstall → BIOS PCIe Gen4 downgrade → hardware reseating) but had not yet proposed stress testing as a diagnostic tool. Difference Analysis: User applied scientific method (controlled experiment to isolate variable) faster than AI’s systematic troubleshooting checklist. This accelerated root-cause confirmation and avoided unnecessary hardware interventions.\nCodex credits unit verification Role Approach Human Recognized from domain knowledge that Codex uses ‘credits’ not USD, suggested assistant verify online documentation AI Analyzed code patterns only, relied on type definitions and existing usage without external verification Difference Analysis: Human brought external domain knowledge about Codex API conventions; AI initially limited search to codebase without consulting external docs despite suggestion\nImplementation Level Locating PR #16 on GitHub Role Approach Human Initially said ‘michaelovo’ then provided full URL after AI struggled with repository name variations AI Systematically tried michaelovo, Michael-OvO, movo-ai variations before asking user for clarification Difference Analysis: Human had exact knowledge but initial instruction lacked precision (case sensitivity, username format); AI exhausted systematic search patterns before requesting explicit URL\nAI Limitations Critical Limitations Initial diagnosis stated ‘PCIe signal quality problem’ (implying physical layer Bad TLP/DLLP errors) based on WHEA corrected error presence. After user challenged this (noting PCIe x16 link confirmed, no signal errors), AI parsed AER register data and corrected to ‘Unsupported Request—a logical/configuration error, not physical.’ Diagnosis was revised 70% → 90% confidence but initial framing was premature. PowerShell command execution repeatedly failed due to bash extglob expansion eating $_ variable (e.g., ’extglob.TimeCreated’ errors). Multiple retry attempts with different quoting/heredoc strategies were needed before finding stable syntax. This fragility suggests tool layer needs better PowerShell encapsulation. Did not verify Codex API documentation online when user suggested checking, relied solely on code analysis despite availability of external information General Limitations After fixing Rust test race condition and warnings, pushed commit without running cargo fmt. CI immediately failed on import ordering. Required second commit (ce63b8b) to fix #[cfg(test)] placement. Standard pre-push checklist (fmt + clippy) should have been applied. Had difficulty resolving GitHub repository due to case sensitivity (michaelovo vs Michael-OvO), required user to provide explicit URL after trying multiple variations Required multiple user continuation prompts after automatic context compaction, indicating loss of conversation state awareness Learnings Key Learnings PCIe Advanced Error Reporting ‘Unsupported Request’ can be triggered by NVIDIA driver’s automatic Gen5↔Gen1 link-state power management during idle periods. Windows powercfg ASPM setting (Link State Power Management) only controls OS-level policy; GPU driver firmware and BIOS independently manage PCIe L-states. RTX 5090 + PCIe Gen5 has known compatibility issues causing UR errors during re-negotiation when GPU tries to access memory-mapped address space mid-transition. Community-validated fix: force ‘Prefer Maximum Performance’ or BIOS PCIe Gen4 lock. Multi-provider rate limiting systems require careful per-provider unit handling - assuming uniform currency formatting breaks when providers use different units (Codex ‘credits’ vs Cursor USD) Fork maintenance strategy: merge upstream architectural changes incrementally with explicit feature restoration commits, document conflicts proactively to maintain upstream relationship Rust parallel test suite with environment variable manipulation requires a single global mutex shared across all test modules—per-module local locks (static ENV_LOCK in module A, separate env_lock() in module B) create race conditions when both modify same env vars. The #[cfg(test)] attribute on imports can cause ‘unused’ warnings if test submodule uses ‘use super::*’ then redundantly imports same item. cargo fmt enforces that conditional imports (#[cfg(test)]) sort after unconditional imports. Two-layer deduplication (remote Python script + local HashSet) effectively prevents duplicate records in distributed log aggregation systems where multiple devices append to shared storage Conversation Summaries Windows System Diagnostics ✅ HP OMEN 45L RTX 5090 blue-screen crash analysis 04:18:02.232 | claude_code Diagnosed 3 BSOD events (0xA, 0x133) and 1010 WHEA PCIe errors over 5 months. Analyzed Windows Event Viewer logs, WHEA AER register data (UncorrectableErrorStatus 0x100000 = Unsupported Request). Identified root cause as NVIDIA driver’s PCIe Gen5↔Gen1 power-state switching during idle. User ran stress test validating errors only occur during idle/boot, not under load. Applied fix (NVIDIA Power Management → Maximum Performance). Post-reboot verification: zero runtime errors, only 2 boot-time events (expected). Also resolved related 5-second YouTube audio delay (HDMI audio controller D3cold sleep).\nTokenMonitor ✅ Multi-bug fixes, CI formatting, upstream communication, v0.13.0 release 22:22:07.043 | claude_code Verified SSH deduplication logic (two-layer: remote Python seen set + local HashSet). Fixed Codex credits display bug by replacing USD formatting with ‘credits’ unit. Fixed Svelte HiddenModelsSettings.svelte closing tag mismatch (removed extra at line 151). Resolved Rust CI test race condition (oauth_token_prefers_credentials_file_on_macos): changed test to call read_token_from_credentials_file() directly, bypassing env var/keychain complexity. Fixed cargo fmt violations (import ordering, whitespace). Wrote comprehensive PR comment to upstream maintainer documenting that statusline rewrite and OAuth/Keychain removal conflicts were already resolved via merge commits, with Codex/Cursor rate limits unaffected. Tagged and pushed v0.13.0 release.\nGadget Python Toolkit ✅ Generate paper-style technical overview documentation 01:19:19.004 | claude_code Used /code-summarize skill to explore gadget project structure via MCP hex-line tools. Read pyproject.toml, README, and key modules (common/llm.py, translation.py, cache.py, sync.py, summarize/auto.py, research/scout/, benchmark/cli.py). Generated 6-section document: Highlights (5 bullets on two-phase LLM pipeline, SHA-256 caching, rclone sync), Introduction (problem/solution/context), Architecture (directory tree + data flow diagram + key abstractions table), Implementation (code snippets for LLM backends, TranslationEngine, DiskCache), Results (real usage stats), Conclusion (future work).\nToken Usage Total: $54.04 — 54.9M tokens\n",
+  "wordCount" : "1909",
+  "inLanguage": "en",
+  "datePublished": "2026-05-05T00:00:00-05:00",
+  "dateModified": "2026-05-05T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-05-05/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-05-05/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/'>Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-05-05
+    </h1>
+    <div class="post-meta"><span title='2026-05-05 00:00:00 -0500 -0500'>May 5, 2026</span>&nbsp;·&nbsp;<span>9 min</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="daily-report--2026-05-05">Daily Report — 2026-05-05<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-05-05">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Diagnosed HP OMEN RTX 5090 blue-screen crashes, generated Python toolkit technical documentation, fixed multiple TokenMonitor bugs (Svelte tag mismatch, Rust test race condition, Codex credits display, CI formatting), communicated architectural resolutions to upstream maintainer, and released v0.13.0</li>
+<li><strong>How it was done:</strong> Analyzed Windows event logs to pinpoint PCIe power-state root cause, explored codebase structure via MCP tools, fixed Svelte/Rust bugs through targeted edits and race-condition analysis, applied auto-formatting, and documented merge strategy in comprehensive PR comment</li>
+<li><strong>Impact:</strong> Eliminated system crash risk (reduced WHEA errors from dozens/day to 2 boot-time events), completed project documentation, improved TokenMonitor UI accuracy and CI reliability, maintained upstream fork relationship, and published stable release with statusline integration</li>
+</ul>
+<blockquote>
+<p>Diagnosed and fixed RTX 5090 PCIe crash, developed gadget toolkit documentation, resolved multiple TypeScript/Rust bugs in TokenMonitor, and released v0.13.0 with upstream conflict resolution</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Diagnose Windows BSOD crashes on HP OMEN 45L with RTX 5090</strong> — Investigated 3 blue-screens (0xA IRQL_NOT_LESS_OR_EQUAL, 0x133 DPC_WATCHDOG_VIOLATION) and 1010 WHEA PCIe errors, identified NVIDIA driver Gen5↔Gen1 link-state switching as root cause, applied fix (NVIDIA Power Management → Prefer Maximum Performance)</li>
+<li>✅ <strong>Tag and publish v0.13.0 release</strong> — Created v0.13.0 tag on commit 004d3f6 and pushed to TzJ2006/TokenMonitor, triggering release workflow</li>
+<li>✅ <strong>Write PR comment to upstream maintainer explaining architectural resolutions</strong> — Documented on PR #16 that statusline rewrite and OAuth/Keychain removal conflicts were already merged, Codex/Cursor rate limits don&rsquo;t depend on removed pipeline</li>
+<li>✅ <strong>Fix Codex credits display unit bug</strong> — Changed UsageBars.svelte:234 from formatUsdAmount() to integer formatting with &lsquo;credits&rsquo; suffix, as Codex uses credits not USD</li>
+<li>✅ <strong>Fix Rust CI test failure and compiler warnings</strong> — Resolved oauth_token_prefers_credentials_file_on_macos race condition (different mutex locks for CLAUDE_CONFIG_DIR across test modules), removed unused import, suppressed dead_code warning, fixed cargo fmt import ordering</li>
+<li>✅ <strong>Verify SSH remote deduplication logic implementation</strong> — Confirmed two-layer deduplication: remote Python script uses &lsquo;seen&rsquo; set by message_id:requestId, local cache uses HashSet before append</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>✅ <strong>Generate gadget project technical overview</strong> — Created 6-section paper-style documentation covering Python 3.10+ toolkit (summarize/research/benchmark/website), shared common/ infrastructure, two-phase LLM pipeline, and Hugo deployment workflow</li>
+<li>✅ <strong>Fix Svelte HiddenModelsSettings.svelte closing tag mismatch</strong> — Removed extra </div> at line 151 causing Vite pre-transform error, verified no other hardcoded max-height constraints that could clip content</li>
+<li>✅ <strong>Fix cargo fmt CI formatting failures</strong> — Ran cargo fmt on tray.rs, usage_query.rs, mod.rs to resolve formatting violations in vec! macro and whitespace</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-nvidia-rtx-5090-producing-1010-whea-pcie-aer-unsupported-request-errors-over-5-months-causing-intermittent-blue-screens-errors-concentrated-during-idle-periods-and-boot-time-not-during-gpu-stress-tests">1. NVIDIA RTX 5090 producing 1010 WHEA PCIe AER Unsupported Request errors over 5 months, causing intermittent blue-screens. Errors concentrated during idle periods and boot-time, not during GPU stress tests.<a hidden class="anchor" aria-hidden="true" href="#1-nvidia-rtx-5090-producing-1010-whea-pcie-aer-unsupported-request-errors-over-5-months-causing-intermittent-blue-screens-errors-concentrated-during-idle-periods-and-boot-time-not-during-gpu-stress-tests">#</a></h4>
+<p><strong>Solution:</strong> Identified root cause as NVIDIA driver&rsquo;s PCIe link-state power management (Gen5 → Gen1 downshift when idle). During re-negotiation, GPU sends memory-mapped I/O requests before address space fully restored, triggering UR. Fixed by setting NVIDIA Control Panel → Power Management Mode → Prefer Maximum Performance. Verified fix: zero new errors during 19-minute runtime after reboot, only 2 boot-time errors (hardware initialization, unavoidable). Also resolved 5-second HDMI audio delay (same root cause: audio controller D3cold sleep).</p>
+<p><strong>Key Insight:</strong> Windows ASPM Off setting only affects OS-level PCIe power policy; NVIDIA driver and BIOS can still perform link-state switching independently. The &lsquo;corrected error&rsquo; designation in WHEA masks severity—累积 UR errors eventually destabilize driver state and trigger kernel bugchecks. Community research confirmed this is a known RTX 5090 + PCIe Gen5 compatibility issue across multiple motherboard vendors.</p>
+<h4 id="2-upstream-maintainer-concerned-about-architectural-conflicts-from-statusline-rewrite-and-oauthkeychain-removal-affecting-codexcursor-rate-limits">2. Upstream maintainer concerned about architectural conflicts from statusline rewrite and OAuth/Keychain removal affecting Codex/Cursor rate limits<a hidden class="anchor" aria-hidden="true" href="#2-upstream-maintainer-concerned-about-architectural-conflicts-from-statusline-rewrite-and-oauthkeychain-removal-affecting-codexcursor-rate-limits">#</a></h4>
+<p><strong>Solution:</strong> Documented that conflicts were already resolved via merge commits f6e0982 and 4492d2f, Codex uses CLI scraping (not OAuth), Cursor doesn&rsquo;t need keychain prompts</p>
+<p><strong>Key Insight:</strong> Incremental merge strategy with explicit feature restoration commits preserves downstream innovations while adopting upstream architecture changes</p>
+<h4 id="3-codex-credits-balance-displayed-as-usd-211602-instead-of-credits-unit-causing-user-confusion">3. Codex credits balance displayed as USD ($2,116.02) instead of credits unit, causing user confusion<a hidden class="anchor" aria-hidden="true" href="#3-codex-credits-balance-displayed-as-usd-211602-instead-of-credits-unit-causing-user-confusion">#</a></h4>
+<p><strong>Solution:</strong> Replaced formatUsdAmount() with Math.round().toLocaleString() + &rsquo; credits&rsquo; suffix in UsageBars.svelte; confirmed fix doesn&rsquo;t affect Cursor&rsquo;s extra_usage which correctly uses USD</p>
+<p><strong>Key Insight:</strong> Multi-provider systems require per-provider unit handling - Codex uses &lsquo;credits&rsquo;, Cursor uses USD; cannot assume uniform currency formatting across providers</p>
+<h4 id="4-rust-test-oauth_token_prefers_credentials_file_on_macos-failed-in-ci-with-claude-credentials-file-unavailable-varfolderstmpclaudecredentialsjson-test-writes-file-to-tmpcredentialsjson-but-lookup-resolves-to-tmpclaudecredentialsjson-indicating-claude_config_dir-env-var-not-respected">4. Rust test oauth_token_prefers_credentials_file_on_macos failed in CI with &lsquo;Claude credentials file unavailable (/var/folders/&hellip;/tmp/.claude/.credentials.json)&rsquo;. Test writes file to tmp/.credentials.json but lookup resolves to tmp/.claude/.credentials.json, indicating CLAUDE_CONFIG_DIR env var not respected.<a hidden class="anchor" aria-hidden="true" href="#4-rust-test-oauth_token_prefers_credentials_file_on_macos-failed-in-ci-with-claude-credentials-file-unavailable-varfolderstmpclaudecredentialsjson-test-writes-file-to-tmpcredentialsjson-but-lookup-resolves-to-tmpclaudecredentialsjson-indicating-claude_config_dir-env-var-not-respected">#</a></h4>
+<p><strong>Solution:</strong> Root cause: rate_limits/claude.rs and statusline/install.rs tests use separate mutex locks (ENV_LOCK vs. env_lock()) to guard CLAUDE_CONFIG_DIR manipulation. Parallel test execution caused statusline test to overwrite claude test&rsquo;s env value. Fixed by changing test to call read_token_from_credentials_file() directly instead of get_claude_oauth_token(), eliminating dependency on env var resolution and macOS keychain fallback complexity. Also fixed unused import &lsquo;Local&rsquo; (test module re-imported it separately) and dead_code warning for claude_settings_file (changed #[cfg_attr(not(test), allow(dead_code))] to unconditional #[allow(dead_code)]).</p>
+<p><strong>Key Insight:</strong> Unsafe environment variable manipulation in parallel tests requires a single global lock shared across all test modules—local per-module locks create false safety. #[cfg(test)] imports can confuse rustc when test submodule does use super::* then re-imports the same item. cargo fmt requires #[cfg(test)] imports to sort after regular imports.</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="5-ci-cargo-fmt-check-failing-on-3-rust-files-due-to-formatting-violations-vec-macro-line-breaks-trailing-whitespace">5. CI cargo fmt check failing on 3 Rust files due to formatting violations (vec! macro line breaks, trailing whitespace)<a hidden class="anchor" aria-hidden="true" href="#5-ci-cargo-fmt-check-failing-on-3-rust-files-due-to-formatting-violations-vec-macro-line-breaks-trailing-whitespace">#</a></h4>
+<p><strong>Solution:</strong> Ran cargo fmt to auto-fix formatting, committed as 004d3f6</p>
+<p><strong>Key Insight:</strong> Automated formatting enforcement catches style inconsistencies early and maintains codebase consistency</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="pcie-memory-read-request-error-interpretation">PCIe &lsquo;Memory Read Request&rsquo; error interpretation<a hidden class="anchor" aria-hidden="true" href="#pcie-memory-read-request-error-interpretation">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User questioned whether &lsquo;GPU memory read request failure&rsquo; indicates bad RAM sticks rather than GPU/PCIe issue, correctly identifying potential ambiguity in terminology.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI initially used shorthand &lsquo;memory read&rsquo; without clarifying MMIO vs. physical memory distinction, required user prompt to explain that PCIe Memory Read targets memory-mapped I/O address space (GPU BAR regions) not system DRAM.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> User demonstrated domain knowledge by challenging terminology; AI assumed shared understanding of PCIe address spaces. User&rsquo;s question forced more precise technical explanation with diagram showing GPU ↔ Root Complex communication.</p>
+<h4 id="verification-approach-for-pcie-error-diagnosis">Verification approach for PCIe error diagnosis<a hidden class="anchor" aria-hidden="true" href="#verification-approach-for-pcie-error-diagnosis">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User proactively ran GPU stress test to check if errors occur under load, then reported &rsquo;no new WHEA errors during test&rsquo;—empirically validating the idle-state switching hypothesis before AI suggested formal verification steps.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI initially recommended diagnostics sequence (DDU driver reinstall → BIOS PCIe Gen4 downgrade → hardware reseating) but had not yet proposed stress testing as a diagnostic tool.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> User applied scientific method (controlled experiment to isolate variable) faster than AI&rsquo;s systematic troubleshooting checklist. This accelerated root-cause confirmation and avoided unnecessary hardware interventions.</p>
+<h4 id="codex-credits-unit-verification">Codex credits unit verification<a hidden class="anchor" aria-hidden="true" href="#codex-credits-unit-verification">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Recognized from domain knowledge that Codex uses &lsquo;credits&rsquo; not USD, suggested assistant verify online documentation</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Analyzed code patterns only, relied on type definitions and existing usage without external verification</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human brought external domain knowledge about Codex API conventions; AI initially limited search to codebase without consulting external docs despite suggestion</p>
+<h3 id="implementation-level">Implementation Level<a hidden class="anchor" aria-hidden="true" href="#implementation-level">#</a></h3>
+<h4 id="locating-pr-16-on-github">Locating PR #16 on GitHub<a hidden class="anchor" aria-hidden="true" href="#locating-pr-16-on-github">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Initially said &lsquo;michaelovo&rsquo; then provided full URL after AI struggled with repository name variations</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Systematically tried michaelovo, Michael-OvO, movo-ai variations before asking user for clarification</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human had exact knowledge but initial instruction lacked precision (case sensitivity, username format); AI exhausted systematic search patterns before requesting explicit URL</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="critical-limitations">Critical Limitations<a hidden class="anchor" aria-hidden="true" href="#critical-limitations">#</a></h3>
+<ul>
+<li>Initial diagnosis stated &lsquo;PCIe signal quality problem&rsquo; (implying physical layer Bad TLP/DLLP errors) based on WHEA corrected error presence. After user challenged this (noting PCIe x16 link confirmed, no signal errors), AI parsed AER register data and corrected to &lsquo;Unsupported Request—a logical/configuration error, not physical.&rsquo; Diagnosis was revised 70% → 90% confidence but initial framing was premature.</li>
+<li>PowerShell command execution repeatedly failed due to bash extglob expansion eating $_ variable (e.g., &rsquo;extglob.TimeCreated&rsquo; errors). Multiple retry attempts with different quoting/heredoc strategies were needed before finding stable syntax. This fragility suggests tool layer needs better PowerShell encapsulation.</li>
+<li>Did not verify Codex API documentation online when user suggested checking, relied solely on code analysis despite availability of external information</li>
+</ul>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>After fixing Rust test race condition and warnings, pushed commit without running cargo fmt. CI immediately failed on import ordering. Required second commit (ce63b8b) to fix #[cfg(test)] placement. Standard pre-push checklist (fmt + clippy) should have been applied.</li>
+<li>Had difficulty resolving GitHub repository due to case sensitivity (michaelovo vs Michael-OvO), required user to provide explicit URL after trying multiple variations</li>
+<li>Required multiple user continuation prompts after automatic context compaction, indicating loss of conversation state awareness</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>PCIe Advanced Error Reporting &lsquo;Unsupported Request&rsquo; can be triggered by NVIDIA driver&rsquo;s automatic Gen5↔Gen1 link-state power management during idle periods. Windows powercfg ASPM setting (Link State Power Management) only controls OS-level policy; GPU driver firmware and BIOS independently manage PCIe L-states. RTX 5090 + PCIe Gen5 has known compatibility issues causing UR errors during re-negotiation when GPU tries to access memory-mapped address space mid-transition. Community-validated fix: force &lsquo;Prefer Maximum Performance&rsquo; or BIOS PCIe Gen4 lock.</li>
+<li>Multi-provider rate limiting systems require careful per-provider unit handling - assuming uniform currency formatting breaks when providers use different units (Codex &lsquo;credits&rsquo; vs Cursor USD)</li>
+<li>Fork maintenance strategy: merge upstream architectural changes incrementally with explicit feature restoration commits, document conflicts proactively to maintain upstream relationship</li>
+<li>Rust parallel test suite with environment variable manipulation requires a single global mutex shared across all test modules—per-module local locks (static ENV_LOCK in module A, separate env_lock() in module B) create race conditions when both modify same env vars. The #[cfg(test)] attribute on imports can cause &lsquo;unused&rsquo; warnings if test submodule uses &lsquo;use super::*&rsquo; then redundantly imports same item. cargo fmt enforces that conditional imports (#[cfg(test)]) sort after unconditional imports.</li>
+<li>Two-layer deduplication (remote Python script + local HashSet) effectively prevents duplicate records in distributed log aggregation systems where multiple devices append to shared storage</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<h3 id="windows-system-diagnostics">Windows System Diagnostics<a hidden class="anchor" aria-hidden="true" href="#windows-system-diagnostics">#</a></h3>
+<p><strong>✅ HP OMEN 45L RTX 5090 blue-screen crash analysis</strong>
+<em>04:18:02.232 | claude_code</em>
+Diagnosed 3 BSOD events (0xA, 0x133) and 1010 WHEA PCIe errors over 5 months. Analyzed Windows Event Viewer logs, WHEA AER register data (UncorrectableErrorStatus 0x100000 = Unsupported Request). Identified root cause as NVIDIA driver&rsquo;s PCIe Gen5↔Gen1 power-state switching during idle. User ran stress test validating errors only occur during idle/boot, not under load. Applied fix (NVIDIA Power Management → Maximum Performance). Post-reboot verification: zero runtime errors, only 2 boot-time events (expected). Also resolved related 5-second YouTube audio delay (HDMI audio controller D3cold sleep).</p>
+<h3 id="tokenmonitor">TokenMonitor<a hidden class="anchor" aria-hidden="true" href="#tokenmonitor">#</a></h3>
+<p><strong>✅ Multi-bug fixes, CI formatting, upstream communication, v0.13.0 release</strong>
+<em>22:22:07.043 | claude_code</em>
+Verified SSH deduplication logic (two-layer: remote Python seen set + local HashSet). Fixed Codex credits display bug by replacing USD formatting with &lsquo;credits&rsquo; unit. Fixed Svelte HiddenModelsSettings.svelte closing tag mismatch (removed extra </div> at line 151). Resolved Rust CI test race condition (oauth_token_prefers_credentials_file_on_macos): changed test to call read_token_from_credentials_file() directly, bypassing env var/keychain complexity. Fixed cargo fmt violations (import ordering, whitespace). Wrote comprehensive PR comment to upstream maintainer documenting that statusline rewrite and OAuth/Keychain removal conflicts were already resolved via merge commits, with Codex/Cursor rate limits unaffected. Tagged and pushed v0.13.0 release.</p>
+<h3 id="gadget-python-toolkit">Gadget Python Toolkit<a hidden class="anchor" aria-hidden="true" href="#gadget-python-toolkit">#</a></h3>
+<p><strong>✅ Generate paper-style technical overview documentation</strong>
+<em>01:19:19.004 | claude_code</em>
+Used /code-summarize skill to explore gadget project structure via MCP hex-line tools. Read pyproject.toml, README, and key modules (common/llm.py, translation.py, cache.py, sync.py, summarize/auto.py, research/scout/, benchmark/cli.py). Generated 6-section document: Highlights (5 bullets on two-phase LLM pipeline, SHA-256 caching, rclone sync), Introduction (problem/solution/context), Architecture (directory tree + data flow diagram + key abstractions table), Implementation (code snippets for LLM backends, TranslationEngine, DiskCache), Results (real usage stats), Conclusion (future work).</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><strong>Total: $54.04</strong> — 54.9M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

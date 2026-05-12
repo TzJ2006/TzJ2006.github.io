@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-27 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Explored Slurm cluster infrastructure, analyzed storage usage across shared filesystem, and reviewed ML model evaluation results for error recovery benchmark">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-02-27/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-02-27/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-27/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-02-27/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-27">
+  <meta property="og:description" content="Explored Slurm cluster infrastructure, analyzed storage usage across shared filesystem, and reviewed ML model evaluation results for error recovery benchmark">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-27T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-27T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-27">
+  <meta name="twitter:description" content="Explored Slurm cluster infrastructure, analyzed storage usage across shared filesystem, and reviewed ML model evaluation results for error recovery benchmark">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-27",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-02-27/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-27",
+  "name": "Bug Journal 2026-02-27",
+  "description": "Explored Slurm cluster infrastructure, analyzed storage usage across shared filesystem, and reviewed ML model evaluation results for error recovery benchmark",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-02-27 Daily Overview What was done: Cluster infrastructure exploration, storage analysis, and ML evaluation result review for error recovery benchmark project How it was done: Slurm command exploration with live testing, parallel directory scanning with timeout handling for large filesystems, result aggregation from evaluation logs Impact: Comprehensive GPU job scheduling guide created enabling batch workflows, storage bottlenecks identified across 18 users on 7.5PB filesystem, model performance baseline established revealing severe distribution shift requiring new training approach Explored Slurm cluster infrastructure, analyzed storage usage across shared filesystem, and reviewed ML model evaluation results for error recovery benchmark\nTasks Architecture \u0026 Strategy ✅ Slurm cluster exploration and GPU node allocation tutorial — Explored Slurm commands (salloc, sbatch, srun), identified 9 idle GPU nodes in ai partition, documented three connection methods with pam_slurm_adopt constraints ✅ M14 evaluation result review for pi0/BC-RNN policies — Retrieved and analyzed completed M14 baseline evaluation showing near-zero success rates (0.28% BC-RNN, 0% VLAs) on error recovery scenarios ✅ HDD_POOL storage analysis across all users — Scanned 18 user directories using parallel execution with timeouts, identified top storage consumers (5.1TB to 1.4TB), confirmed 81% filesystem utilization Implementation \u0026 Fixes ❌ Locate training set evaluation modification — Attempted to find previously discussed modification to evaluate on training set, exhaustive search found no evidence in code/memory/docs Problems \u0026 Solutions Critical Issues 1. All ML policies (BC-RNN 0.28%, Pi0 0%, Pi0.5 0%) show catastrophic failure on M14 error recovery evaluation, with Random baseline achieving higher recovery progress Solution: Results validate need for M15 phase - finetune Pi0.5 with human recovery demonstrations to address distribution shift\nKey Insight: Models trained exclusively on successful task demonstrations fail catastrophically on OOD error-injected scenarios (\u003c1% success), demonstrating severe distribution shift; error recovery requires explicit training on recovery trajectories, not just normal task execution\n2. Cannot SSH directly to GPU compute nodes (pam_slurm_adopt access denied) Solution: Must allocate resources via salloc or sbatch first, then use srun or SSH with active job ID; recommended tmux + salloc workflow for stable interactive sessions\nKey Insight: HPC clusters enforce job-based access control to prevent unauthorized resource usage; direct SSH to compute nodes is blocked until a Slurm job is allocated, requiring two-step workflow (allocate → connect)\n3. Large directory scanning operations timing out (\u003e10 minutes for directories \u003e2TB) when analyzing HDD_POOL storage Solution: Implemented parallel directory scanning with per-directory 600-second timeouts, allowing completion of most scans while gracefully handling extremely large directories\nKey Insight: Shared HPC filesystems require parallel execution with explicit timeouts for directory traversal operations; some user directories (miniconda3, VLA_data, cpx1/2) are so large they require alternative approaches like lfs quota or –max-depth=1 scanning\nHuman vs AI Approaches Implementation Level Storage analysis scope interpretation Role Approach Human Initially asked for storage analysis broadly, then clarified to include all users when AI only showed their own directory AI Interpreted initial request narrowly as user’s own directory analysis, required explicit clarification to expand scope to all 18 users Difference Analysis: Human had systemic view of shared storage from the start, AI defaulted to user-centric interpretation until corrected; demonstrates AI’s tendency to minimize scope without explicit clarification\nEvaluation modification recall Role Approach Human Remembered asking to modify evaluation to use training set instead of test set in previous conversation AI Conducted exhaustive search across code, memory files, and documentation but found no evidence of such modification Difference Analysis: Human relied on episodic memory of conversation, AI relied on searchable artifacts; either the conversation wasn’t persisted, the change wasn’t implemented, or human misremembered the context\nAI Limitations General Limitations Multiple directory scan attempts for large shared filesystem directories (\u003e2TB) timed out despite 600-second limits, requiring fallback to parallel execution and incomplete results for 5 directories (chenshiyu, cpx1, cpx2, liangzhijia, miniconda3, mozihao) Could not locate previously discussed ’evaluate on training set’ modification despite exhaustive search of code, memory system, project documentation, and recent file changes, suggesting conversation persistence gap or human memory error Required explicit user clarification to understand scope of storage analysis should include all users, not just the requesting user’s directory, showing overly narrow default interpretation Learnings Key Learnings Severe distribution shift in error recovery tasks: models trained on successful demonstrations achieve near-zero success (\u003c1%) on injected error scenarios, with Random baseline outperforming learned policies on recovery progress, validating need for error-specific training data collection (M15 phase) Parallel execution with per-task timeouts is essential for scanning large shared HPC filesystems where individual user directories may exceed 2TB; sequential scanning is infeasible for production-scale analysis HPC clusters use pam_slurm_adopt to enforce job-based SSH access control - must allocate resources via salloc/sbatch before SSH/srun to compute nodes; tmux + salloc provides stable interactive workflow resistant to connection drops Tianhe-XY cluster has 9 idle A800 GPU nodes (an16,21,23,28-29,31,34,39-40) in ai partition with 56 CPUs and 1TB memory each, available for 4-72 hour jobs without GPU GRES specification Conversation Summaries Error Recovery Benchmark (Tianhe Cluster) ✅ Slurm GPU node allocation and connection workflow tutorial 05:18:36.275 | claude_code User needed comprehensive guide for Slurm cluster operations. Explored available commands, identified 9 idle GPU nodes in ai partition (an16-40 series), discovered pam_slurm_adopt enforces job-based SSH access. Created detailed tutorial covering salloc (interactive), sbatch (batch), and tmux-based workflows for stable connections, with examples for 4-24 hour GPU jobs.\n✅ HDD_POOL storage usage analysis across all 18 users 04:28:09.784 | claude_code User requested storage analysis; after initial narrow scope (just user’s 29GB), clarified to scan all users. Multiple timeouts on large directories led to parallel scanning strategy with 600s per-directory limits. Identified 14.7TB confirmed usage, top 5 users consuming 5.1TB (chenjunye) to 1.4TB (zhaoganlong), 5 directories \u003e2TB couldn’t complete. Total filesystem: 7.5PB (81% used, 1.5PB remaining).\nError Recovery Benchmark ✅ M14 baseline evaluation results for Pi0/Pi0.5/BC-RNN policies 05:57:24.584 | claude_code User inquired about previously launched evaluation status. Retrieved M14 results from 649 error scenes showing catastrophic failure: BC-RNN 0.28% success (5/1800), Pi0 0%, Pi0.5 0%, with Random baseline achieving higher recovery progress than learned policies. Confirmed severe distribution shift between training (normal trajectories) and evaluation (error-injected scenarios), validating M15 phase need for human recovery demonstrations.\n🔍 Attempt to locate training set evaluation modification 07:57:48.342 | claude_code User recalled requesting modification to evaluate policies on training set. Conducted exhaustive search across codebase, memory system, and documentation but found no evidence of such modification. Unable to locate referenced work; possible conversation persistence gap or memory confusion.\nToken Usage Total: $2.10 — 4.3M tokens\n",
+  "wordCount" : "1066",
+  "inLanguage": "en",
+  "datePublished": "2026-02-27T00:00:00-05:00",
+  "dateModified": "2026-02-27T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-02-27/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-27/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/'>Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-27
+    </h1>
+    <div class="post-meta"><span title='2026-02-27 00:00:00 -0500 EST'>February 27, 2026</span>&nbsp;·&nbsp;<span>6 min</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="daily-report--2026-02-27">Daily Report — 2026-02-27<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-02-27">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Cluster infrastructure exploration, storage analysis, and ML evaluation result review for error recovery benchmark project</li>
+<li><strong>How it was done:</strong> Slurm command exploration with live testing, parallel directory scanning with timeout handling for large filesystems, result aggregation from evaluation logs</li>
+<li><strong>Impact:</strong> Comprehensive GPU job scheduling guide created enabling batch workflows, storage bottlenecks identified across 18 users on 7.5PB filesystem, model performance baseline established revealing severe distribution shift requiring new training approach</li>
+</ul>
+<blockquote>
+<p>Explored Slurm cluster infrastructure, analyzed storage usage across shared filesystem, and reviewed ML model evaluation results for error recovery benchmark</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Slurm cluster exploration and GPU node allocation tutorial</strong> — Explored Slurm commands (salloc, sbatch, srun), identified 9 idle GPU nodes in ai partition, documented three connection methods with pam_slurm_adopt constraints</li>
+<li>✅ <strong>M14 evaluation result review for pi0/BC-RNN policies</strong> — Retrieved and analyzed completed M14 baseline evaluation showing near-zero success rates (0.28% BC-RNN, 0% VLAs) on error recovery scenarios</li>
+<li>✅ <strong>HDD_POOL storage analysis across all users</strong> — Scanned 18 user directories using parallel execution with timeouts, identified top storage consumers (5.1TB to 1.4TB), confirmed 81% filesystem utilization</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>❌ <strong>Locate training set evaluation modification</strong> — Attempted to find previously discussed modification to evaluate on training set, exhaustive search found no evidence in code/memory/docs</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-all-ml-policies-bc-rnn-028-pi0-0-pi05-0-show-catastrophic-failure-on-m14-error-recovery-evaluation-with-random-baseline-achieving-higher-recovery-progress">1. All ML policies (BC-RNN 0.28%, Pi0 0%, Pi0.5 0%) show catastrophic failure on M14 error recovery evaluation, with Random baseline achieving higher recovery progress<a hidden class="anchor" aria-hidden="true" href="#1-all-ml-policies-bc-rnn-028-pi0-0-pi05-0-show-catastrophic-failure-on-m14-error-recovery-evaluation-with-random-baseline-achieving-higher-recovery-progress">#</a></h4>
+<p><strong>Solution:</strong> Results validate need for M15 phase - finetune Pi0.5 with human recovery demonstrations to address distribution shift</p>
+<p><strong>Key Insight:</strong> Models trained exclusively on successful task demonstrations fail catastrophically on OOD error-injected scenarios (&lt;1% success), demonstrating severe distribution shift; error recovery requires explicit training on recovery trajectories, not just normal task execution</p>
+<h4 id="2-cannot-ssh-directly-to-gpu-compute-nodes-pam_slurm_adopt-access-denied">2. Cannot SSH directly to GPU compute nodes (pam_slurm_adopt access denied)<a hidden class="anchor" aria-hidden="true" href="#2-cannot-ssh-directly-to-gpu-compute-nodes-pam_slurm_adopt-access-denied">#</a></h4>
+<p><strong>Solution:</strong> Must allocate resources via salloc or sbatch first, then use srun or SSH with active job ID; recommended tmux + salloc workflow for stable interactive sessions</p>
+<p><strong>Key Insight:</strong> HPC clusters enforce job-based access control to prevent unauthorized resource usage; direct SSH to compute nodes is blocked until a Slurm job is allocated, requiring two-step workflow (allocate → connect)</p>
+<h4 id="3-large-directory-scanning-operations-timing-out-10-minutes-for-directories-2tb-when-analyzing-hdd_pool-storage">3. Large directory scanning operations timing out (&gt;10 minutes for directories &gt;2TB) when analyzing HDD_POOL storage<a hidden class="anchor" aria-hidden="true" href="#3-large-directory-scanning-operations-timing-out-10-minutes-for-directories-2tb-when-analyzing-hdd_pool-storage">#</a></h4>
+<p><strong>Solution:</strong> Implemented parallel directory scanning with per-directory 600-second timeouts, allowing completion of most scans while gracefully handling extremely large directories</p>
+<p><strong>Key Insight:</strong> Shared HPC filesystems require parallel execution with explicit timeouts for directory traversal operations; some user directories (miniconda3, VLA_data, cpx1/2) are so large they require alternative approaches like lfs quota or &ndash;max-depth=1 scanning</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="implementation-level">Implementation Level<a hidden class="anchor" aria-hidden="true" href="#implementation-level">#</a></h3>
+<h4 id="storage-analysis-scope-interpretation">Storage analysis scope interpretation<a hidden class="anchor" aria-hidden="true" href="#storage-analysis-scope-interpretation">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Initially asked for storage analysis broadly, then clarified to include all users when AI only showed their own directory</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Interpreted initial request narrowly as user&rsquo;s own directory analysis, required explicit clarification to expand scope to all 18 users</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human had systemic view of shared storage from the start, AI defaulted to user-centric interpretation until corrected; demonstrates AI&rsquo;s tendency to minimize scope without explicit clarification</p>
+<h4 id="evaluation-modification-recall">Evaluation modification recall<a hidden class="anchor" aria-hidden="true" href="#evaluation-modification-recall">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Remembered asking to modify evaluation to use training set instead of test set in previous conversation</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Conducted exhaustive search across code, memory files, and documentation but found no evidence of such modification</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human relied on episodic memory of conversation, AI relied on searchable artifacts; either the conversation wasn&rsquo;t persisted, the change wasn&rsquo;t implemented, or human misremembered the context</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>Multiple directory scan attempts for large shared filesystem directories (&gt;2TB) timed out despite 600-second limits, requiring fallback to parallel execution and incomplete results for 5 directories (chenshiyu, cpx1, cpx2, liangzhijia, miniconda3, mozihao)</li>
+<li>Could not locate previously discussed &rsquo;evaluate on training set&rsquo; modification despite exhaustive search of code, memory system, project documentation, and recent file changes, suggesting conversation persistence gap or human memory error</li>
+<li>Required explicit user clarification to understand scope of storage analysis should include all users, not just the requesting user&rsquo;s directory, showing overly narrow default interpretation</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>Severe distribution shift in error recovery tasks: models trained on successful demonstrations achieve near-zero success (&lt;1%) on injected error scenarios, with Random baseline outperforming learned policies on recovery progress, validating need for error-specific training data collection (M15 phase)</li>
+<li>Parallel execution with per-task timeouts is essential for scanning large shared HPC filesystems where individual user directories may exceed 2TB; sequential scanning is infeasible for production-scale analysis</li>
+<li>HPC clusters use pam_slurm_adopt to enforce job-based SSH access control - must allocate resources via salloc/sbatch before SSH/srun to compute nodes; tmux + salloc provides stable interactive workflow resistant to connection drops</li>
+<li>Tianhe-XY cluster has 9 idle A800 GPU nodes (an16,21,23,28-29,31,34,39-40) in ai partition with 56 CPUs and 1TB memory each, available for 4-72 hour jobs without GPU GRES specification</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<h3 id="error-recovery-benchmark-tianhe-cluster">Error Recovery Benchmark (Tianhe Cluster)<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark-tianhe-cluster">#</a></h3>
+<p><strong>✅ Slurm GPU node allocation and connection workflow tutorial</strong>
+<em>05:18:36.275 | claude_code</em>
+User needed comprehensive guide for Slurm cluster operations. Explored available commands, identified 9 idle GPU nodes in ai partition (an16-40 series), discovered pam_slurm_adopt enforces job-based SSH access. Created detailed tutorial covering salloc (interactive), sbatch (batch), and tmux-based workflows for stable connections, with examples for 4-24 hour GPU jobs.</p>
+<p><strong>✅ HDD_POOL storage usage analysis across all 18 users</strong>
+<em>04:28:09.784 | claude_code</em>
+User requested storage analysis; after initial narrow scope (just user&rsquo;s 29GB), clarified to scan all users. Multiple timeouts on large directories led to parallel scanning strategy with 600s per-directory limits. Identified 14.7TB confirmed usage, top 5 users consuming 5.1TB (chenjunye) to 1.4TB (zhaoganlong), 5 directories &gt;2TB couldn&rsquo;t complete. Total filesystem: 7.5PB (81% used, 1.5PB remaining).</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>✅ M14 baseline evaluation results for Pi0/Pi0.5/BC-RNN policies</strong>
+<em>05:57:24.584 | claude_code</em>
+User inquired about previously launched evaluation status. Retrieved M14 results from 649 error scenes showing catastrophic failure: BC-RNN 0.28% success (5/1800), Pi0 0%, Pi0.5 0%, with Random baseline achieving higher recovery progress than learned policies. Confirmed severe distribution shift between training (normal trajectories) and evaluation (error-injected scenarios), validating M15 phase need for human recovery demonstrations.</p>
+<p><strong>🔍 Attempt to locate training set evaluation modification</strong>
+<em>07:57:48.342 | claude_code</em>
+User recalled requesting modification to evaluate policies on training set. Conducted exhaustive search across codebase, memory system, and documentation but found no evidence of such modification. Unable to locate referenced work; possible conversation persistence gap or memory confusion.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-02-27-usage.png"></p>
+<p><strong>Total: $2.10</strong> — 4.3M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

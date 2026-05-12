@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-05-05 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="已经诊断并修复了RTX 5090 PCIe设备的故障问题；编写了相关的工具包文档；解决了TokenMonitor中多个TypeScript/Rust代码错误；并发布了v0.13.0版本，其中包含了针对上游代码冲突的解决方案。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-05-05/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-05-05/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-05-05/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-05-05/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-05-05">
+  <meta property="og:description" content="已经诊断并修复了RTX 5090 PCIe设备的故障问题；编写了相关的工具包文档；解决了TokenMonitor中多个TypeScript/Rust代码错误；并发布了v0.13.0版本，其中包含了针对上游代码冲突的解决方案。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-05-05T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-05-05T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-05-05">
+  <meta name="twitter:description" content="已经诊断并修复了RTX 5090 PCIe设备的故障问题；编写了相关的工具包文档；解决了TokenMonitor中多个TypeScript/Rust代码错误；并发布了v0.13.0版本，其中包含了针对上游代码冲突的解决方案。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-05-05",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/2026-05-05/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-05-05",
+  "name": "Bug Journal 2026-05-05",
+  "description": "已经诊断并修复了RTX 5090 PCIe设备的故障问题；编写了相关的工具包文档；解决了TokenMonitor中多个TypeScript/Rust代码错误；并发布了v0.13.0版本，其中包含了针对上游代码冲突的解决方案。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "每日报告 — 2026-05-05 每日概述 **已完成的工作：**诊断了HP OMEN RTX 5090蓝屏故障，生成了Python工具包技术文档，修复了多个TokenMonitor错误（Svelte标签不匹配、Rust测试竞争条件、Codex积分显示、CI格式问题），向上游维护者传达了架构解决方案，并发布了v0.13.0版本。 **完成方式：**分析了Windows事件日志以找出PCIe电源状态问题的根本原因，通过MCP工具检查了代码库结构，通过针对性编辑和竞争条件分析修复了Svelte/Rust中的错误，应用了自动格式化功能，并在综合的PR评论中记录了合并策略。 **影响：**消除了系统崩溃的风险（将WHEA错误从每天数十个减少到仅2次启动时的错误），完成了项目文档的编写，提高了TokenMonitor的UI准确性和CI的可靠性，保持了与上游分支的关系，并发布了包含状态栏功能的稳定版本。 诊断并修复了RTX 5090的PCIe故障，开发了工具包文档，解决了TokenMonitor中的多个TypeScript/Rust错误，并发布了v0.13.0版本，解决了上游冲突问题。\n任务 架构与策略 ✅ 诊断HP OMEN 45L上RTX 5090的Windows蓝屏故障 — 调查了3次蓝屏现象（0xA IRQL_NOT_LESS_OR_EQUAL，0x133 DPC_WATCHDOG_VIOLATION）和1010个WHEA PCIe错误，确定NVIDIA驱动程序从Gen5到Gen1的链接状态切换是根本原因，并应用了修复方案（NVIDIA电源管理→优先最大性能）。 ✅ 标记并发布v0.13.0版本 — 在提交004d3f6时创建了v0.13.0标签，并推送到TzJ2006/TokenMonitor，触发了发布流程。 ✅ 向上游维护者写PR评论解释架构解决方案 — 在PR #16中记录了状态栏重写和OAuth/Keychain移除的冲突已经合并，Codex/Cursor的速率限制不依赖于已移除的管道。 ✅ 修复Codex积分显示单位错误 — 在UsageBars.svelte:234中将formatUsdAmount()改为integer格式，并添加’credits’后缀，因为Codex使用的是积分而不是美元。 ✅ 修复Rust CI测试失败和编译器警告 — 解决了oauth_token_prefers_credentials_file_on_macos的竞争条件（不同测试模块对CLAUDE_CONFIG_DIR使用不同的互斥锁），移除了未使用的导入语句，抑制了死代码警告，修复了cargo fmt的导入顺序。 ✅ 验证SSH远程去重逻辑的实现 — 确认了两层去重：远程Python脚本使用message_id:requestId生成的’seen’集合，本地缓存在追加之前使用HashSet。 实施与修复 ✅ 生成工具包项目的技术概述 — 创建了6部分的纸质风格文档，涵盖Python 3.10+工具包（总结/研究/基准测试/网站），分享了通用/基础设施、两阶段LLM管道以及Hugo部署流程。 ✅ 修复Svelte HiddenModelsSettings.svelte关闭标签不匹配的问题 — 删除了第151行的多余，以避免Vite预转换错误，并确认没有其他硬编码的最大高度限制会裁剪内容。 ✅ 修复cargo fmt的CI格式错误 — 对tray.rs、usage_query.rs、mod.rs进行了cargo fmt处理，以解决vec!宏和空白处的格式问题。 问题与解决方案 关键问题 1. NVIDIA RTX 5090在5个月内产生了1010个WHEA PCIe AER不支持的请求错误，导致间歇性蓝屏。这些错误主要集中在空闲期和启动期间，而不是在GPU压力测试期间。 **解决方案：**确定根本原因是NVIDIA驱动程序的PCIe链接状态电源管理（空闲时从Gen5切换到Gen1）。在重新协商过程中，GPU在地址空间完全恢复之前发送内存映射的I/O请求，从而引发UR。通过将NVIDIA控制面板→电源管理模式→优先最大性能设置为该选项来解决问题。验证后，重启后19分钟的运行时没有新的错误，只有2次启动时的错误（硬件初始化，不可避免的）。同时解决了5秒的HDMI音频延迟问题（同样的原因：音频控制器D3cold睡眠）。\n**关键洞察：**Windows ASPM Off设置只影响操作系统级别的PCIe电源策略；NVIDIA驱动程序和BIOS仍然可以独立进行链接状态切换。“纠正的错误”这一说法掩盖了严重性——累积的UR错误最终会破坏驱动程序的状态并触发内核错误检查。社区研究证实，这是一个已知的RTX 5090与PCIe Gen5兼容性问题，涉及多个主板供应商。\n2. 上游维护者担心状态栏重写和OAuth/Keychain移除导致的Codex/Cursor速率限制冲突。 **解决方案：**记录下这些冲突已经通过合并提交f6e0982和4492d2f解决，Codex使用CLI抓取数据（而非OAuth），Cursor不需要密钥链提示。\n**关键洞察：**逐步合并策略与明确的特性恢复提交相结合，可以在采纳上游架构变更的同时保留下游的创新成果。\n3. Codex积分余额显示为美元（$2,116.02$），而不是积分单位，导致用户困惑。 **解决方案：**在UsageBars.svelte中替换formatUsdAmount()为Math.round().toLocaleString()加上’credits’后缀；确认此修复不会影响Cursor的extra_usage，后者正确使用美元。\n**关键洞察：**多提供商系统需要按提供商处理单位——Codex使用’credits’，而Cursor使用美元；不能假设所有提供商的货币格式都是统一的。\n4. Rust测试中的oauth_token_prefers_credentials_file_on_macos在CI中失败，提示“Claude凭据文件不可用(/var/folders/…/tmp/.claude/.credentials.json)”。测试将文件写入tmp/.credentials.json，但查找结果为tmp/.claude/.credentials.json，表明CLAUDE_CONFIG_DIR环境变量未被正确引用。 **解决方案：**根本原因是ratelimits/claude.rs和statusline/install.rs测试使用单独的互斥锁（ENV_LOCK vs. env_lock()）来保护CLAUDE_CONFIG_DIR的操作。并行测试执行导致状态栏测试覆盖了claude测试的env值。通过将测试直接调用read_token_from_credentials_file()而不是get_claude_oauth_token()来解决这一问题，从而消除了对env变量解析的依赖性和macOS密钥链的复杂性。同时修复了未使用的导入语句’Local’（测试模块单独重新导入它）以及claude_settings_file的死代码警告（将#[cfgattr(not(test), allow(dead_code)]改为无条件的#[allow(dead_code)]）。\n**关键洞察：**在并行测试中，不安全的环境变量操作需要在所有测试模块之间共享一个全局锁——局部模块级锁会产生虚假的安全性。[#cfg(test)]导入可能会让rustc感到困惑，当测试子模块确实使用了super::*然后又重新导入同一个项时。cargo fmt要求#[cfg(test)]导入在常规导入之后排序。\n一般问题 5. CI cargo fmt检查在3个Rust文件中因格式问题失败（vec!宏换行、尾随空白） **解决方案：**运行cargo fmt自动修复格式问题，并将代码提交为004d3f6。**关键洞察：**自动化格式规范执行能够及早发现风格不一致性问题，从而保持代码库的一致性\n人类与人工智能的方法对比 战略层面 对PCIe“内存读取请求”错误的解读 角色 方法 人类 用户质疑“GPU内存读取请求失败”是RAM条损坏还是GPU/PCIe问题，正确识别了术语上的潜在歧义。 人工智能 人工智能最初使用简略的“内存读取”一词，但没有明确区分MMIO和物理内存，需要用户提示才能解释PCIe内存读取是针对内存映射的I/O地址空间（GPU BAR区域）而不是系统DRAM。 **差异分析：**用户通过质疑术语展示了其领域知识；人工智能假设人们对PCIe地址空间有共同的理解。用户的提问迫使人工智能提供更精确的技术解释，并附上图表说明GPU与Root Complex之间的通信关系。\n针对PCIe错误诊断的验证方法 角色 方法 人类 用户主动运行GPU压力测试，以检查在负载下是否会出现错误，然后报告“测试过程中没有新的WHEA错误”——在人工智能建议进行正式验证之前，这一结果已经经验性地验证了空闲状态切换的假设。 人工智能 人工智能最初推荐了诊断顺序（重新安装DDU驱动程序→降低BIOS中的PCIe Gen4等级→重新插拔硬件），但还没有提出压力测试作为诊断工具。 **差异分析：**用户比人工智能更快地应用了科学方法（通过控制实验来隔离变量），这加快了根本原因确认的过程，避免了不必要的硬件干预。\n代码库中的信用单位验证 角色 方法 人类 从领域知识中认识到Codex使用的是“信用”而非美元，建议助手在线验证文档。 人工智能 仅分析了代码模式，依赖于类型定义和现有用法，而没有进行外部验证。 **差异分析：**人类带来了关于Codex API惯例的外部领域知识；人工智能最初只搜索了代码库，没有查阅外部文档，尽管有人提出了建议。\n实施层面 在GitHub上找到PR #16 角色 方法 人类 最初说“michaelovo”，然后在人工智能难以处理仓库名称变化时提供了完整的URL。 人工智能 系统地尝试了michaelovo、Michael-OvO、movo-ai等多种变体，之后才请求用户进行澄清。 **差异分析：**人类拥有确切的知识，但最初的指示不够精确（大小写敏感、用户名格式）；人工智能在请求明确URL之前，已经用尽了系统的搜索模式。\n人工智能的局限性 主要局限性 初步诊断指出“PCIe信号质量问题”（意味着物理层的Bad TLP/DLLP错误），这是基于WHEA修正的错误存在的。当用户对此提出质疑时（指出PCIe x16链接已确认，没有信号错误），人工智能解析了AER寄存器数据，并将诊断结果修正为“不支持的请求——逻辑/配置错误，而非物理问题”。诊断结果的信心度从70%提升到了90%，但最初的框架还是过早的。 PowerShell命令执行反复失败，因为bash的extglob扩展操作消耗了$_变量（例如，“extglob.TimeCreated”错误）。需要多次重试，并使用不同的引用/heredoc策略，才能找到稳定的语法。这种脆弱性表明工具层需要更好的PowerShell封装。 当用户建议检查Codex API文档时，没有进行在线验证，而是完全依赖代码分析，尽管有外部信息可用。 一般局限性 在修复了Rust测试中的竞争条件警告后，提交了提交，但没有运行cargo fmt。CI立即因为导入顺序的问题而失败。需要第二次提交（ce63b8b）来解决#[cfg(test)]的放置问题。应该应用标准的提交前检查清单（fmt + clippy）。 由于大小写敏感性的问题，在解决GitHub仓库问题时，需要用户提供明确的URL，因为尝试了多种变体。 在自动上下文压缩后，需要多次用户继续提示，这表明会话状态意识已经丧失。 经验教训 关键经验教训 PCIe高级错误报告中的“不支持的请求”可能是由NVIDIA驱动程序在空闲期间自动进行的Gen5↔Gen1链接状态电源管理引起的。Windows的powercfg ASPM设置（链接状态电源管理）只能控制操作系统级别的策略；GPU驱动程序和BIOS分别管理PCIe L状态。RTX 5090 + PCIe Gen5存在已知的兼容性问题，这会导致在重新协商期间，GPU试图访问内存映射地址空间时出现UR错误。社区验证的解决方案是强制使用“优先最大性能”或BIOS PCIe Gen4锁定。 多提供商速率限制系统需要仔细处理每个提供商的单元——假设如果提供商会使用不同的单位（Codex的“信用”与Cursor USD），那么统一的货币格式就会失效。 分支维护策略：逐步合并上游的架构变更，并附带明确的特性恢复提交，主动记录冲突以便维持与上游的关系。 Rust并行测试套件中使用环境变量操作，需要在一个全局互斥锁上共享，因为每个模块都有本地锁（模块A中的静态ENV_LOCK，模块B中的单独的env_lock()），当两个模块都修改相同的环境变量时，会产生竞争条件。在导入时使用#[cfg(test)]属性可能会导致“未使用”警告，如果测试子模块使用use super::*，则重复导入同一项。cargo fmt会强制按条件导入的顺序进行排序，而不是无条件导入。 双层去重（远程Python脚本+本地HashSet）可以有效防止分布式日志聚合系统中的重复记录，尤其是在多个设备向共享存储追加数据时。 对话总结 Windows系统诊断 ✅ HP OMEN 45L RTX 5090蓝屏崩溃分析 04:18:02.232 | claude_code 诊断出3次BSOD事件（0xA, 0x133）和1010次WHEA PCIe错误，时间跨度超过5个月。分析了Windows事件查看器日志、WHEA AER寄存器数据（不可纠正错误状态0x100000=不支持的请求）。确定原因是NVIDIA驱动程序在空闲期间进行了PCIe Gen5↔Gen1的电源状态切换。用户进行了压力测试，验证错误仅在空闲/启动期间发生，而在负载下不会发生。应用了解决方案（NVIDIA电源管理→最大性能）。重启后验证：运行时错误为零，只有2次启动时的事件（预期如此）。还解决了相关的5秒YouTube音频延迟问题（HDMI音频控制器D3cold睡眠）。\nTokenMonitor**✅ 多缺陷修复、CI格式调整、上游沟通、v0.13.0版本发布** 22:22:07.043 | claude_code\n已验证SSH去重逻辑（双层处理：远程Python数据+本地HashSet）。通过将美元格式替换为“credits”单位，修复了Codex积分显示错误。修复了Svelte HiddenModelsSettings.svelte文件的关闭标签不匹配问题（删除了第151行的多余）。解决了Rust CI测试中的竞态条件问题（oauth_token_prefers_credentials_file_on_macos）：修改测试以直接调用read_token_from_credentials_file()，避免了环境变量/密钥链的复杂性。修复了cargo fmt的违规问题（导入顺序、空白字符）。为上游维护者撰写了详细的PR评论，说明状态行重写和OAuth/密钥链移除的冲突已通过合并提交解决，且不影响Codex和Cursor的速率限制。已标记并推送v0.13.0版本。\nGadget Python工具包**✅ 生成论文风格的技术概述文档** 01:19:19.004 | claude_code\n使用/code-summarize技能通过MCP十六进制线工具探索Gadget项目结构。阅读pyproject.toml、README文件以及关键模块（common/llm.py、translation.py、cache.py、sync.py、summarize/auto.py、research/scout/、benchmark/cli.py）。生成了包含6个章节的文档：亮点部分（关于两阶段LLM流程的5个要点、SHA-256缓存、rclone同步），介绍部分（问题、解决方案、背景），架构部分（目录树、数据流图、关键抽象表），实现部分（LLM后端、TranslationEngine、DiskCache的代码片段），结果部分（实际使用统计），结论部分（未来工作）。\n令牌使用情况 总计：$54.04 — 5400万令牌\n",
+  "wordCount" : "210",
+  "inLanguage": "zh",
+  "datePublished": "2026-05-05T00:00:00-05:00",
+  "dateModified": "2026-05-05T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/daily/2026-05-05/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="zh"
+                        data-translation-url="https://tzj2006.github.io/bugjournal/daily/2026-05-05/">EN
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/zh/'>主页</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/zh/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-05-05
+    </h1>
+    <div class="post-meta"><span title='2026-05-05 00:00:00 -0500 -0500'>2026年5月5日</span>&nbsp;·&nbsp;<span>1 分钟</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="每日报告--2026-05-05">每日报告 — 2026-05-05<a hidden class="anchor" aria-hidden="true" href="#每日报告--2026-05-05">#</a></h1>
+<h2 id="每日概述">每日概述<a hidden class="anchor" aria-hidden="true" href="#每日概述">#</a></h2>
+<ul>
+<li>**已完成的工作：**诊断了HP OMEN RTX 5090蓝屏故障，生成了Python工具包技术文档，修复了多个TokenMonitor错误（Svelte标签不匹配、Rust测试竞争条件、Codex积分显示、CI格式问题），向上游维护者传达了架构解决方案，并发布了v0.13.0版本。</li>
+<li>**完成方式：**分析了Windows事件日志以找出PCIe电源状态问题的根本原因，通过MCP工具检查了代码库结构，通过针对性编辑和竞争条件分析修复了Svelte/Rust中的错误，应用了自动格式化功能，并在综合的PR评论中记录了合并策略。</li>
+<li>**影响：**消除了系统崩溃的风险（将WHEA错误从每天数十个减少到仅2次启动时的错误），完成了项目文档的编写，提高了TokenMonitor的UI准确性和CI的可靠性，保持了与上游分支的关系，并发布了包含状态栏功能的稳定版本。</li>
+</ul>
+<blockquote>
+<p>诊断并修复了RTX 5090的PCIe故障，开发了工具包文档，解决了TokenMonitor中的多个TypeScript/Rust错误，并发布了v0.13.0版本，解决了上游冲突问题。</p>
+</blockquote>
+<h2 id="任务">任务<a hidden class="anchor" aria-hidden="true" href="#任务">#</a></h2>
+<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<ul>
+<li>✅ <strong>诊断HP OMEN 45L上RTX 5090的Windows蓝屏故障</strong> — 调查了3次蓝屏现象（0xA IRQL_NOT_LESS_OR_EQUAL，0x133 DPC_WATCHDOG_VIOLATION）和1010个WHEA PCIe错误，确定NVIDIA驱动程序从Gen5到Gen1的链接状态切换是根本原因，并应用了修复方案（NVIDIA电源管理→优先最大性能）。</li>
+<li>✅ <strong>标记并发布v0.13.0版本</strong> — 在提交004d3f6时创建了v0.13.0标签，并推送到TzJ2006/TokenMonitor，触发了发布流程。</li>
+<li>✅ <strong>向上游维护者写PR评论解释架构解决方案</strong> — 在PR #16中记录了状态栏重写和OAuth/Keychain移除的冲突已经合并，Codex/Cursor的速率限制不依赖于已移除的管道。</li>
+<li>✅ <strong>修复Codex积分显示单位错误</strong> — 在UsageBars.svelte:234中将formatUsdAmount()改为integer格式，并添加&rsquo;credits&rsquo;后缀，因为Codex使用的是积分而不是美元。</li>
+<li>✅ <strong>修复Rust CI测试失败和编译器警告</strong> — 解决了oauth_token_prefers_credentials_file_on_macos的竞争条件（不同测试模块对CLAUDE_CONFIG_DIR使用不同的互斥锁），移除了未使用的导入语句，抑制了死代码警告，修复了cargo fmt的导入顺序。</li>
+<li>✅ <strong>验证SSH远程去重逻辑的实现</strong> — 确认了两层去重：远程Python脚本使用message_id:requestId生成的&rsquo;seen&rsquo;集合，本地缓存在追加之前使用HashSet。</li>
+</ul>
+<h3 id="实施与修复">实施与修复<a hidden class="anchor" aria-hidden="true" href="#实施与修复">#</a></h3>
+<ul>
+<li>✅ <strong>生成工具包项目的技术概述</strong> — 创建了6部分的纸质风格文档，涵盖Python 3.10+工具包（总结/研究/基准测试/网站），分享了通用/基础设施、两阶段LLM管道以及Hugo部署流程。</li>
+<li>✅ <strong>修复Svelte HiddenModelsSettings.svelte关闭标签不匹配的问题</strong> — 删除了第151行的多余</div>，以避免Vite预转换错误，并确认没有其他硬编码的最大高度限制会裁剪内容。</li>
+<li>✅ <strong>修复cargo fmt的CI格式错误</strong> — 对tray.rs、usage_query.rs、mod.rs进行了cargo fmt处理，以解决vec!宏和空白处的格式问题。</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-nvidia-rtx-5090在5个月内产生了1010个whea-pcie-aer不支持的请求错误导致间歇性蓝屏这些错误主要集中在空闲期和启动期间而不是在gpu压力测试期间">1. NVIDIA RTX 5090在5个月内产生了1010个WHEA PCIe AER不支持的请求错误，导致间歇性蓝屏。这些错误主要集中在空闲期和启动期间，而不是在GPU压力测试期间。<a hidden class="anchor" aria-hidden="true" href="#1-nvidia-rtx-5090在5个月内产生了1010个whea-pcie-aer不支持的请求错误导致间歇性蓝屏这些错误主要集中在空闲期和启动期间而不是在gpu压力测试期间">#</a></h4>
+<p>**解决方案：**确定根本原因是NVIDIA驱动程序的PCIe链接状态电源管理（空闲时从Gen5切换到Gen1）。在重新协商过程中，GPU在地址空间完全恢复之前发送内存映射的I/O请求，从而引发UR。通过将NVIDIA控制面板→电源管理模式→优先最大性能设置为该选项来解决问题。验证后，重启后19分钟的运行时没有新的错误，只有2次启动时的错误（硬件初始化，不可避免的）。同时解决了5秒的HDMI音频延迟问题（同样的原因：音频控制器D3cold睡眠）。</p>
+<p>**关键洞察：**Windows ASPM Off设置只影响操作系统级别的PCIe电源策略；NVIDIA驱动程序和BIOS仍然可以独立进行链接状态切换。“纠正的错误”这一说法掩盖了严重性——累积的UR错误最终会破坏驱动程序的状态并触发内核错误检查。社区研究证实，这是一个已知的RTX 5090与PCIe Gen5兼容性问题，涉及多个主板供应商。</p>
+<h4 id="2-上游维护者担心状态栏重写和oauthkeychain移除导致的codexcursor速率限制冲突">2. 上游维护者担心状态栏重写和OAuth/Keychain移除导致的Codex/Cursor速率限制冲突。<a hidden class="anchor" aria-hidden="true" href="#2-上游维护者担心状态栏重写和oauthkeychain移除导致的codexcursor速率限制冲突">#</a></h4>
+<p>**解决方案：**记录下这些冲突已经通过合并提交f6e0982和4492d2f解决，Codex使用CLI抓取数据（而非OAuth），Cursor不需要密钥链提示。</p>
+<p>**关键洞察：**逐步合并策略与明确的特性恢复提交相结合，可以在采纳上游架构变更的同时保留下游的创新成果。</p>
+<h4 id="3-codex积分余额显示为美元211602而不是积分单位导致用户困惑">3. Codex积分余额显示为美元（$2,116.02$），而不是积分单位，导致用户困惑。<a hidden class="anchor" aria-hidden="true" href="#3-codex积分余额显示为美元211602而不是积分单位导致用户困惑">#</a></h4>
+<p>**解决方案：**在UsageBars.svelte中替换formatUsdAmount()为Math.round().toLocaleString()加上&rsquo;credits&rsquo;后缀；确认此修复不会影响Cursor的extra_usage，后者正确使用美元。</p>
+<p>**关键洞察：**多提供商系统需要按提供商处理单位——Codex使用&rsquo;credits&rsquo;，而Cursor使用美元；不能假设所有提供商的货币格式都是统一的。</p>
+<h4 id="4-rust测试中的oauth_token_prefers_credentials_file_on_macos在ci中失败提示claude凭据文件不可用varfolderstmpclaudecredentialsjson测试将文件写入tmpcredentialsjson但查找结果为tmpclaudecredentialsjson表明claude_config_dir环境变量未被正确引用">4. Rust测试中的oauth_token_prefers_credentials_file_on_macos在CI中失败，提示“Claude凭据文件不可用(/var/folders/&hellip;/tmp/.claude/.credentials.json)”。测试将文件写入tmp/.credentials.json，但查找结果为tmp/.claude/.credentials.json，表明CLAUDE_CONFIG_DIR环境变量未被正确引用。<a hidden class="anchor" aria-hidden="true" href="#4-rust测试中的oauth_token_prefers_credentials_file_on_macos在ci中失败提示claude凭据文件不可用varfolderstmpclaudecredentialsjson测试将文件写入tmpcredentialsjson但查找结果为tmpclaudecredentialsjson表明claude_config_dir环境变量未被正确引用">#</a></h4>
+<p>**解决方案：**根本原因是ratelimits/claude.rs和statusline/install.rs测试使用单独的互斥锁（ENV_LOCK vs. env_lock()）来保护CLAUDE_CONFIG_DIR的操作。并行测试执行导致状态栏测试覆盖了claude测试的env值。通过将测试直接调用read_token_from_credentials_file()而不是get_claude_oauth_token()来解决这一问题，从而消除了对env变量解析的依赖性和macOS密钥链的复杂性。同时修复了未使用的导入语句&rsquo;Local&rsquo;（测试模块单独重新导入它）以及claude_settings_file的死代码警告（将#[cfgattr(not(test), allow(dead_code)]改为无条件的#[allow(dead_code)]）。</p>
+<p>**关键洞察：**在并行测试中，不安全的环境变量操作需要在所有测试模块之间共享一个全局锁——局部模块级锁会产生虚假的安全性。[#cfg(test)]导入可能会让rustc感到困惑，当测试子模块确实使用了super::*然后又重新导入同一个项时。cargo fmt要求#[cfg(test)]导入在常规导入之后排序。</p>
+<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
+<h4 id="5-ci-cargo-fmt检查在3个rust文件中因格式问题失败vec宏换行尾随空白">5. CI cargo fmt检查在3个Rust文件中因格式问题失败（vec!宏换行、尾随空白）<a hidden class="anchor" aria-hidden="true" href="#5-ci-cargo-fmt检查在3个rust文件中因格式问题失败vec宏换行尾随空白">#</a></h4>
+<p>**解决方案：**运行cargo fmt自动修复格式问题，并将代码提交为004d3f6。**关键洞察：**自动化格式规范执行能够及早发现风格不一致性问题，从而保持代码库的一致性</p>
+<h2 id="人类与人工智能的方法对比">人类与人工智能的方法对比<a hidden class="anchor" aria-hidden="true" href="#人类与人工智能的方法对比">#</a></h2>
+<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<h4 id="对pcie内存读取请求错误的解读">对PCIe“内存读取请求”错误的解读<a hidden class="anchor" aria-hidden="true" href="#对pcie内存读取请求错误的解读">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户质疑“GPU内存读取请求失败”是RAM条损坏还是GPU/PCIe问题，正确识别了术语上的潜在歧义。</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>人工智能最初使用简略的“内存读取”一词，但没有明确区分MMIO和物理内存，需要用户提示才能解释PCIe内存读取是针对内存映射的I/O地址空间（GPU BAR区域）而不是系统DRAM。</td>
+      </tr>
+  </tbody>
+</table>
+<p>**差异分析：**用户通过质疑术语展示了其领域知识；人工智能假设人们对PCIe地址空间有共同的理解。用户的提问迫使人工智能提供更精确的技术解释，并附上图表说明GPU与Root Complex之间的通信关系。</p>
+<h4 id="针对pcie错误诊断的验证方法">针对PCIe错误诊断的验证方法<a hidden class="anchor" aria-hidden="true" href="#针对pcie错误诊断的验证方法">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>用户主动运行GPU压力测试，以检查在负载下是否会出现错误，然后报告“测试过程中没有新的WHEA错误”——在人工智能建议进行正式验证之前，这一结果已经经验性地验证了空闲状态切换的假设。</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>人工智能最初推荐了诊断顺序（重新安装DDU驱动程序→降低BIOS中的PCIe Gen4等级→重新插拔硬件），但还没有提出压力测试作为诊断工具。</td>
+      </tr>
+  </tbody>
+</table>
+<p>**差异分析：**用户比人工智能更快地应用了科学方法（通过控制实验来隔离变量），这加快了根本原因确认的过程，避免了不必要的硬件干预。</p>
+<h4 id="代码库中的信用单位验证">代码库中的信用单位验证<a hidden class="anchor" aria-hidden="true" href="#代码库中的信用单位验证">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>从领域知识中认识到Codex使用的是“信用”而非美元，建议助手在线验证文档。</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>仅分析了代码模式，依赖于类型定义和现有用法，而没有进行外部验证。</td>
+      </tr>
+  </tbody>
+</table>
+<p>**差异分析：**人类带来了关于Codex API惯例的外部领域知识；人工智能最初只搜索了代码库，没有查阅外部文档，尽管有人提出了建议。</p>
+<h3 id="实施层面">实施层面<a hidden class="anchor" aria-hidden="true" href="#实施层面">#</a></h3>
+<h4 id="在github上找到pr-16">在GitHub上找到PR #16<a hidden class="anchor" aria-hidden="true" href="#在github上找到pr-16">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>角色</th>
+          <th>方法</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>人类</td>
+          <td>最初说“michaelovo”，然后在人工智能难以处理仓库名称变化时提供了完整的URL。</td>
+      </tr>
+      <tr>
+          <td>人工智能</td>
+          <td>系统地尝试了michaelovo、Michael-OvO、movo-ai等多种变体，之后才请求用户进行澄清。</td>
+      </tr>
+  </tbody>
+</table>
+<p>**差异分析：**人类拥有确切的知识，但最初的指示不够精确（大小写敏感、用户名格式）；人工智能在请求明确URL之前，已经用尽了系统的搜索模式。</p>
+<h2 id="人工智能的局限性">人工智能的局限性<a hidden class="anchor" aria-hidden="true" href="#人工智能的局限性">#</a></h2>
+<h3 id="主要局限性">主要局限性<a hidden class="anchor" aria-hidden="true" href="#主要局限性">#</a></h3>
+<ul>
+<li>初步诊断指出“PCIe信号质量问题”（意味着物理层的Bad TLP/DLLP错误），这是基于WHEA修正的错误存在的。当用户对此提出质疑时（指出PCIe x16链接已确认，没有信号错误），人工智能解析了AER寄存器数据，并将诊断结果修正为“不支持的请求——逻辑/配置错误，而非物理问题”。诊断结果的信心度从70%提升到了90%，但最初的框架还是过早的。</li>
+<li>PowerShell命令执行反复失败，因为bash的extglob扩展操作消耗了$_变量（例如，“extglob.TimeCreated”错误）。需要多次重试，并使用不同的引用/heredoc策略，才能找到稳定的语法。这种脆弱性表明工具层需要更好的PowerShell封装。</li>
+<li>当用户建议检查Codex API文档时，没有进行在线验证，而是完全依赖代码分析，尽管有外部信息可用。</li>
+</ul>
+<h3 id="一般局限性">一般局限性<a hidden class="anchor" aria-hidden="true" href="#一般局限性">#</a></h3>
+<ul>
+<li>在修复了Rust测试中的竞争条件警告后，提交了提交，但没有运行cargo fmt。CI立即因为导入顺序的问题而失败。需要第二次提交（ce63b8b）来解决#[cfg(test)]的放置问题。应该应用标准的提交前检查清单（fmt + clippy）。</li>
+<li>由于大小写敏感性的问题，在解决GitHub仓库问题时，需要用户提供明确的URL，因为尝试了多种变体。</li>
+<li>在自动上下文压缩后，需要多次用户继续提示，这表明会话状态意识已经丧失。</li>
+</ul>
+<h2 id="经验教训">经验教训<a hidden class="anchor" aria-hidden="true" href="#经验教训">#</a></h2>
+<h3 id="关键经验教训">关键经验教训<a hidden class="anchor" aria-hidden="true" href="#关键经验教训">#</a></h3>
+<ul>
+<li>PCIe高级错误报告中的“不支持的请求”可能是由NVIDIA驱动程序在空闲期间自动进行的Gen5↔Gen1链接状态电源管理引起的。Windows的powercfg ASPM设置（链接状态电源管理）只能控制操作系统级别的策略；GPU驱动程序和BIOS分别管理PCIe L状态。RTX 5090 + PCIe Gen5存在已知的兼容性问题，这会导致在重新协商期间，GPU试图访问内存映射地址空间时出现UR错误。社区验证的解决方案是强制使用“优先最大性能”或BIOS PCIe Gen4锁定。</li>
+<li>多提供商速率限制系统需要仔细处理每个提供商的单元——假设如果提供商会使用不同的单位（Codex的“信用”与Cursor USD），那么统一的货币格式就会失效。</li>
+<li>分支维护策略：逐步合并上游的架构变更，并附带明确的特性恢复提交，主动记录冲突以便维持与上游的关系。</li>
+<li>Rust并行测试套件中使用环境变量操作，需要在一个全局互斥锁上共享，因为每个模块都有本地锁（模块A中的静态ENV_LOCK，模块B中的单独的env_lock()），当两个模块都修改相同的环境变量时，会产生竞争条件。在导入时使用#[cfg(test)]属性可能会导致“未使用”警告，如果测试子模块使用use super::*，则重复导入同一项。cargo fmt会强制按条件导入的顺序进行排序，而不是无条件导入。</li>
+<li>双层去重（远程Python脚本+本地HashSet）可以有效防止分布式日志聚合系统中的重复记录，尤其是在多个设备向共享存储追加数据时。</li>
+</ul>
+<h2 id="对话总结">对话总结<a hidden class="anchor" aria-hidden="true" href="#对话总结">#</a></h2>
+<h3 id="windows系统诊断">Windows系统诊断<a hidden class="anchor" aria-hidden="true" href="#windows系统诊断">#</a></h3>
+<p><strong>✅ HP OMEN 45L RTX 5090蓝屏崩溃分析</strong>
+<em>04:18:02.232 | claude_code</em>
+诊断出3次BSOD事件（0xA, 0x133）和1010次WHEA PCIe错误，时间跨度超过5个月。分析了Windows事件查看器日志、WHEA AER寄存器数据（不可纠正错误状态0x100000=不支持的请求）。确定原因是NVIDIA驱动程序在空闲期间进行了PCIe Gen5↔Gen1的电源状态切换。用户进行了压力测试，验证错误仅在空闲/启动期间发生，而在负载下不会发生。应用了解决方案（NVIDIA电源管理→最大性能）。重启后验证：运行时错误为零，只有2次启动时的事件（预期如此）。还解决了相关的5秒YouTube音频延迟问题（HDMI音频控制器D3cold睡眠）。</p>
+<h3 id="tokenmonitor-多缺陷修复ci格式调整上游沟通v0130版本发布">TokenMonitor**✅ 多缺陷修复、CI格式调整、上游沟通、v0.13.0版本发布**<a hidden class="anchor" aria-hidden="true" href="#tokenmonitor-多缺陷修复ci格式调整上游沟通v0130版本发布">#</a></h3>
+<p><em>22:22:07.043 | claude_code</em><br>
+已验证SSH去重逻辑（双层处理：远程Python数据+本地HashSet）。通过将美元格式替换为“credits”单位，修复了Codex积分显示错误。修复了Svelte HiddenModelsSettings.svelte文件的关闭标签不匹配问题（删除了第151行的多余</div>）。解决了Rust CI测试中的竞态条件问题（oauth_token_prefers_credentials_file_on_macos）：修改测试以直接调用read_token_from_credentials_file()，避免了环境变量/密钥链的复杂性。修复了cargo fmt的违规问题（导入顺序、空白字符）。为上游维护者撰写了详细的PR评论，说明状态行重写和OAuth/密钥链移除的冲突已通过合并提交解决，且不影响Codex和Cursor的速率限制。已标记并推送v0.13.0版本。</p>
+<h3 id="gadget-python工具包-生成论文风格的技术概述文档">Gadget Python工具包**✅ 生成论文风格的技术概述文档**<a hidden class="anchor" aria-hidden="true" href="#gadget-python工具包-生成论文风格的技术概述文档">#</a></h3>
+<p><em>01:19:19.004 | claude_code</em><br>
+使用/code-summarize技能通过MCP十六进制线工具探索Gadget项目结构。阅读pyproject.toml、README文件以及关键模块（common/llm.py、translation.py、cache.py、sync.py、summarize/auto.py、research/scout/、benchmark/cli.py）。生成了包含6个章节的文档：亮点部分（关于两阶段LLM流程的5个要点、SHA-256缓存、rclone同步），介绍部分（问题、解决方案、背景），架构部分（目录树、数据流图、关键抽象表），实现部分（LLM后端、TranslationEngine、DiskCache的代码片段），结果部分（实际使用统计），结论部分（未来工作）。</p>
+<h2 id="令牌使用情况">令牌使用情况<a hidden class="anchor" aria-hidden="true" href="#令牌使用情况">#</a></h2>
+<p><strong>总计：$54.04</strong> — 5400万令牌</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

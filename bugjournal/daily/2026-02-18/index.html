@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-02-18 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Fixed critical spatial coordinate bug in MIHD multimodal fusion benchmark and built infrastructure for robotic policy visualization and checkpoint management">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-02-18/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-02-18/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-18/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-02-18/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-02-18">
+  <meta property="og:description" content="Fixed critical spatial coordinate bug in MIHD multimodal fusion benchmark and built infrastructure for robotic policy visualization and checkpoint management">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-02-18T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-02-18T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-02-18">
+  <meta name="twitter:description" content="Fixed critical spatial coordinate bug in MIHD multimodal fusion benchmark and built infrastructure for robotic policy visualization and checkpoint management">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-02-18",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-02-18/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-02-18",
+  "name": "Bug Journal 2026-02-18",
+  "description": "Fixed critical spatial coordinate bug in MIHD multimodal fusion benchmark and built infrastructure for robotic policy visualization and checkpoint management",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-02-18 Daily Overview What was done: Two parallel research tracks: fixed spatial transcriptomics coordinate handling bug causing vision embedding errors (DCC), and built comprehensive policy benchmarking infrastructure with unified checkpoint management and rollout visualization (tianhe) How it was done: Deep debugging of coordinate systems via code inspection and verification, followed by cache clearing and re-running experiments; infrastructure work via symlink organization, script development, and integration testing Impact: MIHD: 86% improvement in UNI2-only clustering performance after fix validates multimodal fusion results; tianhe: unified checkpoint management and visualization tools enable systematic VLA cross-task generalization analysis DCC What was done: Diagnosed and fixed coordinate swap bug in MIHD spatial transcriptomics pipeline where pxl_row/pxl_col were incorrectly mapped as X/Y instead of Y/X How it was done: Modified run_benchmark.py and data_loader.py to correct column naming, cleared vision cache, re-ran 33 vision-only and 88 fusion experiments over ~6 hours with STAIG training Impact: UNI2 embeddings now correctly extracted from proper image locations; ARI improved from 0.065→0.121 for vision-only, concat fusion reached 0.275 ARI validating multimodal integration approach tianhe What was done: Built unified checkpoint management system with symlinks, created policy rollout visualization tool, and investigated VLA training data availability for PickPlace task How it was done: Created checkpoints/ directory structure linking BC-RNN/VLA/Robomimic models, wrote 200-line visualize_policy_rollout.py with MP4 rendering, updated configs and Makefile, searched zhaoganlong’s datasets Impact: Can now visualize policy behavior via MP4 rollouts and identified root cause of VLA failure (no task-specific finetuning); discovered MimicGen can expand 10→500 demos for future training Fixed critical spatial coordinate bug in MIHD multimodal fusion benchmark and built infrastructure for robotic policy visualization and checkpoint management\nTasks Architecture \u0026 Strategy ✅ Fix MIHD coordinate swap bug — Corrected tissue_positions_list.csv column mapping where pxl_row_in_fullres (Y) and pxl_col_in_fullres (X) were swapped as pixel_x/pixel_y Implementation \u0026 Fixes 🔄 Re-run MIHD vision and fusion experiments — Regenerate embeddings and benchmark results for 33 vision-only and 88 multimodal fusion experiments after coordinate fix ✅ Create policy rollout visualization tool — Wrote visualize_policy_rollout.py script with offscreen rendering, HUD overlay, MP4 export, and support for random/BC-RNN/VLA policies ✅ Build unified checkpoint management system — Created checkpoints/ directory with symlinks to BC-RNN, VLA (Pi0/Pi0.5), and Robomimic models for consistent path references ✅ Investigate VLA training data availability — Searched for PickPlace-specific VLA checkpoints and training data; found only 10 source demos vs 500 demos for Coffee/Stack tasks Problems \u0026 Solutions Critical Issues 1. Vision embeddings extracted from transposed image locations due to X/Y coordinate swap in tissue_positions_list.csv parsing Solution: Renamed columns to pxl_row/pxl_col (semantic names), swapped coordinate order to (X, Y) = (pxl_col, pxl_row), deleted vision cache, re-ran experiments\nKey Insight: Spatial data requires explicit Y-as-row, X-as-column semantics; 10x scale factor validation (pixel coords × scalefactor = microns) catches coordinate system errors early\n2. Pi0_libero checkpoint achieves 0% success on PickPlace despite 96-100% on Coffee/Stack Solution: Identified root cause: Pi0_libero is LIBERO-domain finetuned, lacks PickPlace-specific training data (only 10 source demos vs 500 for other tasks); proposed MimicGen→LeRobot→LoRA pipeline\nKey Insight: VLA cross-task generalization fails when task domains differ (LIBERO vs PickPlace object/scene layout); finetuning requires 500+ demos expandable via MimicGen from 10 source demos\nGeneral Issues 3. No way to visually inspect VLA policy behavior on PickPlace task to diagnose 0% success rate Solution: Built visualize_policy_rollout.py with EGL offscreen rendering, frame-by-frame capture, HUD overlay (policy/step/reward/success), and MP4 export per rollout\nKey Insight: Video rollouts reveal behavioral patterns (e.g., random flailing vs directed failures) that success rate alone cannot distinguish\n4. Scattered checkpoint paths across multiple HDD_POOL directories making config management fragile Solution: Created centralized checkpoints/ directory with task-organized symlinks (bc_rnn/pick_place, vla/pi0_libero, robomimic/lift) and updated all configs to use relative paths\nKey Insight: Symlink-based checkpoint organization enables atomic path updates and clear separation between original storage and project references\nHuman vs AI Approaches Strategic Level VLA checkpoint selection for PickPlace Role Approach Human Questioned why Pi0_libero was being loaded instead of a PickPlace-specific checkpoint, assumed zhaoganlong should have one AI Initially loaded Pi0_libero as the only available VLA checkpoint without verifying task-specific training Difference Analysis: Human correctly intuited that task-specific finetuning should exist; AI defaulted to available checkpoint without validating task match. Investigation revealed no PickPlace checkpoint exists.\nImplementation Level UNI/UNI2 usage in literature Role Approach Human Requested web search to verify how other papers extract patches and handle coordinates for spatial transcriptomics AI Focused on code-level debugging without consulting literature for domain best practices Difference Analysis: Human sought external validation from published methods; AI relied on internal code logic. Literature search confirmed 224x224 patches at 20x magnification but didn’t provide specific coordinate handling details.\nAI Limitations General Limitations Did not proactively search for task-specific VLA checkpoints before recommending Pi0_libero, required human prompting to investigate zhaoganlong’s full checkpoint directory Needed multiple search iterations to discover zhaoganlong’s datasets were organized by task (Coffee/Stack) with 500 generated demos each, initially focused on finding PickPlace directly Learnings Key Learnings Spatial coordinate systems in medical imaging require explicit semantic naming (pxl_row=Y, pxl_col=X) and validation via physical units (pixels × scalefactor = microns); generic pixel_x/pixel_y naming is error-prone Vision foundation model integration in multimodal learning critically depends on spatial alignment; incorrect patch extraction (from transposed locations) can halve performance even with correct architecture VLA models trained on one task domain (LIBERO) show minimal cross-task generalization to different manipulation setups (PickPlace) despite similar action spaces; domain-specific finetuning is essential MimicGen can expand 10 human demonstrations to 500 training examples via automatic variation generation, matching the data scale used in successful VLA finetuning (Coffee: 96%, Stack: 100%) Practical Learnings Symlink-based checkpoint management enables version control of path references while preserving original data locations; critical for shared filesystem collaboration Conversation Summaries MIHD Spatial Transcriptomics 🔄 Coordinate swap bug fix in vision patch extraction 00:01:02.520 | claude_code Diagnosed and fixed critical bug where tissue_positions_list.csv columns (pxl_row, pxl_col) were incorrectly mapped as (pixel_x, pixel_y), causing vision patches to be extracted from transposed locations. Cleared vision cache and re-ran 121 experiments (33 vision-only + 88 fusion). Results showed UNI2 ARI improved from 0.065 to 0.121 (+86%). User requested literature review on UNI/UNI2 usage patterns; web search confirmed 224x224 patches at 20x magnification standard but lacked coordinate handling specifics. Experiments still running after 6+ hours due to STAIG training requirements.\nError Recovery Benchmark 🔍 VLA training data investigation and PickPlace finetuning path 04:52:08.850 | claude_code User asked about training VLA on PickPlace task after realizing Pi0_libero has 0% success. Investigation revealed PickPlace only has 10 source demos (6288 steps) while zhaoganlong’s successful Coffee/Stack training used ~500 demos generated via MimicGen. No PickPlace-specific VLA checkpoint exists; all VLA models are LIBERO-domain or base weights. Identified training path: 1) Run MimicGen to expand 10→500 demos, 2) Convert to LeRobot format via zhaoganlong’s scripts, 3) Run Pi0.5 LoRA finetuning. All necessary scripts and pipelines available in zhaoganlong’s repo.\n✅ Checkpoint inventory and availability assessment 05:32:29.978 | claude_code User requested inventory of usable VLA models and checkpoints. Found 4 VLA model types registered in code (pi0, pi05, phoenix, flare) but only Pi0_libero and Pi05_base have actual checkpoints (~12GB each). Also identified BC-RNN PickPlace checkpoints (12 epochs, 14MB each) and Robomimic Lift checkpoint (7.6MB, 100% success). Discovered robomimic’s can/square/transport directories are empty. VLA checkpoints all reside in zhaoganlong’s HDD_POOL directory, linked via symlinks to project.\n✅ Policy visualization infrastructure setup 00:26:49.679 | claude_code Built unified checkpoint management via checkpoints/ directory with symlinks (bc_rnn/pick_place, vla/pi0_libero, robomimic/lift). Created visualize_policy_rollout.py (200 lines) supporting random/BC-RNN/VLA policies with offscreen rendering, HUD overlay, and MP4 export. Updated benchmark_v4.yaml to use symlink paths and added 3 Makefile visualization targets. Tested successfully with random policy, generated 2 MP4 files. Updated documentation in 项目全景总结.md with new v4.7 checkpoint management section.\nToken Usage Total: $11.96 — 18.4M tokens\n",
+  "wordCount" : "1278",
+  "inLanguage": "en",
+  "datePublished": "2026-02-18T00:00:00-05:00",
+  "dateModified": "2026-02-18T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-02-18/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-02-18/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/'>Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-02-18
+    </h1>
+    <div class="post-meta"><span title='2026-02-18 00:00:00 -0500 EST'>February 18, 2026</span>&nbsp;·&nbsp;<span>6 min</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="daily-report--2026-02-18">Daily Report — 2026-02-18<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-02-18">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Two parallel research tracks: fixed spatial transcriptomics coordinate handling bug causing vision embedding errors (DCC), and built comprehensive policy benchmarking infrastructure with unified checkpoint management and rollout visualization (tianhe)</li>
+<li><strong>How it was done:</strong> Deep debugging of coordinate systems via code inspection and verification, followed by cache clearing and re-running experiments; infrastructure work via symlink organization, script development, and integration testing</li>
+<li><strong>Impact:</strong> MIHD: 86% improvement in UNI2-only clustering performance after fix validates multimodal fusion results; tianhe: unified checkpoint management and visualization tools enable systematic VLA cross-task generalization analysis</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Diagnosed and fixed coordinate swap bug in MIHD spatial transcriptomics pipeline where pxl_row/pxl_col were incorrectly mapped as X/Y instead of Y/X</li>
+<li><strong>How it was done:</strong> Modified run_benchmark.py and data_loader.py to correct column naming, cleared vision cache, re-ran 33 vision-only and 88 fusion experiments over ~6 hours with STAIG training</li>
+<li><strong>Impact:</strong> UNI2 embeddings now correctly extracted from proper image locations; ARI improved from 0.065→0.121 for vision-only, concat fusion reached 0.275 ARI validating multimodal integration approach</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Built unified checkpoint management system with symlinks, created policy rollout visualization tool, and investigated VLA training data availability for PickPlace task</li>
+<li><strong>How it was done:</strong> Created checkpoints/ directory structure linking BC-RNN/VLA/Robomimic models, wrote 200-line visualize_policy_rollout.py with MP4 rendering, updated configs and Makefile, searched zhaoganlong&rsquo;s datasets</li>
+<li><strong>Impact:</strong> Can now visualize policy behavior via MP4 rollouts and identified root cause of VLA failure (no task-specific finetuning); discovered MimicGen can expand 10→500 demos for future training</li>
+</ul>
+<blockquote>
+<p>Fixed critical spatial coordinate bug in MIHD multimodal fusion benchmark and built infrastructure for robotic policy visualization and checkpoint management</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Fix MIHD coordinate swap bug</strong> — Corrected tissue_positions_list.csv column mapping where pxl_row_in_fullres (Y) and pxl_col_in_fullres (X) were swapped as pixel_x/pixel_y</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>🔄 <strong>Re-run MIHD vision and fusion experiments</strong> — Regenerate embeddings and benchmark results for 33 vision-only and 88 multimodal fusion experiments after coordinate fix</li>
+<li>✅ <strong>Create policy rollout visualization tool</strong> — Wrote visualize_policy_rollout.py script with offscreen rendering, HUD overlay, MP4 export, and support for random/BC-RNN/VLA policies</li>
+<li>✅ <strong>Build unified checkpoint management system</strong> — Created checkpoints/ directory with symlinks to BC-RNN, VLA (Pi0/Pi0.5), and Robomimic models for consistent path references</li>
+<li>✅ <strong>Investigate VLA training data availability</strong> — Searched for PickPlace-specific VLA checkpoints and training data; found only 10 source demos vs 500 demos for Coffee/Stack tasks</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-vision-embeddings-extracted-from-transposed-image-locations-due-to-xy-coordinate-swap-in-tissue_positions_listcsv-parsing">1. Vision embeddings extracted from transposed image locations due to X/Y coordinate swap in tissue_positions_list.csv parsing<a hidden class="anchor" aria-hidden="true" href="#1-vision-embeddings-extracted-from-transposed-image-locations-due-to-xy-coordinate-swap-in-tissue_positions_listcsv-parsing">#</a></h4>
+<p><strong>Solution:</strong> Renamed columns to pxl_row/pxl_col (semantic names), swapped coordinate order to (X, Y) = (pxl_col, pxl_row), deleted vision cache, re-ran experiments</p>
+<p><strong>Key Insight:</strong> Spatial data requires explicit Y-as-row, X-as-column semantics; 10x scale factor validation (pixel coords × scalefactor = microns) catches coordinate system errors early</p>
+<h4 id="2-pi0_libero-checkpoint-achieves-0-success-on-pickplace-despite-96-100-on-coffeestack">2. Pi0_libero checkpoint achieves 0% success on PickPlace despite 96-100% on Coffee/Stack<a hidden class="anchor" aria-hidden="true" href="#2-pi0_libero-checkpoint-achieves-0-success-on-pickplace-despite-96-100-on-coffeestack">#</a></h4>
+<p><strong>Solution:</strong> Identified root cause: Pi0_libero is LIBERO-domain finetuned, lacks PickPlace-specific training data (only 10 source demos vs 500 for other tasks); proposed MimicGen→LeRobot→LoRA pipeline</p>
+<p><strong>Key Insight:</strong> VLA cross-task generalization fails when task domains differ (LIBERO vs PickPlace object/scene layout); finetuning requires 500+ demos expandable via MimicGen from 10 source demos</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="3-no-way-to-visually-inspect-vla-policy-behavior-on-pickplace-task-to-diagnose-0-success-rate">3. No way to visually inspect VLA policy behavior on PickPlace task to diagnose 0% success rate<a hidden class="anchor" aria-hidden="true" href="#3-no-way-to-visually-inspect-vla-policy-behavior-on-pickplace-task-to-diagnose-0-success-rate">#</a></h4>
+<p><strong>Solution:</strong> Built visualize_policy_rollout.py with EGL offscreen rendering, frame-by-frame capture, HUD overlay (policy/step/reward/success), and MP4 export per rollout</p>
+<p><strong>Key Insight:</strong> Video rollouts reveal behavioral patterns (e.g., random flailing vs directed failures) that success rate alone cannot distinguish</p>
+<h4 id="4-scattered-checkpoint-paths-across-multiple-hdd_pool-directories-making-config-management-fragile">4. Scattered checkpoint paths across multiple HDD_POOL directories making config management fragile<a hidden class="anchor" aria-hidden="true" href="#4-scattered-checkpoint-paths-across-multiple-hdd_pool-directories-making-config-management-fragile">#</a></h4>
+<p><strong>Solution:</strong> Created centralized checkpoints/ directory with task-organized symlinks (bc_rnn/pick_place, vla/pi0_libero, robomimic/lift) and updated all configs to use relative paths</p>
+<p><strong>Key Insight:</strong> Symlink-based checkpoint organization enables atomic path updates and clear separation between original storage and project references</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="vla-checkpoint-selection-for-pickplace">VLA checkpoint selection for PickPlace<a hidden class="anchor" aria-hidden="true" href="#vla-checkpoint-selection-for-pickplace">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Questioned why Pi0_libero was being loaded instead of a PickPlace-specific checkpoint, assumed zhaoganlong should have one</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Initially loaded Pi0_libero as the only available VLA checkpoint without verifying task-specific training</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human correctly intuited that task-specific finetuning should exist; AI defaulted to available checkpoint without validating task match. Investigation revealed no PickPlace checkpoint exists.</p>
+<h3 id="implementation-level">Implementation Level<a hidden class="anchor" aria-hidden="true" href="#implementation-level">#</a></h3>
+<h4 id="uniuni2-usage-in-literature">UNI/UNI2 usage in literature<a hidden class="anchor" aria-hidden="true" href="#uniuni2-usage-in-literature">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Requested web search to verify how other papers extract patches and handle coordinates for spatial transcriptomics</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Focused on code-level debugging without consulting literature for domain best practices</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human sought external validation from published methods; AI relied on internal code logic. Literature search confirmed 224x224 patches at 20x magnification but didn&rsquo;t provide specific coordinate handling details.</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>Did not proactively search for task-specific VLA checkpoints before recommending Pi0_libero, required human prompting to investigate zhaoganlong&rsquo;s full checkpoint directory</li>
+<li>Needed multiple search iterations to discover zhaoganlong&rsquo;s datasets were organized by task (Coffee/Stack) with 500 generated demos each, initially focused on finding PickPlace directly</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>Spatial coordinate systems in medical imaging require explicit semantic naming (pxl_row=Y, pxl_col=X) and validation via physical units (pixels × scalefactor = microns); generic pixel_x/pixel_y naming is error-prone</li>
+<li>Vision foundation model integration in multimodal learning critically depends on spatial alignment; incorrect patch extraction (from transposed locations) can halve performance even with correct architecture</li>
+<li>VLA models trained on one task domain (LIBERO) show minimal cross-task generalization to different manipulation setups (PickPlace) despite similar action spaces; domain-specific finetuning is essential</li>
+<li>MimicGen can expand 10 human demonstrations to 500 training examples via automatic variation generation, matching the data scale used in successful VLA finetuning (Coffee: 96%, Stack: 100%)</li>
+</ul>
+<h3 id="practical-learnings">Practical Learnings<a hidden class="anchor" aria-hidden="true" href="#practical-learnings">#</a></h3>
+<ul>
+<li>Symlink-based checkpoint management enables version control of path references while preserving original data locations; critical for shared filesystem collaboration</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<h3 id="mihd-spatial-transcriptomics">MIHD Spatial Transcriptomics<a hidden class="anchor" aria-hidden="true" href="#mihd-spatial-transcriptomics">#</a></h3>
+<p><strong>🔄 Coordinate swap bug fix in vision patch extraction</strong>
+<em>00:01:02.520 | claude_code</em>
+Diagnosed and fixed critical bug where tissue_positions_list.csv columns (pxl_row, pxl_col) were incorrectly mapped as (pixel_x, pixel_y), causing vision patches to be extracted from transposed locations. Cleared vision cache and re-ran 121 experiments (33 vision-only + 88 fusion). Results showed UNI2 ARI improved from 0.065 to 0.121 (+86%). User requested literature review on UNI/UNI2 usage patterns; web search confirmed 224x224 patches at 20x magnification standard but lacked coordinate handling specifics. Experiments still running after 6+ hours due to STAIG training requirements.</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔍 VLA training data investigation and PickPlace finetuning path</strong>
+<em>04:52:08.850 | claude_code</em>
+User asked about training VLA on PickPlace task after realizing Pi0_libero has 0% success. Investigation revealed PickPlace only has 10 source demos (6288 steps) while zhaoganlong&rsquo;s successful Coffee/Stack training used ~500 demos generated via MimicGen. No PickPlace-specific VLA checkpoint exists; all VLA models are LIBERO-domain or base weights. Identified training path: 1) Run MimicGen to expand 10→500 demos, 2) Convert to LeRobot format via zhaoganlong&rsquo;s scripts, 3) Run Pi0.5 LoRA finetuning. All necessary scripts and pipelines available in zhaoganlong&rsquo;s repo.</p>
+<p><strong>✅ Checkpoint inventory and availability assessment</strong>
+<em>05:32:29.978 | claude_code</em>
+User requested inventory of usable VLA models and checkpoints. Found 4 VLA model types registered in code (pi0, pi05, phoenix, flare) but only Pi0_libero and Pi05_base have actual checkpoints (~12GB each). Also identified BC-RNN PickPlace checkpoints (12 epochs, 14MB each) and Robomimic Lift checkpoint (7.6MB, 100% success). Discovered robomimic&rsquo;s can/square/transport directories are empty. VLA checkpoints all reside in zhaoganlong&rsquo;s HDD_POOL directory, linked via symlinks to project.</p>
+<p><strong>✅ Policy visualization infrastructure setup</strong>
+<em>00:26:49.679 | claude_code</em>
+Built unified checkpoint management via checkpoints/ directory with symlinks (bc_rnn/pick_place, vla/pi0_libero, robomimic/lift). Created visualize_policy_rollout.py (200 lines) supporting random/BC-RNN/VLA policies with offscreen rendering, HUD overlay, and MP4 export. Updated benchmark_v4.yaml to use symlink paths and added 3 Makefile visualization targets. Tested successfully with random policy, generated 2 MP4 files. Updated documentation in 项目全景总结.md with new v4.7 checkpoint management section.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-02-18-usage.png"></p>
+<p><strong>Total: $11.96</strong> — 18.4M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

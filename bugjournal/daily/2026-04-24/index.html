@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-04-24 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Integrated Apple Speech as default ASR in MeetingHelper, completed comprehensive TokenMonitor refactoring (codebase cleanup, dynamic exchange rates, CI optimization), fixed critical 25x data inflation bugs in JSONL/SSH deduplication, enhanced SSH sync with auto-discovery, and documented MimicGen augmentation pipeline for error recovery benchmark">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-04-24/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-04-24/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-24/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-04-24/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-04-24">
+  <meta property="og:description" content="Integrated Apple Speech as default ASR in MeetingHelper, completed comprehensive TokenMonitor refactoring (codebase cleanup, dynamic exchange rates, CI optimization), fixed critical 25x data inflation bugs in JSONL/SSH deduplication, enhanced SSH sync with auto-discovery, and documented MimicGen augmentation pipeline for error recovery benchmark">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-04-24T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-04-24T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-04-24">
+  <meta name="twitter:description" content="Integrated Apple Speech as default ASR in MeetingHelper, completed comprehensive TokenMonitor refactoring (codebase cleanup, dynamic exchange rates, CI optimization), fixed critical 25x data inflation bugs in JSONL/SSH deduplication, enhanced SSH sync with auto-discovery, and documented MimicGen augmentation pipeline for error recovery benchmark">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-04-24",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-04-24/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-04-24",
+  "name": "Bug Journal 2026-04-24",
+  "description": "Integrated Apple Speech as default ASR in MeetingHelper, completed comprehensive TokenMonitor refactoring (codebase cleanup, dynamic exchange rates, CI optimization), fixed critical 25x data inflation bugs in JSONL/SSH deduplication, enhanced SSH sync with auto-discovery, and documented MimicGen augmentation pipeline for error recovery benchmark",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-04-24 Daily Overview What was done: Integrated Apple Speech recognition into MeetingHelper with zero-dependency streaming, executed multi-stage TokenMonitor refactoring (cleanup + optimization + module extraction + dynamic exchange rates via frankfurter.dev), fixed critical 25x data inflation bugs in Claude JSONL parsing and SSH sync deduplication, optimized CI cache from 3.8GB to under 700MB, enhanced SSH extraction to auto-discover all .claude* directories, merged upstream updates to v0.10.4, deployed error_recovery codebase, and documented MimicGen 3A augmentation pipeline How it was done: Used PyObjC SFSpeechRecognizer with ctypes for efficient audio handling, applied structured refactoring workflow (repo-tidy → optimize → ccplan), implemented message.id-based deduplication with max(output_tokens) strategy, replaced actions/cache with Swatinem/rust-cache@v2, added glob-based dynamic path discovery for SSH extraction, resolved Git merge conflicts preserving local refactors, and performed deep codebase exploration with specialized agents Impact: MeetingHelper now has production-ready zero-dependency ASR as default, TokenMonitor codebase reduced largest files by 13-72% with all tests passing, replaced hardcoded 2025-03 exchange rates with auto-updating API (24h cache), CI cache reduced by 80%, corrected cost tracking from $460→$18 (25x inflation eliminated), SSH sync covers all Claude installations automatically, submitted PR #16 to upstream with v0.10.2, and established complete understanding of robotic demo augmentation pipeline Integrated Apple Speech as default ASR in MeetingHelper, completed comprehensive TokenMonitor refactoring (codebase cleanup, dynamic exchange rates, CI optimization), fixed critical 25x data inflation bugs in JSONL/SSH deduplication, enhanced SSH sync with auto-discovery, and documented MimicGen augmentation pipeline for error recovery benchmark\nTasks Architecture \u0026 Strategy ✅ Fix critical TokenMonitor data duplication bugs (25x inflation) — Fixed two cascading bugs: (1) Claude JSONL parser - modified create_claude_unique_hash() to use message.id alone when requestId missing, preventing 2.4x inflation. (2) SSH sync pipeline - added message.id deduplication in remote extraction script and key-set filtering in local sync_host() before append, preventing 10-25x inflation from repeated sync cycles. Combined effect corrected $460→$18 athena usage ✅ Investigate and validate ccusage vs TokenMonitor token counting discrepancy — Analyzed 18,403+ JSONL records, discovered ccusage createUniqueHash() returns null when requestId missing (affecting 13,960 entries) causing dedup failure and ~1.75x overcount. Validated TokenMonitor’s correctness: message.id fallback + max(output_tokens) strategy. Searched GitHub confirming known ccusage bugs #797, #888, #901. Also verified archive data integrity with zero drift ✅ Integrate Apple SFSpeechRecognizer as default ASR backend in MeetingHelper — Implemented AppleSpeechTranscriber using SFSpeechAudioBufferRecognitionRequest for true streaming recognition, added ctypes-based efficient audio buffer copying via objc_msgSend, set as default model in live-subtitle.py and start.sh, updated documentation ✅ Fix Apple Speech critical bugs (TypeError and finalization) — Fixed PyObjC type incompatibility where buf.floatChannelData() returned PyObjC-wrapped pointer incompatible with ctypes.memmove by using ctypes objc_msgSend to get native float** pointer. Fixed text deduplication logic that skipped final callbacks when text was identical to last partial by changing condition to ‘is_final or text != self._last_text’ ✅ TokenMonitor codebase refactoring pipeline (repo-tidy → optimize → refactor) — Executed multi-stage workflow: deleted ccusage.rs (994 lines) and artifacts, fixed 4 audit issues (panic logging, platform dedup, stale rates, timestamp parsing), pulled upstream v0.10.1, refactored large files - split ssh.rs (1536→471 lines via device_aggregation.rs extraction), parser.rs (4129→3577 lines via claude_parser.rs), float_ball.rs (1818 lines to directory module with layout.rs separation), FloatBall.svelte (1063→985 lines via floatBallUtils.ts), skipped Task 4 (resizeOrchestrator.ts) after cost-benefit analysis ✅ Implement dynamic exchange rates feature via frankfurter.dev API — Created usage/exchange_rates.rs (fetch frankfurter.dev API → 24h disk cache → OnceLock",
+  "wordCount" : "4115",
+  "inLanguage": "en",
+  "datePublished": "2026-04-24T00:00:00-05:00",
+  "dateModified": "2026-04-24T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-04-24/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-24/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/'>Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-04-24
+    </h1>
+    <div class="post-meta"><span title='2026-04-24 00:00:00 -0500 -0500'>April 24, 2026</span>&nbsp;·&nbsp;<span>20 min</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="daily-report--2026-04-24">Daily Report — 2026-04-24<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-04-24">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Integrated Apple Speech recognition into MeetingHelper with zero-dependency streaming, executed multi-stage TokenMonitor refactoring (cleanup + optimization + module extraction + dynamic exchange rates via frankfurter.dev), fixed critical 25x data inflation bugs in Claude JSONL parsing and SSH sync deduplication, optimized CI cache from 3.8GB to under 700MB, enhanced SSH extraction to auto-discover all .claude* directories, merged upstream updates to v0.10.4, deployed error_recovery codebase, and documented MimicGen 3A augmentation pipeline</li>
+<li><strong>How it was done:</strong> Used PyObjC SFSpeechRecognizer with ctypes for efficient audio handling, applied structured refactoring workflow (repo-tidy → optimize → ccplan), implemented message.id-based deduplication with max(output_tokens) strategy, replaced actions/cache with Swatinem/rust-cache@v2, added glob-based dynamic path discovery for SSH extraction, resolved Git merge conflicts preserving local refactors, and performed deep codebase exploration with specialized agents</li>
+<li><strong>Impact:</strong> MeetingHelper now has production-ready zero-dependency ASR as default, TokenMonitor codebase reduced largest files by 13-72% with all tests passing, replaced hardcoded 2025-03 exchange rates with auto-updating API (24h cache), CI cache reduced by 80%, corrected cost tracking from $460→$18 (25x inflation eliminated), SSH sync covers all Claude installations automatically, submitted PR #16 to upstream with v0.10.2, and established complete understanding of robotic demo augmentation pipeline</li>
+</ul>
+<blockquote>
+<p>Integrated Apple Speech as default ASR in MeetingHelper, completed comprehensive TokenMonitor refactoring (codebase cleanup, dynamic exchange rates, CI optimization), fixed critical 25x data inflation bugs in JSONL/SSH deduplication, enhanced SSH sync with auto-discovery, and documented MimicGen augmentation pipeline for error recovery benchmark</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Fix critical TokenMonitor data duplication bugs (25x inflation)</strong> — Fixed two cascading bugs: (1) Claude JSONL parser - modified create_claude_unique_hash() to use message.id alone when requestId missing, preventing 2.4x inflation. (2) SSH sync pipeline - added message.id deduplication in remote extraction script and key-set filtering in local sync_host() before append, preventing 10-25x inflation from repeated sync cycles. Combined effect corrected $460→$18 athena usage</li>
+<li>✅ <strong>Investigate and validate ccusage vs TokenMonitor token counting discrepancy</strong> — Analyzed 18,403+ JSONL records, discovered ccusage createUniqueHash() returns null when requestId missing (affecting 13,960 entries) causing dedup failure and ~1.75x overcount. Validated TokenMonitor&rsquo;s correctness: message.id fallback + max(output_tokens) strategy. Searched GitHub confirming known ccusage bugs #797, #888, #901. Also verified archive data integrity with zero drift</li>
+<li>✅ <strong>Integrate Apple SFSpeechRecognizer as default ASR backend in MeetingHelper</strong> — Implemented AppleSpeechTranscriber using SFSpeechAudioBufferRecognitionRequest for true streaming recognition, added ctypes-based efficient audio buffer copying via objc_msgSend, set as default model in live-subtitle.py and start.sh, updated documentation</li>
+<li>✅ <strong>Fix Apple Speech critical bugs (TypeError and finalization)</strong> — Fixed PyObjC type incompatibility where buf.floatChannelData() returned PyObjC-wrapped pointer incompatible with ctypes.memmove by using ctypes objc_msgSend to get native float** pointer. Fixed text deduplication logic that skipped final callbacks when text was identical to last partial by changing condition to &lsquo;is_final or text != self._last_text&rsquo;</li>
+<li>✅ <strong>TokenMonitor codebase refactoring pipeline (repo-tidy → optimize → refactor)</strong> — Executed multi-stage workflow: deleted ccusage.rs (994 lines) and artifacts, fixed 4 audit issues (panic logging, platform dedup, stale rates, timestamp parsing), pulled upstream v0.10.1, refactored large files - split ssh.rs (1536→471 lines via device_aggregation.rs extraction), parser.rs (4129→3577 lines via claude_parser.rs), float_ball.rs (1818 lines to directory module with layout.rs separation), FloatBall.svelte (1063→985 lines via floatBallUtils.ts), skipped Task 4 (resizeOrchestrator.ts) after cost-benefit analysis</li>
+<li>✅ <strong>Implement dynamic exchange rates feature via frankfurter.dev API</strong> — Created usage/exchange_rates.rs (fetch frankfurter.dev API → 24h disk cache → OnceLock&lt;RwLock&lt;&raquo;), added get_exchange_rates IPC command, modified format.ts to inject dynamic rates, updated bootstrap.ts to fetch on startup. Includes 5 unit tests. Replaced hardcoded 2025-03 rates with auto-updating API</li>
+<li>✅ <strong>Optimize GitHub Actions Cargo cache from 3.8GB to under 700MB</strong> — Replaced actions/cache@v5 with Swatinem/rust-cache@v2, disabled CARGO_INCREMENTAL for CI, reduced cache by 80% (from ~3.8GB to ~400-700MB per platform) by caching only dependencies instead of entire target/ directory including incremental builds and docs</li>
+<li>✅ <strong>Enhance SSH extraction to auto-discover Claude directories</strong> — Replaced hardcoded ~/.claude/projects paths with glob pattern for _cd in $HOME/.claude*; discovers .claude, .claude-code, and any .claude-* variants automatically; also sources shell rc files to pick up CLAUDE_CONFIG_DIR</li>
+<li>✅ <strong>Merge upstream Michael-OvO/TokenMonitor updates to v0.10.4</strong> — Resolved 5 file conflicts across two merge operations (v0.10.1 and v0.10.4), bumped version to 0.10.4, preserved refactored module structure while integrating upstream permission guards and security fixes</li>
+<li>✅ <strong>Unify TokenMonitor device breakdown data sources</strong> — Fixed build_device_breakdown_for_payload() and build_device_time_chart_buckets() to use archive + frontier filtering like DevicesView does, eliminating double-counting of archived hours</li>
+<li>✅ <strong>Document MimicGen 3A augmentation pipeline in detail</strong> — Produced comprehensive documentation of scene augmentation workflow: variant generation, object anchoring logic (grasp detection, goal completion, phase-locked placement refs, transitive contact), task phase system (6 phases → 4 groups), object-centric warping, waypoint interpolation, and success validation</li>
+<li>✅ <strong>Include SSH remote models in TokenMonitor Settings</strong> — Modified get_known_models command to iterate over SSH cache records in addition to local entries; added data-updated event listener in HiddenModelsSettings to auto-refresh model list when remote sync completes</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>✅ <strong>Fix TokenMonitor chart rendering issues</strong> — Fixed chart line data misalignment by changing lineData calculation from find() to filter().reduce() to sum all segments with same model_key. Optimized Y-axis scaling by adding intermediate thresholds (15/30/75/150/300) to niceMax() function, preventing &lsquo;flat&rsquo; appearance</li>
+<li>✅ <strong>Implement collapsible Model Visibility UI</strong> — Added collapsible &lsquo;Model Visibility&rsquo; row in Settings Monitoring card with chevron animation, hidden count display, smooth max-height transition, and proper button accessibility</li>
+<li>✅ <strong>TokenMonitor UI improvements (SSH sync buttons, UpdateBanner, cache reset)</strong> — Added spinning refresh icon to DevicesView and SshHostsSettings sync buttons matching Settings style, moved UpdateBanner to bottom of Settings scroll area with reversed border, added cache reset confirmation UI (green/red visual feedback for 2 seconds) and extended clear_cache() to wipe archive and remote-cache directories</li>
+<li>✅ <strong>Version bump to 0.10.2 and create PR to upstream</strong> — Updated package.json, Cargo.toml, tauri.conf.json. Created PR #16 to Michael-OvO/TokenMonitor from TzJ2006:main. Fixed FloatBallSizes import issue for Linux CI. All tests passing (345 Rust + 225 frontend)</li>
+<li>✅ <strong>Fix SSH jq path lacking deduplication and cargo fmt issues</strong> — Removed jq extraction branch in ssh_remote.rs, unified on Python path with message.id-based dedup. Fixed cargo fmt violations in ssh.rs, device_aggregation.rs, ssh_remote.rs. Fixed Clippy doc_lazy_continuation warnings</li>
+<li>✅ <strong>Deploy error_recovery codebase to tianhe server</strong> — Used rsync to upload 402M/3644 files to tianhe:/HOME/&hellip;/error_recovery_benchmark/error_recovery_collection/, excluding .git and .DS_Store</li>
+<li>• <strong>Explore AWS Bedrock config for Opus 4.7</strong> — Checked environment variables for Bedrock routing. Found CLAUDE_CODE_USE_BEDROCK=1 and AWS_REGION set, but ANTHROPIC_MODEL and CLAUDE_CODE_USE_MANTLE missing</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-claude-code-jsonl-format-change-caused-24x-cost-inflation-assistant-messages-with-multiple-content-blocks-written-as-separate-lines-with-identical-usage-but-deduplication-skipped-when-requestid-missing">1. Claude Code JSONL format change caused 2.4x cost inflation: assistant messages with multiple content blocks written as separate lines with identical usage, but deduplication skipped when requestId missing<a hidden class="anchor" aria-hidden="true" href="#1-claude-code-jsonl-format-change-caused-24x-cost-inflation-assistant-messages-with-multiple-content-blocks-written-as-separate-lines-with-identical-usage-but-deduplication-skipped-when-requestid-missing">#</a></h4>
+<p><strong>Solution:</strong> Modified create_claude_unique_hash() to use message.id alone as fallback when requestId is None. Same message.id across multiple lines now correctly deduplicated as single API call</p>
+<p><strong>Key Insight:</strong> New Claude Code format lacks top-level requestId in many entries; message.id is sufficient unique identifier since content blocks share same message.id</p>
+<h4 id="2-ssh-remote-sync-caused-10-25x-data-inflation-extraction-script-emitted-duplicate-content-block-lines-and-local-append-used--newer-file-filter-causing-full-file-re-extraction-on-any-update-with-no-deduplication-before-append">2. SSH remote sync caused 10-25x data inflation: extraction script emitted duplicate content-block lines, and local append used -newer file filter causing full file re-extraction on any update, with no deduplication before append<a hidden class="anchor" aria-hidden="true" href="#2-ssh-remote-sync-caused-10-25x-data-inflation-extraction-script-emitted-duplicate-content-block-lines-and-local-append-used--newer-file-filter-causing-full-file-re-extraction-on-any-update-with-no-deduplication-before-append">#</a></h4>
+<p><strong>Solution:</strong> Two-layer fix: (1) Remote Python script now maintains seen={} by message.id during extraction. (2) Local sync_host() loads existing cache, builds key-set from (ts, model, in, out) tuples, filters new records before append</p>
+<p><strong>Key Insight:</strong> File-based incremental sync (-newer mtime) does not imply record-level deduplication. Every layer (extraction, ingestion, aggregation) needs explicit duplicate detection</p>
+<h4 id="3-ccusage-reported-175x-higher-token-usage-than-tokenmonitor-on-same-data-causing-confusion-about-actual-consumption">3. ccusage reported ~1.75x higher token usage than TokenMonitor on same data, causing confusion about actual consumption<a hidden class="anchor" aria-hidden="true" href="#3-ccusage-reported-175x-higher-token-usage-than-tokenmonitor-on-same-data-causing-confusion-about-actual-consumption">#</a></h4>
+<p><strong>Solution:</strong> Root cause identified in ccusage&rsquo;s createUniqueHash() requiring both message.id AND requestId - when requestId is missing (13,960 of 20,116 entries), no deduplication occurs, causing duplicates to be counted multiple times. Additionally, ccusage uses &lsquo;first-wins&rsquo; strategy which keeps early snapshots with low token counts</p>
+<p><strong>Key Insight:</strong> Streaming APIs write multiple JSONL snapshots per response with incrementing output_tokens; &lsquo;first-wins&rsquo; deduplication keeps early snapshots with low token counts, while TokenMonitor&rsquo;s &lsquo;max output_tokens&rsquo; strategy correctly captures final values</p>
+<h4 id="4-apple-speech-subtitles-stayed-gray-partial-state-and-never-turned-white-finalized-with-new-text-overwriting-previous-text-instead-of-appending">4. Apple Speech subtitles stayed gray (partial state) and never turned white (finalized), with new text overwriting previous text instead of appending<a hidden class="anchor" aria-hidden="true" href="#4-apple-speech-subtitles-stayed-gray-partial-state-and-never-turned-white-finalized-with-new-text-overwriting-previous-text-instead-of-appending">#</a></h4>
+<p><strong>Solution:</strong> Modified _on_result callback condition from &lsquo;if text and text != self._last_text&rsquo; to &lsquo;if text and (is_final or text != self._last_text)&rsquo; to ensure final callbacks aren&rsquo;t skipped by deduplication logic</p>
+<p><strong>Key Insight:</strong> Apple&rsquo;s SFSpeechRecognizer returns identical text for final result and last partial result; deduplication must check is_final flag explicitly</p>
+<h4 id="5-agents-claude_parserrs-extraction-reverted-sshrs-to-old-version-losing-task-3s-device_aggregation-refactor">5. Agent&rsquo;s claude_parser.rs extraction reverted ssh.rs to old version, losing Task 3&rsquo;s device_aggregation refactor<a hidden class="anchor" aria-hidden="true" href="#5-agents-claude_parserrs-extraction-reverted-sshrs-to-old-version-losing-task-3s-device_aggregation-refactor">#</a></h4>
+<p><strong>Solution:</strong> Human identified issue by checking file line counts (ssh.rs back to 1536 lines). Re-applied all ssh.rs changes manually: removed aggregation functions, updated imports to device_aggregation::*, fixed all callers. Verified with cargo check + test</p>
+<p><strong>Key Insight:</strong> Agent-driven file modifications can revert uncommitted changes if system-reminder contains stale linter state. Always verify critical files after agent operations</p>
+<h4 id="6-apple-speech-audio-capture-stopped-working-with-typeerror-wrong-type-in-ctypesmemmove-when-copying-audio-samples-to-avaudiopcmbuffer">6. Apple Speech audio capture stopped working with &lsquo;TypeError: wrong type&rsquo; in ctypes.memmove when copying audio samples to AVAudioPCMBuffer<a hidden class="anchor" aria-hidden="true" href="#6-apple-speech-audio-capture-stopped-working-with-typeerror-wrong-type-in-ctypesmemmove-when-copying-audio-samples-to-avaudiopcmbuffer">#</a></h4>
+<p><strong>Solution:</strong> Bypassed PyObjC bridge by using ctypes to directly call objc_msgSend with sel_registerName(&lsquo;floatChannelData&rsquo;), obtaining native ctypes-compatible float** pointer instead of PyObjC-wrapped object</p>
+<p><strong>Key Insight:</strong> PyObjC bridge types are not directly compatible with ctypes functions; need to use objc_msgSend for low-level C API interop</p>
+<h4 id="7-ssh-remote-extraction-only-found-claudeprojects-and-configclaudeprojects-missing-custom-installations-like-claude-code-with-different-models">7. SSH remote extraction only found ~/.claude/projects and ~/.config/claude/projects, missing custom installations like ~/.claude-code with different models<a hidden class="anchor" aria-hidden="true" href="#7-ssh-remote-extraction-only-found-claudeprojects-and-configclaudeprojects-missing-custom-installations-like-claude-code-with-different-models">#</a></h4>
+<p><strong>Solution:</strong> Replaced hardcoded paths with glob pattern &lsquo;for _cd in $HOME/.claude*; do [ -d $_cd/projects ] &amp;&amp; &hellip;&rsquo; to auto-discover all .claude-prefixed directories; also source shell rc files to pick up CLAUDE_CONFIG_DIR environment variable</p>
+<p><strong>Key Insight:</strong> Users may have multiple Claude CLI installations with different configs in parallel directories; glob-based discovery is more robust than hardcoding</p>
+<h4 id="8-github-actions-cache-approaching-10gb-limit-due-to-caching-entire-target-directory-including-incremental-build-artifacts-and-docs">8. GitHub Actions cache approaching 10GB limit due to caching entire target/ directory including incremental build artifacts and docs<a hidden class="anchor" aria-hidden="true" href="#8-github-actions-cache-approaching-10gb-limit-due-to-caching-entire-target-directory-including-incremental-build-artifacts-and-docs">#</a></h4>
+<p><strong>Solution:</strong> Replaced actions/cache@v5 with Swatinem/rust-cache@v2 which only caches dependencies, added CARGO_INCREMENTAL=0 for CI job, achieved 80% cache reduction</p>
+<p><strong>Key Insight:</strong> Incremental compilation benefits local dev but wastes CI cache space since runners are stateless; specialized Rust cache actions provide smarter caching than generic file caching</p>
+<h4 id="9-chart-line-y-coordinates-mismatched-tooltip-values-5145-point-rendered-near-0-while-tooltip-correctly-showed-5145">9. Chart line Y-coordinates mismatched tooltip values: $51.45 point rendered near $0, while tooltip correctly showed $51.45<a hidden class="anchor" aria-hidden="true" href="#9-chart-line-y-coordinates-mismatched-tooltip-values-5145-point-rendered-near-0-while-tooltip-correctly-showed-5145">#</a></h4>
+<p><strong>Solution:</strong> Changed lineData segment lookup from find() to filter().reduce((sum, s) =&gt; sum + s.cost, 0) to sum all matching segments per bucket</p>
+<p><strong>Key Insight:</strong> Aggregated data (tooltip) and visual encoding (line position) must use same summation logic. Device-level disaggregation means one model can have multiple segments per time bucket</p>
+<h4 id="10-devicesview-and-main-chart-showed-different-device-breakdown-totals-devicesview-used-archive--frontier-filtering-main-page-read-raw-remote-cache-usagejsonl-without-excluding-archived-hours">10. DevicesView and main chart showed different device breakdown totals. DevicesView used archive + frontier filtering, main page read raw remote-cache usage.jsonl without excluding archived hours<a hidden class="anchor" aria-hidden="true" href="#10-devicesview-and-main-chart-showed-different-device-breakdown-totals-devicesview-used-archive--frontier-filtering-main-page-read-raw-remote-cache-usagejsonl-without-excluding-archived-hours">#</a></h4>
+<p><strong>Solution:</strong> Unified both code paths to call build_device_summary_merged() with archive.frontier() filter, skipping compact records already covered by archived entries</p>
+<p><strong>Key Insight:</strong> Archive system creates dual data sources (archived JSONL + live cache). All consumers must use frontier cutoff to avoid double-counting transition period</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="11-ci-failed-with-cannot-find-type-floatballsizes--linux-cfg-blocks-used-floatballsizes-but-modrs-didnt-import-it-for-linux">11. CI failed with &lsquo;cannot find type FloatBallSizes&rsquo; — Linux #[cfg] blocks used FloatBallSizes but mod.rs didn&rsquo;t import it for Linux<a hidden class="anchor" aria-hidden="true" href="#11-ci-failed-with-cannot-find-type-floatballsizes--linux-cfg-blocks-used-floatballsizes-but-modrs-didnt-import-it-for-linux">#</a></h4>
+<p><strong>Solution:</strong> Added #[cfg(target_os = &ldquo;linux&rdquo;)] use layout::FloatBallSizes; and #[allow(unused_imports)] on FloatBallAnchor (only used in non-Linux #[cfg] blocks). Verified with cargo clippy</p>
+<p><strong>Key Insight:</strong> Platform-conditional compilation requires platform-specific imports. Unused import warnings can be platform-dependent; use #[allow(unused_imports)] with #[cfg] documentation</p>
+<h4 id="12-chart-y-axis-scaling-too-coarse-50100-jump-made-51-75-data-appear-flat-only-using-half-chart-height">12. Chart Y-axis scaling too coarse: $50→$100 jump made $51-75 data appear &lsquo;flat&rsquo; (only using half chart height)<a hidden class="anchor" aria-hidden="true" href="#12-chart-y-axis-scaling-too-coarse-50100-jump-made-51-75-data-appear-flat-only-using-half-chart-height">#</a></h4>
+<p><strong>Solution:</strong> Added intermediate thresholds to niceMax() sequence: 15/30 between 10-50, 75 between 50-100, 150/300 between 100-500, etc. Now $51 maps to $75 ceiling instead of $100</p>
+<p><strong>Key Insight:</strong> Nice number scales need denser steps in commonly-used ranges. 2x jump is too aggressive for cost data typically $10-100</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="root-cause-of-460-athena-cost-anomaly">Root cause of $460 athena cost anomaly<a hidden class="anchor" aria-hidden="true" href="#root-cause-of-460-athena-cost-anomaly">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User immediately suspected SSH sync persistence + multiple sync cycles causing cumulative duplication, asked &lsquo;might it be repeated SSH sync after persistence?&rsquo;</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI initially focused on local Claude JSONL parsing bug (cached_input_tokens pricing calculation), only investigated SSH pipeline after user&rsquo;s hypothesis</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> User&rsquo;s domain knowledge of the sync architecture led to faster root-cause identification. AI followed code paths linearly rather than hypothesis-driven investigation</p>
+<h4 id="identifying-agent-caused-file-reversion">Identifying agent-caused file reversion<a hidden class="anchor" aria-hidden="true" href="#identifying-agent-caused-file-reversion">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Checked file line counts after agent operation and noticed ssh.rs was back to 1536 lines (should be ~471). Immediately requested verification and re-application</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Didn&rsquo;t proactively verify prior work was preserved after agent returned. Only noticed issue when human pointed it out</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human maintained mental model of expected file sizes and caught regression. AI lacked proactive verification of cross-session state preservation</p>
+<h4 id="decision-to-skip-task-4-resizeorchestratorts-refactor">Decision to skip Task 4 (resizeOrchestrator.ts refactor)<a hidden class="anchor" aria-hidden="true" href="#decision-to-skip-task-4-resizeorchestratorts-refactor">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Asked &lsquo;why not modify anymore?&rsquo; — wanted to understand reasoning before accepting skip decision</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Analyzed closure state dependencies (19 variables shared across almost all functions) and concluded forced extraction would add complexity without benefit. Proposed skip with technical justification</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human prioritized understanding &lsquo;why&rsquo; over blind execution; AI provided data-driven refactoring cost-benefit analysis. Both aligned on outcome after explanation</p>
+<h4 id="diagnosing-apple-speech-transcription-stoppage">Diagnosing Apple Speech transcription stoppage<a hidden class="anchor" aria-hidden="true" href="#diagnosing-apple-speech-transcription-stoppage">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User observed that text stayed gray (partial) and new speech overwrote previous text, immediately connecting this to missing finalization rather than file I/O</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI initially suspected file writing issue and checked logs/file timestamps before realizing the callback was being skipped</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human&rsquo;s direct observation of UI behavior (gray text never turning white) led to faster root cause identification than AI&rsquo;s log-based investigation</p>
+<h4 id="chart-line-y-axis-behavior-diagnosis">Chart line Y-axis behavior diagnosis<a hidden class="anchor" aria-hidden="true" href="#chart-line-y-axis-behavior-diagnosis">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User provided screenshot showing visual mismatch (line at $0, tooltip $51.45), directly stated &lsquo;data and chart don&rsquo;t match&rsquo;</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI analyzed code to find find() vs aggregation mismatch, but initially missed that line charts vs bar charts need different maxCost calculation</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> User&rsquo;s visual-first debugging caught rendering issue immediately; AI needed to trace through multiple code layers</p>
+<h4 id="version-number-conflict-resolution">Version number conflict resolution<a hidden class="anchor" aria-hidden="true" href="#version-number-conflict-resolution">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Proactively requested version 0.10.4 instead of accepting upstream&rsquo;s 0.10.3</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Initial merge plan adopted upstream 0.10.3, focused on technical correctness</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human demonstrates forward-thinking version management (avoiding collision), AI prioritizes immediate conflict resolution</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="critical-limitations">Critical Limitations<a hidden class="anchor" aria-hidden="true" href="#critical-limitations">#</a></h3>
+<ul>
+<li>Agent-driven file operations can silently revert uncommitted changes if they read from system-reminder&rsquo;s linter-saved state instead of actual working tree. Did not proactively verify preservation of prior session&rsquo;s work after agent completed operations</li>
+<li>Did not proactively suspect SSH sync pipeline as duplication source; required user&rsquo;s explicit hypothesis to investigate remote extraction and append logic. Focused on local parser first instead of hypothesis-driven investigation</li>
+<li>Initially misdiagnosed Apple Speech issue as file writing problem rather than callback being filtered by deduplication logic; should have analyzed the callback chain first given user&rsquo;s description of &rsquo;text stays gray&rsquo;</li>
+<li>During ccusage analysis, initially suspected schema validation issues and spent multiple rounds exploring timestamp regex, usage field structure - actual root cause was createUniqueHash returning null. Should have examined dedup logic first</li>
+<li>Initially stated user&rsquo;s requestId field was &rsquo;entirely missing&rsquo; which was factually incorrect - actual data showed 30.6% of entries had requestId present</li>
+</ul>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>When fixing line chart Y-axis, initially only changed segment aggregation but missed that bar (stacked) vs line (non-stacked) charts need different max calculation. Required visual analysis to realize maxCost should differ by chart mode</li>
+<li>Missed platform-conditional import issue (FloatBallSizes only needed on Linux) until CI failed. Rust&rsquo;s #[cfg] conditional compilation creates platform-dependent symbol visibility not caught by local macOS build</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>Multi-layer data pipelines require defensive deduplication at every boundary: extraction (remote script), ingestion (local append), aggregation (parser), and archival (frontier filtering). File-based incremental sync does not guarantee record-level uniqueness</li>
+<li>Correct JSONL dedup for streaming APIs: same message.id written multiple times with incrementing output_tokens. Must keep last entry or max(output_tokens). Relying solely on requestId (which may be absent) causes dedup failure. &lsquo;First-wins&rsquo; strategy undercounts output tokens</li>
+<li>Open-source tool correctness validation: ccusage has two unresolved bugs - #797 (requestId missing causes overcount) and #705 (first-wins undercount output_tokens). Cross-tool comparison + GitHub issue search effectively validates algorithm correctness</li>
+<li>Apple&rsquo;s SFSpeechRecognizer returns identical text for isFinal=True and last partial result; deduplication logic must explicitly check is_final flag to avoid skipping finalization callbacks</li>
+<li>Factory closure pattern with shared mutable state (e.g., resizeOrchestrator with 19 state variables) should NOT be forcibly refactored. Cost-benefit analysis: only 6/573 lines are pure functions; extraction would require passing 19 parameters or introducing state object, increasing cognitive load</li>
+<li>Reusing proven architectural patterns (LiteLLM fetch/cache) for similar features (exchange rates) ensures consistency and reduces bugs. Both use: fetch API → disk cache (TTL) → OnceLock&lt;RwLock&lt;&raquo; → startup load + async refresh + background loop check</li>
+<li>GitHub Actions cache strategy: incremental compilation provides no benefit in CI (cold builds every run). Swatinem/rust-cache intelligently caches only dependencies vs entire target/ directory, reducing cache by 80% while maintaining speed</li>
+<li>User domain intuition about system behavior (SSH sync repetition) is often faster than AI&rsquo;s code-path analysis for identifying root causes. Hypothesis-driven debugging beats exhaustive tracing when symptoms have clear patterns</li>
+<li>Streaming API deduplication requires &rsquo;last-wins&rsquo; or &lsquo;max-value&rsquo; strategies rather than &lsquo;first-wins&rsquo; because early chunks contain incomplete accumulated values (especially for output_tokens)</li>
+<li>PyObjC bridge objects are not ctypes-compatible; use ctypes objc_msgSend with sel_registerName for direct C API interop to obtain native pointers</li>
+<li>Glob-based path discovery (~/.claude*/) is more maintainable than hardcoding specific directory names when users may have parallel installations with different configs</li>
+<li>Module extraction pattern for large Rust files: directory modules (foo/ with mod.rs + layout.rs) cleanly separate pure logic from stateful/platform-specific code. Applied successfully to float_ball.rs (geometry → layout.rs, IPC/window → mod.rs) and parser.rs (Claude parsing → claude_parser.rs)</li>
+<li>Chart visual encoding and tooltip aggregation must use identical data pipeline. If tooltip sums all device segments but line Y uses first segment only, the mismatch is immediately visible even if both are &lsquo;correct&rsquo; in their own context</li>
+<li>jq as stateless JSON processor cannot implement deduplication - requires stateful tools like Python/awk. Multi-path extraction logic (jq/python/grep) must guarantee behavioral consistency</li>
+<li>Archive system creates dual data sources (archived JSONL + live cache). All consumers must use frontier cutoff to avoid double-counting transition period</li>
+<li>MimicGen augmentation requires deep semantic understanding: task phases encode manipulation progress, object anchoring prevents invalid scenes, warping preserves relative pose, and success validation is essential. Pure trajectory replay fails without context-aware adaptation</li>
+<li>Deduplication key construction should use fallback strategies (e.g., message.id when requestId missing) rather than returning null, to avoid accidentally treating duplicates as unique entries</li>
+</ul>
+<h3 id="practical-learnings">Practical Learnings<a hidden class="anchor" aria-hidden="true" href="#practical-learnings">#</a></h3>
+<ul>
+<li>Nice number scales need empirical tuning for the domain&rsquo;s typical value range. Generic geometric progression (1/2/5/10/20/50/100) is too coarse for cost data concentrated in $10-100; intermediate steps (15/30/75) improve data-ink ratio</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<h3 id="meetinghelper">MeetingHelper<a hidden class="anchor" aria-hidden="true" href="#meetinghelper">#</a></h3>
+<p><strong>✅ Apple Speech backend integration and critical bug fixes</strong>
+<em>14:35:56.072 | claude_code</em>
+Implemented AppleSpeechTranscriber using SFSpeechAudioBufferRecognitionRequest for true streaming recognition with zero model downloads. Set apple as default model in start.sh and live-subtitle.py. Fixed two critical bugs: PyObjC type incompatibility causing &lsquo;TypeError: wrong type&rsquo; in audio capture (solved via ctypes objc_msgSend to get native float** pointer), and final results not being saved because deduplication filtered identical final/partial text (solved by adding explicit is_final check). Updated documentation. Verified discovery of 63 supported languages with on-device English support.</p>
+<p><strong>✅ Summarized spatial metabolomics research presentation</strong>
+<em>14:25:57.510 | claude_code</em>
+Analyzed meeting transcript about predicting spatial metabolomics distribution from H&amp;E images. Covered data source selection issues (MetaSpace Lung had low resolution and poor alignment, Robbie GBM had mismatched tissue sections, final choice was HCCR CC with near-perfect alignment), preprocessing pipeline including upsampling and TIC normalization, and initial training results comparing HCCR CC vs MetaSpace datasets.</p>
+<h3 id="tokenmonitor">TokenMonitor<a hidden class="anchor" aria-hidden="true" href="#tokenmonitor">#</a></h3>
+<p><strong>✅ Investigate ccusage token counting 1.75x overcounting bug and fix SSH jq dedup</strong>
+<em>15:55:24.272 | claude_code</em>
+User reported ccusage shows significantly more tokens than TokenMonitor. Deep investigation into bundled ccusage source revealed createUniqueHash returns null when requestId missing, causing all 18,403 entries to bypass dedup (10,252 duplicates). Additionally, ccusage uses &lsquo;first-wins&rsquo; which undercounts output_tokens. TokenMonitor correctly dedupes by message.id with max(output_tokens). Searched GitHub confirming known ccusage bugs #797, #888, #901. Fixed bonus issue: SSH jq path lacking dedup - removed jq branch entirely, unified on Python path. Added spinning refresh icon to SSH sync buttons matching Settings style.</p>
+<p><strong>✅ Fix critical 25x data duplication bugs in JSONL + SSH sync and chart rendering</strong>
+<em>15:08:47.945 | claude_code</em>
+Discovered and fixed two cascading bugs causing 25x cost inflation: (1) Claude JSONL parser skipped deduplication when requestId missing - fixed create_claude_unique_hash() to use message.id alone (2.4x fix). (2) SSH sync repeatedly appended full file contents without checking existing records - added remote Python dedup by message.id and local sync_host() key-set filtering (10x fix). Combined correction: $460→$18 athena usage. Also fixed chart line misalignment (sum all segments per model via filter().reduce()), Y-axis scaling (added intermediate thresholds 15/30/75/150/300), device breakdown inconsistency (unified archive+frontier filter), UpdateBanner positioning (bottom in Settings), and cache reset UI feedback (green/red confirmation, extended to wipe archive and remote-cache). All changes validated with 347 passing Rust tests.</p>
+<p><strong>✅ Codebase health improvement pipeline: tidy → optimize → refactor + dynamic exchange rates</strong>
+<em>01:44:27.261 | claude_code</em>
+Executed multi-stage workflow: cleaned dead code (ccusage.rs, .DS_Store), fixed 4 audit issues (panic logging, platform dedup, stale rates, timestamp parsing), pulled upstream v0.10.1, completed Tasks 1-3 &amp; 5 refactoring (parser.rs split via claude_parser.rs, ssh.rs split via device_aggregation.rs, float_ball.rs converted to directory module with layout.rs, FloatBall.svelte extracted to floatBallUtils.ts), skipped Task 4 (resizeOrchestrator.ts) after cost-benefit analysis. Implemented dynamic exchange rates via frankfurter.dev API with 24h cache, IPC command, and frontend injection. Agent accidentally reverted ssh.rs; human identified via line count check and manually re-applied changes. Fixed FloatBallSizes Linux import issue. Created PR #16 to upstream. Final result: 345 Rust tests + 225 frontend tests passing, 0 warnings, version 0.10.2.</p>
+<p><strong>✅ Optimize GitHub Actions Cargo cache and merge upstream v0.10.4</strong>
+<em>15:46:51.777 | claude_code</em>
+User noticed excessive CI cache size approaching GitHub&rsquo;s 10GB limit. Analyzed cache composition revealing 2.6GB incremental builds and 606MB docs. Replaced actions/cache@v5 with Swatinem/rust-cache@v2, disabled CARGO_INCREMENTAL in ci.yml and release.yml, achieved 80% reduction to under 700MB. Merged upstream v0.10.4 resolving 5 file conflicts, preserved refactored device_aggregation module while integrating upstream usage_access_enabled permission guards. All tests passed.</p>
+<p><strong>✅ Token counting discrepancy investigation &amp; verification</strong>
+<em>16:53:18.586 | codex</em>
+User requested investigation of why ccusage reports higher token counts than TokenMonitor. AI performed deep analysis of both tools&rsquo; deduplication logic, discovering ccusage&rsquo;s createUniqueHash() returns null when requestId is missing (affecting 13,960 of 20,116 entries), causing no deduplication and ~1.75x overcount. Additionally verified ccusage uses &lsquo;first-wins&rsquo; strategy which keeps early snapshots with incomplete output_tokens. Confirmed TokenMonitor&rsquo;s fallback strategy (use message.id alone) and max-output_tokens selection are more robust. Also verified TokenMonitor archive data integrity with zero drift. Corrected initial statement about requestId being entirely missing (actually 30.6% present).</p>
+<p><strong>✅ SSH extraction auto-discovery and remote model inclusion</strong>
+<em>04:55:34.873 | claude_code</em>
+Enhanced SSH remote extraction script to dynamically discover all ~/.claude* directories using glob pattern instead of hardcoded paths, also sources shell rc files to pick up CLAUDE_CONFIG_DIR. Modified get_known_models to iterate SSH cache records from enabled remote hosts ensuring models like Opus 4.7 and GLM 5.1 appear in Settings. Added data-updated event listener for auto-refresh. Verified on tianhe2 finding both ~/.claude/projects (885 files, GLM models) and ~/.claude-code/projects (16 files, Opus 4.7).</p>
+<p><strong>✅ Implemented collapsible Model Visibility UI in Settings</strong>
+<em>17:04:40.305 | claude_code</em>
+Designed and built collapsible &lsquo;Model Visibility&rsquo; section in HiddenModelsSettings component to reduce clutter from model toggle grid. Added clickable button row with chevron animation, hidden count badge, smooth max-height transition, and proper accessibility. Changed from div to button element to satisfy a11y requirements. All Svelte and Rust tests pass with 0 warnings.</p>
+<p><strong>✅ Fix cargo fmt formatting violations in CI</strong>
+<em>15:43:59.656 | claude_code</em>
+CI reported 3 formatting issues from cargo fmt check: extra blank line in ssh.rs, function call wrapping in device_aggregation.rs, format! macro layout in ssh_remote.rs. Applied fixes and verified full CI suite (clippy, svelte-check, tests) passes cleanly.</p>
+<p><strong>🔍 AWS Bedrock environment variable configuration for Opus 4.7</strong>
+<em>17:31:29.348 | claude_code</em>
+User asked about using CLAUDE_CODE_USE_BEDROCK and ANTHROPIC_MODEL environment variables to access Opus 4.7 via AWS Bedrock. Explained requirements (AWS credentials, Bedrock model access approval, regional availability). Checked current env: BEDROCK and AWS_REGION set, but ANTHROPIC_MODEL and CLAUDE_CODE_USE_MANTLE missing, explaining why 4.6 was still active.</p>
+<h3 id="error_recovery">error_recovery<a hidden class="anchor" aria-hidden="true" href="#error_recovery">#</a></h3>
+<p><strong>✅ Document MimicGen 3A scene augmentation pipeline in detail</strong>
+<em>15:00:30.240 | claude_code</em>
+User requested detailed explanation of MimicGen augmentation logic. Launched Explore agent to analyze recovery_segmenter, recovery_mimicgen, error_scene_variants, and related modules. Generated comprehensive report covering: variant generation with object anchoring (grasp detection, goal completion, phase-locked placement refs, transitive contact), task phase system (6 fine-grained phases mapped to 4 groups), object-centric warping math (relative pose preservation), waypoint interpolation, action noise, and success validation. User requested deeper detail on phase logic; provided complete breakdown of phase group mapping, anchoring rules, and phase-aware reference selection.</p>
+<p><strong>✅ Upload error_recovery codebase to tianhe SSH server</strong>
+<em>15:22:39.242 | claude_code</em>
+User requested rsync upload of 402MB project directory to tianhe:/HOME/&hellip;/error_recovery_benchmark/error_recovery_collection/. Confirmed SSH config, executed rsync with progress tracking, excluded .git and .DS_Store. Transfer completed successfully (3644 files, 349MB compressed, 622KB/s).</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-04-24-usage.png"></p>
+<p><strong>Total: $70.50</strong> — 74.4M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-12 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Fixed the sandbox permissions structure in the macOS Wallpaper app, and resolved issues related to PyTorch dependencies and CUDA compilation for deep learning evaluation environments.">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-12/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-12/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-12/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-12/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-12">
+  <meta property="og:description" content="Fixed the sandbox permissions structure in the macOS Wallpaper app, and resolved issues related to PyTorch dependencies and CUDA compilation for deep learning evaluation environments.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-12T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-12T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-12">
+  <meta name="twitter:description" content="Fixed the sandbox permissions structure in the macOS Wallpaper app, and resolved issues related to PyTorch dependencies and CUDA compilation for deep learning evaluation environments.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-03-12",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-03-12/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-12",
+  "name": "Bug Journal 2026-03-12",
+  "description": "Fixed the sandbox permissions structure in the macOS Wallpaper app, and resolved issues related to PyTorch dependencies and CUDA compilation for deep learning evaluation environments.",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-03-12 Daily Overview What was done: Cross-platform solutions were implemented for three independent projects: upgrading the sandbox permissions architecture of macOS wallpaper applications, optimizing the output of GPU monitoring tools, and fixing dependency chains in the deep learning evaluation environment. How it was done: System-level log analysis was used to identify issues with the macOS TCC permission mechanism. Dependency version matrices were utilized to track ABI compatibility in the PyTorch ecosystem. The CUDA toolchain was configured to ensure proper local compilation of C++ extensions. Impact: macOS applications now have production-grade file access persistence capabilities. Two research projects on the tianhe server have resumed operation (although the checkpoint path issue has not been fully resolved). MacBook What was done: Sandbox migration and permission system restructuring were completed for desktop-video applications. A critical bug was fixed where historical records could not open old files. How it was done: The App Sandbox was enabled to make security-scoped bookmarks effective. Bookmark parsing logic was corrected, and an NSOpenPanel reauthorization mechanism was added. Impact: The user history feature is now fully functional. The app adheres to macOS best practices, paving the way for its release on the App Store. tianhe What was done: Conflicts in PyTorch dependencies for the RoboTwin project were resolved. Compilation issues with curobo were addressed, and the readability of GPU monitoring tools was improved. How it was done: The pip version matrix was used to match torch/torchvision. The CUDA toolchain path (CUDA_HOME and CPATH) was configured in the conda environment. The process aggregation logic was rewritten to limit the output width. Impact: The robot strategy evaluation environment has mostly resumed its functionality. GPU resource monitoring is more efficient, but the checkpoint path mapping issue remains unresolved. The sandbox permissions architecture of macOS wallpaper applications was fixed, and issues with PyTorch dependencies and CUDA compilation in the deep learning evaluation environment were resolved.\nTasks Architecture \u0026 Strategy ✅ Fixed the issue where historical records could not open old videos — Enabled the App Sandbox, corrected bookmark parsing logic (added non-scoped backtracking), added a retry mechanism for permission errors (NSOpenPanel reauthorization), updated localization and ChangeLog. ✅ Resolved conflicts in PyTorch versions for the RoboTwin evaluation environment — Upgraded torchvision from 0.21.0 to 0.22.1+cu126 to match torch 2.7.1. This resolved issues with the registration of torchvision::nms operators. ✅ Recompiled curobo to match the current PyTorch ABI — Deleted the old.so file, installed ninja, set up CUDA_HOME and CPATH, and recompiled from source using pip install -e . ❌ Resolved the issue where the RoboTwin checkpoint path did not exist — The eval.sh parameter specified checkpoint_id=5000, but the directory contained only 15000/25000/29999. The session was interrupted when analyzing the parameter mapping logic. Implementation \u0026 Fixes 🔄 Optimized the output format of GPU monitoring tools — Limited the output to 80 columns, removed duplicate processes from display, and filtered out noise from subprocesses. Users reported that understanding the issue was incorrect, causing the session to be interrupted. Problems \u0026 Solutions Critical Issues 1. macOS non-sandbox applications cannot persistently access files, and old videos in historical records fail with Operation not permitted error Solution: Enabled the App Sandbox permissions (com.apple.security.app-sandbox and files.user-selected.read-write). EnsureFileAccess was corrected to add non-scoped bookmark backtracking, and showVideo/showImage added an NSOpenPanel reauthorization mechanism.\nKey Insight: The macOS TCC mechanism requires the App Sandbox to create security-scoped bookmarks. Non-scoped bookmarks can only parse URLs without granting access rights, resulting in the inability to open old files. A combination of sandbox and downgrade paths is required.\n2. Torch 2.7.1 and torchvision 0.21.0 are incompatible, causing torchvision::nms operator registration failures Solution: Upgraded torchvision to 0.22.1+cu126 to match torch 2.7.1.\nKey Insight: When compiling custom operators in torchvision, the C++ API of torch is linked. Mismatching versions can cause operator registration failures. torchvision 0.21.0 is compatible with torch 2.6.x and cannot be used with torch 2.7.x.\n3. The pre-compiled curobo.so file is incompatible with the current PyTorch ABI. JIT compilation cannot find cuda_runtime.h Solution: Deleted the old.so file, installed the ninja compiler, set up CUDA_HOME=/path/to/conda/env and CPATH=/path/to/targets/x86_64-linux/include, and recompiled from source using pip install -e .\nKey Insight: After upgrading the PyTorch version, the C++ extension needs to be recompiled. The nvidia package installed via pip in the conda environment places the CUDA headers in a non-standard path (targets/x86_64-linux/include/), which requires correct environment variables to allow JIT compilation to find them.\nGeneral Issues 4. The GPU monitoring tool’s output is too wide and processes are displayed repeatedly, making it difficult to read Solution: Limited the output to 80 columns, aggregated GPUs by process, and filtered out noise from multiprocessing workers and other subprocesses.\nKey Insight: The original implementation grouped GPUs, causing a multi-GPU process to appear repeatedly under multiple GPUs. It is necessary to aggregate by process and display all used card numbers in the GPU column.\nHuman vs AI Approaches Strategic Level Depth of explanation for macOS file permission issues Role Approach Human Asked a straightforward question like ‘Why is there a lack of permissions?’ and asked the AI to explain the underlying principles of TCC and sandbox mechanisms. AI Provided technical solutions but did not explain the background principles. Human intervention was needed to provide a complete context. Difference Analysis: Humans guided the AI to provide a more complete background explanation rather than jumping directly to solutions. Humans focused more on ‘why’, while AI focused more on ‘how to do it’.\nStrategy for choosing a solution Role Approach Human Clearly chose a defensive approach of combining both solutions (sandbox + NSOpenPanel reauthorization). AI Provided two separate solutions (sandbox or reauthorization) but did not suggest a combination. Difference Analysis: Humans prefer defensive programming (multiple layers of protection), while AI prefers a single optimal solution. Humans’ combination strategy addresses both the root cause and provides a fallback path, making it more robust.\nImplementation Level Understanding of GPU monitoring tool requirements Role Approach Human Corrected the statement ‘Each process should only be displayed once per GPU’ to emphasize the many-to-many relationship between processes and GPUs. AI Misunderstood the requirement and aggregated multiple GPU processes into a single line, displaying card numbers separated by commas in the GPU column. Difference Analysis: Humans understood the many-to-many relationship between processes and GPUs better. AI over-optimized the solution, resulting in information loss (resources used by a process on GPU0 and GPU1 should be displayed in two lines).\nAI Limitations General Limitations Failed to explain the technical background (macOS TCC/sandbox mechanism) actively. Human intervention was needed to provide a complete context. AI should have explained the ‘why’ when proposing solutions. Misunderstood the GPU monitoring requirement, simplifying the many-to-one relationship between processes and GPUs, leading to information loss. The visualization of complex data relationships was not accurately understood. When analyzing the checkpoint path issue, the AI went too deep into code details (continuous Read operations) without confirming the scope of the problem with the user. The parameter mapping logic should have been understood at a high level first. Learnings Key Learnings macOS TCC permission mechanism: Non-sandbox applications cannot create security-scoped bookmarks. They can only create non-scoped bookmarks (which only parse URLs without granting access rights), causing historical file access to become invalid after the app restarts. The App Sandbox must be enabled to persistently grant file access permissions. PyTorch C++ extension ABI compatibility: Custom operators in torchvision (such as torchvision::nms) link to the C++ API of torch during compilation. The versions must be exactly matched (torchvision 0.21 → torch 2.6, torchvision 0.22 → torch 2.7). Mismatched versions can cause operator registration failures. Conditionally environment CUDA toolchain configuration: Packages installed via pip in the conda environment place the CUDA headers in a non-standard path (targets/x86_64-linux/include/), rather than the standard include/ path. JIT compilation of C++ extensions requires setting CUDA_HOME to point to the conda env, and CPATH to include the targets path. Defensive programming principle: The combination of sandbox and reauthorization is more robust than a single solution. The sandbox addresses the root cause (persistent permissions), and the NSOpenPanel provides a fallback path (temporary authorization). Combining both ensures that users can always access files. Conversation Summaries Desktop Video ✅ Fixed the permission issue where historical records could not open old videos 07:52:05.359 | claude_code Users reported that old videos could not be opened in historical records (Operation not permitted Code=257). Log analysis revealed that the App did not enable the Sandbox, causing security-scoped bookmarks to fail to be created. EnsureFileAccess only tried with.withSecurityScope parsing, resulting in non-scoped bookmarks always failing, ultimately leading to macOS TCC refusal to access. Three layers of fixes were implemented: enabling App Sandbox permissions, fixing bookmark parsing by adding non-scoped backtracking, and adding an NSOpenPanel reauthorization mechanism for showVideo/showImage. Code modifications, localization updates, and ChangeLog were completed, and the build verification passed.\nrobobrain GPU monitor 🔄 Optimized the output format of GPU monitoring tools 15:48:28.705 | claude_code Users requested that the output width of gpumon.py be limited to 80 columns and that duplicate processes be removed from display. The AI rewrote the process table logic, aggregating each process into a single line, displaying card numbers separated by commas in the GPU column, and filtering out noise from multiprocessing workers and other subprocesses. Users corrected their understanding, pointing out that it should be ’each process should only be displayed once per GPU’ instead of aggregated display, causing the session to be interrupted.\nRoboTwin Policy Evaluation 🔄 Diagnosed dependency conflicts that caused eval.sh to fail 02:23:18.758 | claude_code Users ran bash eval.sh and encountered errors. The AI identified three layers of dependency problems: 1) Torch 2.7.1 and torchvision 0.21.0 were not compatible, causing the registration of torchvision::nms operators to fail; 2) The pre-compiled curobo.so file was incompatible with the Torch ABI. Ninja was missing for JIT compilation; 3) The checkpoint path did not exist (the parameter specified 5000, but there were only 15000/25000/29999). The AI provided a version upgrade solution, and the user chose to upgrade torchvision.\n🔄 Implemented dependency fixes and resolved subsequent compilation issues 02:34:02.614 | claude_code The repair plan was executed: successfully upgraded torchvision to 0.22.1+cu126 and verified its compatibility with torch 2.7.1; installed the ninja compiler; deleted the old.so file and recompiled curobo by setting CUDA_HOME and CPATH (pointing to the conda env’s targets/x86_64-linux/include/); verified that curobo was imported correctly. When running eval.sh again, the issue of the missing checkpoint path was encountered. The AI began analyzing the parameter mapping logic of deploy_policy.yml and eval_policy.py, causing the session to be interrupted.\nToken Usage Total: $0.25 — 1.1M tokens\n",
+  "wordCount" : "1742",
+  "inLanguage": "en",
+  "datePublished": "2026-03-12T00:00:00-05:00",
+  "dateModified": "2026-03-12T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-03-12/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-12/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/'>Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-12
+    </h1>
+    <div class="post-meta"><span title='2026-03-12 00:00:00 -0500 -0500'>March 12, 2026</span>&nbsp;·&nbsp;<span>9 min</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="daily-report--2026-03-12">Daily Report — 2026-03-12<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-03-12">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Cross-platform solutions were implemented for three independent projects: upgrading the sandbox permissions architecture of macOS wallpaper applications, optimizing the output of GPU monitoring tools, and fixing dependency chains in the deep learning evaluation environment.</li>
+<li><strong>How it was done:</strong> System-level log analysis was used to identify issues with the macOS TCC permission mechanism. Dependency version matrices were utilized to track ABI compatibility in the PyTorch ecosystem. The CUDA toolchain was configured to ensure proper local compilation of C++ extensions.</li>
+<li><strong>Impact:</strong> macOS applications now have production-grade file access persistence capabilities. Two research projects on the tianhe server have resumed operation (although the checkpoint path issue has not been fully resolved).</li>
+</ul>
+<h3 id="macbook">MacBook<a hidden class="anchor" aria-hidden="true" href="#macbook">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Sandbox migration and permission system restructuring were completed for desktop-video applications. A critical bug was fixed where historical records could not open old files.</li>
+<li><strong>How it was done:</strong> The App Sandbox was enabled to make security-scoped bookmarks effective. Bookmark parsing logic was corrected, and an NSOpenPanel reauthorization mechanism was added.</li>
+<li><strong>Impact:</strong> The user history feature is now fully functional. The app adheres to macOS best practices, paving the way for its release on the App Store.</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Conflicts in PyTorch dependencies for the RoboTwin project were resolved. Compilation issues with curobo were addressed, and the readability of GPU monitoring tools was improved.</li>
+<li><strong>How it was done:</strong> The pip version matrix was used to match torch/torchvision. The CUDA toolchain path (CUDA_HOME and CPATH) was configured in the conda environment. The process aggregation logic was rewritten to limit the output width.</li>
+<li><strong>Impact:</strong> The robot strategy evaluation environment has mostly resumed its functionality. GPU resource monitoring is more efficient, but the checkpoint path mapping issue remains unresolved.</li>
+</ul>
+<blockquote>
+<p>The sandbox permissions architecture of macOS wallpaper applications was fixed, and issues with PyTorch dependencies and CUDA compilation in the deep learning evaluation environment were resolved.</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Fixed the issue where historical records could not open old videos</strong> — Enabled the App Sandbox, corrected bookmark parsing logic (added non-scoped backtracking), added a retry mechanism for permission errors (NSOpenPanel reauthorization), updated localization and ChangeLog.</li>
+<li>✅ <strong>Resolved conflicts in PyTorch versions for the RoboTwin evaluation environment</strong> — Upgraded torchvision from 0.21.0 to 0.22.1+cu126 to match torch 2.7.1. This resolved issues with the registration of torchvision::nms operators.</li>
+<li>✅ <strong>Recompiled curobo to match the current PyTorch ABI</strong> — Deleted the old.so file, installed ninja, set up CUDA_HOME and CPATH, and recompiled from source using pip install -e .</li>
+<li>❌ <strong>Resolved the issue where the RoboTwin checkpoint path did not exist</strong> — The eval.sh parameter specified checkpoint_id=5000, but the directory contained only 15000/25000/29999. The session was interrupted when analyzing the parameter mapping logic.</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>🔄 <strong>Optimized the output format of GPU monitoring tools</strong> — Limited the output to 80 columns, removed duplicate processes from display, and filtered out noise from subprocesses. Users reported that understanding the issue was incorrect, causing the session to be interrupted.</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-macos-non-sandbox-applications-cannot-persistently-access-files-and-old-videos-in-historical-records-fail-with-operation-not-permitted-error">1. macOS non-sandbox applications cannot persistently access files, and old videos in historical records fail with Operation not permitted error<a hidden class="anchor" aria-hidden="true" href="#1-macos-non-sandbox-applications-cannot-persistently-access-files-and-old-videos-in-historical-records-fail-with-operation-not-permitted-error">#</a></h4>
+<p><strong>Solution:</strong> Enabled the App Sandbox permissions (com.apple.security.app-sandbox and files.user-selected.read-write). EnsureFileAccess was corrected to add non-scoped bookmark backtracking, and showVideo/showImage added an NSOpenPanel reauthorization mechanism.</p>
+<p><strong>Key Insight:</strong> The macOS TCC mechanism requires the App Sandbox to create security-scoped bookmarks. Non-scoped bookmarks can only parse URLs without granting access rights, resulting in the inability to open old files. A combination of sandbox and downgrade paths is required.</p>
+<h4 id="2-torch-271-and-torchvision-0210-are-incompatible-causing-torchvisionnms-operator-registration-failures">2. Torch 2.7.1 and torchvision 0.21.0 are incompatible, causing torchvision::nms operator registration failures<a hidden class="anchor" aria-hidden="true" href="#2-torch-271-and-torchvision-0210-are-incompatible-causing-torchvisionnms-operator-registration-failures">#</a></h4>
+<p><strong>Solution:</strong> Upgraded torchvision to 0.22.1+cu126 to match torch 2.7.1.</p>
+<p><strong>Key Insight:</strong> When compiling custom operators in torchvision, the C++ API of torch is linked. Mismatching versions can cause operator registration failures. torchvision 0.21.0 is compatible with torch 2.6.x and cannot be used with torch 2.7.x.</p>
+<h4 id="3-the-pre-compiled-curoboso-file-is-incompatible-with-the-current-pytorch-abi-jit-compilation-cannot-find-cuda_runtimeh">3. The pre-compiled curobo.so file is incompatible with the current PyTorch ABI. JIT compilation cannot find cuda_runtime.h<a hidden class="anchor" aria-hidden="true" href="#3-the-pre-compiled-curoboso-file-is-incompatible-with-the-current-pytorch-abi-jit-compilation-cannot-find-cuda_runtimeh">#</a></h4>
+<p><strong>Solution:</strong> Deleted the old.so file, installed the ninja compiler, set up CUDA_HOME=/path/to/conda/env and CPATH=/path/to/targets/x86_64-linux/include, and recompiled from source using pip install -e .</p>
+<p><strong>Key Insight:</strong> After upgrading the PyTorch version, the C++ extension needs to be recompiled. The nvidia package installed via pip in the conda environment places the CUDA headers in a non-standard path (targets/x86_64-linux/include/), which requires correct environment variables to allow JIT compilation to find them.</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="4-the-gpu-monitoring-tools-output-is-too-wide-and-processes-are-displayed-repeatedly-making-it-difficult-to-read">4. The GPU monitoring tool&rsquo;s output is too wide and processes are displayed repeatedly, making it difficult to read<a hidden class="anchor" aria-hidden="true" href="#4-the-gpu-monitoring-tools-output-is-too-wide-and-processes-are-displayed-repeatedly-making-it-difficult-to-read">#</a></h4>
+<p><strong>Solution:</strong> Limited the output to 80 columns, aggregated GPUs by process, and filtered out noise from multiprocessing workers and other subprocesses.</p>
+<p><strong>Key Insight:</strong> The original implementation grouped GPUs, causing a multi-GPU process to appear repeatedly under multiple GPUs. It is necessary to aggregate by process and display all used card numbers in the GPU column.</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="depth-of-explanation-for-macos-file-permission-issues">Depth of explanation for macOS file permission issues<a hidden class="anchor" aria-hidden="true" href="#depth-of-explanation-for-macos-file-permission-issues">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Asked a straightforward question like &lsquo;Why is there a lack of permissions?&rsquo; and asked the AI to explain the underlying principles of TCC and sandbox mechanisms.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Provided technical solutions but did not explain the background principles. Human intervention was needed to provide a complete context.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Humans guided the AI to provide a more complete background explanation rather than jumping directly to solutions. Humans focused more on &lsquo;why&rsquo;, while AI focused more on &lsquo;how to do it&rsquo;.</p>
+<h4 id="strategy-for-choosing-a-solution">Strategy for choosing a solution<a hidden class="anchor" aria-hidden="true" href="#strategy-for-choosing-a-solution">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Clearly chose a defensive approach of combining both solutions (sandbox + NSOpenPanel reauthorization).</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Provided two separate solutions (sandbox or reauthorization) but did not suggest a combination.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Humans prefer defensive programming (multiple layers of protection), while AI prefers a single optimal solution. Humans&rsquo; combination strategy addresses both the root cause and provides a fallback path, making it more robust.</p>
+<h3 id="implementation-level">Implementation Level<a hidden class="anchor" aria-hidden="true" href="#implementation-level">#</a></h3>
+<h4 id="understanding-of-gpu-monitoring-tool-requirements">Understanding of GPU monitoring tool requirements<a hidden class="anchor" aria-hidden="true" href="#understanding-of-gpu-monitoring-tool-requirements">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Corrected the statement &lsquo;Each process should only be displayed once per GPU&rsquo; to emphasize the many-to-many relationship between processes and GPUs.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Misunderstood the requirement and aggregated multiple GPU processes into a single line, displaying card numbers separated by commas in the GPU column.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Humans understood the many-to-many relationship between processes and GPUs better. AI over-optimized the solution, resulting in information loss (resources used by a process on GPU0 and GPU1 should be displayed in two lines).</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>Failed to explain the technical background (macOS TCC/sandbox mechanism) actively. Human intervention was needed to provide a complete context. AI should have explained the &lsquo;why&rsquo; when proposing solutions.</li>
+<li>Misunderstood the GPU monitoring requirement, simplifying the many-to-one relationship between processes and GPUs, leading to information loss. The visualization of complex data relationships was not accurately understood.</li>
+<li>When analyzing the checkpoint path issue, the AI went too deep into code details (continuous Read operations) without confirming the scope of the problem with the user. The parameter mapping logic should have been understood at a high level first.</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>macOS TCC permission mechanism: Non-sandbox applications cannot create security-scoped bookmarks. They can only create non-scoped bookmarks (which only parse URLs without granting access rights), causing historical file access to become invalid after the app restarts. The App Sandbox must be enabled to persistently grant file access permissions.</li>
+<li>PyTorch C++ extension ABI compatibility: Custom operators in torchvision (such as torchvision::nms) link to the C++ API of torch during compilation. The versions must be exactly matched (torchvision 0.21 → torch 2.6, torchvision 0.22 → torch 2.7). Mismatched versions can cause operator registration failures.</li>
+<li>Conditionally environment CUDA toolchain configuration: Packages installed via pip in the conda environment place the CUDA headers in a non-standard path (targets/x86_64-linux/include/), rather than the standard include/ path. JIT compilation of C++ extensions requires setting CUDA_HOME to point to the conda env, and CPATH to include the targets path.</li>
+<li>Defensive programming principle: The combination of sandbox and reauthorization is more robust than a single solution. The sandbox addresses the root cause (persistent permissions), and the NSOpenPanel provides a fallback path (temporary authorization). Combining both ensures that users can always access files.</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<h3 id="desktop-video">Desktop Video<a hidden class="anchor" aria-hidden="true" href="#desktop-video">#</a></h3>
+<p><strong>✅ Fixed the permission issue where historical records could not open old videos</strong>
+<em>07:52:05.359 | claude_code</em>
+Users reported that old videos could not be opened in historical records (Operation not permitted Code=257). Log analysis revealed that the App did not enable the Sandbox, causing security-scoped bookmarks to fail to be created. EnsureFileAccess only tried with.withSecurityScope parsing, resulting in non-scoped bookmarks always failing, ultimately leading to macOS TCC refusal to access. Three layers of fixes were implemented: enabling App Sandbox permissions, fixing bookmark parsing by adding non-scoped backtracking, and adding an NSOpenPanel reauthorization mechanism for showVideo/showImage. Code modifications, localization updates, and ChangeLog were completed, and the build verification passed.</p>
+<h3 id="robobrain-gpu-monitor">robobrain GPU monitor<a hidden class="anchor" aria-hidden="true" href="#robobrain-gpu-monitor">#</a></h3>
+<p><strong>🔄 Optimized the output format of GPU monitoring tools</strong>
+<em>15:48:28.705 | claude_code</em>
+Users requested that the output width of gpumon.py be limited to 80 columns and that duplicate processes be removed from display. The AI rewrote the process table logic, aggregating each process into a single line, displaying card numbers separated by commas in the GPU column, and filtering out noise from multiprocessing workers and other subprocesses. Users corrected their understanding, pointing out that it should be &rsquo;each process should only be displayed once per GPU&rsquo; instead of aggregated display, causing the session to be interrupted.</p>
+<h3 id="robotwin-policy-evaluation">RoboTwin Policy Evaluation<a hidden class="anchor" aria-hidden="true" href="#robotwin-policy-evaluation">#</a></h3>
+<p><strong>🔄 Diagnosed dependency conflicts that caused eval.sh to fail</strong>
+<em>02:23:18.758 | claude_code</em>
+Users ran bash eval.sh and encountered errors. The AI identified three layers of dependency problems: 1) Torch 2.7.1 and torchvision 0.21.0 were not compatible, causing the registration of torchvision::nms operators to fail; 2) The pre-compiled curobo.so file was incompatible with the Torch ABI. Ninja was missing for JIT compilation; 3) The checkpoint path did not exist (the parameter specified 5000, but there were only 15000/25000/29999). The AI provided a version upgrade solution, and the user chose to upgrade torchvision.</p>
+<p><strong>🔄 Implemented dependency fixes and resolved subsequent compilation issues</strong>
+<em>02:34:02.614 | claude_code</em>
+The repair plan was executed: successfully upgraded torchvision to 0.22.1+cu126 and verified its compatibility with torch 2.7.1; installed the ninja compiler; deleted the old.so file and recompiled curobo by setting CUDA_HOME and CPATH (pointing to the conda env&rsquo;s targets/x86_64-linux/include/); verified that curobo was imported correctly. When running eval.sh again, the issue of the missing checkpoint path was encountered. The AI began analyzing the parameter mapping logic of deploy_policy.yml and eval_policy.py, causing the session to be interrupted.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-03-12-usage.png"></p>
+<p><strong>Total: $0.25</strong> — 1.1M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

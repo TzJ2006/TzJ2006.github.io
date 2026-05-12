@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-03 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="MIHD跨样本RM-IDEAL基准测试已经完成开发（包括设计、781行脚本编写、错误修复、数据可视化处理以及459行的文档说明）。在DCC平台上，对13天内的AI对话日志进行了批量处理，生成了结构化的每日报告。此外，还构建了BC-RNN/Pi0.5评估流程，并在天津节点上发现了基础模型配置中的关键错误。最后，优化了屏幕保护程序的用户界面，并制作了与网站相关的文档。">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-03/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-03/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-03/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-03/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-03">
+  <meta property="og:description" content="MIHD跨样本RM-IDEAL基准测试已经完成开发（包括设计、781行脚本编写、错误修复、数据可视化处理以及459行的文档说明）。在DCC平台上，对13天内的AI对话日志进行了批量处理，生成了结构化的每日报告。此外，还构建了BC-RNN/Pi0.5评估流程，并在天津节点上发现了基础模型配置中的关键错误。最后，优化了屏幕保护程序的用户界面，并制作了与网站相关的文档。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-03T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-03T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-03">
+  <meta name="twitter:description" content="MIHD跨样本RM-IDEAL基准测试已经完成开发（包括设计、781行脚本编写、错误修复、数据可视化处理以及459行的文档说明）。在DCC平台上，对13天内的AI对话日志进行了批量处理，生成了结构化的每日报告。此外，还构建了BC-RNN/Pi0.5评估流程，并在天津节点上发现了基础模型配置中的关键错误。最后，优化了屏幕保护程序的用户界面，并制作了与网站相关的文档。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/zh/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-03-03",
+      "item": "https://tzj2006.github.io/zh/bugjournal/daily/2026-03-03/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-03",
+  "name": "Bug Journal 2026-03-03",
+  "description": "MIHD跨样本RM-IDEAL基准测试已经完成开发（包括设计、781行脚本编写、错误修复、数据可视化处理以及459行的文档说明）。在DCC平台上，对13天内的AI对话日志进行了批量处理，生成了结构化的每日报告。此外，还构建了BC-RNN/Pi0.5评估流程，并在天津节点上发现了基础模型配置中的关键错误。最后，优化了屏幕保护程序的用户界面，并制作了与网站相关的文档。",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "每日报告 — 2026-03-03 每日概述 已完成的工作： 四个并行工作流：DCC完成了MIHD多模态融合框架的完整跨样本RM-IDEAL基准测试；MacBook批量处理了4台设备和5个项目在13天内的历史对话记录，生成结构化报告；天和构建了BC-RNN基线和Pi0.5 LoRA评估基础设施，发现pi0.5_libero与pi0.5_base的配置错误；MacBook还完善了屏幕保护程序的时钟视觉效果，并创建了Hugo网站文档。 完成方式： DCC：使用3个探索代理遍历代码库，设计从第二阶段输出中提取独立脚本加载STAIG融合嵌入的方法，使用WWL图内核计算拓扑分数与嵌入余弦相似度，生成Spearman/Precision@K指标和空间热图。MacBook：使用gadget/summarize工具的双阶段流程（导出→合并），结合Claude Sonnet从JSONL对话文件中提取结构化信息，手动修复了JSON截断问题。天和：重构多任务支持的评估脚本，调试了用于机器人模拟兼容性的numpy dtype过滤，通过Slurm启动批量GPU评估，调查了an53节点因sacct日志而崩溃的情况。屏幕保护程序：统一字体粗细，禁用CALayer隐式动画，用NSVisualEffectView替换SwiftUI material以实现 withinWindow混合效果。 影响： 建立了可复用的跨样本评估工具链，显示融合嵌入与拓扑结构有显著相关性（Layer_3 r≈0.44）；构建了涵盖机器人模拟、空间转录组学、AI助手项目的结构化知识库，便于回顾分析；发现了一个需要重新训练的基本训练配置错误（使用pi0.5_libero而不是pi0.5_base的LoRA）；实现了消除视觉故障的屏幕保护程序功能；为网站维护建立了全面的文档标准。 DCC 已完成的工作： 完成了MIHD项目的RM-IDEAL基准测试，包括设计、实现、验证和文档编写。 完成方式： 使用3个代理探索代码库和设计方法，创建脚本/benchmark_rm_ideal.py（781行），修复零嵌入检测和CUDA兼容性问题，在RTX 2080 Ti上运行151673↔151676测试，使用scanpy生成6面板空间热图，编写文档/CROSS_SAMPLE_QUERY.md（459行）。 影响： 构建了一个可复用的跨样本评估工具，涵盖了从空间图构建到评估指标的10个阶段；实验结果表明融合嵌入与拓扑结构有显著相关性。 MacBook 已完成的工作： 批量处理4台设备和5个项目在13天内的历史AI对话记录（2月7日至19日），生成结构化每日报告；完善屏幕保护程序的时钟视觉效果（修复幽灵伪影、平滑动画、无视频模式、玻璃透明度）；创建Hugo网站CLAUDE.md文档。 完成方式： 连续运行daily_summary.py文件4.5小时，进行约20次导出操作和10多次合并操作；使用parse_claude_code()读取~/.claude/projects/中的JSONL会话文件，调用AI提取结构化信息（任务/问题/人与AI的差异/技术见解），生成Markdown+JSON双格式报告；通过修复提示手动修复JSON截断问题。屏幕保护程序：统一高亮层和遮罩层之间的字体粗细，将遮罩更新包裹在CATransaction.setDisableActions(true)中，用NSViewRepresentable替换SwiftUI .ultraThinMaterial，并用NSVisualEffectView实现withinWindow混合模式。网站：分析Hugo博客结构并建立管道（update.sh增量压缩）。 影响： 系统地生成了13份完整的历史技术日志，记录了两周内机器人模拟、空间转录组学、AI助手项目的进展；为错误回顾、架构审查和知识转移建立了结构化知识库。在生产应用中消除了屏幕保护程序的视觉故障；为未来的贡献者建立了可维护的文档标准。 天和 已完成的工作： 构建了具有多任务支持的BC-RNN基线和Pi0.5 LoRA评估管道；调试了训练检查点格式；启动了5任务评估批次；监控了8个并行Pi0.5训练作业（17k-26k/36k步骤）；在an53崩溃后启动了2-GPU评估；发现了一个关键的基础模型配置错误（使用pi0.5_libero而不是pi0.5_base）。 完成方式： 重构评估脚本，添加–task参数和每任务检查点分辨率；创建BC-RNN检查点符号链接；修改policy_adapter._to_robosuite_obs以过滤robomimic TensorUtils无法处理的numpy标量类型（float64）；创建eval_pi05_lora_2gpu.sh用于分割GPU架构（GPU 0：VLA服务器，GPU 1：MuJoCo滚动）；分析Slurm日志（sacct）以调查08:30的an53 NODE_FAIL；解析JSONL评估结果。 影响： 发现咖啡任务BC-RNN训练失败（0% SR）；为5个任务的250个滚动项自动化评估基础设施；识别出需要重新训练的关键基础模型配置错误；排除AI操作作为节点故障的原因（AI活动后3小时资源过载）；成功在备份节点上部署评估，预计耗时60-70分钟。 在DCC完成了MIHD跨样本RM-IDEAL基准测试的实现（设计、781行脚本、错误修复、可视化、459行文档）；在MacBook上批量处理2月7日至19日的13天历史AI对话记录，生成结构化每日报告；在天和构建了BC-RNN/Pi0.5评估管道，并发现关键的基础模型配置错误；完善了屏幕保护程序的用户界面，并创建了网站文档。\n任务 架构与策略- ❌ 识别Pi0.5基础模型配置错误 — 用户发现LoRA微调中使用的基模型为pi0.5_libero而非pi0.5_base。需要对比zhaoganlong的设置，并可能在所有任务上使用an49的8个GPU进行重新训练。 ✅ 实现脚本/benchmark_rm_ideal.py — 创建了包含781行代码的基准测试脚本，核心功能包括：load_section_string_labels（从注释文件中加载字符串标签，并按缓存条形码排序）、load_fusedEmbeddings（从第二阶段输出中加载STAIG融合嵌入或重新计算）、compute_cross_embedding_similarity（交叉剖面生态位中心余弦相似性）、evaluate_correlation（Spearman r / Precision@K / 相同标签率）、run_cross_section_benchmark（单向剖面评估流程）、generate_summary（CSV + JSON + 标准输出格式化输出）。 ✅ 运行Layer_3基准测试并生成结果 — 在RTX 2080 Ti上运行了151673↔151676双向Layer_3测试；成功重新计算了151676的STAIG融合嵌入，并从缓存中加载了RM-IDEAL分数；结果：151673→151676 Spearman r=0.4356（p=6.24e-159），151676→151673 Spearman r=0.4542（p=2.66e-183），显示出中等的正相关关系；P@K接近0（最高排名差异较大），相同标签率较低。 ✅ 运行BC-RNN基线评估（5个任务×50次轮询） — 完成了咖啡、堆栈、堆栈三种、线程、三件组装的批量评估；所有任务的成功率均为0%。 🔄 监控Pi0.5 LoRA微调进度 — 8个训练任务在8x A800 GPU上运行。进度：咖啡（72%）、堆栈/堆栈三种（69-71%）、线程/三件组装（50%）。所有任务的平均迭代时间为约6.1秒。预计每个任务还需要17-31小时。 ✅ 总结Pi0.5和BC-RNN评估结果 — Pi0.5（第15千步）：堆栈95-100%，堆栈三种80-90%，咖啡/线程/三件组装15-45%。BC-RNN基线：所有任务成功率均为0%。Phoenix比较（第99999步）：咖啡0%，堆栈12-24%。 ✅ 修复零嵌入检测与自动重新计算逻辑问题 — 发现151676的STAIG融合嵌入全部为零（模型崩溃）；在load_fusedEmbeddings中添加零嵌入检测（np.allclose(embeddings, 0)），自动触发–recompute_fusion以重新训练STAIG（300个周期，约50秒），修复后嵌入恢复正常。 ✅ 生成空间热图可视化 — 使用scanpy的sc.read_visium()加载DLPFC数据（数据集/DLPFC/151673路径），使用sc.pl.spatial()绘制2×3面板图：每行代表一个方向（151673→151676 / 151676→151673），三列分别为真实值、RM-IDEAL分数热图、嵌入余弦相似度热图；保存为outputs/rm_ideal_benchmark/rm_ideal_layer3_spatial.png。 ✅ 批量生成2026-02-07至2026-02-19的历史日报告 — 处理了13个日期，涉及4台设备（DCC/tianhe/TzJsDesktop/MacBook）和5个项目（error-recovery-benchmark/MIHD/CalendarPro/gadget/Motion-based Self-Reflection Framework）的工作；进行了约20次导出操作和10多次合并操作；手动修复了2026-02-14报告的JSON截断问题。 ✅ 修复屏幕保护程序时钟的透明度问题 — 用NSViewRepresentable替换了SwiftUI的.ultraThinMaterial，并使用.withinWindow混合模式来显示视频内容，而不是桌面画面。 ✅ 在an53上启动2-GPU Pi0.5 LoRA评估 — 创建了eval_pi05_lora_2gpu.sh脚本，将VLA服务器（GPU 0）和MuJoCo轮询（GPU 1）分开处理。在an53上成功启动了8个任务×20次试验。预计总运行时间为60-70分钟。 ✅ 探索RM-IDEAL代码库并设计基准测试方法 — 使用3个探索代理全面探索RM-IDEAL的实现（utils/rm_ideal.py中的RMIdealEvaluator）、跨样本能力（compute_niche_scores_cross-section方法）以及实验记录系统；设计了独立的脚本方法（仅测试PCA+UNI2+STAIG_FUSION，目标剖面为151673和151676），但用户拒绝了ExitPlanMode。 ✅ 编写文档/CROSS_SAMPLE_QUERY.md方法论文档 — 创建了459行的中文方法论文档，涵盖10章内容：概述（问题定义、两种评估方式、应用场景）、空间图构建（build_grid_connectivity k-NN + 对称化）、k跳子图提取（bfs_k_hop BFS预计算）、WWL图内核（消息传递迭代、共享哈希表）、Wasserstein距离（汉明成本矩阵、POT/scipy双后端）、剖面评估流程（全局类型映射、节点ID偏移）、嵌入相似性比较（生态位中心、余弦相似性）、相关性评估指标（Spearman ρ、Precision@K、相同标签率）、实验结果（Layer_3双向查询数据）、关键代码路径摘要（完整文件/函数/数据流图）。 ✅ 为无视频状态实现屏幕保护程序 — 移除了媒体内容保护功能，为没有壁纸的屏幕创建黑色背景窗口，并在黑色屏幕上显示时钟。 ✅ 修复视频切换错误（书签URL不匹配） — 在ensureFileAccess中添加了一个防护机制，用于检测书签解析的URL与请求URL是否匹配，并在NSOpenPanel情况下返回原始URL。 ✅ 修复BC-RNN评估的numpy dtype错误 — 修改了policy_adapter._to_robosuite_obs，过滤掉robomimic TensorUtils无法处理的numpy标量类型（float64）。 ✅ 调查an53节点的故障（08:30出现NODE_FAIL） — 分析了Slurm日志（sacct），确定an53因资源过载（8个GPU + 高CPU负载）而崩溃，并非由于AI操作导致。AI的srun命令在崩溃前就已经失败。节点在09:41重启，SSH主机密钥也发生了变化。 实施与修复- ✅ 修复CUDA兼容性检测和CPU回退问题——最初在P100 GPU上遇到CUDA内核不兼容问题，PyTorch需要sm_70+版本；添加了try/except来处理torchzeros(1).cuda()异常，失败时回退到CPU；用户更换为RTX 2080 Ti（sm_75）后成功运行 ✅ 修复屏幕保护程序时钟文字更新时的残影问题——在CATransaction.setDisableActions(true)中更新了掩模层，消除了时间变化时出现的0.2秒残影 ✅ 在BC-RNN评估脚本中添加–task参数——重构了5_baseline_accuracy.py和visualize_policy_rollout.py，以支持任务注册和按任务的分辨率处理 ✅ 更新CLAUDE.md文档，包含编码规范和评估命令——增强了CLAUDE.md文档，增加了35个Makefile目标（从15个增加到35个），添加了来自AGENTS.md的编码规范，记录了并行VLA评估工作流程，并添加了训练脚本参考 ✅ 修复屏幕保护程序时钟的灰色残影问题——统一了ScreensaverClockHighlight和ScreensaverClockMask的字体粗细，消除了文字边缘的模糊效果 ✅ 创建BC-RNN检查点符号链接——为5个任务设置了从checkpoints/bc_rnn/{任务}到实际BC-RNN d0训练目录的符号链接 ✅ 创建网站/CLAUDE.md文档——分析了Hugo博客结构，创建了包含构建命令、内容部分以及静态资源规范的完整CLAUDE.md文档 问题与解决方案 关键问题 1. SwiftUI .ultraThinMaterial在视频中显示的是固定颜色，而不是透明玻璃 **解决方案：**SwiftUI材料使用了.behindWindow混合模式（在窗口后面显示桌面内容），而不是.integralWindow模式（在相同窗口内容上显示）。用NSViewRepresentable替换了NSVisualEffectView，并在NSHostingView上明确指定.integralWindow模式以及.clearBackgroundColor属性\n**关键洞察：**SwiftUI的抽象层次隐藏了关键的渲染流程细节；对于复杂的视觉效果，如窗口内的透明度，需要NSView级别的控制\n2. 151676的STAIG融合嵌入全部为零（嵌入相似度全部为0，Spearman r为NaN），模型完全崩溃 **解决方案：**在load_fused Embeddings中添加np.allclose(embeddings, 0)检测；如果检测到这种情况，则打印警告并自动触发–recompute_fusion路径，以从缓存中重新加载基因/视觉嵌入并进行STAIG的重新训练（300个周期，在RTX 2080 Ti上大约需要50秒）；修复后嵌入恢复正常（64维，范数为1.0）\n**关键洞察：**由于训练不稳定，第二阶段保存的STAIG融合嵌入可能会变为零；需要在基准测试脚本中进行主动检测和自动重新计算，以避免手动干预\n3. 在NSOpenPanel选择后切换视频时，仍然播放旧视频 **解决方案：**确保FileAccess将每屏幕的书签解析为旧视频的URL，而不是请求的新URL。添加了一个判断条件，比较解析后的URL与请求的URL；如果不同，则返回原始URL（该URL具有NSOpenPanel提供的临时沙箱权限）#### 4. Coffee任务的BC-RNN成功率显示为0%，怀疑是评估错误\n**解决方案：**检查了训练日志，确认咖啡任务的BC-RNN训练在所有阶段都达到了0%的成功率（训练了600个周期）。这不是评估错误；该任务确实在训练中失败了\n**关键洞察：**在调试评估流程之前，务必先验证训练指标；下游的零值可能反映了上游训练的失败- 在多段对话合并任务中，初始输出往往非常冗长（逐个保留所有任务/问题，而不是整合），需要人类在输出预期简洁版本之前，在提示中明确强调“整合和提炼，合并类似内容，保留更重要的内容”\n",
+  "wordCount" : "196",
+  "inLanguage": "zh",
+  "datePublished": "2026-03-03T00:00:00-05:00",
+  "dateModified": "2026-03-03T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/zh/bugjournal/daily/2026-03-03/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/zh/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="zh"
+                        data-translation-url="https://tzj2006.github.io/bugjournal/daily/2026-03-03/">EN
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/zh/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/zh/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/zh/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/zh/'>主页</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/zh/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-03
+    </h1>
+    <div class="post-meta"><span title='2026-03-03 00:00:00 -0500 EST'>2026年3月3日</span>&nbsp;·&nbsp;<span>1 分钟</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="每日报告--2026-03-03">每日报告 — 2026-03-03<a hidden class="anchor" aria-hidden="true" href="#每日报告--2026-03-03">#</a></h1>
+<h2 id="每日概述">每日概述<a hidden class="anchor" aria-hidden="true" href="#每日概述">#</a></h2>
+<ul>
+<li><strong>已完成的工作：</strong> 四个并行工作流：DCC完成了MIHD多模态融合框架的完整跨样本RM-IDEAL基准测试；MacBook批量处理了4台设备和5个项目在13天内的历史对话记录，生成结构化报告；天和构建了BC-RNN基线和Pi0.5 LoRA评估基础设施，发现pi0.5_libero与pi0.5_base的配置错误；MacBook还完善了屏幕保护程序的时钟视觉效果，并创建了Hugo网站文档。</li>
+<li><strong>完成方式：</strong> DCC：使用3个探索代理遍历代码库，设计从第二阶段输出中提取独立脚本加载STAIG融合嵌入的方法，使用WWL图内核计算拓扑分数与嵌入余弦相似度，生成Spearman/Precision@K指标和空间热图。MacBook：使用gadget/summarize工具的双阶段流程（导出→合并），结合Claude Sonnet从JSONL对话文件中提取结构化信息，手动修复了JSON截断问题。天和：重构多任务支持的评估脚本，调试了用于机器人模拟兼容性的numpy dtype过滤，通过Slurm启动批量GPU评估，调查了an53节点因sacct日志而崩溃的情况。屏幕保护程序：统一字体粗细，禁用CALayer隐式动画，用NSVisualEffectView替换SwiftUI material以实现 withinWindow混合效果。</li>
+<li><strong>影响：</strong> 建立了可复用的跨样本评估工具链，显示融合嵌入与拓扑结构有显著相关性（Layer_3 r≈0.44）；构建了涵盖机器人模拟、空间转录组学、AI助手项目的结构化知识库，便于回顾分析；发现了一个需要重新训练的基本训练配置错误（使用pi0.5_libero而不是pi0.5_base的LoRA）；实现了消除视觉故障的屏幕保护程序功能；为网站维护建立了全面的文档标准。</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>已完成的工作：</strong> 完成了MIHD项目的RM-IDEAL基准测试，包括设计、实现、验证和文档编写。</li>
+<li><strong>完成方式：</strong> 使用3个代理探索代码库和设计方法，创建脚本/benchmark_rm_ideal.py（781行），修复零嵌入检测和CUDA兼容性问题，在RTX 2080 Ti上运行151673↔151676测试，使用scanpy生成6面板空间热图，编写文档/CROSS_SAMPLE_QUERY.md（459行）。</li>
+<li><strong>影响：</strong> 构建了一个可复用的跨样本评估工具，涵盖了从空间图构建到评估指标的10个阶段；实验结果表明融合嵌入与拓扑结构有显著相关性。</li>
+</ul>
+<h3 id="macbook">MacBook<a hidden class="anchor" aria-hidden="true" href="#macbook">#</a></h3>
+<ul>
+<li><strong>已完成的工作：</strong> 批量处理4台设备和5个项目在13天内的历史AI对话记录（2月7日至19日），生成结构化每日报告；完善屏幕保护程序的时钟视觉效果（修复幽灵伪影、平滑动画、无视频模式、玻璃透明度）；创建Hugo网站CLAUDE.md文档。</li>
+<li><strong>完成方式：</strong> 连续运行daily_summary.py文件4.5小时，进行约20次导出操作和10多次合并操作；使用parse_claude_code()读取~/.claude/projects/中的JSONL会话文件，调用AI提取结构化信息（任务/问题/人与AI的差异/技术见解），生成Markdown+JSON双格式报告；通过修复提示手动修复JSON截断问题。屏幕保护程序：统一高亮层和遮罩层之间的字体粗细，将遮罩更新包裹在CATransaction.setDisableActions(true)中，用NSViewRepresentable替换SwiftUI .ultraThinMaterial，并用NSVisualEffectView实现withinWindow混合模式。网站：分析Hugo博客结构并建立管道（update.sh增量压缩）。</li>
+<li><strong>影响：</strong> 系统地生成了13份完整的历史技术日志，记录了两周内机器人模拟、空间转录组学、AI助手项目的进展；为错误回顾、架构审查和知识转移建立了结构化知识库。在生产应用中消除了屏幕保护程序的视觉故障；为未来的贡献者建立了可维护的文档标准。</li>
+</ul>
+<h3 id="天和">天和<a hidden class="anchor" aria-hidden="true" href="#天和">#</a></h3>
+<ul>
+<li><strong>已完成的工作：</strong> 构建了具有多任务支持的BC-RNN基线和Pi0.5 LoRA评估管道；调试了训练检查点格式；启动了5任务评估批次；监控了8个并行Pi0.5训练作业（17k-26k/36k步骤）；在an53崩溃后启动了2-GPU评估；发现了一个关键的基础模型配置错误（使用pi0.5_libero而不是pi0.5_base）。</li>
+<li><strong>完成方式：</strong> 重构评估脚本，添加&ndash;task参数和每任务检查点分辨率；创建BC-RNN检查点符号链接；修改policy_adapter._to_robosuite_obs以过滤robomimic TensorUtils无法处理的numpy标量类型（float64）；创建eval_pi05_lora_2gpu.sh用于分割GPU架构（GPU 0：VLA服务器，GPU 1：MuJoCo滚动）；分析Slurm日志（sacct）以调查08:30的an53 NODE_FAIL；解析JSONL评估结果。</li>
+<li><strong>影响：</strong> 发现咖啡任务BC-RNN训练失败（0% SR）；为5个任务的250个滚动项自动化评估基础设施；识别出需要重新训练的关键基础模型配置错误；排除AI操作作为节点故障的原因（AI活动后3小时资源过载）；成功在备份节点上部署评估，预计耗时60-70分钟。</li>
+</ul>
+<blockquote>
+<p>在DCC完成了MIHD跨样本RM-IDEAL基准测试的实现（设计、781行脚本、错误修复、可视化、459行文档）；在MacBook上批量处理2月7日至19日的13天历史AI对话记录，生成结构化每日报告；在天和构建了BC-RNN/Pi0.5评估管道，并发现关键的基础模型配置错误；完善了屏幕保护程序的用户界面，并创建了网站文档。</p>
+</blockquote>
+<h2 id="任务">任务<a hidden class="anchor" aria-hidden="true" href="#任务">#</a></h2>
+<h3 id="架构与策略---识别pi05基础模型配置错误--用户发现lora微调中使用的基模型为pi05_libero而非pi05_base需要对比zhaoganlong的设置并可能在所有任务上使用an49的8个gpu进行重新训练">架构与策略- ❌ <strong>识别Pi0.5基础模型配置错误</strong> — 用户发现LoRA微调中使用的基模型为pi0.5_libero而非pi0.5_base。需要对比zhaoganlong的设置，并可能在所有任务上使用an49的8个GPU进行重新训练。<a hidden class="anchor" aria-hidden="true" href="#架构与策略---识别pi05基础模型配置错误--用户发现lora微调中使用的基模型为pi05_libero而非pi05_base需要对比zhaoganlong的设置并可能在所有任务上使用an49的8个gpu进行重新训练">#</a></h3>
+<ul>
+<li>✅ <strong>实现脚本/benchmark_rm_ideal.py</strong> — 创建了包含781行代码的基准测试脚本，核心功能包括：load_section_string_labels（从注释文件中加载字符串标签，并按缓存条形码排序）、load_fusedEmbeddings（从第二阶段输出中加载STAIG融合嵌入或重新计算）、compute_cross_embedding_similarity（交叉剖面生态位中心余弦相似性）、evaluate_correlation（Spearman r / Precision@K / 相同标签率）、run_cross_section_benchmark（单向剖面评估流程）、generate_summary（CSV + JSON + 标准输出格式化输出）。</li>
+<li>✅ <strong>运行Layer_3基准测试并生成结果</strong> — 在RTX 2080 Ti上运行了151673↔151676双向Layer_3测试；成功重新计算了151676的STAIG融合嵌入，并从缓存中加载了RM-IDEAL分数；结果：151673→151676 Spearman r=0.4356（p=6.24e-159），151676→151673 Spearman r=0.4542（p=2.66e-183），显示出中等的正相关关系；P@K接近0（最高排名差异较大），相同标签率较低。</li>
+<li>✅ <strong>运行BC-RNN基线评估（5个任务×50次轮询）</strong> — 完成了咖啡、堆栈、堆栈三种、线程、三件组装的批量评估；所有任务的成功率均为0%。</li>
+<li>🔄 <strong>监控Pi0.5 LoRA微调进度</strong> — 8个训练任务在8x A800 GPU上运行。进度：咖啡（72%）、堆栈/堆栈三种（69-71%）、线程/三件组装（50%）。所有任务的平均迭代时间为约6.1秒。预计每个任务还需要17-31小时。</li>
+<li>✅ <strong>总结Pi0.5和BC-RNN评估结果</strong> — Pi0.5（第15千步）：堆栈95-100%，堆栈三种80-90%，咖啡/线程/三件组装15-45%。BC-RNN基线：所有任务成功率均为0%。Phoenix比较（第99999步）：咖啡0%，堆栈12-24%。</li>
+<li>✅ <strong>修复零嵌入检测与自动重新计算逻辑问题</strong> — 发现151676的STAIG融合嵌入全部为零（模型崩溃）；在load_fusedEmbeddings中添加零嵌入检测（np.allclose(embeddings, 0)），自动触发&ndash;recompute_fusion以重新训练STAIG（300个周期，约50秒），修复后嵌入恢复正常。</li>
+<li>✅ <strong>生成空间热图可视化</strong> — 使用scanpy的sc.read_visium()加载DLPFC数据（数据集/DLPFC/151673路径），使用sc.pl.spatial()绘制2×3面板图：每行代表一个方向（151673→151676 / 151676→151673），三列分别为真实值、RM-IDEAL分数热图、嵌入余弦相似度热图；保存为outputs/rm_ideal_benchmark/rm_ideal_layer3_spatial.png。</li>
+<li>✅ <strong>批量生成2026-02-07至2026-02-19的历史日报告</strong> — 处理了13个日期，涉及4台设备（DCC/tianhe/TzJsDesktop/MacBook）和5个项目（error-recovery-benchmark/MIHD/CalendarPro/gadget/Motion-based Self-Reflection Framework）的工作；进行了约20次导出操作和10多次合并操作；手动修复了2026-02-14报告的JSON截断问题。</li>
+<li>✅ <strong>修复屏幕保护程序时钟的透明度问题</strong> — 用NSViewRepresentable替换了SwiftUI的.ultraThinMaterial，并使用.withinWindow混合模式来显示视频内容，而不是桌面画面。</li>
+<li>✅ <strong>在an53上启动2-GPU Pi0.5 LoRA评估</strong> — 创建了eval_pi05_lora_2gpu.sh脚本，将VLA服务器（GPU 0）和MuJoCo轮询（GPU 1）分开处理。在an53上成功启动了8个任务×20次试验。预计总运行时间为60-70分钟。</li>
+<li>✅ <strong>探索RM-IDEAL代码库并设计基准测试方法</strong> — 使用3个探索代理全面探索RM-IDEAL的实现（utils/rm_ideal.py中的RMIdealEvaluator）、跨样本能力（compute_niche_scores_cross-section方法）以及实验记录系统；设计了独立的脚本方法（仅测试PCA+UNI2+STAIG_FUSION，目标剖面为151673和151676），但用户拒绝了ExitPlanMode。</li>
+<li>✅ <strong>编写文档/CROSS_SAMPLE_QUERY.md方法论文档</strong> — 创建了459行的中文方法论文档，涵盖10章内容：概述（问题定义、两种评估方式、应用场景）、空间图构建（build_grid_connectivity k-NN + 对称化）、k跳子图提取（bfs_k_hop BFS预计算）、WWL图内核（消息传递迭代、共享哈希表）、Wasserstein距离（汉明成本矩阵、POT/scipy双后端）、剖面评估流程（全局类型映射、节点ID偏移）、嵌入相似性比较（生态位中心、余弦相似性）、相关性评估指标（Spearman ρ、Precision@K、相同标签率）、实验结果（Layer_3双向查询数据）、关键代码路径摘要（完整文件/函数/数据流图）。</li>
+<li>✅ <strong>为无视频状态实现屏幕保护程序</strong> — 移除了媒体内容保护功能，为没有壁纸的屏幕创建黑色背景窗口，并在黑色屏幕上显示时钟。</li>
+<li>✅ <strong>修复视频切换错误（书签URL不匹配）</strong> — 在ensureFileAccess中添加了一个防护机制，用于检测书签解析的URL与请求URL是否匹配，并在NSOpenPanel情况下返回原始URL。</li>
+<li>✅ <strong>修复BC-RNN评估的numpy dtype错误</strong> — 修改了policy_adapter._to_robosuite_obs，过滤掉robomimic TensorUtils无法处理的numpy标量类型（float64）。</li>
+<li>✅ <strong>调查an53节点的故障（08:30出现NODE_FAIL）</strong> — 分析了Slurm日志（sacct），确定an53因资源过载（8个GPU + 高CPU负载）而崩溃，并非由于AI操作导致。AI的srun命令在崩溃前就已经失败。节点在09:41重启，SSH主机密钥也发生了变化。</li>
+</ul>
+<h3 id="实施与修复---修复cuda兼容性检测和cpu回退问题最初在p100-gpu上遇到cuda内核不兼容问题pytorch需要sm_70版本添加了tryexcept来处理torchzeros1cuda异常失败时回退到cpu用户更换为rtx-2080-tism_75后成功运行">实施与修复- ✅ <strong>修复CUDA兼容性检测和CPU回退问题</strong>——最初在P100 GPU上遇到CUDA内核不兼容问题，PyTorch需要sm_70+版本；添加了try/except来处理torchzeros(1).cuda()异常，失败时回退到CPU；用户更换为RTX 2080 Ti（sm_75）后成功运行<a hidden class="anchor" aria-hidden="true" href="#实施与修复---修复cuda兼容性检测和cpu回退问题最初在p100-gpu上遇到cuda内核不兼容问题pytorch需要sm_70版本添加了tryexcept来处理torchzeros1cuda异常失败时回退到cpu用户更换为rtx-2080-tism_75后成功运行">#</a></h3>
+<ul>
+<li>✅ <strong>修复屏幕保护程序时钟文字更新时的残影问题</strong>——在CATransaction.setDisableActions(true)中更新了掩模层，消除了时间变化时出现的0.2秒残影</li>
+<li>✅ <strong>在BC-RNN评估脚本中添加&ndash;task参数</strong>——重构了5_baseline_accuracy.py和visualize_policy_rollout.py，以支持任务注册和按任务的分辨率处理</li>
+<li>✅ <strong>更新CLAUDE.md文档，包含编码规范和评估命令</strong>——增强了CLAUDE.md文档，增加了35个Makefile目标（从15个增加到35个），添加了来自AGENTS.md的编码规范，记录了并行VLA评估工作流程，并添加了训练脚本参考</li>
+<li>✅ <strong>修复屏幕保护程序时钟的灰色残影问题</strong>——统一了ScreensaverClockHighlight和ScreensaverClockMask的字体粗细，消除了文字边缘的模糊效果</li>
+<li>✅ <strong>创建BC-RNN检查点符号链接</strong>——为5个任务设置了从checkpoints/bc_rnn/{任务}到实际BC-RNN d0训练目录的符号链接</li>
+<li>✅ <strong>创建网站/CLAUDE.md文档</strong>——分析了Hugo博客结构，创建了包含构建命令、内容部分以及静态资源规范的完整CLAUDE.md文档</li>
+</ul>
+<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
+<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
+<h4 id="1-swiftui-ultrathinmaterial在视频中显示的是固定颜色而不是透明玻璃">1. SwiftUI .ultraThinMaterial在视频中显示的是固定颜色，而不是透明玻璃<a hidden class="anchor" aria-hidden="true" href="#1-swiftui-ultrathinmaterial在视频中显示的是固定颜色而不是透明玻璃">#</a></h4>
+<p>**解决方案：**SwiftUI材料使用了.behindWindow混合模式（在窗口后面显示桌面内容），而不是.integralWindow模式（在相同窗口内容上显示）。用NSViewRepresentable替换了NSVisualEffectView，并在NSHostingView上明确指定.integralWindow模式以及.clearBackgroundColor属性</p>
+<p>**关键洞察：**SwiftUI的抽象层次隐藏了关键的渲染流程细节；对于复杂的视觉效果，如窗口内的透明度，需要NSView级别的控制</p>
+<h4 id="2-151676的staig融合嵌入全部为零嵌入相似度全部为0spearman-r为nan模型完全崩溃">2. 151676的STAIG融合嵌入全部为零（嵌入相似度全部为0，Spearman r为NaN），模型完全崩溃<a hidden class="anchor" aria-hidden="true" href="#2-151676的staig融合嵌入全部为零嵌入相似度全部为0spearman-r为nan模型完全崩溃">#</a></h4>
+<p>**解决方案：**在load_fused Embeddings中添加np.allclose(embeddings, 0)检测；如果检测到这种情况，则打印警告并自动触发&ndash;recompute_fusion路径，以从缓存中重新加载基因/视觉嵌入并进行STAIG的重新训练（300个周期，在RTX 2080 Ti上大约需要50秒）；修复后嵌入恢复正常（64维，范数为1.0）</p>
+<p>**关键洞察：**由于训练不稳定，第二阶段保存的STAIG融合嵌入可能会变为零；需要在基准测试脚本中进行主动检测和自动重新计算，以避免手动干预</p>
+<h4 id="3-在nsopenpanel选择后切换视频时仍然播放旧视频">3. 在NSOpenPanel选择后切换视频时，仍然播放旧视频<a hidden class="anchor" aria-hidden="true" href="#3-在nsopenpanel选择后切换视频时仍然播放旧视频">#</a></h4>
+<p>**解决方案：**确保FileAccess将每屏幕的书签解析为旧视频的URL，而不是请求的新URL。添加了一个判断条件，比较解析后的URL与请求的URL；如果不同，则返回原始URL（该URL具有NSOpenPanel提供的临时沙箱权限）#### 4. Coffee任务的BC-RNN成功率显示为0%，怀疑是评估错误</p>
+<p>**解决方案：**检查了训练日志，确认咖啡任务的BC-RNN训练在所有阶段都达到了0%的成功率（训练了600个周期）。这不是评估错误；该任务确实在训练中失败了</p>
+<p>**关键洞察：**在调试评估流程之前，务必先验证训练指标；下游的零值可能反映了上游训练的失败- 在多段对话合并任务中，初始输出往往非常冗长（逐个保留所有任务/问题，而不是整合），需要人类在输出预期简洁版本之前，在提示中明确强调“整合和提炼，合并类似内容，保留更重要的内容”</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/zh/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

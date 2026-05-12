@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-03-17 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Cross-device collaboration on MIHD spatial omics refactoring, QCVLA latent bridge deep dive with FLARE-inspired improvements, VLA training/inference infrastructure fixes, error benchmark data generation, and system tool enhancements">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-03-17/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-03-17/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-17/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-03-17/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-03-17">
+  <meta property="og:description" content="Cross-device collaboration on MIHD spatial omics refactoring, QCVLA latent bridge deep dive with FLARE-inspired improvements, VLA training/inference infrastructure fixes, error benchmark data generation, and system tool enhancements">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-03-17T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-03-17T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-03-17">
+  <meta name="twitter:description" content="Cross-device collaboration on MIHD spatial omics refactoring, QCVLA latent bridge deep dive with FLARE-inspired improvements, VLA training/inference infrastructure fixes, error benchmark data generation, and system tool enhancements">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-03-17",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-03-17/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-03-17",
+  "name": "Bug Journal 2026-03-17",
+  "description": "Cross-device collaboration on MIHD spatial omics refactoring, QCVLA latent bridge deep dive with FLARE-inspired improvements, VLA training/inference infrastructure fixes, error benchmark data generation, and system tool enhancements",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-03-17 Daily Overview What was done: Completed large-scale MIHD refactoring (9 optimizations including O(N²)→O(Nlogk)), achieved comprehensive QCVLA understanding and proposed 11 improvements via cross-project analysis (FLARE + 9 VLA papers), fixed critical VLA inference bugs and separated loss monitoring, generated 2920 error benchmark scenes, optimized data conversion pipelines, configured remote development environment, and enhanced GPU monitoring tool How it was done: Used parallel Agent-based code review for MIHD, conducted iterative Q\u0026A and literature survey for QCVLA, performed systematic debugging and architecture redesign for VLA systems, executed multi-task error injection pipeline, implemented non-blocking I/O for interactive monitoring, automated server setup via SSH Impact: MIHD: eliminated code duplication and latent bugs, prevented HD data OOM. QCVLA: identified P0 quick-wins and proposed perturbation \u0026 bridging augmentation to break DAgger saturation. VLA: stabilized inference system, enabled separate action_loss/task_loss tracking. Error benchmark 90% complete (needs D0 sample補充). GPU monitoring usability greatly improved. Remote server ready for distributed development DCC What was done: Conducted comprehensive code review and refactoring of MIHD multi-modal integration codebase, covering 21 modified Python files with focus on eliminating redundancy and performance bottlenecks How it was done: Executed /simplify workflow with three parallel Agent reviews (code reuse, quality, efficiency), applied 9 targeted fixes including centralizing NEEDS_COORDS_FUSIONS constant, hoisting device resolution, replacing O(N²) cdist with cKDTree, removing vestigial wrappers, and reusing DataPreparer instances Impact: Removed 8 duplicate device resolution checks, fixed missing adaln_attention in spatial coordinate fusion list (latent bug), prevented OOM on 17K+ spot HD data via algorithmic optimization, improved code maintainability with centralized constants MacBook What was done: Deep dive into QCVLA latent bridge architecture, cross-project improvement planning via 9-paper survey, FLARE integration analysis, and remote server environment configuration How it was done: Created CLAUDE.md documentation, iterative Q\u0026A to understand 7-step pipeline and covariate shift problem, web search for VLA efficiency/robustness literature (VLA-Cache, AC²-VLA, Spec-VLA, KERV, etc.), extracted transferable techniques from FLARE paper (perturbation augmentation, hard failure mining, phase-aware scheduling, vision-conditional bridging, modular LoRA), automated athena.egr.duke.edu setup via SSH + Node.js + Claude/Codex installation Impact: Achieved complete technical comprehension of bridge mechanism (57.6% compute savings with 4% performance drop). Identified P0 quick wins (enable existing Action-Aware Channel Importance Loss) and high-value P1 improvements (Bridge Confidence Head for adaptive scheduling). Proposed FLARE-inspired perturbation \u0026 bridging to address DAgger saturation (+1pp plateau). Server ready for distributed development tianhe What was done: Fixed VLA inference critical bugs, implemented training loss separation, completed error benchmark data generation (2920 scenes), optimized CALVIN dataset conversion, integrated LIBERO custom test suite, fixed GPU monitoring duplicate display issue, diagnosed RoboCasa MimicGen download failure, resolved git proxy and wandb configuration How it was done: Code review identified and fixed 4 inference bugs (None check order, prompt reset, log threshold, state update); modified compute_loss to return (loss_array, aux_dict) tuple with has_aux=True; ran 6-task error injection pipeline (3.5 hours); corrected RLDS-to-LeRobot key mappings and added progress bars; created LIBERO_OBJECT_COM class and BDDL files; implemented ENV+FD verification and parent chain deduplication for gpumon.py; added non-blocking keyboard navigation (arrow keys, command scrolling); traced RoboCasa error through registry to box_links_ds.json; tested proxies and updated git local config; provided wandb API key environment variable solution Impact: VLA inference system stabilized (eliminated crashes and infinite loops), training process now separately monitors action_loss/task_loss in wandb, error benchmark dataset 90% complete (2920 scenes generated, needs D0 sample補充 for some error types), dataset conversion pipeline robust and user-friendly, LIBERO test framework extended, GPU monitoring tool reduced display from 35 to 8 unique processes with nvitop-like interactive features, RoboCasa analysis identified upstream data publishing issue (0 MimicGen Box links in box_links_ds.json), git and wandb configuration issues resolved Cross-device collaboration on MIHD spatial omics refactoring, QCVLA latent bridge deep dive with FLARE-inspired improvements, VLA training/inference infrastructure fixes, error benchmark data generation, and system tool enhancements\nTasks Architecture \u0026 Strategy ✅ QCVLA project documentation creation and improvement planning — Created initial CLAUDE.md via /init covering 7-step pipeline, SingleStepDiT architecture, and critical gotchas. Generated improvement_analysis.md with 11 proposals from FLARE + 9 papers. Documented perturbation \u0026 bridging data augmentation strategy. Analyzed FLARE paper and extracted transferable techniques (perturbation augmentation, hard failure mining, phase-aware scheduling, vision-conditional bridging, modular LoRA). ✅ VLA inference system bug fixes — Discovered and fixed 4 critical bugs in vla_infer.py: None check order error causing potential crashes, prompt not reset after task completion causing infinite loop, debug log threshold inconsistency (chunk 3/4 silent), task completion status not updated to idle ✅ MIHD codebase refactoring and optimization — Executed /simplify on 21 modified Python files, applied 9 key fixes including: centralized NEEDS_COORDS_FUSIONS (fixing missing adaln_attention), hoisted device resolution (removed 8 duplicates), replaced O(N²) cdist with cKDTree (prevent HD OOM), removed unused imports and vestigial wrappers, reused DataPreparer instances. Updated CLAUDE.md to reflect architecture changes. ✅ Training loss monitoring separation — Modified BaseModel.compute_loss to return tuple[loss_array, aux_dict], implemented separate action_loss and task_loss returns in pi0/pi0_fast models, updated training script to use has_aux=True for unpacking and logging to wandb ✅ Error Recovery Benchmark data generation — Completed 6 tasks (pick_place, coffee, stack, stack_three, threading, three_piece_assembly) error injection pipeline, generated 2920 error scenes. Identified some D0 samples insufficient (\u003c10) requiring replenishment, threading task only injection collision_empty due to all phase_labels being pre_reach 🔄 Error benchmark D0 sample replenishment — Some error types at D0 degree have sample count \u003c 10 (e.g., collision_self: 2, drop_at_wrong_place: 8), need to rerun pipeline to supplement; threading task needs analysis of why only collision_empty can be injected ✅ CALVIN dataset conversion script optimization — Corrected RLDS-to-LeRobot conversion script dataset name (calvin_abc vs calvin_abc_d), key mappings (rgb_static vs image), removed non-existent fields, added progress bars and overwrite confirmation logic ✅ LIBERO custom test suite integration — Added libero_object_com suite to LIBERO benchmark framework, modified task_map, registered Benchmark class, created BDDL files, updated client main.py Implementation \u0026 Fixes ✅ GPU monitoring tool duplicate process fix and interactive navigation — Fixed gpumon.py showing 35 duplicate processes (reduced to 8) by implementing ENV+FD verification and parent chain deduplication. Added nvitop-like interactive features: arrow key navigation, command scrolling, visual highlighting for selected row ✅ RoboCasa MimicGen dataset download failure diagnosis — Traced ‘No dataset for this task and dataset type exists!’ error through download_datasets.py → dataset_registry_utils.py → box_links_ds.json, confirmed 0 MimicGen entries exist (upstream data publishing issue) ✅ Remote server environment configuration (athena.egr.duke.edu) — Configured SSH key authentication (user manually ran ssh-copy-id after initial failure), automated installation of fnm + Node.js 22, installed Claude Code 2.1.77 and Codex CLI 0.115.0, transferred qcvla_bridge_pipeline project (51 files, 3.1MB) via rsync. Server ready for distributed development. ✅ Git proxy configuration fix — Diagnosed git fetch network error, tested multiple proxies to find localhost:9999 works, updated local git config to override unavailable global proxy ✅ wandb account configuration — Provided 4 solutions for directory-level wandb account configuration, recommended WANDB_API_KEY environment variable or direnv approach Problems \u0026 Solutions Critical Issues 1. QCVLA: DAgger Round 2 only improved by +1pp (60%→61% SR), indicating saturation. Bridge only sees its own naturally-produced error distribution, which is limited in diversity Solution: Proposed perturbation \u0026 bridging data augmentation: during DAgger rollout, randomly inject short action sequences followed by reverse recovery actions. Captures coherent large-magnitude deviations bridge would never naturally produce, expanding training distribution coverage. Trains both bridge (feature prediction on perturbed states) and action head (recovery action sequences).\nKey Insight: Self-supervised training saturates when model only sees its own error modes. Injecting synthetic but realistic deviations (inspired by FLARE’s perturbation strategy) expands the distribution. Coherent action perturbations are more effective than per-frame Gaussian noise for robotic manipulation.\n2. VLA inference: task completed but infinite loop sending done messages because current_prompt was not reset, causing chunk_count to remain non-zero and model to continuously output high scores Solution: Set current_prompt = \"\" after task completion and call _publish_state(“idle”) to prevent next round from triggering immediately; moved None check before task_completed.item() to avoid crashes on non-pi05 models\nKey Insight: State machines require explicit reset of all related variables at each termination node, otherwise unpredictable loops occur; multi-device compatibility (pi05 vs non-pi05) needs early boundary condition handling\n3. MIHD: NEEDS_COORDS_FUSIONS tuple was duplicated in pipeline/runner.py and pipeline/evaluation_planner.py, with adaln_attention missing from both (latent bug), making it hard to maintain consistency when adding new fusion strategies Solution: Centralized NEEDS_COORDS_FUSIONS as a constant in models/Fusion.py, imported by both files. Added missing adaln_attention to the tuple, fixing a bug where this fusion strategy would fail to receive spatial coordinates.\nKey Insight: Duplicate constants across modules lead to inconsistency and missed updates. Single source of truth prevents latent bugs and simplifies maintenance.\n4. MIHD: refine_labels_spatial_majority in utils/clustering.py used scipy.spatial.distance.cdist with O(N²) memory complexity, causing OOM on Visium HD data with 17K+ spots Solution: Replaced cdist with scipy.spatial.cKDTree.query which has O(N*k) complexity for k-nearest neighbor search. Changed from computing full distance matrix to on-demand radius neighbor queries.\nKey Insight: Spatial queries on large point clouds require tree-based structures (KDTree, BallTree) to avoid quadratic memory explosion. For HD spatial data (10K+ points), algorithmic choice matters more than implementation details.\n5. Training combined action_loss and task_loss into single value logged to wandb, unable to monitor each separately Solution: Modified compute_loss to return (combined_loss, {“action_loss”: …, “task_loss”: …}) tuple, training loop uses nnx.value_and_grad(…, has_aux=True) to unpack auxiliary metrics and add to info dict\nKey Insight: JAX/Flax’s has_aux=True mechanism elegantly returns additional monitoring metrics from loss function without affecting gradient computation; requires synchronizing all compute_loss implementations (pi0 and pi0_fast) to maintain interface consistency\n6. Error benchmark threading task can only inject collision_empty, other error types cannot be generated Solution: Analysis found all clean trajectory phase_labels for threading are ‘pre_reach’, lacking grasp/lift/transport phases, causing errors dependent on these phases (like drop_in_transit) to have no injection opportunities; need to check get_task_phase logic or threading task definition\nKey Insight: Error injection depends on task phase segmentation; incomplete phase recognition causes some error types to be uncoverable; need to verify all tasks cover expected phases during opportunity map generation\n7. gpumon.py counted bash/ffmpeg/claude processes with inherited CUDA_VISIBLE_DEVICES as GPU processes, and showed DDP worker processes separately instead of grouping with parent Solution: Modified _get_proc_gpus() to require both CUDA_VISIBLE_DEVICES env var AND open /dev/nvidia* file descriptors; added parent chain traversal in get_gpu_procs() to collapse child processes with identical GPU sets to their ancestor\nKey Insight: Process GPU usage detection requires both environment variable inheritance check and actual device file descriptor verification to avoid false positives\n8. All 317 RoboCasa tasks failed to download MimicGen data with error messages, unclear if code bug or data availability issue Solution: Systematic analysis revealed: 257 tasks have no mg_path registration (yellow warnings), 60 tasks have mg_path but box_links_ds.json contains 0 MimicGen download URLs (red errors). Confirmed this is upstream data publishing issue, not code defect.\nKey Insight: When download failures are systematic across all items, investigate data availability before attempting code fixes. box_links_ds.json grep for ‘/mg/’ returned zero matches, conclusively proving missing download links\n9. CALVIN RLDS dataset conversion failed with KeyError: ‘image’, actual field names are ‘rgb_static’ and ‘rgb_gripper’ Solution: Read features.json to confirm actual schema, modified frame extraction key names, removed non-existent environment_state and relative_action field definitions from dataset\nKey Insight: Dataset format conversion must verify source data schema before assuming field names; RLDS features.json is authoritative source for determining actual field names\n10. How to implement interactive keyboard navigation in a monitoring tool that needs to refresh periodically without blocking on input Solution: Used select.select() with 0 timeout for non-blocking keyboard input detection, termios/tty for raw mode terminal control, stored selected_idx and scroll_offset state across renders, applied reverse video (\\033[7m) for highlighting\nKey Insight: Non-blocking I/O with select() enables real-time interaction in monitoring tools while maintaining refresh intervals. Terminal raw mode requires careful state management to capture arrow keys without echo\nGeneral Issues 11. git fetch reported Could not resolve host: github.com, global configured proxy 172.16.31.200:3138 unavailable Solution: Used curl to test multiple proxy ports, found localhost:9999 returns 200; updated git local config http.proxy and https.proxy to available proxy, overriding global config\nKey Insight: In server environments, git global proxy takes priority over environment variables; local repository config \u003e global config \u003e environment variables, can use git config –local to override unavailable global settings\n12. Server athena.egr.duke.edu rejected SSH connection with ‘Permission denied (publickey)’ despite user claiming password login was possible Solution: User manually executed ssh-copy-id to upload public key to server’s authorized_keys. Subsequent automation (Node.js, Claude Code, Codex installation, project transfer) proceeded smoothly via passwordless SSH.\nKey Insight: SSH error messages can be misleading—server may support multiple auth methods. Human’s domain knowledge (actual server configuration) overrides AI’s strict interpretation of error messages. For interactive operations (password input), delegate to user then resume automation.\nHuman vs AI Approaches Strategic Level VLA inference bug fix scope Role Approach Human User requested “check documentation on how current task status reporting classification works, and check if related changes have problems” AI AI conducted comprehensive code review, not only answering “how it works” but also discovering 4 unnoticed bugs (None check order, prompt not reset, log coverage incomplete, state not updated), providing priority assessment and fix proposals Difference Analysis: Human’s request is descriptive (“how it works”), AI expanded to preventive code review. AI proactively found serious issues without being asked to “find bugs”, demonstrating proactive code review mindset\nPerturbation data augmentation strategy for QCVLA DAgger Role Approach Human Proposed executing coherent random action sequences followed by reverse recovery (inspired by FLARE’s perturbation \u0026 bridging), creating large-magnitude structured deviations. Emphasized this is more effective than per-frame noise because it produces realistic recovery trajectories. AI Initially suggested adding per-frame Gaussian noise to actions with probability p_perturb, treating perturbation as independent frame-level randomness. Difference Analysis: Human leveraged cross-project insight from FLARE: coherent action sequences produce realistic, large-magnitude deviations that stress-test the bridge’s ability to handle compounding errors, while per-frame noise lacks temporal structure. This represents domain expertise in robotic manipulation (actions have inertia, environments have physics) vs generic data augmentation thinking.\nError benchmark sample quality standards Role Approach Human Explicitly required each error at D0 to have at least 10 samples, and questioned “why threading has so many errors that cannot be injected” AI AI counted existing sample distribution, found some \u003c 10, then diagnosed threading only having pre_reach phase as root cause by analyzing opportunity map, clean trajectory, and phase_labels Difference Analysis: Human focuses on final quality standards and deep “why” questions; AI leans toward data statistics and technical diagnosis. Human’s quality standards drove subsequent补充 tasks, AI’s diagnosis revealed systematic issues in threading task definition or phase recognition\nLoss monitoring separation implementation Role Approach Human Clearly stated requirement: “separate action_loss and task_loss display in wandb and progress bar” AI AI designed compute_loss return tuple + has_aux=True architecture, considered interface consistency (both pi0 and pi0_fast need changes), non-pi05 model compatibility (task_loss fills zero), gradient computation unaffected, and other details Difference Analysis: Human proposed product requirement (“separate display”), AI handled architecture design and edge cases. AI’s solution goes deeper than surface requirement, considering multi-model compatibility and training process completeness\nRoboCasa download issue diagnosis approach Role Approach Human Reported download command failure and confirmed all tasks failed when asked AI Traced error flow through 4 layers (download_datasets.py → get_ds_meta → dataset_registry.py → box_links_ds.json) and used grep to quantitatively verify 0 MimicGen entries exist Difference Analysis: Human provided critical confirmation that ALL tasks failed (not just some), which helped AI distinguish between partial registration issue vs. complete data absence. AI’s systematic code+data traversal identified the exact missing component (Box links)\nGPU process deduplication strategy Role Approach Human Observed duplicate process display issue empirically (saw GPUs 6,7 showing many identical processes) and requested fix AI Analyzed from two angles: filtering out non-GPU processes by file descriptor check, and hierarchical deduplication by parent chain traversal Difference Analysis: Human identified the symptom; AI broke down root cause into two distinct mechanisms (false positive detection + child process duplication) requiring separate fixes\nImplementation Level SSH authentication diagnosis for server configuration Role Approach Human Stated ‘I can use password login’ despite server error message explicitly saying ‘Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password)’, indicating knowledge of actual server configuration or mixed auth mode. AI Interpreted error message literally as ‘server only accepts publickey/gssapi, not password’, proposed asking user for alternative access methods (web panel, jumphost, admin help). Difference Analysis: Human had ground truth about server configuration (possibly mixed mode: passwordless preferred but password allowed, or outdated error message), while AI relied on error message text. Demonstrates AI limitation in trusting error messages over human domain knowledge, and inability to perform interactive password entry.\nAI Limitations Critical Limitations Could not directly determine root cause of why threading task only has pre_reach phase (task definition issue vs phase recognition bug), requires further analysis of get_task_completion_stages implementation Cannot directly run code to verify fix effectiveness; bug fixes can only wait for user feedback, with risks (e.g., loss separation feature needs actual training to confirm wandb display is correct) Dataset key names required multiple trial-and-error attempts to determine; initially tried ‘image’ which failed, then read features.json to confirm ‘rgb_static’, unable to accurately infer in one attempt General Limitations During RoboCasa diagnosis, AI initially explored code logic extensively before checking the data file (box_links_ds.json). A more efficient approach would be to verify data availability earlier since download failures often stem from missing data rather than code bugs Limited understanding of project historical context, needs to gradually understand through git log and documentation (e.g., background of recent commit c2c998a), cannot quickly locate like a human engineer familiar with the project Cannot interactively input passwords in terminal, requiring user to manually execute ssh-copy-id for initial SSH key setup before automation can proceed Three parallel Agent tool calls for code review were rejected by user, possibly due to long wait times on large diff (33K lines) or permission settings. Unable to diagnose exact rejection reason or adapt strategy in real-time Multiple ExitPlanMode attempts were rejected when user only wanted a .md file, not code changes. Failed to recognize user’s preference for analysis-only output until explicitly corrected Learnings Key Learnings Large-scale code refactoring should use parallel Agent-based multi-dimensional review (reuse/quality/efficiency) to systematically discover issues. This uncovered 9 problems including latent bugs, performance bottlenecks, and maintainability issues that single-pass review would miss When DAgger-style training saturates, expand data distribution via structured perturbations (coherent action sequences + recovery) rather than per-frame noise. For robotic manipulation, temporal coherence matters—physics and inertia make sequential perturbations more realistic than i.i.d. noise State machine implementations must explicitly reset all related variables at each termination node; implicit assumptions that “next loop will naturally change” easily lead to unpredictable behaviors like infinite loops Code review should be proactive rather than reactive; even when user only asks “how it’s implemented”, expand to “are there problems”. Proactively discovering potential bugs is more valuable than fixing them after users encounter issues Cross-project technical transfer requires distinguishing ‘directly applicable’ from ‘conceptually adaptable’. FLARE→QCVLA transfer was mostly conceptual (perturbation thinking, expert mixing) rather than code-level, because FLARE addresses policy robustness while QCVLA addresses feature prediction efficiency Spatial queries on large point clouds (10K+ spots) must use tree-based structures. O(N²) distance matrices cause OOM. cKDTree with O(N*k) neighbor queries scales to HD spatial omics data JAX/Flax’s value_and_grad(…, has_aux=True) elegantly returns additional monitoring metrics from loss function without affecting gradient computation, the standard pattern for multi-metric monitoring Error injection benchmark quality depends on task phase segmentation completeness; incomplete phase recognition causes some error types to be uncoverable, need to verify all tasks cover expected phases during opportunity map stage Process GPU usage detection requires both environment variable inheritance check and actual device file descriptor verification to avoid false positives from shell processes Download failure diagnosis should follow data-first approach: when systematic failures occur, verify data availability (grep for expected patterns in config files) before deep-diving into code logic Dataset format conversion must read schema files (like RLDS features.json) to confirm actual field names before assuming common conventions or guessing Non-blocking terminal I/O pattern: select.select() with timeout=0 + termios raw mode + state persistence across renders enables interactive features in real-time monitoring tools without sacrificing refresh rate Parent process chain traversal is effective for deduplicating hierarchical process structures (DDP workers, PyTorch subprocesses) in monitoring tools by collapsing children to ancestors when GPU sets match Practical Learnings Git local repository config \u003e global config \u003e environment variables priority can override unavailable global proxy on shared servers; git config –local is effective for resolving shared server configuration conflicts Server environment automation workflow: SSH key→package manager (fnm/nvm)→runtime (Node.js)→tools (Claude/Codex)→project transfer. User handles interactive auth, AI handles repeatable installation steps Conversation Summaries MIHD Spatial Omics Multi-modal Integration ✅ Large-scale code refactoring via /simplify workflow 13:54:46.661 | claude_code Executed /simplify on MIHD codebase (75 files changed, 21 modified Python files). Launched three parallel Agent reviews for code reuse, quality, and efficiency. Applied 9 key fixes: centralized NEEDS_COORDS_FUSIONS constant (fixing missing adaln_attention bug), hoisted device resolution logic (removed 8 duplicates), replaced O(N²) cdist with cKDTree in spatial neighbor search (prevent HD data OOM), removed vestigial train_staig() wrapper, simplified redundant assignments, removed unused imports, reused DataPreparer instances across extraction steps. All changes passed Python syntax validation. Updated CLAUDE.md to reflect new centralized constant architecture.\nQCVLA Latent Bridge Pipeline ✅ Deep dive into pipeline architecture, cross-project improvement planning, and FLARE integration analysis 2026-03-17 | claude_code, codex Created CLAUDE.md via /init covering 7-step pipeline, SingleStepDiT architecture, and critical gotchas. Iterative Q\u0026A achieved complete understanding of bridge mechanism (lightweight model predicts VLM output, 57.6% compute savings with 4% performance drop). Conducted literature survey of 9 VLA papers (VLA-Cache, AC²-VLA, Spec-VLA, KERV, DeeR-VLA, DySL-VLA, Critic-in-the-Loop, Fast-in-Slow, CronusVLA). Generated improvement_analysis.md with 11 proposals across performance/efficiency/robustness dimensions, identified P0 quick wins (unused Action-Aware Loss modules) and P1 high-value improvements (Bridge Confidence Head, VLA-Cache integration). Explored CVPR 2026 FLARE paper, extracted transferable techniques: perturbation \u0026 bridging augmentation, hard failure sample mining, phase-aware scheduling, vision-conditional bridging, modular LoRA. Generated FLARE_TRANSFER_STUDY.md with ready-to-use commands and smoke test plan. User proposed perturbation \u0026 bridging data augmentation to break DAgger saturation (+1pp plateau).\nRobobrain Pi VLA System ✅ Inference bug fixes, training loss separation, git/wandb configuration 2026-03-17 | claude_code Comprehensive code review of vla_infer.py identified and fixed 4 critical bugs: None check order (potential crashes on non-pi05 models), prompt not reset after task completion (infinite done loop), debug log threshold inconsistency (chunk 3/4 silent), task completion status not updated to idle. Designed and implemented training loss separation: modified compute_loss to return (loss_array, aux_dict) tuple, updated pi0/pi0_fast models to return separate action_loss and task_loss, training script uses has_aux=True for unpacking to wandb. Fixed git proxy configuration by testing multiple proxies (localhost:9999 works) and updating local config to override unavailable global proxy. Provided wandb account configuration solutions with WANDB_API_KEY environment variable or direnv. Multiple commits and cherry-picks to sync main and dev/mlp_old branches.\nError Recovery Benchmark 🔄 Error injection data generation progress and quality check 14:03:00.473 | claude_code Queried pipeline progress, found 3.5 hours ago completion, generated 2920 error scenes (6 tasks). Compiled statistics for each task’s error types across D0/D1/D2 degrees, found some D0 samples \u003c 10 (e.g., collision_self: 2, drop_at_wrong_place: 8) requiring replenishment. Threading task only injection collision_empty available; analysis discovered all phase_labels are pre_reach, lacking grasp/lift/transport phases, needs further investigation of phase recognition logic.\nLIBERO Custom Test Suite ✅ Add libero_object_com custom test suite 09:16:19.809 | claude_code Analyzed LIBERO benchmark framework architecture, determined necessary modifications: libero_suite_task_map.py, init.py (register LIBERO_OBJECT_COM class), create BDDL files, update main.py. Verification found most modifications already completed, only validation needed. init_files directory currently unnecessary due to env.reset() + seed usage.\nCALVIN Dataset Converter ✅ RLDS to LeRobot data conversion script optimization 06:51:06.033 | claude_code Corrected dataset name (calvin_abc_d → calvin_abc), fixed key mappings (image → rgb_static, wrist_image → rgb_gripper), removed non-existent fields (environment_state, relative_action), added progress bars (frames, steps_in_ep, task), implemented overwrite confirmation logic when directory exists. Multiple debugging iterations for KeyError and FileExistsError.\nRemote Server Environment (athena.egr.duke.edu) ✅ Remote development environment setup for QCVLA 20:32:16.991 | claude_code Configured athena.egr.duke.edu as remote development server. Initial SSH connection failed (publickey rejection), user manually executed ssh-copy-id to upload public key. Automated subsequent steps: installed fnm package manager, installed Node.js 22, installed Claude Code 2.1.77 and Codex CLI 0.115.0, transferred qcvla_bridge_pipeline project (51 files, 3.1MB) via rsync. Server now has passwordless SSH, AI coding toolchain, and project code ready for distributed development.\nGPU Monitor Tool (Tianhe Server) ✅ Fix duplicate process display bug and add interactive navigation 03:01:28.167 | claude_code User reported gpumon.py showing ~35 duplicate GPU processes when only 8 unique processes existed. AI diagnosed two causes: false positive detection of ENV-only processes and DDP worker duplication. Implemented fixes requiring both CUDA_VISIBLE_DEVICES and /dev/nvidia* file descriptors for detection, plus parent chain deduplication. Then added nvitop-like interactive features: arrow key navigation, command scrolling, visual highlighting. Reduced process count from 35 to 8 unique entries.\nRoboCasa Dataset Management ✅ Diagnose MimicGen dataset download failure across all tasks 03:00:36.287 | claude_code User encountered ‘No dataset for this task and dataset type exists!’ when downloading MimicGen pretrain data via download_datasets.py. AI performed systematic analysis tracing error through download script → registry → box_links_ds.json. Discovered two-layer issue: 257/317 tasks lack mg_path registration (expected), but critically, box_links_ds.json contains 0 MimicGen download links despite 350 human data links. Confirmed this is upstream data publishing issue, not code defect. Recommended contacting maintainers about data release timeline.\nToken Usage Total: $0.26 — 0.3M tokens\n",
+  "wordCount" : "4195",
+  "inLanguage": "en",
+  "datePublished": "2026-03-17T00:00:00-05:00",
+  "dateModified": "2026-03-17T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-03-17/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-17/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/'>Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-03-17
+    </h1>
+    <div class="post-meta"><span title='2026-03-17 00:00:00 -0500 -0500'>March 17, 2026</span>&nbsp;·&nbsp;<span>20 min</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="daily-report--2026-03-17">Daily Report — 2026-03-17<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-03-17">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Completed large-scale MIHD refactoring (9 optimizations including O(N²)→O(Nlogk)), achieved comprehensive QCVLA understanding and proposed 11 improvements via cross-project analysis (FLARE + 9 VLA papers), fixed critical VLA inference bugs and separated loss monitoring, generated 2920 error benchmark scenes, optimized data conversion pipelines, configured remote development environment, and enhanced GPU monitoring tool</li>
+<li><strong>How it was done:</strong> Used parallel Agent-based code review for MIHD, conducted iterative Q&amp;A and literature survey for QCVLA, performed systematic debugging and architecture redesign for VLA systems, executed multi-task error injection pipeline, implemented non-blocking I/O for interactive monitoring, automated server setup via SSH</li>
+<li><strong>Impact:</strong> MIHD: eliminated code duplication and latent bugs, prevented HD data OOM. QCVLA: identified P0 quick-wins and proposed perturbation &amp; bridging augmentation to break DAgger saturation. VLA: stabilized inference system, enabled separate action_loss/task_loss tracking. Error benchmark 90% complete (needs D0 sample補充). GPU monitoring usability greatly improved. Remote server ready for distributed development</li>
+</ul>
+<h3 id="dcc">DCC<a hidden class="anchor" aria-hidden="true" href="#dcc">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Conducted comprehensive code review and refactoring of MIHD multi-modal integration codebase, covering 21 modified Python files with focus on eliminating redundancy and performance bottlenecks</li>
+<li><strong>How it was done:</strong> Executed /simplify workflow with three parallel Agent reviews (code reuse, quality, efficiency), applied 9 targeted fixes including centralizing NEEDS_COORDS_FUSIONS constant, hoisting device resolution, replacing O(N²) cdist with cKDTree, removing vestigial wrappers, and reusing DataPreparer instances</li>
+<li><strong>Impact:</strong> Removed 8 duplicate device resolution checks, fixed missing adaln_attention in spatial coordinate fusion list (latent bug), prevented OOM on 17K+ spot HD data via algorithmic optimization, improved code maintainability with centralized constants</li>
+</ul>
+<h3 id="macbook">MacBook<a hidden class="anchor" aria-hidden="true" href="#macbook">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Deep dive into QCVLA latent bridge architecture, cross-project improvement planning via 9-paper survey, FLARE integration analysis, and remote server environment configuration</li>
+<li><strong>How it was done:</strong> Created CLAUDE.md documentation, iterative Q&amp;A to understand 7-step pipeline and covariate shift problem, web search for VLA efficiency/robustness literature (VLA-Cache, AC²-VLA, Spec-VLA, KERV, etc.), extracted transferable techniques from FLARE paper (perturbation augmentation, hard failure mining, phase-aware scheduling, vision-conditional bridging, modular LoRA), automated athena.egr.duke.edu setup via SSH + Node.js + Claude/Codex installation</li>
+<li><strong>Impact:</strong> Achieved complete technical comprehension of bridge mechanism (57.6% compute savings with 4% performance drop). Identified P0 quick wins (enable existing Action-Aware Channel Importance Loss) and high-value P1 improvements (Bridge Confidence Head for adaptive scheduling). Proposed FLARE-inspired perturbation &amp; bridging to address DAgger saturation (+1pp plateau). Server ready for distributed development</li>
+</ul>
+<h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
+<ul>
+<li><strong>What was done:</strong> Fixed VLA inference critical bugs, implemented training loss separation, completed error benchmark data generation (2920 scenes), optimized CALVIN dataset conversion, integrated LIBERO custom test suite, fixed GPU monitoring duplicate display issue, diagnosed RoboCasa MimicGen download failure, resolved git proxy and wandb configuration</li>
+<li><strong>How it was done:</strong> Code review identified and fixed 4 inference bugs (None check order, prompt reset, log threshold, state update); modified compute_loss to return (loss_array, aux_dict) tuple with has_aux=True; ran 6-task error injection pipeline (3.5 hours); corrected RLDS-to-LeRobot key mappings and added progress bars; created LIBERO_OBJECT_COM class and BDDL files; implemented ENV+FD verification and parent chain deduplication for gpumon.py; added non-blocking keyboard navigation (arrow keys, command scrolling); traced RoboCasa error through registry to box_links_ds.json; tested proxies and updated git local config; provided wandb API key environment variable solution</li>
+<li><strong>Impact:</strong> VLA inference system stabilized (eliminated crashes and infinite loops), training process now separately monitors action_loss/task_loss in wandb, error benchmark dataset 90% complete (2920 scenes generated, needs D0 sample補充 for some error types), dataset conversion pipeline robust and user-friendly, LIBERO test framework extended, GPU monitoring tool reduced display from 35 to 8 unique processes with nvitop-like interactive features, RoboCasa analysis identified upstream data publishing issue (0 MimicGen Box links in box_links_ds.json), git and wandb configuration issues resolved</li>
+</ul>
+<blockquote>
+<p>Cross-device collaboration on MIHD spatial omics refactoring, QCVLA latent bridge deep dive with FLARE-inspired improvements, VLA training/inference infrastructure fixes, error benchmark data generation, and system tool enhancements</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>QCVLA project documentation creation and improvement planning</strong> — Created initial CLAUDE.md via /init covering 7-step pipeline, SingleStepDiT architecture, and critical gotchas. Generated improvement_analysis.md with 11 proposals from FLARE + 9 papers. Documented perturbation &amp; bridging data augmentation strategy. Analyzed FLARE paper and extracted transferable techniques (perturbation augmentation, hard failure mining, phase-aware scheduling, vision-conditional bridging, modular LoRA).</li>
+<li>✅ <strong>VLA inference system bug fixes</strong> — Discovered and fixed 4 critical bugs in vla_infer.py: None check order error causing potential crashes, prompt not reset after task completion causing infinite loop, debug log threshold inconsistency (chunk 3/4 silent), task completion status not updated to idle</li>
+<li>✅ <strong>MIHD codebase refactoring and optimization</strong> — Executed /simplify on 21 modified Python files, applied 9 key fixes including: centralized NEEDS_COORDS_FUSIONS (fixing missing adaln_attention), hoisted device resolution (removed 8 duplicates), replaced O(N²) cdist with cKDTree (prevent HD OOM), removed unused imports and vestigial wrappers, reused DataPreparer instances. Updated CLAUDE.md to reflect architecture changes.</li>
+<li>✅ <strong>Training loss monitoring separation</strong> — Modified BaseModel.compute_loss to return tuple[loss_array, aux_dict], implemented separate action_loss and task_loss returns in pi0/pi0_fast models, updated training script to use has_aux=True for unpacking and logging to wandb</li>
+<li>✅ <strong>Error Recovery Benchmark data generation</strong> — Completed 6 tasks (pick_place, coffee, stack, stack_three, threading, three_piece_assembly) error injection pipeline, generated 2920 error scenes. Identified some D0 samples insufficient (&lt;10) requiring replenishment, threading task only injection collision_empty due to all phase_labels being pre_reach</li>
+<li>🔄 <strong>Error benchmark D0 sample replenishment</strong> — Some error types at D0 degree have sample count &lt; 10 (e.g., collision_self: 2, drop_at_wrong_place: 8), need to rerun pipeline to supplement; threading task needs analysis of why only collision_empty can be injected</li>
+<li>✅ <strong>CALVIN dataset conversion script optimization</strong> — Corrected RLDS-to-LeRobot conversion script dataset name (calvin_abc vs calvin_abc_d), key mappings (rgb_static vs image), removed non-existent fields, added progress bars and overwrite confirmation logic</li>
+<li>✅ <strong>LIBERO custom test suite integration</strong> — Added libero_object_com suite to LIBERO benchmark framework, modified task_map, registered Benchmark class, created BDDL files, updated client main.py</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>✅ <strong>GPU monitoring tool duplicate process fix and interactive navigation</strong> — Fixed gpumon.py showing 35 duplicate processes (reduced to 8) by implementing ENV+FD verification and parent chain deduplication. Added nvitop-like interactive features: arrow key navigation, command scrolling, visual highlighting for selected row</li>
+<li>✅ <strong>RoboCasa MimicGen dataset download failure diagnosis</strong> — Traced &lsquo;No dataset for this task and dataset type exists!&rsquo; error through download_datasets.py → dataset_registry_utils.py → box_links_ds.json, confirmed 0 MimicGen entries exist (upstream data publishing issue)</li>
+<li>✅ <strong>Remote server environment configuration (athena.egr.duke.edu)</strong> — Configured SSH key authentication (user manually ran ssh-copy-id after initial failure), automated installation of fnm + Node.js 22, installed Claude Code 2.1.77 and Codex CLI 0.115.0, transferred qcvla_bridge_pipeline project (51 files, 3.1MB) via rsync. Server ready for distributed development.</li>
+<li>✅ <strong>Git proxy configuration fix</strong> — Diagnosed git fetch network error, tested multiple proxies to find localhost:9999 works, updated local git config to override unavailable global proxy</li>
+<li>✅ <strong>wandb account configuration</strong> — Provided 4 solutions for directory-level wandb account configuration, recommended WANDB_API_KEY environment variable or direnv approach</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-qcvla-dagger-round-2-only-improved-by-1pp-6061-sr-indicating-saturation-bridge-only-sees-its-own-naturally-produced-error-distribution-which-is-limited-in-diversity">1. QCVLA: DAgger Round 2 only improved by +1pp (60%→61% SR), indicating saturation. Bridge only sees its own naturally-produced error distribution, which is limited in diversity<a hidden class="anchor" aria-hidden="true" href="#1-qcvla-dagger-round-2-only-improved-by-1pp-6061-sr-indicating-saturation-bridge-only-sees-its-own-naturally-produced-error-distribution-which-is-limited-in-diversity">#</a></h4>
+<p><strong>Solution:</strong> Proposed perturbation &amp; bridging data augmentation: during DAgger rollout, randomly inject short action sequences followed by reverse recovery actions. Captures coherent large-magnitude deviations bridge would never naturally produce, expanding training distribution coverage. Trains both bridge (feature prediction on perturbed states) and action head (recovery action sequences).</p>
+<p><strong>Key Insight:</strong> Self-supervised training saturates when model only sees its own error modes. Injecting synthetic but realistic deviations (inspired by FLARE&rsquo;s perturbation strategy) expands the distribution. Coherent action perturbations are more effective than per-frame Gaussian noise for robotic manipulation.</p>
+<h4 id="2-vla-inference-task-completed-but-infinite-loop-sending-done-messages-because-current_prompt-was-not-reset-causing-chunk_count-to-remain-non-zero-and-model-to-continuously-output-high-scores">2. VLA inference: task completed but infinite loop sending done messages because current_prompt was not reset, causing chunk_count to remain non-zero and model to continuously output high scores<a hidden class="anchor" aria-hidden="true" href="#2-vla-inference-task-completed-but-infinite-loop-sending-done-messages-because-current_prompt-was-not-reset-causing-chunk_count-to-remain-non-zero-and-model-to-continuously-output-high-scores">#</a></h4>
+<p><strong>Solution:</strong> Set current_prompt = &quot;&quot; after task completion and call _publish_state(&ldquo;idle&rdquo;) to prevent next round from triggering immediately; moved None check before task_completed.item() to avoid crashes on non-pi05 models</p>
+<p><strong>Key Insight:</strong> State machines require explicit reset of all related variables at each termination node, otherwise unpredictable loops occur; multi-device compatibility (pi05 vs non-pi05) needs early boundary condition handling</p>
+<h4 id="3-mihd-needs_coords_fusions-tuple-was-duplicated-in-pipelinerunnerpy-and-pipelineevaluation_plannerpy-with-adaln_attention-missing-from-both-latent-bug-making-it-hard-to-maintain-consistency-when-adding-new-fusion-strategies">3. MIHD: NEEDS_COORDS_FUSIONS tuple was duplicated in pipeline/runner.py and pipeline/evaluation_planner.py, with adaln_attention missing from both (latent bug), making it hard to maintain consistency when adding new fusion strategies<a hidden class="anchor" aria-hidden="true" href="#3-mihd-needs_coords_fusions-tuple-was-duplicated-in-pipelinerunnerpy-and-pipelineevaluation_plannerpy-with-adaln_attention-missing-from-both-latent-bug-making-it-hard-to-maintain-consistency-when-adding-new-fusion-strategies">#</a></h4>
+<p><strong>Solution:</strong> Centralized NEEDS_COORDS_FUSIONS as a constant in models/Fusion.py, imported by both files. Added missing adaln_attention to the tuple, fixing a bug where this fusion strategy would fail to receive spatial coordinates.</p>
+<p><strong>Key Insight:</strong> Duplicate constants across modules lead to inconsistency and missed updates. Single source of truth prevents latent bugs and simplifies maintenance.</p>
+<h4 id="4-mihd-refine_labels_spatial_majority-in-utilsclusteringpy-used-scipyspatialdistancecdist-with-on-memory-complexity-causing-oom-on-visium-hd-data-with-17k-spots">4. MIHD: refine_labels_spatial_majority in utils/clustering.py used scipy.spatial.distance.cdist with O(N²) memory complexity, causing OOM on Visium HD data with 17K+ spots<a hidden class="anchor" aria-hidden="true" href="#4-mihd-refine_labels_spatial_majority-in-utilsclusteringpy-used-scipyspatialdistancecdist-with-on-memory-complexity-causing-oom-on-visium-hd-data-with-17k-spots">#</a></h4>
+<p><strong>Solution:</strong> Replaced cdist with scipy.spatial.cKDTree.query which has O(N*k) complexity for k-nearest neighbor search. Changed from computing full distance matrix to on-demand radius neighbor queries.</p>
+<p><strong>Key Insight:</strong> Spatial queries on large point clouds require tree-based structures (KDTree, BallTree) to avoid quadratic memory explosion. For HD spatial data (10K+ points), algorithmic choice matters more than implementation details.</p>
+<h4 id="5-training-combined-action_loss-and-task_loss-into-single-value-logged-to-wandb-unable-to-monitor-each-separately">5. Training combined action_loss and task_loss into single value logged to wandb, unable to monitor each separately<a hidden class="anchor" aria-hidden="true" href="#5-training-combined-action_loss-and-task_loss-into-single-value-logged-to-wandb-unable-to-monitor-each-separately">#</a></h4>
+<p><strong>Solution:</strong> Modified compute_loss to return (combined_loss, {&ldquo;action_loss&rdquo;: &hellip;, &ldquo;task_loss&rdquo;: &hellip;}) tuple, training loop uses nnx.value_and_grad(&hellip;, has_aux=True) to unpack auxiliary metrics and add to info dict</p>
+<p><strong>Key Insight:</strong> JAX/Flax&rsquo;s has_aux=True mechanism elegantly returns additional monitoring metrics from loss function without affecting gradient computation; requires synchronizing all compute_loss implementations (pi0 and pi0_fast) to maintain interface consistency</p>
+<h4 id="6-error-benchmark-threading-task-can-only-inject-collision_empty-other-error-types-cannot-be-generated">6. Error benchmark threading task can only inject collision_empty, other error types cannot be generated<a hidden class="anchor" aria-hidden="true" href="#6-error-benchmark-threading-task-can-only-inject-collision_empty-other-error-types-cannot-be-generated">#</a></h4>
+<p><strong>Solution:</strong> Analysis found all clean trajectory phase_labels for threading are &lsquo;pre_reach&rsquo;, lacking grasp/lift/transport phases, causing errors dependent on these phases (like drop_in_transit) to have no injection opportunities; need to check get_task_phase logic or threading task definition</p>
+<p><strong>Key Insight:</strong> Error injection depends on task phase segmentation; incomplete phase recognition causes some error types to be uncoverable; need to verify all tasks cover expected phases during opportunity map generation</p>
+<h4 id="7-gpumonpy-counted-bashffmpegclaude-processes-with-inherited-cuda_visible_devices-as-gpu-processes-and-showed-ddp-worker-processes-separately-instead-of-grouping-with-parent">7. gpumon.py counted bash/ffmpeg/claude processes with inherited CUDA_VISIBLE_DEVICES as GPU processes, and showed DDP worker processes separately instead of grouping with parent<a hidden class="anchor" aria-hidden="true" href="#7-gpumonpy-counted-bashffmpegclaude-processes-with-inherited-cuda_visible_devices-as-gpu-processes-and-showed-ddp-worker-processes-separately-instead-of-grouping-with-parent">#</a></h4>
+<p><strong>Solution:</strong> Modified _get_proc_gpus() to require both CUDA_VISIBLE_DEVICES env var AND open /dev/nvidia* file descriptors; added parent chain traversal in get_gpu_procs() to collapse child processes with identical GPU sets to their ancestor</p>
+<p><strong>Key Insight:</strong> Process GPU usage detection requires both environment variable inheritance check and actual device file descriptor verification to avoid false positives</p>
+<h4 id="8-all-317-robocasa-tasks-failed-to-download-mimicgen-data-with-error-messages-unclear-if-code-bug-or-data-availability-issue">8. All 317 RoboCasa tasks failed to download MimicGen data with error messages, unclear if code bug or data availability issue<a hidden class="anchor" aria-hidden="true" href="#8-all-317-robocasa-tasks-failed-to-download-mimicgen-data-with-error-messages-unclear-if-code-bug-or-data-availability-issue">#</a></h4>
+<p><strong>Solution:</strong> Systematic analysis revealed: 257 tasks have no mg_path registration (yellow warnings), 60 tasks have mg_path but box_links_ds.json contains 0 MimicGen download URLs (red errors). Confirmed this is upstream data publishing issue, not code defect.</p>
+<p><strong>Key Insight:</strong> When download failures are systematic across all items, investigate data availability before attempting code fixes. box_links_ds.json grep for &lsquo;/mg/&rsquo; returned zero matches, conclusively proving missing download links</p>
+<h4 id="9-calvin-rlds-dataset-conversion-failed-with-keyerror-image-actual-field-names-are-rgb_static-and-rgb_gripper">9. CALVIN RLDS dataset conversion failed with KeyError: &lsquo;image&rsquo;, actual field names are &lsquo;rgb_static&rsquo; and &lsquo;rgb_gripper&rsquo;<a hidden class="anchor" aria-hidden="true" href="#9-calvin-rlds-dataset-conversion-failed-with-keyerror-image-actual-field-names-are-rgb_static-and-rgb_gripper">#</a></h4>
+<p><strong>Solution:</strong> Read features.json to confirm actual schema, modified frame extraction key names, removed non-existent environment_state and relative_action field definitions from dataset</p>
+<p><strong>Key Insight:</strong> Dataset format conversion must verify source data schema before assuming field names; RLDS features.json is authoritative source for determining actual field names</p>
+<h4 id="10-how-to-implement-interactive-keyboard-navigation-in-a-monitoring-tool-that-needs-to-refresh-periodically-without-blocking-on-input">10. How to implement interactive keyboard navigation in a monitoring tool that needs to refresh periodically without blocking on input<a hidden class="anchor" aria-hidden="true" href="#10-how-to-implement-interactive-keyboard-navigation-in-a-monitoring-tool-that-needs-to-refresh-periodically-without-blocking-on-input">#</a></h4>
+<p><strong>Solution:</strong> Used select.select() with 0 timeout for non-blocking keyboard input detection, termios/tty for raw mode terminal control, stored selected_idx and scroll_offset state across renders, applied reverse video (\033[7m) for highlighting</p>
+<p><strong>Key Insight:</strong> Non-blocking I/O with select() enables real-time interaction in monitoring tools while maintaining refresh intervals. Terminal raw mode requires careful state management to capture arrow keys without echo</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="11-git-fetch-reported-could-not-resolve-host-githubcom-global-configured-proxy-17216312003138-unavailable">11. git fetch reported Could not resolve host: github.com, global configured proxy 172.16.31.200:3138 unavailable<a hidden class="anchor" aria-hidden="true" href="#11-git-fetch-reported-could-not-resolve-host-githubcom-global-configured-proxy-17216312003138-unavailable">#</a></h4>
+<p><strong>Solution:</strong> Used curl to test multiple proxy ports, found localhost:9999 returns 200; updated git local config http.proxy and https.proxy to available proxy, overriding global config</p>
+<p><strong>Key Insight:</strong> In server environments, git global proxy takes priority over environment variables; local repository config &gt; global config &gt; environment variables, can use git config &ndash;local to override unavailable global settings</p>
+<h4 id="12-server-athenaegrdukeedu-rejected-ssh-connection-with-permission-denied-publickey-despite-user-claiming-password-login-was-possible">12. Server athena.egr.duke.edu rejected SSH connection with &lsquo;Permission denied (publickey)&rsquo; despite user claiming password login was possible<a hidden class="anchor" aria-hidden="true" href="#12-server-athenaegrdukeedu-rejected-ssh-connection-with-permission-denied-publickey-despite-user-claiming-password-login-was-possible">#</a></h4>
+<p><strong>Solution:</strong> User manually executed ssh-copy-id to upload public key to server&rsquo;s authorized_keys. Subsequent automation (Node.js, Claude Code, Codex installation, project transfer) proceeded smoothly via passwordless SSH.</p>
+<p><strong>Key Insight:</strong> SSH error messages can be misleading—server may support multiple auth methods. Human&rsquo;s domain knowledge (actual server configuration) overrides AI&rsquo;s strict interpretation of error messages. For interactive operations (password input), delegate to user then resume automation.</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="vla-inference-bug-fix-scope">VLA inference bug fix scope<a hidden class="anchor" aria-hidden="true" href="#vla-inference-bug-fix-scope">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User requested &ldquo;check documentation on how current task status reporting classification works, and check if related changes have problems&rdquo;</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI conducted comprehensive code review, not only answering &ldquo;how it works&rdquo; but also discovering 4 unnoticed bugs (None check order, prompt not reset, log coverage incomplete, state not updated), providing priority assessment and fix proposals</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human&rsquo;s request is descriptive (&ldquo;how it works&rdquo;), AI expanded to preventive code review. AI proactively found serious issues without being asked to &ldquo;find bugs&rdquo;, demonstrating proactive code review mindset</p>
+<h4 id="perturbation-data-augmentation-strategy-for-qcvla-dagger">Perturbation data augmentation strategy for QCVLA DAgger<a hidden class="anchor" aria-hidden="true" href="#perturbation-data-augmentation-strategy-for-qcvla-dagger">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Proposed executing coherent random action sequences followed by reverse recovery (inspired by FLARE&rsquo;s perturbation &amp; bridging), creating large-magnitude structured deviations. Emphasized this is more effective than per-frame noise because it produces realistic recovery trajectories.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Initially suggested adding per-frame Gaussian noise to actions with probability p_perturb, treating perturbation as independent frame-level randomness.</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human leveraged cross-project insight from FLARE: coherent action sequences produce realistic, large-magnitude deviations that stress-test the bridge&rsquo;s ability to handle compounding errors, while per-frame noise lacks temporal structure. This represents domain expertise in robotic manipulation (actions have inertia, environments have physics) vs generic data augmentation thinking.</p>
+<h4 id="error-benchmark-sample-quality-standards">Error benchmark sample quality standards<a hidden class="anchor" aria-hidden="true" href="#error-benchmark-sample-quality-standards">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Explicitly required each error at D0 to have at least 10 samples, and questioned &ldquo;why threading has so many errors that cannot be injected&rdquo;</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI counted existing sample distribution, found some &lt; 10, then diagnosed threading only having pre_reach phase as root cause by analyzing opportunity map, clean trajectory, and phase_labels</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human focuses on final quality standards and deep &ldquo;why&rdquo; questions; AI leans toward data statistics and technical diagnosis. Human&rsquo;s quality standards drove subsequent补充 tasks, AI&rsquo;s diagnosis revealed systematic issues in threading task definition or phase recognition</p>
+<h4 id="loss-monitoring-separation-implementation">Loss monitoring separation implementation<a hidden class="anchor" aria-hidden="true" href="#loss-monitoring-separation-implementation">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Clearly stated requirement: &ldquo;separate action_loss and task_loss display in wandb and progress bar&rdquo;</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI designed compute_loss return tuple + has_aux=True architecture, considered interface consistency (both pi0 and pi0_fast need changes), non-pi05 model compatibility (task_loss fills zero), gradient computation unaffected, and other details</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human proposed product requirement (&ldquo;separate display&rdquo;), AI handled architecture design and edge cases. AI&rsquo;s solution goes deeper than surface requirement, considering multi-model compatibility and training process completeness</p>
+<h4 id="robocasa-download-issue-diagnosis-approach">RoboCasa download issue diagnosis approach<a hidden class="anchor" aria-hidden="true" href="#robocasa-download-issue-diagnosis-approach">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Reported download command failure and confirmed all tasks failed when asked</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Traced error flow through 4 layers (download_datasets.py → get_ds_meta → dataset_registry.py → box_links_ds.json) and used grep to quantitatively verify 0 MimicGen entries exist</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human provided critical confirmation that ALL tasks failed (not just some), which helped AI distinguish between partial registration issue vs. complete data absence. AI&rsquo;s systematic code+data traversal identified the exact missing component (Box links)</p>
+<h4 id="gpu-process-deduplication-strategy">GPU process deduplication strategy<a hidden class="anchor" aria-hidden="true" href="#gpu-process-deduplication-strategy">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Observed duplicate process display issue empirically (saw GPUs 6,7 showing many identical processes) and requested fix</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Analyzed from two angles: filtering out non-GPU processes by file descriptor check, and hierarchical deduplication by parent chain traversal</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human identified the symptom; AI broke down root cause into two distinct mechanisms (false positive detection + child process duplication) requiring separate fixes</p>
+<h3 id="implementation-level">Implementation Level<a hidden class="anchor" aria-hidden="true" href="#implementation-level">#</a></h3>
+<h4 id="ssh-authentication-diagnosis-for-server-configuration">SSH authentication diagnosis for server configuration<a hidden class="anchor" aria-hidden="true" href="#ssh-authentication-diagnosis-for-server-configuration">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Stated &lsquo;I can use password login&rsquo; despite server error message explicitly saying &lsquo;Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password)&rsquo;, indicating knowledge of actual server configuration or mixed auth mode.</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Interpreted error message literally as &lsquo;server only accepts publickey/gssapi, not password&rsquo;, proposed asking user for alternative access methods (web panel, jumphost, admin help).</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human had ground truth about server configuration (possibly mixed mode: passwordless preferred but password allowed, or outdated error message), while AI relied on error message text. Demonstrates AI limitation in trusting error messages over human domain knowledge, and inability to perform interactive password entry.</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="critical-limitations">Critical Limitations<a hidden class="anchor" aria-hidden="true" href="#critical-limitations">#</a></h3>
+<ul>
+<li>Could not directly determine root cause of why threading task only has pre_reach phase (task definition issue vs phase recognition bug), requires further analysis of get_task_completion_stages implementation</li>
+<li>Cannot directly run code to verify fix effectiveness; bug fixes can only wait for user feedback, with risks (e.g., loss separation feature needs actual training to confirm wandb display is correct)</li>
+<li>Dataset key names required multiple trial-and-error attempts to determine; initially tried &lsquo;image&rsquo; which failed, then read features.json to confirm &lsquo;rgb_static&rsquo;, unable to accurately infer in one attempt</li>
+</ul>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>During RoboCasa diagnosis, AI initially explored code logic extensively before checking the data file (box_links_ds.json). A more efficient approach would be to verify data availability earlier since download failures often stem from missing data rather than code bugs</li>
+<li>Limited understanding of project historical context, needs to gradually understand through git log and documentation (e.g., background of recent commit c2c998a), cannot quickly locate like a human engineer familiar with the project</li>
+<li>Cannot interactively input passwords in terminal, requiring user to manually execute ssh-copy-id for initial SSH key setup before automation can proceed</li>
+<li>Three parallel Agent tool calls for code review were rejected by user, possibly due to long wait times on large diff (33K lines) or permission settings. Unable to diagnose exact rejection reason or adapt strategy in real-time</li>
+<li>Multiple ExitPlanMode attempts were rejected when user only wanted a .md file, not code changes. Failed to recognize user&rsquo;s preference for analysis-only output until explicitly corrected</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>Large-scale code refactoring should use parallel Agent-based multi-dimensional review (reuse/quality/efficiency) to systematically discover issues. This uncovered 9 problems including latent bugs, performance bottlenecks, and maintainability issues that single-pass review would miss</li>
+<li>When DAgger-style training saturates, expand data distribution via structured perturbations (coherent action sequences + recovery) rather than per-frame noise. For robotic manipulation, temporal coherence matters—physics and inertia make sequential perturbations more realistic than i.i.d. noise</li>
+<li>State machine implementations must explicitly reset all related variables at each termination node; implicit assumptions that &ldquo;next loop will naturally change&rdquo; easily lead to unpredictable behaviors like infinite loops</li>
+<li>Code review should be proactive rather than reactive; even when user only asks &ldquo;how it&rsquo;s implemented&rdquo;, expand to &ldquo;are there problems&rdquo;. Proactively discovering potential bugs is more valuable than fixing them after users encounter issues</li>
+<li>Cross-project technical transfer requires distinguishing &lsquo;directly applicable&rsquo; from &lsquo;conceptually adaptable&rsquo;. FLARE→QCVLA transfer was mostly conceptual (perturbation thinking, expert mixing) rather than code-level, because FLARE addresses policy robustness while QCVLA addresses feature prediction efficiency</li>
+<li>Spatial queries on large point clouds (10K+ spots) must use tree-based structures. O(N²) distance matrices cause OOM. cKDTree with O(N*k) neighbor queries scales to HD spatial omics data</li>
+<li>JAX/Flax&rsquo;s value_and_grad(&hellip;, has_aux=True) elegantly returns additional monitoring metrics from loss function without affecting gradient computation, the standard pattern for multi-metric monitoring</li>
+<li>Error injection benchmark quality depends on task phase segmentation completeness; incomplete phase recognition causes some error types to be uncoverable, need to verify all tasks cover expected phases during opportunity map stage</li>
+<li>Process GPU usage detection requires both environment variable inheritance check and actual device file descriptor verification to avoid false positives from shell processes</li>
+<li>Download failure diagnosis should follow data-first approach: when systematic failures occur, verify data availability (grep for expected patterns in config files) before deep-diving into code logic</li>
+<li>Dataset format conversion must read schema files (like RLDS features.json) to confirm actual field names before assuming common conventions or guessing</li>
+<li>Non-blocking terminal I/O pattern: select.select() with timeout=0 + termios raw mode + state persistence across renders enables interactive features in real-time monitoring tools without sacrificing refresh rate</li>
+<li>Parent process chain traversal is effective for deduplicating hierarchical process structures (DDP workers, PyTorch subprocesses) in monitoring tools by collapsing children to ancestors when GPU sets match</li>
+</ul>
+<h3 id="practical-learnings">Practical Learnings<a hidden class="anchor" aria-hidden="true" href="#practical-learnings">#</a></h3>
+<ul>
+<li>Git local repository config &gt; global config &gt; environment variables priority can override unavailable global proxy on shared servers; git config &ndash;local is effective for resolving shared server configuration conflicts</li>
+<li>Server environment automation workflow: SSH key→package manager (fnm/nvm)→runtime (Node.js)→tools (Claude/Codex)→project transfer. User handles interactive auth, AI handles repeatable installation steps</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<h3 id="mihd-spatial-omics-multi-modal-integration">MIHD Spatial Omics Multi-modal Integration<a hidden class="anchor" aria-hidden="true" href="#mihd-spatial-omics-multi-modal-integration">#</a></h3>
+<p><strong>✅ Large-scale code refactoring via /simplify workflow</strong>
+<em>13:54:46.661 | claude_code</em>
+Executed /simplify on MIHD codebase (75 files changed, 21 modified Python files). Launched three parallel Agent reviews for code reuse, quality, and efficiency. Applied 9 key fixes: centralized NEEDS_COORDS_FUSIONS constant (fixing missing adaln_attention bug), hoisted device resolution logic (removed 8 duplicates), replaced O(N²) cdist with cKDTree in spatial neighbor search (prevent HD data OOM), removed vestigial train_staig() wrapper, simplified redundant assignments, removed unused imports, reused DataPreparer instances across extraction steps. All changes passed Python syntax validation. Updated CLAUDE.md to reflect new centralized constant architecture.</p>
+<h3 id="qcvla-latent-bridge-pipeline">QCVLA Latent Bridge Pipeline<a hidden class="anchor" aria-hidden="true" href="#qcvla-latent-bridge-pipeline">#</a></h3>
+<p><strong>✅ Deep dive into pipeline architecture, cross-project improvement planning, and FLARE integration analysis</strong>
+<em>2026-03-17 | claude_code, codex</em>
+Created CLAUDE.md via /init covering 7-step pipeline, SingleStepDiT architecture, and critical gotchas. Iterative Q&amp;A achieved complete understanding of bridge mechanism (lightweight model predicts VLM output, 57.6% compute savings with 4% performance drop). Conducted literature survey of 9 VLA papers (VLA-Cache, AC²-VLA, Spec-VLA, KERV, DeeR-VLA, DySL-VLA, Critic-in-the-Loop, Fast-in-Slow, CronusVLA). Generated improvement_analysis.md with 11 proposals across performance/efficiency/robustness dimensions, identified P0 quick wins (unused Action-Aware Loss modules) and P1 high-value improvements (Bridge Confidence Head, VLA-Cache integration). Explored CVPR 2026 FLARE paper, extracted transferable techniques: perturbation &amp; bridging augmentation, hard failure sample mining, phase-aware scheduling, vision-conditional bridging, modular LoRA. Generated FLARE_TRANSFER_STUDY.md with ready-to-use commands and smoke test plan. User proposed perturbation &amp; bridging data augmentation to break DAgger saturation (+1pp plateau).</p>
+<h3 id="robobrain-pi-vla-system">Robobrain Pi VLA System<a hidden class="anchor" aria-hidden="true" href="#robobrain-pi-vla-system">#</a></h3>
+<p><strong>✅ Inference bug fixes, training loss separation, git/wandb configuration</strong>
+<em>2026-03-17 | claude_code</em>
+Comprehensive code review of vla_infer.py identified and fixed 4 critical bugs: None check order (potential crashes on non-pi05 models), prompt not reset after task completion (infinite done loop), debug log threshold inconsistency (chunk 3/4 silent), task completion status not updated to idle. Designed and implemented training loss separation: modified compute_loss to return (loss_array, aux_dict) tuple, updated pi0/pi0_fast models to return separate action_loss and task_loss, training script uses has_aux=True for unpacking to wandb. Fixed git proxy configuration by testing multiple proxies (localhost:9999 works) and updating local config to override unavailable global proxy. Provided wandb account configuration solutions with WANDB_API_KEY environment variable or direnv. Multiple commits and cherry-picks to sync main and dev/mlp_old branches.</p>
+<h3 id="error-recovery-benchmark">Error Recovery Benchmark<a hidden class="anchor" aria-hidden="true" href="#error-recovery-benchmark">#</a></h3>
+<p><strong>🔄 Error injection data generation progress and quality check</strong>
+<em>14:03:00.473 | claude_code</em>
+Queried pipeline progress, found 3.5 hours ago completion, generated 2920 error scenes (6 tasks). Compiled statistics for each task&rsquo;s error types across D0/D1/D2 degrees, found some D0 samples &lt; 10 (e.g., collision_self: 2, drop_at_wrong_place: 8) requiring replenishment. Threading task only injection collision_empty available; analysis discovered all phase_labels are pre_reach, lacking grasp/lift/transport phases, needs further investigation of phase recognition logic.</p>
+<h3 id="libero-custom-test-suite">LIBERO Custom Test Suite<a hidden class="anchor" aria-hidden="true" href="#libero-custom-test-suite">#</a></h3>
+<p><strong>✅ Add libero_object_com custom test suite</strong>
+<em>09:16:19.809 | claude_code</em>
+Analyzed LIBERO benchmark framework architecture, determined necessary modifications: libero_suite_task_map.py, <strong>init</strong>.py (register LIBERO_OBJECT_COM class), create BDDL files, update main.py. Verification found most modifications already completed, only validation needed. init_files directory currently unnecessary due to env.reset() + seed usage.</p>
+<h3 id="calvin-dataset-converter">CALVIN Dataset Converter<a hidden class="anchor" aria-hidden="true" href="#calvin-dataset-converter">#</a></h3>
+<p><strong>✅ RLDS to LeRobot data conversion script optimization</strong>
+<em>06:51:06.033 | claude_code</em>
+Corrected dataset name (calvin_abc_d → calvin_abc), fixed key mappings (image → rgb_static, wrist_image → rgb_gripper), removed non-existent fields (environment_state, relative_action), added progress bars (frames, steps_in_ep, task), implemented overwrite confirmation logic when directory exists. Multiple debugging iterations for KeyError and FileExistsError.</p>
+<h3 id="remote-server-environment-athenaegrdukeedu">Remote Server Environment (athena.egr.duke.edu)<a hidden class="anchor" aria-hidden="true" href="#remote-server-environment-athenaegrdukeedu">#</a></h3>
+<p><strong>✅ Remote development environment setup for QCVLA</strong>
+<em>20:32:16.991 | claude_code</em>
+Configured athena.egr.duke.edu as remote development server. Initial SSH connection failed (publickey rejection), user manually executed ssh-copy-id to upload public key. Automated subsequent steps: installed fnm package manager, installed Node.js 22, installed Claude Code 2.1.77 and Codex CLI 0.115.0, transferred qcvla_bridge_pipeline project (51 files, 3.1MB) via rsync. Server now has passwordless SSH, AI coding toolchain, and project code ready for distributed development.</p>
+<h3 id="gpu-monitor-tool-tianhe-server">GPU Monitor Tool (Tianhe Server)<a hidden class="anchor" aria-hidden="true" href="#gpu-monitor-tool-tianhe-server">#</a></h3>
+<p><strong>✅ Fix duplicate process display bug and add interactive navigation</strong>
+<em>03:01:28.167 | claude_code</em>
+User reported gpumon.py showing ~35 duplicate GPU processes when only 8 unique processes existed. AI diagnosed two causes: false positive detection of ENV-only processes and DDP worker duplication. Implemented fixes requiring both CUDA_VISIBLE_DEVICES and /dev/nvidia* file descriptors for detection, plus parent chain deduplication. Then added nvitop-like interactive features: arrow key navigation, command scrolling, visual highlighting. Reduced process count from 35 to 8 unique entries.</p>
+<h3 id="robocasa-dataset-management">RoboCasa Dataset Management<a hidden class="anchor" aria-hidden="true" href="#robocasa-dataset-management">#</a></h3>
+<p><strong>✅ Diagnose MimicGen dataset download failure across all tasks</strong>
+<em>03:00:36.287 | claude_code</em>
+User encountered &lsquo;No dataset for this task and dataset type exists!&rsquo; when downloading MimicGen pretrain data via download_datasets.py. AI performed systematic analysis tracing error through download script → registry → box_links_ds.json. Discovered two-layer issue: 257/317 tasks lack mg_path registration (expected), but critically, box_links_ds.json contains 0 MimicGen download links despite 350 human data links. Confirmed this is upstream data publishing issue, not code defect. Recommended contacting maintainers about data release timeline.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-03-17-usage.png"></p>
+<p><strong>Total: $0.26</strong> — 0.3M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
