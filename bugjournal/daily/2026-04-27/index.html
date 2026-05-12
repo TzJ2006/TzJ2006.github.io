@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-04-27 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Fixed 6&#43; Windows-specific TokenMonitor bugs (tray focus, PowerShell popups, window anchor detection, hover oscillation, warning thresholds, bottom edge alignment) and implemented one-click Cursor IDE auto-reconnect with token refresh polling">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-04-27/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-04-27/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-27/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-04-27/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-04-27">
+  <meta property="og:description" content="Fixed 6&#43; Windows-specific TokenMonitor bugs (tray focus, PowerShell popups, window anchor detection, hover oscillation, warning thresholds, bottom edge alignment) and implemented one-click Cursor IDE auto-reconnect with token refresh polling">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-04-27T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-04-27T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-04-27">
+  <meta name="twitter:description" content="Fixed 6&#43; Windows-specific TokenMonitor bugs (tray focus, PowerShell popups, window anchor detection, hover oscillation, warning thresholds, bottom edge alignment) and implemented one-click Cursor IDE auto-reconnect with token refresh polling">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-04-27",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-04-27/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-04-27",
+  "name": "Bug Journal 2026-04-27",
+  "description": "Fixed 6+ Windows-specific TokenMonitor bugs (tray focus, PowerShell popups, window anchor detection, hover oscillation, warning thresholds, bottom edge alignment) and implemented one-click Cursor IDE auto-reconnect with token refresh polling",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-04-27 Daily Overview What was done: Debugged and resolved critical Windows platform bugs in TokenMonitor system tray application affecting window focus, process spawning, positioning, hover behavior, warning logic, and visual alignment; also built automated Cursor IDE connection recovery feature How it was done: Combined Win32 API analysis (SetForegroundWindow foreground rights, CREATE_NO_WINDOW flags, work area calculations), multi-layer hover oscillation defense (state-based fake event detection, observer blocking, shrink guards), Rust IPC command additions (open_cursor_app, retry_cursor_auth), and data pipeline logic refinements (dual API fallback, auto-retry polling) Impact: Eliminates all major Windows visual glitches and false positive warnings, breaks feedback loops causing rapid oscillation, automates connection recovery without app restart, and moves TokenMonitor toward production-ready cross-platform support Fixed 6+ Windows-specific TokenMonitor bugs (tray focus, PowerShell popups, window anchor detection, hover oscillation, warning thresholds, bottom edge alignment) and implemented one-click Cursor IDE auto-reconnect with token refresh polling\nTasks Architecture \u0026 Strategy ✅ Root cause diagnosis and fix of Windows hover oscillation bug — Analyzed feedback loop where window resize → position change → fake browser mouseLeave → detail panel toggle → repeat. Implemented three-layer defense: hoveredIdx state check in onLeave timer (300ms delay), observer-driven resize blocking during chartHoverActive, and shrink-guard in applyWindowHeight ✅ Implement Cursor IDE auto-reconnect feature — Added open_cursor_app and retry_cursor_auth Rust IPC commands; implemented frontend button with 4-second polling (max 8 attempts, 32s total) that launches Cursor, auto-detects token refresh, and clears warnings without requiring app restart ✅ Fix tray icon first-click animation failure — Windows tray icon first click shows blank window; second click works. Diagnosed SetFocus race condition where calling thread lacks foreground ownership, implemented SetForegroundWindow (has implicit tray context rights) with 200ms fallback timeout ✅ Implement dynamic window anchor detection — Built anchor detection system (AnchorCorner enum, detect_anchor_corner, AtomicU8 storage) to adapt window positioning to taskbar location and eliminate visual flashing when taskbar is not at bottom ✅ Fix Cursor usage warning false positives — Refined dual-pipeline warning logic to only trigger when both rate limits and usage events APIs fail; downgraded usage events failure from warning to logging when rate limits work correctly ✅ Fix window bottom-edge alignment and transparency gap — Changed anchored_resize_origin to use work.bottom instead of current_rect.bottom for stable anchor during resize; added data-anchor attribute to conditionally remove bottom border-radius when bottom-anchored to eliminate transparent gap with taskbar ✅ Eliminate PowerShell window popups — sqlite3 process spawn in cursor_parser.rs missing CREATE_NO_WINDOW flag, causing console windows to flash on Windows during database operations Implementation \u0026 Fixes ✅ Add ‘x of y enabled’ format to Model Visibility settings — Updated HiddenModelsSettings.svelte to show ‘x of y enabled’ format instead of ‘x hidden’, matching Provider visibility UI for consistency Problems \u0026 Solutions Critical Issues 1. Window height oscillates rapidly (150-200ms cycles) when hovering chart bars, causing detail panel to flash on/off in continuous feedback loop Solution: Implemented three-layer defense: (1) onLeave timer checks hoveredIdx \u003e= 0 to skip fake leaves, (2) ResizeOrchestrator blocks observer-driven resize during chartHoverActive, (3) shrink-guard prevents window from shrinking during hover\nKey Insight: The oscillation was a feedback loop where SetWindowPos changing window position caused browser to fire fake mouseLeave events; breaking the loop required intervention at multiple points, not just blocking resize\n2. SetFocus Win32 API requires calling thread to own foreground window, but tray click handler doesn’t have foreground ownership Solution: Use SetForegroundWindow which has implicit foreground rights in tray icon context, combined with 200ms fallback timer in Svelte to handle edge cases\nKey Insight: Win32 foreground window rules are context-dependent: tray icon events grant foreground permission to SetForegroundWindow but not SetFocus; understanding the context is critical\n3. Window bottom edge drifts from taskbar during resize, creating visual gap; using current_rect.bottom causes bottom edge to jump unpredictably Solution: Changed anchored_resize_origin from current_rect.bottom - height to work.bottom - height; work area boundary is stable constant while current_rect reflects intermediate async SetWindowPos states\nKey Insight: In async window management systems, ‘current state’ queries during rapid changes return intermediate values leading to instability; anchor to fixed reference points (work area bounds) instead of current state\n4. Hardcoded bottom-right anchor causes flashing when taskbar is elsewhere, or window gets repositioned by user or system Solution: Built dynamic anchor detection: compare window center to work area center, store result in AtomicU8, use detected anchor in all positioning functions\nKey Insight: Window anchor must be detected dynamically based on actual position relative to work area, not assumed from default taskbar location\n5. Cursor usage warning appears even when rate limits API works correctly, confusing users about actual connection status Solution: Downgraded remote usage events API failure from set_cursor_warning to logging; only warn when authentication genuinely unavailable (both pipelines fail)\nKey Insight: Multi-tier data pipelines serving different features should fail independently - don’t warn user about one pipeline failure when another works\n6. Mouse position detection using clientX/Y + getBoundingClientRect failed to prevent fake leave events during window movement Solution: Abandoned coordinate-based detection; instead used hoveredIdx state check in timer callback - if hoveredIdx \u003e= 0 after 300ms, a re-enter happened, so skip the leave\nKey Insight: When window moves, pointermove doesn’t fire (mouse didn’t actually move), so tracked coordinates become stale; state-based detection (hoveredIdx) is more reliable than coordinate-based\n7. Users had to manually reopen Cursor and restart TokenMonitor to fix yellow ‘Connected’ warning state when auth token became stale Solution: Implemented open_cursor_app command for cross-platform app launching (macOS open -a, Windows .exe paths, Linux cursor command) and retry_cursor_auth polling mechanism that automatically detects token refresh and clears warnings\nKey Insight: Auto-retry pattern with timer cleanup prevents resource leaks; polling every 4 seconds for ~32 seconds balances responsiveness with resource usage\n8. Window bottom edge showed transparent gap due to 14px border-radius when bottom-anchored to taskbar Solution: Query window anchor direction on startup via get_window_anchor_edge IPC, set data-anchor attribute on , conditionally remove bottom border-radius in CSS when data-anchor=‘bottom’\nKey Insight: Transparent windows with border-radius create visual gaps when edges are meant to align with screen boundaries; need conditional styling based on runtime anchor position\n9. sqlite3 Command spawn missing CREATE_NO_WINDOW flag causes console windows to pop up on Windows Solution: Added const CREATE_NO_WINDOW: u32 = 0x0800_0000 and .creation_flags() call with #[cfg(target_os = “windows”)] guard to cursor_parser.rs\nKey Insight: All Windows process spawns need explicit CREATE_NO_WINDOW flag; one missed spawn in any module breaks entire UX\nHuman vs AI Approaches Strategic Level Bottom edge ’not moving’ interpretation Role Approach Human Clarified ‘bottom edge not moving’ means both window bottom AND content bottom (cache text) should stay visually fixed on screen, not just window bottom coordinate staying constant in logs AI Initially interpreted as window.bottom coordinate staying constant in logs, missing the visual/content positioning aspect Difference Analysis: Human focused on end-user visual experience, AI focused on technical measurements; highlights importance of understanding user intent behind technical requirements\nIterative debugging vs complete solution attempts Role Approach Human Repeatedly asked to check logs, describe current changes, and verify specific behaviors step-by-step before implementing fixes AI Attempted to implement complete solutions based on hypotheses without confirming intermediate diagnostic data Difference Analysis: Human preferred incremental validation of hypotheses, AI tended toward ‘complete fix’ implementations; human’s approach prevented wasted effort on wrong assumptions\nCursor warning conditions and user experience Role Approach Human Recognized that if rate limits work, warning is wrong - ‘working’ means ‘don’t warn’ regardless of internal pipeline details; applied holistic UX reasoning AI Explained dual pipeline architecture accurately but didn’t immediately suggest changing warning threshold until user pointed out UX gap Difference Analysis: Human applied holistic UX reasoning (working feature = no warning); AI focused on technical accuracy without synthesizing UX implication\nSymptom description vs root cause focus Role Approach Human Emphasized clear symptom description (‘window jumps up and down rapidly’) before diving into root cause; requested focus on visual behavior user experiences AI Initially jumped to root cause analysis and technical implementation details without clearly articulating the user-facing symptom Difference Analysis: Human wanted clear problem statement first (what user sees), AI defaulted to technical diagnosis mode; human’s approach ensures alignment on what we’re actually fixing\nUser experience improvement for Cursor connection issues Role Approach Human Identified opportunity to add a button that opens Cursor and auto-detects when connection is restored, eliminating restart requirement AI Focused on technical exploration of existing code patterns (connection status, IPC mechanisms, platform-specific launching) and implementation planning Difference Analysis: Human prioritized end-user pain point elimination; AI translated the UX goal into technical architecture with cross-platform considerations\nAI Limitations Critical Limitations Initially focused on preventing resize rather than understanding that the oscillation was caused by fake mouseLeave events from window movement, not from resize itself; took multiple turns to identify the feedback loop Over-reliance on log analysis without seeing actual console output; added console.warn logs but couldn’t verify if chartHoverActive was actually being set without user manually checking devtools Made multiple attempts to modify aligned_window_origin before fully understanding the difference between ‘initial positioning’ vs ‘resize-time repositioning’ and the async nature of SetWindowPos Attempted complex coordinate-based mouse position detection (clientX/Y + getBoundingClientRect) without recognizing that pointermove doesn’t fire when only window moves, leading to stale coordinate tracking Didn’t immediately connect ‘rate limits working’ to ‘warning threshold wrong’ - required user to explicitly point out the UX gap between technical correctness and user-facing behavior Learnings Key Learnings Feedback loops in UI systems can have non-obvious triggers: window resize → position change → browser event → state change → resize. Breaking the loop requires identifying correct intervention points at multiple layers Win32 foreground window rules are context-dependent: SetFocus requires calling thread to own foreground, but SetForegroundWindow has implicit rights from tray icon event context - critical for system tray applications Async window management (SetWindowPos) means ‘current state’ queries (GetWindowRect) during rapid changes return intermediate values; stable anchors (work area bounds) are more reliable than querying current state Browser mouse events during window movement are ‘fake’ from user perspective but ‘real’ from browser perspective; need state-based rather than coordinate-based detection to distinguish genuine user actions from window-movement artifacts Multi-tier data pipeline design: when pipelines serve different features (rate limits vs usage events), failure handling should reflect feature independence - don’t block one feature for another’s failure Svelte 5 reactivity timing: $state updates queue DOM changes in micro-tasks, but CustomEvent dispatch is synchronous - can cause race conditions when measurements happen before DOM updates Auto-retry pattern design: use onDestroy/cleanup to prevent timer leaks; balance polling frequency (4s) and max attempts (8) for 32-second window that covers typical auth refresh time Transparent windows with border-radius require careful consideration of anchor position to avoid visual gaps at screen edges; conditional styling based on runtime anchor detection solves this Tauri v2 IPC command pattern: define Rust command with #[tauri::command], register in invoke_handler, call from frontend with invoke(); requires platform-specific handling for external app launching Conversation Summaries ✅ Windows hover oscillation bug - root cause diagnosis and multi-layer fix 05:35:35.315 | claude_code Diagnosed Windows-specific bug where hovering chart bars caused rapid window oscillation (150-200ms cycles between 1244↔1337↔1364px). Identified feedback loop: window resize → position change → fake browser mouseLeave → detail panel toggle → repeat. Attempted multiple solutions including coordinate-based detection before arriving at three-layer defense: hoveredIdx state check in onLeave timer (300ms delay), observer-driven resize blocking during hover, and shrink-guard in applyWindowHeight. Also fixed bottom-edge transparency gap by conditionally removing border-radius based on anchor direction.\n✅ Cursor IDE auto-reconnect feature with token refresh 05:38:14.862 | claude_code Designed and implemented one-click fix for Cursor yellow warning state. Added Rust commands: open_cursor_app (cross-platform app launching) and retry_cursor_auth (token refresh + warning clear). Frontend: button triggers Cursor launch, then polls every 4s (max 8 attempts) until token refreshes. Auto-clears warnings and usage cache when auth succeeds. Includes timer cleanup on component destroy.\n✅ Fix Windows tray icon first-click animation failure 05:39:18.949 | claude_code Diagnosed race condition where tray icon first click shows blank window (second click works). Root cause: SplashScreen.svelte animation depends on window focus event, but Win32 SetFocus API requires calling thread to own foreground. Implemented dual fix: Rust-side SetForegroundWindow (has implicit foreground rights in tray context) + frontend 200ms fallback timer. Verified with cargo check + 422 passing tests.\n✅ Implement adaptive window anchor for taskbar position 05:43:36.127 | claude_code User reported window visual flashing when taskbar not at bottom or window gets repositioned. Built complete anchor detection system: AnchorCorner enum (TopLeft/TopRight/BottomLeft/BottomRight), detect_anchor_corner() comparing window/work area centers, AtomicU8 storage, updated aligned_window_origin and anchored_resize_origin to use detected anchor. Added 5 anchor detection tests. Fixed clippy warning (.map_or → .is_some_and). All 422 tests passed.\n✅ Fix false ‘usage warning’ when rate limits work 18:23:28.135 | claude_code User noticed ‘Usage warning’ appears despite Cursor rate limits displaying correctly. Analyzed dual Cursor pipeline: rate limits API (working) vs usage events API (returning empty array). User pointed out that working rate limits means warning is wrong. Modified parser.rs to downgrade remote usage events failure from set_cursor_warning to logging. Now only warns when auth genuinely unavailable (both pipelines fail).\n✅ Fix PowerShell window popups from sqlite3 calls 04:56:21.981 | claude_code User reported multiple PowerShell windows popping up when running TokenMonitor on Windows. Explored all process spawns in Rust backend, found sqlite3 command in cursor_parser.rs:490 missing CREATE_NO_WINDOW flag (all other spawns had it). Added const CREATE_NO_WINDOW with platform guard and creation_flags call. Verified with 410 passing tests.\n✅ Add ‘x of y enabled’ format to Model Visibility 05:36:52.157 | claude_code User requested consistency between Provider and Model visibility sections in Settings. Modified HiddenModelsSettings.svelte to show ‘x of y enabled’ instead of ‘x hidden’, changing derived calculation from hiddenCount to visibleCount and updating template text.\nToken Usage Total: $113.70 — 129.6M tokens\n",
+  "wordCount" : "2261",
+  "inLanguage": "en",
+  "datePublished": "2026-04-27T00:00:00-05:00",
+  "dateModified": "2026-04-27T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-04-27/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-27/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/'>Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-04-27
+    </h1>
+    <div class="post-meta"><span title='2026-04-27 00:00:00 -0500 -0500'>April 27, 2026</span>&nbsp;·&nbsp;<span>11 min</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="daily-report--2026-04-27">Daily Report — 2026-04-27<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-04-27">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Debugged and resolved critical Windows platform bugs in TokenMonitor system tray application affecting window focus, process spawning, positioning, hover behavior, warning logic, and visual alignment; also built automated Cursor IDE connection recovery feature</li>
+<li><strong>How it was done:</strong> Combined Win32 API analysis (SetForegroundWindow foreground rights, CREATE_NO_WINDOW flags, work area calculations), multi-layer hover oscillation defense (state-based fake event detection, observer blocking, shrink guards), Rust IPC command additions (open_cursor_app, retry_cursor_auth), and data pipeline logic refinements (dual API fallback, auto-retry polling)</li>
+<li><strong>Impact:</strong> Eliminates all major Windows visual glitches and false positive warnings, breaks feedback loops causing rapid oscillation, automates connection recovery without app restart, and moves TokenMonitor toward production-ready cross-platform support</li>
+</ul>
+<blockquote>
+<p>Fixed 6+ Windows-specific TokenMonitor bugs (tray focus, PowerShell popups, window anchor detection, hover oscillation, warning thresholds, bottom edge alignment) and implemented one-click Cursor IDE auto-reconnect with token refresh polling</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>✅ <strong>Root cause diagnosis and fix of Windows hover oscillation bug</strong> — Analyzed feedback loop where window resize → position change → fake browser mouseLeave → detail panel toggle → repeat. Implemented three-layer defense: hoveredIdx state check in onLeave timer (300ms delay), observer-driven resize blocking during chartHoverActive, and shrink-guard in applyWindowHeight</li>
+<li>✅ <strong>Implement Cursor IDE auto-reconnect feature</strong> — Added open_cursor_app and retry_cursor_auth Rust IPC commands; implemented frontend button with 4-second polling (max 8 attempts, 32s total) that launches Cursor, auto-detects token refresh, and clears warnings without requiring app restart</li>
+<li>✅ <strong>Fix tray icon first-click animation failure</strong> — Windows tray icon first click shows blank window; second click works. Diagnosed SetFocus race condition where calling thread lacks foreground ownership, implemented SetForegroundWindow (has implicit tray context rights) with 200ms fallback timeout</li>
+<li>✅ <strong>Implement dynamic window anchor detection</strong> — Built anchor detection system (AnchorCorner enum, detect_anchor_corner, AtomicU8 storage) to adapt window positioning to taskbar location and eliminate visual flashing when taskbar is not at bottom</li>
+<li>✅ <strong>Fix Cursor usage warning false positives</strong> — Refined dual-pipeline warning logic to only trigger when both rate limits and usage events APIs fail; downgraded usage events failure from warning to logging when rate limits work correctly</li>
+<li>✅ <strong>Fix window bottom-edge alignment and transparency gap</strong> — Changed anchored_resize_origin to use work.bottom instead of current_rect.bottom for stable anchor during resize; added data-anchor attribute to conditionally remove bottom border-radius when bottom-anchored to eliminate transparent gap with taskbar</li>
+<li>✅ <strong>Eliminate PowerShell window popups</strong> — sqlite3 process spawn in cursor_parser.rs missing CREATE_NO_WINDOW flag, causing console windows to flash on Windows during database operations</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>✅ <strong>Add &lsquo;x of y enabled&rsquo; format to Model Visibility settings</strong> — Updated HiddenModelsSettings.svelte to show &lsquo;x of y enabled&rsquo; format instead of &lsquo;x hidden&rsquo;, matching Provider visibility UI for consistency</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-window-height-oscillates-rapidly-150-200ms-cycles-when-hovering-chart-bars-causing-detail-panel-to-flash-onoff-in-continuous-feedback-loop">1. Window height oscillates rapidly (150-200ms cycles) when hovering chart bars, causing detail panel to flash on/off in continuous feedback loop<a hidden class="anchor" aria-hidden="true" href="#1-window-height-oscillates-rapidly-150-200ms-cycles-when-hovering-chart-bars-causing-detail-panel-to-flash-onoff-in-continuous-feedback-loop">#</a></h4>
+<p><strong>Solution:</strong> Implemented three-layer defense: (1) onLeave timer checks hoveredIdx &gt;= 0 to skip fake leaves, (2) ResizeOrchestrator blocks observer-driven resize during chartHoverActive, (3) shrink-guard prevents window from shrinking during hover</p>
+<p><strong>Key Insight:</strong> The oscillation was a feedback loop where SetWindowPos changing window position caused browser to fire fake mouseLeave events; breaking the loop required intervention at multiple points, not just blocking resize</p>
+<h4 id="2-setfocus-win32-api-requires-calling-thread-to-own-foreground-window-but-tray-click-handler-doesnt-have-foreground-ownership">2. SetFocus Win32 API requires calling thread to own foreground window, but tray click handler doesn&rsquo;t have foreground ownership<a hidden class="anchor" aria-hidden="true" href="#2-setfocus-win32-api-requires-calling-thread-to-own-foreground-window-but-tray-click-handler-doesnt-have-foreground-ownership">#</a></h4>
+<p><strong>Solution:</strong> Use SetForegroundWindow which has implicit foreground rights in tray icon context, combined with 200ms fallback timer in Svelte to handle edge cases</p>
+<p><strong>Key Insight:</strong> Win32 foreground window rules are context-dependent: tray icon events grant foreground permission to SetForegroundWindow but not SetFocus; understanding the context is critical</p>
+<h4 id="3-window-bottom-edge-drifts-from-taskbar-during-resize-creating-visual-gap-using-current_rectbottom-causes-bottom-edge-to-jump-unpredictably">3. Window bottom edge drifts from taskbar during resize, creating visual gap; using current_rect.bottom causes bottom edge to jump unpredictably<a hidden class="anchor" aria-hidden="true" href="#3-window-bottom-edge-drifts-from-taskbar-during-resize-creating-visual-gap-using-current_rectbottom-causes-bottom-edge-to-jump-unpredictably">#</a></h4>
+<p><strong>Solution:</strong> Changed anchored_resize_origin from current_rect.bottom - height to work.bottom - height; work area boundary is stable constant while current_rect reflects intermediate async SetWindowPos states</p>
+<p><strong>Key Insight:</strong> In async window management systems, &lsquo;current state&rsquo; queries during rapid changes return intermediate values leading to instability; anchor to fixed reference points (work area bounds) instead of current state</p>
+<h4 id="4-hardcoded-bottom-right-anchor-causes-flashing-when-taskbar-is-elsewhere-or-window-gets-repositioned-by-user-or-system">4. Hardcoded bottom-right anchor causes flashing when taskbar is elsewhere, or window gets repositioned by user or system<a hidden class="anchor" aria-hidden="true" href="#4-hardcoded-bottom-right-anchor-causes-flashing-when-taskbar-is-elsewhere-or-window-gets-repositioned-by-user-or-system">#</a></h4>
+<p><strong>Solution:</strong> Built dynamic anchor detection: compare window center to work area center, store result in AtomicU8, use detected anchor in all positioning functions</p>
+<p><strong>Key Insight:</strong> Window anchor must be detected dynamically based on actual position relative to work area, not assumed from default taskbar location</p>
+<h4 id="5-cursor-usage-warning-appears-even-when-rate-limits-api-works-correctly-confusing-users-about-actual-connection-status">5. Cursor usage warning appears even when rate limits API works correctly, confusing users about actual connection status<a hidden class="anchor" aria-hidden="true" href="#5-cursor-usage-warning-appears-even-when-rate-limits-api-works-correctly-confusing-users-about-actual-connection-status">#</a></h4>
+<p><strong>Solution:</strong> Downgraded remote usage events API failure from set_cursor_warning to logging; only warn when authentication genuinely unavailable (both pipelines fail)</p>
+<p><strong>Key Insight:</strong> Multi-tier data pipelines serving different features should fail independently - don&rsquo;t warn user about one pipeline failure when another works</p>
+<h4 id="6-mouse-position-detection-using-clientxy--getboundingclientrect-failed-to-prevent-fake-leave-events-during-window-movement">6. Mouse position detection using clientX/Y + getBoundingClientRect failed to prevent fake leave events during window movement<a hidden class="anchor" aria-hidden="true" href="#6-mouse-position-detection-using-clientxy--getboundingclientrect-failed-to-prevent-fake-leave-events-during-window-movement">#</a></h4>
+<p><strong>Solution:</strong> Abandoned coordinate-based detection; instead used hoveredIdx state check in timer callback - if hoveredIdx &gt;= 0 after 300ms, a re-enter happened, so skip the leave</p>
+<p><strong>Key Insight:</strong> When window moves, pointermove doesn&rsquo;t fire (mouse didn&rsquo;t actually move), so tracked coordinates become stale; state-based detection (hoveredIdx) is more reliable than coordinate-based</p>
+<h4 id="7-users-had-to-manually-reopen-cursor-and-restart-tokenmonitor-to-fix-yellow-connected-warning-state-when-auth-token-became-stale">7. Users had to manually reopen Cursor and restart TokenMonitor to fix yellow &lsquo;Connected&rsquo; warning state when auth token became stale<a hidden class="anchor" aria-hidden="true" href="#7-users-had-to-manually-reopen-cursor-and-restart-tokenmonitor-to-fix-yellow-connected-warning-state-when-auth-token-became-stale">#</a></h4>
+<p><strong>Solution:</strong> Implemented open_cursor_app command for cross-platform app launching (macOS open -a, Windows .exe paths, Linux cursor command) and retry_cursor_auth polling mechanism that automatically detects token refresh and clears warnings</p>
+<p><strong>Key Insight:</strong> Auto-retry pattern with timer cleanup prevents resource leaks; polling every 4 seconds for ~32 seconds balances responsiveness with resource usage</p>
+<h4 id="8-window-bottom-edge-showed-transparent-gap-due-to-14px-border-radius-when-bottom-anchored-to-taskbar">8. Window bottom edge showed transparent gap due to 14px border-radius when bottom-anchored to taskbar<a hidden class="anchor" aria-hidden="true" href="#8-window-bottom-edge-showed-transparent-gap-due-to-14px-border-radius-when-bottom-anchored-to-taskbar">#</a></h4>
+<p><strong>Solution:</strong> Query window anchor direction on startup via get_window_anchor_edge IPC, set data-anchor attribute on <html>, conditionally remove bottom border-radius in CSS when data-anchor=&lsquo;bottom&rsquo;</p>
+<p><strong>Key Insight:</strong> Transparent windows with border-radius create visual gaps when edges are meant to align with screen boundaries; need conditional styling based on runtime anchor position</p>
+<h4 id="9-sqlite3-command-spawn-missing-create_no_window-flag-causes-console-windows-to-pop-up-on-windows">9. sqlite3 Command spawn missing CREATE_NO_WINDOW flag causes console windows to pop up on Windows<a hidden class="anchor" aria-hidden="true" href="#9-sqlite3-command-spawn-missing-create_no_window-flag-causes-console-windows-to-pop-up-on-windows">#</a></h4>
+<p><strong>Solution:</strong> Added const CREATE_NO_WINDOW: u32 = 0x0800_0000 and .creation_flags() call with #[cfg(target_os = &ldquo;windows&rdquo;)] guard to cursor_parser.rs</p>
+<p><strong>Key Insight:</strong> All Windows process spawns need explicit CREATE_NO_WINDOW flag; one missed spawn in any module breaks entire UX</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
+<h4 id="bottom-edge-not-moving-interpretation">Bottom edge &rsquo;not moving&rsquo; interpretation<a hidden class="anchor" aria-hidden="true" href="#bottom-edge-not-moving-interpretation">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Clarified &lsquo;bottom edge not moving&rsquo; means both window bottom AND content bottom (cache text) should stay visually fixed on screen, not just window bottom coordinate staying constant in logs</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Initially interpreted as window.bottom coordinate staying constant in logs, missing the visual/content positioning aspect</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human focused on end-user visual experience, AI focused on technical measurements; highlights importance of understanding user intent behind technical requirements</p>
+<h4 id="iterative-debugging-vs-complete-solution-attempts">Iterative debugging vs complete solution attempts<a hidden class="anchor" aria-hidden="true" href="#iterative-debugging-vs-complete-solution-attempts">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Repeatedly asked to check logs, describe current changes, and verify specific behaviors step-by-step before implementing fixes</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Attempted to implement complete solutions based on hypotheses without confirming intermediate diagnostic data</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human preferred incremental validation of hypotheses, AI tended toward &lsquo;complete fix&rsquo; implementations; human&rsquo;s approach prevented wasted effort on wrong assumptions</p>
+<h4 id="cursor-warning-conditions-and-user-experience">Cursor warning conditions and user experience<a hidden class="anchor" aria-hidden="true" href="#cursor-warning-conditions-and-user-experience">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Recognized that if rate limits work, warning is wrong - &lsquo;working&rsquo; means &lsquo;don&rsquo;t warn&rsquo; regardless of internal pipeline details; applied holistic UX reasoning</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Explained dual pipeline architecture accurately but didn&rsquo;t immediately suggest changing warning threshold until user pointed out UX gap</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human applied holistic UX reasoning (working feature = no warning); AI focused on technical accuracy without synthesizing UX implication</p>
+<h4 id="symptom-description-vs-root-cause-focus">Symptom description vs root cause focus<a hidden class="anchor" aria-hidden="true" href="#symptom-description-vs-root-cause-focus">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Emphasized clear symptom description (&lsquo;window jumps up and down rapidly&rsquo;) before diving into root cause; requested focus on visual behavior user experiences</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Initially jumped to root cause analysis and technical implementation details without clearly articulating the user-facing symptom</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human wanted clear problem statement first (what user sees), AI defaulted to technical diagnosis mode; human&rsquo;s approach ensures alignment on what we&rsquo;re actually fixing</p>
+<h4 id="user-experience-improvement-for-cursor-connection-issues">User experience improvement for Cursor connection issues<a hidden class="anchor" aria-hidden="true" href="#user-experience-improvement-for-cursor-connection-issues">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>Identified opportunity to add a button that opens Cursor and auto-detects when connection is restored, eliminating restart requirement</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>Focused on technical exploration of existing code patterns (connection status, IPC mechanisms, platform-specific launching) and implementation planning</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human prioritized end-user pain point elimination; AI translated the UX goal into technical architecture with cross-platform considerations</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="critical-limitations">Critical Limitations<a hidden class="anchor" aria-hidden="true" href="#critical-limitations">#</a></h3>
+<ul>
+<li>Initially focused on preventing resize rather than understanding that the oscillation was caused by fake mouseLeave events from window movement, not from resize itself; took multiple turns to identify the feedback loop</li>
+<li>Over-reliance on log analysis without seeing actual console output; added console.warn logs but couldn&rsquo;t verify if chartHoverActive was actually being set without user manually checking devtools</li>
+<li>Made multiple attempts to modify aligned_window_origin before fully understanding the difference between &lsquo;initial positioning&rsquo; vs &lsquo;resize-time repositioning&rsquo; and the async nature of SetWindowPos</li>
+<li>Attempted complex coordinate-based mouse position detection (clientX/Y + getBoundingClientRect) without recognizing that pointermove doesn&rsquo;t fire when only window moves, leading to stale coordinate tracking</li>
+<li>Didn&rsquo;t immediately connect &lsquo;rate limits working&rsquo; to &lsquo;warning threshold wrong&rsquo; - required user to explicitly point out the UX gap between technical correctness and user-facing behavior</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>Feedback loops in UI systems can have non-obvious triggers: window resize → position change → browser event → state change → resize. Breaking the loop requires identifying correct intervention points at multiple layers</li>
+<li>Win32 foreground window rules are context-dependent: SetFocus requires calling thread to own foreground, but SetForegroundWindow has implicit rights from tray icon event context - critical for system tray applications</li>
+<li>Async window management (SetWindowPos) means &lsquo;current state&rsquo; queries (GetWindowRect) during rapid changes return intermediate values; stable anchors (work area bounds) are more reliable than querying current state</li>
+<li>Browser mouse events during window movement are &lsquo;fake&rsquo; from user perspective but &lsquo;real&rsquo; from browser perspective; need state-based rather than coordinate-based detection to distinguish genuine user actions from window-movement artifacts</li>
+<li>Multi-tier data pipeline design: when pipelines serve different features (rate limits vs usage events), failure handling should reflect feature independence - don&rsquo;t block one feature for another&rsquo;s failure</li>
+<li>Svelte 5 reactivity timing: $state updates queue DOM changes in micro-tasks, but CustomEvent dispatch is synchronous - can cause race conditions when measurements happen before DOM updates</li>
+<li>Auto-retry pattern design: use onDestroy/cleanup to prevent timer leaks; balance polling frequency (4s) and max attempts (8) for 32-second window that covers typical auth refresh time</li>
+<li>Transparent windows with border-radius require careful consideration of anchor position to avoid visual gaps at screen edges; conditional styling based on runtime anchor detection solves this</li>
+<li>Tauri v2 IPC command pattern: define Rust command with #[tauri::command], register in invoke_handler, call from frontend with invoke(); requires platform-specific handling for external app launching</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<p><strong>✅ Windows hover oscillation bug - root cause diagnosis and multi-layer fix</strong>
+<em>05:35:35.315 | claude_code</em>
+Diagnosed Windows-specific bug where hovering chart bars caused rapid window oscillation (150-200ms cycles between 1244↔1337↔1364px). Identified feedback loop: window resize → position change → fake browser mouseLeave → detail panel toggle → repeat. Attempted multiple solutions including coordinate-based detection before arriving at three-layer defense: hoveredIdx state check in onLeave timer (300ms delay), observer-driven resize blocking during hover, and shrink-guard in applyWindowHeight. Also fixed bottom-edge transparency gap by conditionally removing border-radius based on anchor direction.</p>
+<p><strong>✅ Cursor IDE auto-reconnect feature with token refresh</strong>
+<em>05:38:14.862 | claude_code</em>
+Designed and implemented one-click fix for Cursor yellow warning state. Added Rust commands: open_cursor_app (cross-platform app launching) and retry_cursor_auth (token refresh + warning clear). Frontend: button triggers Cursor launch, then polls every 4s (max 8 attempts) until token refreshes. Auto-clears warnings and usage cache when auth succeeds. Includes timer cleanup on component destroy.</p>
+<p><strong>✅ Fix Windows tray icon first-click animation failure</strong>
+<em>05:39:18.949 | claude_code</em>
+Diagnosed race condition where tray icon first click shows blank window (second click works). Root cause: SplashScreen.svelte animation depends on window focus event, but Win32 SetFocus API requires calling thread to own foreground. Implemented dual fix: Rust-side SetForegroundWindow (has implicit foreground rights in tray context) + frontend 200ms fallback timer. Verified with cargo check + 422 passing tests.</p>
+<p><strong>✅ Implement adaptive window anchor for taskbar position</strong>
+<em>05:43:36.127 | claude_code</em>
+User reported window visual flashing when taskbar not at bottom or window gets repositioned. Built complete anchor detection system: AnchorCorner enum (TopLeft/TopRight/BottomLeft/BottomRight), detect_anchor_corner() comparing window/work area centers, AtomicU8 storage, updated aligned_window_origin and anchored_resize_origin to use detected anchor. Added 5 anchor detection tests. Fixed clippy warning (.map_or → .is_some_and). All 422 tests passed.</p>
+<p><strong>✅ Fix false &lsquo;usage warning&rsquo; when rate limits work</strong>
+<em>18:23:28.135 | claude_code</em>
+User noticed &lsquo;Usage warning&rsquo; appears despite Cursor rate limits displaying correctly. Analyzed dual Cursor pipeline: rate limits API (working) vs usage events API (returning empty array). User pointed out that working rate limits means warning is wrong. Modified parser.rs to downgrade remote usage events failure from set_cursor_warning to logging. Now only warns when auth genuinely unavailable (both pipelines fail).</p>
+<p><strong>✅ Fix PowerShell window popups from sqlite3 calls</strong>
+<em>04:56:21.981 | claude_code</em>
+User reported multiple PowerShell windows popping up when running TokenMonitor on Windows. Explored all process spawns in Rust backend, found sqlite3 command in cursor_parser.rs:490 missing CREATE_NO_WINDOW flag (all other spawns had it). Added const CREATE_NO_WINDOW with platform guard and creation_flags call. Verified with 410 passing tests.</p>
+<p><strong>✅ Add &lsquo;x of y enabled&rsquo; format to Model Visibility</strong>
+<em>05:36:52.157 | claude_code</em>
+User requested consistency between Provider and Model visibility sections in Settings. Modified HiddenModelsSettings.svelte to show &lsquo;x of y enabled&rsquo; instead of &lsquo;x hidden&rsquo;, changing derived calculation from hiddenCount to visibleCount and updating template text.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-04-27-usage.png"></p>
+<p><strong>Total: $113.70</strong> — 129.6M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

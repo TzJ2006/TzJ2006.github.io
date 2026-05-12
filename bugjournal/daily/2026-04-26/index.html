@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Bug Journal 2026-04-26 | TzJ&#39;s Net</title>
+<meta name="keywords" content="Bug Journal">
+<meta name="description" content="Fixed Tauri development environment on Linux and attempted to sync feature branch with upstream v0.11.1, encountering 29 merge conflicts">
+<meta name="author" content="">
+<link rel="canonical" href="https://tzj2006.github.io/bugjournal/daily/2026-04-26/">
+<link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://tzj2006.github.io/images/icon2.png">
+<link rel="apple-touch-icon" href="https://tzj2006.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://tzj2006.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://tzj2006.github.io/bugjournal/daily/2026-04-26/">
+<link rel="alternate" hreflang="zh" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-26/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<script>
+(function() {
+    try { var stored = localStorage.getItem("pref-lang"); } catch(e) { return; }
+    if (!stored) return;
+    var current = document.documentElement.lang.split("-")[0];
+    if (stored === current) return;
+    var alt = document.querySelector('link[rel="alternate"][hreflang="' + stored + '"]');
+    if (alt && alt.href && alt.href !== window.location.href) window.location.replace(alt.href);
+})();
+</script>
+<meta property="og:url" content="https://tzj2006.github.io/bugjournal/daily/2026-04-26/">
+  <meta property="og:site_name" content="TzJ&#39;s Net">
+  <meta property="og:title" content="Bug Journal 2026-04-26">
+  <meta property="og:description" content="Fixed Tauri development environment on Linux and attempted to sync feature branch with upstream v0.11.1, encountering 29 merge conflicts">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="bugjournal">
+    <meta property="article:published_time" content="2026-04-26T00:00:00-05:00">
+    <meta property="article:modified_time" content="2026-04-26T00:00:00-05:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bug Journal 2026-04-26">
+  <meta name="twitter:description" content="Fixed Tauri development environment on Linux and attempted to sync feature branch with upstream v0.11.1, encountering 29 merge conflicts">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Bug Journal",
+      "item": "https://tzj2006.github.io/bugjournal/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Bug Journal 2026-04-26",
+      "item": "https://tzj2006.github.io/bugjournal/daily/2026-04-26/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Bug Journal 2026-04-26",
+  "name": "Bug Journal 2026-04-26",
+  "description": "Fixed Tauri development environment on Linux and attempted to sync feature branch with upstream v0.11.1, encountering 29 merge conflicts",
+  "keywords": [
+    "Bug Journal"
+  ],
+  "articleBody": "Daily Report — 2026-04-26 Daily Overview What was done: Resolved cross-platform Tauri CLI native binding issues and initiated branch version sync from 0.10.6 to 0.11.1 How it was done: Clean reinstalled node_modules to pull Linux binaries, used git fetch + stash + merge workflow to integrate upstream changes Impact: Development environment functional for Linux, but merge conflicts require manual resolution before completing version upgrade Fixed Tauri development environment on Linux and attempted to sync feature branch with upstream v0.11.1, encountering 29 merge conflicts\nTasks Architecture \u0026 Strategy ❌ Sync feat/fast-mode-support branch to v0.11.1 — Merged origin/main (v0.11.1) into feature branch but encountered 29 merge conflicts across Rust, TypeScript, Svelte, and config files Implementation \u0026 Fixes ✅ Fix Tauri development environment on Linux — Resolved missing node_modules and native binding issues preventing npm run tauri dev from running on Linux Problems \u0026 Solutions Critical Issues 1. Feature branch stuck at v0.10.6 while main progressed to v0.11.1 Solution: Executed git fetch origin \u0026\u0026 git stash \u0026\u0026 git merge origin/main, resulting in 29 merge conflicts requiring manual resolution\nKey Insight: Long-lived feature branches accumulate significant divergence; regular rebasing would prevent large conflict sets\nGeneral Issues 2. @tauri-apps/cli native binding missing for Linux x64 (cli.linux-x64-gnu.node) Solution: Deleted node_modules and package-lock.json, reinstalled to pull correct platform-specific binaries\nKey Insight: Cross-platform development on NTFS partition caused Windows binaries to be cached; clean install pulls correct Linux native modules\n3. npm run tauri dev failed with ’tauri: not found’ error Solution: Ran npm install to populate node_modules with Tauri CLI dependencies\nKey Insight: Basic environment setup step was missing - node_modules directory did not exist\nHuman vs AI Approaches Implementation Level Version discrepancy detection Role Approach Human User noticed running app showed v0.10.6 despite expecting v0.11.1, prompting investigation AI AI checked package.json, Cargo.toml, tauri.conf.json and git history to diagnose the branch divergence Difference Analysis: Human caught the version mismatch through UI observation; AI performed systematic file/git analysis to explain root cause\nAI Limitations Critical Limitations AI suggested git stash + merge workflow without warning about potential merge conflicts, leading to 29 unresolved conflicts that interrupted the user’s workflow General Limitations Two authentication failures at session start (‘Your organization does not have access to Claude’) with no diagnostic context or recovery suggestion Learnings Key Learnings Node.js native modules are platform-specific; cross-platform development on shared NTFS partitions requires clean reinstalls when switching OS to pull correct binaries Feature branches forked from v0.10.6 that remain unsynced while main advances to v0.11.1 will accumulate significant merge conflicts (29 files in this case) Conversation Summaries 🔄 Sync feature branch to upstream v0.11.1 05:29:56.374 | claude_code User noticed app version 0.10.6 instead of expected 0.11.1. Investigation revealed feat/fast-mode-support branch diverged from main at v0.10.6, while origin/main advanced to v0.11.1. Attempted git stash + merge origin/main workflow; merge succeeded but git stash pop triggered 29 merge conflicts. User interrupted before conflict resolution.\n✅ Fix Tauri CLI native binding for Linux 05:24:21.805 | claude_code After npm install, Tauri CLI failed with missing @tauri-apps/cli-linux-x64-gnu module. Diagnosed as cross-platform issue (Windows NTFS binaries cached). Deleted node_modules and package-lock.json, reinstalled successfully. Verified with tauri-cli 2.10.1 working.\n✅ Troubleshoot npm run tauri dev failure 05:34:06.462 | claude_code User unable to run Tauri dev server. AI identified missing node_modules directory as root cause. Solution: run npm install to populate dependencies.\nToken Usage Total: $3.16 — 1.3M tokens\n",
+  "wordCount" : "557",
+  "inLanguage": "en",
+  "datePublished": "2026-04-26T00:00:00-05:00",
+  "dateModified": "2026-04-26T00:00:00-05:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://tzj2006.github.io/bugjournal/daily/2026-04-26/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "TzJ's Net",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://tzj2006.github.io/images/icon2.png"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://tzj2006.github.io/" accesskey="h" title="TzJ&#39;s Net (Alt + H)">TzJ&#39;s Net</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button><span class="lang-sep">|</span>
+                    <button id="lang-toggle" accesskey="l" title="(Alt + L)" aria-label="Toggle language"
+                        data-current-lang="en"
+                        data-translation-url="https://tzj2006.github.io/zh/bugjournal/daily/2026-04-26/">中文
+                    </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li class="">
+                <a href="https://tzj2006.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li class="has-submenu">
+                <a href="https://tzj2006.github.io/bugjournal/daily/" title="bugJournal">
+                    <span class="active">bugJournal</span>
+                    <span class="submenu-caret" aria-hidden="true">▾</span>
+                </a>
+                <ul class="submenu" aria-label="bugJournal">
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/daily/">
+                            <span>Daily</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/weekly/">
+                            <span>Weekly</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://tzj2006.github.io/bugjournal/monthly/">
+                            <span>Monthly</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/leetcode/" title="leetcode">
+                    <span>leetcode</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/posts/" title="posts &amp; notes">
+                    <span>posts &amp; notes</span>
+                </a>
+            </li>
+            <li class="">
+                <a href="https://tzj2006.github.io/benchmark/" title="benchmark">
+                    <span>benchmark</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    <a href='https://tzj2006.github.io/'>Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="https://tzj2006.github.io/bugjournal/">Bug Journal</a></nav>
+    <h1 class="post-title entry-hint-parent">
+      Bug Journal 2026-04-26
+    </h1>
+    <div class="post-meta"><span title='2026-04-26 00:00:00 -0500 -0500'>April 26, 2026</span>&nbsp;·&nbsp;<span>3 min</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><h1 id="daily-report--2026-04-26">Daily Report — 2026-04-26<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-04-26">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
+<ul>
+<li><strong>What was done:</strong> Resolved cross-platform Tauri CLI native binding issues and initiated branch version sync from 0.10.6 to 0.11.1</li>
+<li><strong>How it was done:</strong> Clean reinstalled node_modules to pull Linux binaries, used git fetch + stash + merge workflow to integrate upstream changes</li>
+<li><strong>Impact:</strong> Development environment functional for Linux, but merge conflicts require manual resolution before completing version upgrade</li>
+</ul>
+<blockquote>
+<p>Fixed Tauri development environment on Linux and attempted to sync feature branch with upstream v0.11.1, encountering 29 merge conflicts</p>
+</blockquote>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
+<ul>
+<li>❌ <strong>Sync feat/fast-mode-support branch to v0.11.1</strong> — Merged origin/main (v0.11.1) into feature branch but encountered 29 merge conflicts across Rust, TypeScript, Svelte, and config files</li>
+</ul>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
+<ul>
+<li>✅ <strong>Fix Tauri development environment on Linux</strong> — Resolved missing node_modules and native binding issues preventing <code>npm run tauri dev</code> from running on Linux</li>
+</ul>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-feature-branch-stuck-at-v0106-while-main-progressed-to-v0111">1. Feature branch stuck at v0.10.6 while main progressed to v0.11.1<a hidden class="anchor" aria-hidden="true" href="#1-feature-branch-stuck-at-v0106-while-main-progressed-to-v0111">#</a></h4>
+<p><strong>Solution:</strong> Executed git fetch origin &amp;&amp; git stash &amp;&amp; git merge origin/main, resulting in 29 merge conflicts requiring manual resolution</p>
+<p><strong>Key Insight:</strong> Long-lived feature branches accumulate significant divergence; regular rebasing would prevent large conflict sets</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="2-tauri-appscli-native-binding-missing-for-linux-x64-clilinux-x64-gnunode">2. @tauri-apps/cli native binding missing for Linux x64 (cli.linux-x64-gnu.node)<a hidden class="anchor" aria-hidden="true" href="#2-tauri-appscli-native-binding-missing-for-linux-x64-clilinux-x64-gnunode">#</a></h4>
+<p><strong>Solution:</strong> Deleted node_modules and package-lock.json, reinstalled to pull correct platform-specific binaries</p>
+<p><strong>Key Insight:</strong> Cross-platform development on NTFS partition caused Windows binaries to be cached; clean install pulls correct Linux native modules</p>
+<h4 id="3-npm-run-tauri-dev-failed-with-tauri-not-found-error">3. npm run tauri dev failed with &rsquo;tauri: not found&rsquo; error<a hidden class="anchor" aria-hidden="true" href="#3-npm-run-tauri-dev-failed-with-tauri-not-found-error">#</a></h4>
+<p><strong>Solution:</strong> Ran npm install to populate node_modules with Tauri CLI dependencies</p>
+<p><strong>Key Insight:</strong> Basic environment setup step was missing - node_modules directory did not exist</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="implementation-level">Implementation Level<a hidden class="anchor" aria-hidden="true" href="#implementation-level">#</a></h3>
+<h4 id="version-discrepancy-detection">Version discrepancy detection<a hidden class="anchor" aria-hidden="true" href="#version-discrepancy-detection">#</a></h4>
+<table>
+  <thead>
+      <tr>
+          <th>Role</th>
+          <th>Approach</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Human</td>
+          <td>User noticed running app showed v0.10.6 despite expecting v0.11.1, prompting investigation</td>
+      </tr>
+      <tr>
+          <td>AI</td>
+          <td>AI checked package.json, Cargo.toml, tauri.conf.json and git history to diagnose the branch divergence</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Difference Analysis:</strong> Human caught the version mismatch through UI observation; AI performed systematic file/git analysis to explain root cause</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="critical-limitations">Critical Limitations<a hidden class="anchor" aria-hidden="true" href="#critical-limitations">#</a></h3>
+<ul>
+<li>AI suggested git stash + merge workflow without warning about potential merge conflicts, leading to 29 unresolved conflicts that interrupted the user&rsquo;s workflow</li>
+</ul>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
+<ul>
+<li>Two authentication failures at session start (&lsquo;Your organization does not have access to Claude&rsquo;) with no diagnostic context or recovery suggestion</li>
+</ul>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
+<ul>
+<li>Node.js native modules are platform-specific; cross-platform development on shared NTFS partitions requires clean reinstalls when switching OS to pull correct binaries</li>
+<li>Feature branches forked from v0.10.6 that remain unsynced while main advances to v0.11.1 will accumulate significant merge conflicts (29 files in this case)</li>
+</ul>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
+<p><strong>🔄 Sync feature branch to upstream v0.11.1</strong>
+<em>05:29:56.374 | claude_code</em>
+User noticed app version 0.10.6 instead of expected 0.11.1. Investigation revealed feat/fast-mode-support branch diverged from main at v0.10.6, while origin/main advanced to v0.11.1. Attempted git stash + merge origin/main workflow; merge succeeded but git stash pop triggered 29 merge conflicts. User interrupted before conflict resolution.</p>
+<p><strong>✅ Fix Tauri CLI native binding for Linux</strong>
+<em>05:24:21.805 | claude_code</em>
+After npm install, Tauri CLI failed with missing @tauri-apps/cli-linux-x64-gnu module. Diagnosed as cross-platform issue (Windows NTFS binaries cached). Deleted node_modules and package-lock.json, reinstalled successfully. Verified with tauri-cli 2.10.1 working.</p>
+<p><strong>✅ Troubleshoot npm run tauri dev failure</strong>
+<em>05:34:06.462 | claude_code</em>
+User unable to run Tauri dev server. AI identified missing node_modules directory as root cause. Solution: run npm install to populate dependencies.</p>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
+<p><img alt="Token Usage" loading="lazy" src="2026-04-26-usage.png"></p>
+<p><strong>Total: $3.16</strong> — 1.3M tokens</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://tzj2006.github.io/">TzJ&#39;s Net</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+<script>
+(function() {
+    var el = document.getElementById("lang-toggle");
+    if (!el) return;
+    el.addEventListener("click", function() {
+        var current = this.getAttribute("data-current-lang");
+        var url = this.getAttribute("data-translation-url");
+        var newLang = (current === "en") ? "zh" : "en";
+        try { localStorage.setItem("pref-lang", newLang); } catch(e) {}
+        if (url) {
+            window.location.href = url;
+        } else {
+            window.location.href = window.location.origin + (newLang === "zh" ? "/zh/" : "/");
+        }
+    });
+})();
+</script>
+
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
