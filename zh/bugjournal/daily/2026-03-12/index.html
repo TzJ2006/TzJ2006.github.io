@@ -7,7 +7,7 @@
 <meta name="robots" content="index, follow">
 <title>Bug Journal 2026-03-12 | TzJ&#39;s Net</title>
 <meta name="keywords" content="Bug Journal">
-<meta name="description" content="修复了 macOS 壁纸应用中的沙盒权限结构问题，同时解决了深度学习评估环境下的 PyTorch 依赖链以及 CUDA 编译方面的问题。">
+<meta name="description" content="修复macOS壁纸应用的沙盒权限架构,并解决深度学习评估环境的PyTorch依赖链和CUDA编译问题">
 <meta name="author" content="">
 <link rel="canonical" href="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-12/">
 <link crossorigin="anonymous" href="https://tzj2006.github.io/assets/css/stylesheet.b46751d62555e7ed0eef9f9d415b90be72c9afc4bd2c5411a5e369593a49856d.css" integrity="sha256-tGdR1iVV5&#43;0O75&#43;dQVuQvnLJr8S9LFQRpeNpWTpJhW0=" rel="preload stylesheet" as="style">
@@ -79,7 +79,7 @@
 <meta property="og:url" content="https://tzj2006.github.io/zh/bugjournal/daily/2026-03-12/">
   <meta property="og:site_name" content="TzJ&#39;s Net">
   <meta property="og:title" content="Bug Journal 2026-03-12">
-  <meta property="og:description" content="修复了 macOS 壁纸应用中的沙盒权限结构问题，同时解决了深度学习评估环境下的 PyTorch 依赖链以及 CUDA 编译方面的问题。">
+  <meta property="og:description" content="修复macOS壁纸应用的沙盒权限架构,并解决深度学习评估环境的PyTorch依赖链和CUDA编译问题">
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="bugjournal">
@@ -88,7 +88,7 @@
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Bug Journal 2026-03-12">
-  <meta name="twitter:description" content="修复了 macOS 壁纸应用中的沙盒权限结构问题，同时解决了深度学习评估环境下的 PyTorch 依赖链以及 CUDA 编译方面的问题。">
+  <meta name="twitter:description" content="修复macOS壁纸应用的沙盒权限架构,并解决深度学习评估环境的PyTorch依赖链和CUDA编译问题">
 
 
 <script type="application/ld+json">
@@ -117,12 +117,12 @@
   "@type": "BlogPosting",
   "headline": "Bug Journal 2026-03-12",
   "name": "Bug Journal 2026-03-12",
-  "description": "修复了 macOS 壁纸应用中的沙盒权限结构问题，同时解决了深度学习评估环境下的 PyTorch 依赖链以及 CUDA 编译方面的问题。",
+  "description": "修复macOS壁纸应用的沙盒权限架构,并解决深度学习评估环境的PyTorch依赖链和CUDA编译问题",
   "keywords": [
     "Bug Journal"
   ],
-  "articleBody": "每日报告 — 2026-03-12 每日总结 已完成的工作： 跨平台解决了3个独立项目的技术问题：macOS壁纸应用的沙盒权限架构升级、GPU监控工具的输出优化，以及深度学习评估环境的依赖链修复。 实施方法： 通过系统级日志分析定位macOS TCC权限机制问题，通过依赖版本矩阵追踪PyTorch生态的ABI兼容性，通过CUDA工具链配置解决C++扩展本地编译环境问题。 影响： macOS应用获得了生产级的文件访问持久化能力，tianhe服务器上的两个研究项目恢复了可运行状态（尽管checkpoint路径问题尚未完全解决）。 MacBook 已完成的工作： 完成desktop-video应用的沙盒迁移和权限系统重构，修复历史记录无法打开旧文件的关键bug。 实施方法： 通过启用App Sandbox使security-scoped bookmark生效，修复书签解析回退逻辑，添加NSOpenPanel重新授权机制。 影响： 用户历史记录功能恢复完整，应用符合macOS最佳实践，为App Store发布铺平道路。 tianhe 已完成的工作： 处理RoboTwin项目的PyTorch环境依赖冲突，解决curobo编译问题，优化GPU监控工具的可读性。 实施方法： 通过pip版本矩阵匹配torch/torchvision，配置conda环境中的CUDA工具链路径(CUDA_HOME和CPATH)，重写进程聚合逻辑限制输出宽度。 影响： 机器人策略评估环境恢复大部分工作能力，GPU资源监控更高效，但checkpoint路径映射问题尚未解决。 修复macOS壁纸应用的沙盒权限架构，并解决深度学习评估环境的PyTorch依赖链和CUDA编译问题\n任务 架构与策略 ✅ 修复macOS壁纸应用历史记录无法打开旧视频 — 启用App Sandbox，修复bookmark解析逻辑（添加non-scoped回退），添加权限错误重试机制（NSOpenPanel重新授权），更新本地化和ChangeLog。 ✅ 修复RoboTwin评估环境torch/torchvision版本冲突 — 升级torchvision从0.21.0到0.22.1+cu126以匹配torch 2.7.1，解决torchvision::nms算子注册失败问题。 ✅ 重新编译curobo以匹配当前PyTorch ABI — 删除旧.so文件，安装ninja编译工具，配置CUDA_HOME和CPATH，通过pip install -e .从源码重新编译。 ❌ 解决RoboTwin checkpoint路径不存在问题 — eval.sh参数指定checkpoint_id=5000但目录中只有15000/25000/29999。开始分析参数映射逻辑时会话被打断。 实施与修复 🔄 优化GPU监控工具输出格式 — 限制宽度为80列，去重进程显示，过滤噪声子进程。用户指出理解偏差后会话被打断。 问题与解决方案 关键问题 1. macOS非沙盒应用无法持久化文件访问权限，历史记录中旧视频报Operation not permitted错误 解决方案： 启用App Sandbox权限(com.apple.security.app-sandbox和files.user-selected.read-write)，修复ensureFileAccess添加non-scoped bookmark回退解析，showVideo/showImage添加NSOpenPanel重新授权机制。\n关键洞察： macOS TCC机制要求App Sandbox才能创建security-scoped bookmark。Non-scoped bookmark只能解析URL但不授予访问权限，导致旧文件无法打开。需要沙盒+降级路径的组合方案。\n2. torch 2.7.1与torchvision 0.21.0 ABI不兼容导致torchvision::nms算子注册失败 解决方案： 升级torchvision到0.22.1+cu126以匹配torch 2.7.1版本。\n关键洞察： torchvision的自定义算子编译时链接torch的C++ API，版本不匹配会导致算子注册接口失效。torchvision 0.21.0对应torch 2.6.x，不能用于torch 2.7.x。\n3. curobo预编译.so文件与当前torch版本ABI不兼容，JIT编译又找不到cuda_runtime.h 解决方案： 删除旧.so文件，安装ninja编译工具，设置CUDA_HOME=/path/to/conda.env和CPATH=/path/to/targets/x86_64-linux/include，通过pip install -e .重新编译。\n关键洞察： PyTorch版本升级后C++扩展需要重新编译。conda环境中pip安装的nvidia包将CUDA headers放在非标准路径(targets/x86_64-linux/include/)，需要正确配置环境变量才能让JIT编译找到。\n一般问题 4. GPU监控工具输出宽度过大且进程重复显示，难以阅读 解决方案： 限制输出为80列，按进程聚合GPU列表，过滤multiprocessing worker等噪声子进程。\n关键洞察： 原始实现按GPU分组导致一个多卡进程在多个GPU下重复出现。需要按进程聚合并在GPU列显示所有使用的卡号。\n人与AI的方法差异 战略层面 macOS文件权限问题的解释深度 角色 方法 人类 直观提问“为什么会权限不足？”，要求AI解释TCC机制和沙盒机制的底层原理 人工智能 给出技术解决方案，但没有主动说明背景原理，需要人类追问才给出完整上下文 差异分析： 人类的问题导向思维引导AI给出了更完整的背景解释，而不是直接跳到解决方案。人类更关注“为什么”，AI更关注“怎么做”。\n修复方案的选择策略 角色 方法 人类 明确选择“两者结合”（沙盒+NSOpenPanel重新授权）的防御性方案 人工智能 提供了两个独立方案（沙盒或重新授权）但没有主动建议组合 差异分析： 人类更倾向于防御性编程（多层保障），人工智能倾向于单一最优方案。人类的组合策略既解决根因又提供降级路径，更鲁棒。\n实施层面 GPU监控工具的需求理解 角色 方法 人类 纠正“每个进程在一个gpu上只显示一次”而非“每个进程只显示一次”，强调多对多关系 人工智能 误解了需求，将多GPU进程聚合为单行，在GPU列显示逗号分隔的卡号 差异分析： 人类更准确理解了进程-GPU的多对多关系显示需求，人工智能过度优化导致信息丢失（一个进程在GPU0和GPU1上的资源使用情况应该分两行显示）\n人工智能的局限性 一般局限性 未能主动解释技术背景（macOS TCC/沙盒机制），需要人类追问才给出完整上下文。人工智能应在提出解决方案时主动说明“为什么”。 误解GPU监控需求，将进程-GPU的多对多关系简化为一对多聚合，导致信息丢失。对复杂数据关系的可视化需求理解不准确。 在checkpoint路径问题分析时，开始过度深入代码细节（连续Read操作）而未先与用户确认问题范围。应该先高层次的了解参数映射逻辑。 学习成果 关键学习点 macOS TCC权限机制：非沙盒应用无法创建security-scoped bookmark，只能创建non-scoped bookmark（仅解析URL不授予权限），导致历史文件访问在app重启后失效。必须启用App Sandbox才能持久化文件访问权限。 PyTorch C++扩展ABI兼容性：torchvision的自定义算子（如torchvision::nms）编译时链接torch的C++ API，版本必须精确匹配（torchvision 0.21→torch 2.6，torchvision 0.22→torch 2.7）。版本不匹配会导致算子注册失败。 conda环境CUDA工具链配置：pip安装的nvidia包将CUDA headers放在targets/x86_64-linux/include/而非标准的include/。JIT编译C++扩展时需要设置CUDA_HOME指向conda env,CPATH包含targets路径。 防御性编程原则：沙盒+重新授权的组合方案比单一方案更鲁棒。沙盒解决根因（持久化权限），NSOpenPanel提供降级路径（临时授权），两者结合保证用户总能访问文件。 对话总结 Desktop Video ✅ 修复历史记录无法打开旧视频的权限问题 07:52:05.359 | claude_code 用户报告历史记录中旧视频无法打开（Operation not permitted Code=257）。通过日志分析发现App未启用沙盒导致security-scoped bookmark创建失败,ensureFileAccess只尝试.withSecurityScope解析导致non-scoped书签永远失败,最终被macOS TCC拒绝访问。实施了三层修复: 启用App Sandbox权限、修复bookmark解析添加non-scoped回退、showVideo/showImage添加NSOpenPanel重新授权机制。完成代码修改、本地化更新和ChangeLog,构建验证通过\nrobobrain GPU monitor 🔄 优化GPU监控工具输出格式 15:48:28.705 | claude_code 用户要求将gpumon.py输出宽度限制为80列并去重进程显示。AI重写了进程表逻辑,将每个进程聚合为一行,GPU列显示逗号分隔的卡号,并过滤掉multiprocessing worker等噪声子进程。用户纠正理解偏差,指出应该是’每个进程在一个gpu上只显示一次’而非聚合显示,会话被打断\nRoboTwin Policy Evaluation 🔄 诊断eval.sh运行失败的依赖冲突 02:23:18.758 | claude_code 用户运行bash eval.sh报错,AI分析出三层依赖问题: 1) torch 2.7.1与torchvision 0.21.0版本不匹配导致torchvision::nms算子注册失败; 2) curobo预编译.so与torch ABI不兼容,JIT编译又缺少ninja; 3) checkpoint路径不存在(参数指定5000但只有15000/25000/29999)。AI提供版本升级方案,用户选择升级torchvision\n🔄 执行依赖修复并解决后续编译问题 02:34:02.614 | claude_code 执行修复计划: 成功升级torchvision到0.22.1+cu126并验证与torch 2.7.1兼容性; 安装ninja编译工具; 删除旧.so文件后通过配置CUDA_HOME和CPATH(指向conda env的targets/x86_64-linux/include/)重新编译curobo; 验证curobo导入正常。重新运行eval.sh后遇到checkpoint路径不存在问题,AI开始分析deploy_policy.yml和eval_policy.py的参数映射逻辑时会话被打断\n令牌使用 总支出：$0.25 — 1.1M令牌\n",
-  "wordCount" : "222",
+  "articleBody": "Daily Report — 2026-03-12 Daily Overview What was done: 跨平台解决了3个独立项目的技术问题: macOS壁纸应用的沙盒权限架构升级、GPU监控工具的输出优化、以及深度学习评估环境的依赖链修复 How it was done: 通过系统级日志分析定位macOS TCC权限机制问题,通过依赖版本矩阵追踪PyTorch生态的ABI兼容性,通过CUDA工具链配置解决C++扩展本地编译环境 Impact: macOS应用获得了生产级的文件访问持久化能力,tianhe服务器上的两个研究项目恢复了可运行状态(尽管checkpoint路径问题尚未完全解决) MacBook What was done: 完成desktop-video应用的沙盒迁移和权限系统重构,修复历史记录无法打开旧文件的关键bug How it was done: 通过启用App Sandbox使security-scoped bookmark生效,修复书签解析回退逻辑,添加NSOpenPanel重新授权机制 Impact: 用户历史记录功能恢复完整,app符合macOS最佳实践,为App Store发布铺平道路 tianhe What was done: 处理RoboTwin项目的PyTorch环境依赖冲突,解决curobo编译问题,优化GPU监控工具的可读性 How it was done: 通过pip版本矩阵匹配torch/torchvision,配置conda环境中的CUDA工具链路径(CUDA_HOME和CPATH),重写进程聚合逻辑限制输出宽度 Impact: 机器人策略评估环境恢复大部分工作能力,GPU资源监控更高效,但checkpoint路径映射问题尚未解决 修复macOS壁纸应用的沙盒权限架构,并解决深度学习评估环境的PyTorch依赖链和CUDA编译问题\nTasks Architecture \u0026 Strategy ✅ 修复macOS壁纸应用历史记录无法打开旧视频 — 启用App Sandbox,修复bookmark解析逻辑(添加non-scoped回退),添加权限错误重试机制(NSOpenPanel重新授权),更新本地化和ChangeLog ✅ 修复RoboTwin评估环境torch/torchvision版本冲突 — 升级torchvision从0.21.0到0.22.1+cu126以匹配torch 2.7.1,解决torchvision::nms算子注册失败 ✅ 重新编译curobo以匹配当前PyTorch ABI — 删除旧.so文件,安装ninja,配置CUDA_HOME和CPATH,通过pip install -e .从源码重新编译 ❌ 解决RoboTwin checkpoint路径不存在问题 — eval.sh参数指定checkpoint_id=5000但目录中只有15000/25000/29999。开始分析参数映射逻辑时会话被打断 Implementation \u0026 Fixes 🔄 优化GPU监控工具输出格式 — 限制宽度为80列,去重进程显示,过滤噪声子进程。用户指出理解偏差后会话被打断 Problems \u0026 Solutions Critical Issues 1. macOS非沙盒应用无法持久化文件访问权限,历史记录中旧视频报Operation not permitted错误 Solution: 启用App Sandbox权限(com.apple.security.app-sandbox和files.user-selected.read-write),修复ensureFileAccess添加non-scoped bookmark回退解析,showVideo/showImage添加NSOpenPanel重新授权机制\nKey Insight: macOS TCC机制要求App Sandbox才能创建security-scoped bookmark。Non-scoped bookmark只能解析URL但不授予访问权限,导致旧文件无法打开。需要沙盒+降级路径的组合方案\n2. torch 2.7.1与torchvision 0.21.0 ABI不兼容导致torchvision::nms算子注册失败 Solution: 升级torchvision到0.22.1+cu126以匹配torch 2.7.1版本\nKey Insight: torchvision的自定义算子编译时链接torch的C++ API,版本不匹配会导致算子注册接口失效。torchvision 0.21.0对应torch 2.6.x,不能用于torch 2.7.x\n3. curobo预编译.so文件与当前torch版本ABI不兼容,JIT编译又找不到cuda_runtime.h Solution: 删除旧.so文件,安装ninja编译工具,设置CUDA_HOME=/path/to/conda/env和CPATH=/path/to/targets/x86_64-linux/include,通过pip install -e .重新编译\nKey Insight: PyTorch版本升级后C++扩展需要重新编译。conda环境中pip安装的nvidia包将CUDA headers放在非标准路径(targets/x86_64-linux/include/),需要正确配置环境变量才能让JIT编译找到\nGeneral Issues 4. GPU监控工具输出宽度过大且进程重复显示,难以阅读 Solution: 限制输出为80列,按进程聚合GPU列表,过滤multiprocessing worker等子进程噪声\nKey Insight: 原始实现按GPU分组导致一个多卡进程在多个GPU下重复出现。需要按进程聚合并在GPU列显示所有使用的卡号\nHuman vs AI Approaches Strategic Level macOS文件权限问题的解释深度 Role Approach Human 直观提问’为什么会权限不足?’,要求AI解释TCC机制和沙盒机制的底层原理 AI 给出技术解决方案但没有主动说明背景原理,需要人类追问才给出完整上下文 Difference Analysis: 人类的问题导向思维引导AI给出了更完整的背景解释,而不是直接跳到解决方案。人类更关注’为什么’,AI更关注’怎么做'\n修复方案的选择策略 Role Approach Human 明确选择’两者结合’(沙盒+NSOpenPanel重新授权)的防御性方案 AI 提供了两个独立方案(沙盒或重新授权)但没有主动建议组合 Difference Analysis: 人类更倾向于防御性编程(多层保障),AI倾向于单一最优方案。人类的组合策略既解决根因又提供降级路径,更robust\nImplementation Level GPU监控工具的需求理解 Role Approach Human 纠正’每个进程在一个gpu上只显示一次’而非’每个进程只显示一次’,强调多对多关系 AI 误解了需求,将多GPU进程聚合为单行,在GPU列显示逗号分隔的卡号 Difference Analysis: 人类更准确理解了进程-GPU的多对多关系显示需求,AI过度优化导致信息丢失(一个进程在GPU0和GPU1上的资源使用情况应该分两行显示)\nAI Limitations General Limitations 未能主动解释技术背景(macOS TCC/沙盒机制),需要人类追问才给出完整上下文。AI应在提出解决方案时主动说明’为什么' 误解GPU监控需求,将进程-GPU的多对多关系简化为一对多聚合,导致信息丢失。对复杂数据关系的可视化需求理解不准确 在checkpoint路径问题分析时,开始过度深入代码细节(连续Read操作)而未先与用户确认问题范围。应该先high-level理解参数映射逻辑 Learnings Key Learnings macOS TCC权限机制: 非沙盒应用无法创建security-scoped bookmark,只能创建non-scoped bookmark(仅解析URL不授予权限),导致历史文件访问在app重启后失效。必须启用App Sandbox才能持久化文件访问权限 PyTorch C++扩展ABI兼容性: torchvision的自定义算子(如torchvision::nms)编译时链接torch的C++ API,版本必须精确匹配(torchvision 0.21→torch 2.6, torchvision 0.22→torch 2.7)。版本不匹配会导致算子注册失败 conda环境CUDA工具链配置: pip安装的nvidia包将CUDA headers放在targets/x86_64-linux/include/而非标准的include/。JIT编译C++扩展时需要设置CUDA_HOME指向conda env,CPATH包含targets路径 防御性编程原则: 沙盒+重新授权的组合方案比单一方案更robust。沙盒解决根因(持久化权限),NSOpenPanel提供降级路径(临时授权),两者结合保证用户总能访问文件 Conversation Summaries Desktop Video ✅ 修复历史记录无法打开旧视频的权限问题 07:52:05.359 | claude_code 用户报告历史记录中旧视频无法打开(Operation not permitted Code=257)。通过日志分析发现App未启用沙盒导致security-scoped bookmark创建失败,ensureFileAccess只尝试.withSecurityScope解析导致non-scoped书签永远失败,最终被macOS TCC拒绝访问。实施了三层修复: 启用App Sandbox权限、修复bookmark解析添加non-scoped回退、showVideo/showImage添加NSOpenPanel重新授权机制。完成代码修改、本地化更新和ChangeLog,构建验证通过\nrobobrain GPU monitor 🔄 优化GPU监控工具输出格式 15:48:28.705 | claude_code 用户要求将gpumon.py输出宽度限制为80列并去重进程显示。AI重写了进程表逻辑,将每个进程聚合为一行,GPU列显示逗号分隔的卡号,并过滤掉multiprocessing worker等噪声子进程。用户纠正理解偏差,指出应该是’每个进程在一个gpu上只显示一次’而非聚合显示,会话被打断\nRoboTwin Policy Evaluation 🔄 诊断eval.sh运行失败的依赖冲突 02:23:18.758 | claude_code 用户运行bash eval.sh报错,AI分析出三层依赖问题: 1) torch 2.7.1与torchvision 0.21.0版本不匹配导致torchvision::nms算子注册失败; 2) curobo预编译.so与torch ABI不兼容,JIT编译又缺少ninja; 3) checkpoint路径不存在(参数指定5000但只有15000/25000/29999)。AI提供版本升级方案,用户选择升级torchvision\n🔄 执行依赖修复并解决后续编译问题 02:34:02.614 | claude_code 执行修复计划: 成功升级torchvision到0.22.1+cu126并验证与torch 2.7.1兼容性; 安装ninja编译工具; 删除旧.so文件后通过配置CUDA_HOME和CPATH(指向conda env的targets/x86_64-linux/include/)重新编译curobo; 验证curobo导入正常。重新运行eval.sh后遇到checkpoint路径不存在问题,AI开始分析deploy_policy.yml和eval_policy.py的参数映射逻辑时会话被打断\nToken Usage Total: $0.25 — 1.1M tokens\n",
+  "wordCount" : "272",
   "inLanguage": "zh",
   "datePublished": "2026-03-12T00:00:00-05:00",
   "dateModified": "2026-03-12T00:00:00-05:00",
@@ -238,138 +238,138 @@
 
 </div>
   </header> 
-  <div class="post-content md-content"><h1 id="每日报告--2026-03-12">每日报告 — 2026-03-12<a hidden class="anchor" aria-hidden="true" href="#每日报告--2026-03-12">#</a></h1>
-<h2 id="每日总结">每日总结<a hidden class="anchor" aria-hidden="true" href="#每日总结">#</a></h2>
+  <div class="post-content md-content"><h1 id="daily-report--2026-03-12">Daily Report — 2026-03-12<a hidden class="anchor" aria-hidden="true" href="#daily-report--2026-03-12">#</a></h1>
+<h2 id="daily-overview">Daily Overview<a hidden class="anchor" aria-hidden="true" href="#daily-overview">#</a></h2>
 <ul>
-<li><strong>已完成的工作：</strong> 跨平台解决了3个独立项目的技术问题：macOS壁纸应用的沙盒权限架构升级、GPU监控工具的输出优化，以及深度学习评估环境的依赖链修复。</li>
-<li><strong>实施方法：</strong> 通过系统级日志分析定位macOS TCC权限机制问题，通过依赖版本矩阵追踪PyTorch生态的ABI兼容性，通过CUDA工具链配置解决C++扩展本地编译环境问题。</li>
-<li><strong>影响：</strong> macOS应用获得了生产级的文件访问持久化能力，tianhe服务器上的两个研究项目恢复了可运行状态（尽管checkpoint路径问题尚未完全解决）。</li>
+<li><strong>What was done:</strong> 跨平台解决了3个独立项目的技术问题: macOS壁纸应用的沙盒权限架构升级、GPU监控工具的输出优化、以及深度学习评估环境的依赖链修复</li>
+<li><strong>How it was done:</strong> 通过系统级日志分析定位macOS TCC权限机制问题,通过依赖版本矩阵追踪PyTorch生态的ABI兼容性,通过CUDA工具链配置解决C++扩展本地编译环境</li>
+<li><strong>Impact:</strong> macOS应用获得了生产级的文件访问持久化能力,tianhe服务器上的两个研究项目恢复了可运行状态(尽管checkpoint路径问题尚未完全解决)</li>
 </ul>
 <h3 id="macbook">MacBook<a hidden class="anchor" aria-hidden="true" href="#macbook">#</a></h3>
 <ul>
-<li><strong>已完成的工作：</strong> 完成desktop-video应用的沙盒迁移和权限系统重构，修复历史记录无法打开旧文件的关键bug。</li>
-<li><strong>实施方法：</strong> 通过启用App Sandbox使security-scoped bookmark生效，修复书签解析回退逻辑，添加NSOpenPanel重新授权机制。</li>
-<li><strong>影响：</strong> 用户历史记录功能恢复完整，应用符合macOS最佳实践，为App Store发布铺平道路。</li>
+<li><strong>What was done:</strong> 完成desktop-video应用的沙盒迁移和权限系统重构,修复历史记录无法打开旧文件的关键bug</li>
+<li><strong>How it was done:</strong> 通过启用App Sandbox使security-scoped bookmark生效,修复书签解析回退逻辑,添加NSOpenPanel重新授权机制</li>
+<li><strong>Impact:</strong> 用户历史记录功能恢复完整,app符合macOS最佳实践,为App Store发布铺平道路</li>
 </ul>
 <h3 id="tianhe">tianhe<a hidden class="anchor" aria-hidden="true" href="#tianhe">#</a></h3>
 <ul>
-<li><strong>已完成的工作：</strong> 处理RoboTwin项目的PyTorch环境依赖冲突，解决curobo编译问题，优化GPU监控工具的可读性。</li>
-<li><strong>实施方法：</strong> 通过pip版本矩阵匹配torch/torchvision，配置conda环境中的CUDA工具链路径(CUDA_HOME和CPATH)，重写进程聚合逻辑限制输出宽度。</li>
-<li><strong>影响：</strong> 机器人策略评估环境恢复大部分工作能力，GPU资源监控更高效，但checkpoint路径映射问题尚未解决。</li>
+<li><strong>What was done:</strong> 处理RoboTwin项目的PyTorch环境依赖冲突,解决curobo编译问题,优化GPU监控工具的可读性</li>
+<li><strong>How it was done:</strong> 通过pip版本矩阵匹配torch/torchvision,配置conda环境中的CUDA工具链路径(CUDA_HOME和CPATH),重写进程聚合逻辑限制输出宽度</li>
+<li><strong>Impact:</strong> 机器人策略评估环境恢复大部分工作能力,GPU资源监控更高效,但checkpoint路径映射问题尚未解决</li>
 </ul>
 <blockquote>
-<p>修复macOS壁纸应用的沙盒权限架构，并解决深度学习评估环境的PyTorch依赖链和CUDA编译问题</p>
+<p>修复macOS壁纸应用的沙盒权限架构,并解决深度学习评估环境的PyTorch依赖链和CUDA编译问题</p>
 </blockquote>
-<h2 id="任务">任务<a hidden class="anchor" aria-hidden="true" href="#任务">#</a></h2>
-<h3 id="架构与策略">架构与策略<a hidden class="anchor" aria-hidden="true" href="#架构与策略">#</a></h3>
+<h2 id="tasks">Tasks<a hidden class="anchor" aria-hidden="true" href="#tasks">#</a></h2>
+<h3 id="architecture--strategy">Architecture &amp; Strategy<a hidden class="anchor" aria-hidden="true" href="#architecture--strategy">#</a></h3>
 <ul>
-<li>✅ <strong>修复macOS壁纸应用历史记录无法打开旧视频</strong> — 启用App Sandbox，修复bookmark解析逻辑（添加non-scoped回退），添加权限错误重试机制（NSOpenPanel重新授权），更新本地化和ChangeLog。</li>
-<li>✅ <strong>修复RoboTwin评估环境torch/torchvision版本冲突</strong> — 升级torchvision从0.21.0到0.22.1+cu126以匹配torch 2.7.1，解决torchvision::nms算子注册失败问题。</li>
-<li>✅ <strong>重新编译curobo以匹配当前PyTorch ABI</strong> — 删除旧.so文件，安装ninja编译工具，配置CUDA_HOME和CPATH，通过pip install -e .从源码重新编译。</li>
-<li>❌ <strong>解决RoboTwin checkpoint路径不存在问题</strong> — eval.sh参数指定checkpoint_id=5000但目录中只有15000/25000/29999。开始分析参数映射逻辑时会话被打断。</li>
+<li>✅ <strong>修复macOS壁纸应用历史记录无法打开旧视频</strong> — 启用App Sandbox,修复bookmark解析逻辑(添加non-scoped回退),添加权限错误重试机制(NSOpenPanel重新授权),更新本地化和ChangeLog</li>
+<li>✅ <strong>修复RoboTwin评估环境torch/torchvision版本冲突</strong> — 升级torchvision从0.21.0到0.22.1+cu126以匹配torch 2.7.1,解决torchvision::nms算子注册失败</li>
+<li>✅ <strong>重新编译curobo以匹配当前PyTorch ABI</strong> — 删除旧.so文件,安装ninja,配置CUDA_HOME和CPATH,通过pip install -e .从源码重新编译</li>
+<li>❌ <strong>解决RoboTwin checkpoint路径不存在问题</strong> — eval.sh参数指定checkpoint_id=5000但目录中只有15000/25000/29999。开始分析参数映射逻辑时会话被打断</li>
 </ul>
-<h3 id="实施与修复">实施与修复<a hidden class="anchor" aria-hidden="true" href="#实施与修复">#</a></h3>
+<h3 id="implementation--fixes">Implementation &amp; Fixes<a hidden class="anchor" aria-hidden="true" href="#implementation--fixes">#</a></h3>
 <ul>
-<li>🔄 <strong>优化GPU监控工具输出格式</strong> — 限制宽度为80列，去重进程显示，过滤噪声子进程。用户指出理解偏差后会话被打断。</li>
+<li>🔄 <strong>优化GPU监控工具输出格式</strong> — 限制宽度为80列,去重进程显示,过滤噪声子进程。用户指出理解偏差后会话被打断</li>
 </ul>
-<h2 id="问题与解决方案">问题与解决方案<a hidden class="anchor" aria-hidden="true" href="#问题与解决方案">#</a></h2>
-<h3 id="关键问题">关键问题<a hidden class="anchor" aria-hidden="true" href="#关键问题">#</a></h3>
-<h4 id="1-macos非沙盒应用无法持久化文件访问权限历史记录中旧视频报operation-not-permitted错误">1. macOS非沙盒应用无法持久化文件访问权限，历史记录中旧视频报Operation not permitted错误<a hidden class="anchor" aria-hidden="true" href="#1-macos非沙盒应用无法持久化文件访问权限历史记录中旧视频报operation-not-permitted错误">#</a></h4>
-<p><strong>解决方案：</strong> 启用App Sandbox权限(com.apple.security.app-sandbox和files.user-selected.read-write)，修复ensureFileAccess添加non-scoped bookmark回退解析，showVideo/showImage添加NSOpenPanel重新授权机制。</p>
-<p><strong>关键洞察：</strong> macOS TCC机制要求App Sandbox才能创建security-scoped bookmark。Non-scoped bookmark只能解析URL但不授予访问权限，导致旧文件无法打开。需要沙盒+降级路径的组合方案。</p>
+<h2 id="problems--solutions">Problems &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#problems--solutions">#</a></h2>
+<h3 id="critical-issues">Critical Issues<a hidden class="anchor" aria-hidden="true" href="#critical-issues">#</a></h3>
+<h4 id="1-macos非沙盒应用无法持久化文件访问权限历史记录中旧视频报operation-not-permitted错误">1. macOS非沙盒应用无法持久化文件访问权限,历史记录中旧视频报Operation not permitted错误<a hidden class="anchor" aria-hidden="true" href="#1-macos非沙盒应用无法持久化文件访问权限历史记录中旧视频报operation-not-permitted错误">#</a></h4>
+<p><strong>Solution:</strong> 启用App Sandbox权限(com.apple.security.app-sandbox和files.user-selected.read-write),修复ensureFileAccess添加non-scoped bookmark回退解析,showVideo/showImage添加NSOpenPanel重新授权机制</p>
+<p><strong>Key Insight:</strong> macOS TCC机制要求App Sandbox才能创建security-scoped bookmark。Non-scoped bookmark只能解析URL但不授予访问权限,导致旧文件无法打开。需要沙盒+降级路径的组合方案</p>
 <h4 id="2-torch-271与torchvision-0210-abi不兼容导致torchvisionnms算子注册失败">2. torch 2.7.1与torchvision 0.21.0 ABI不兼容导致torchvision::nms算子注册失败<a hidden class="anchor" aria-hidden="true" href="#2-torch-271与torchvision-0210-abi不兼容导致torchvisionnms算子注册失败">#</a></h4>
-<p><strong>解决方案：</strong> 升级torchvision到0.22.1+cu126以匹配torch 2.7.1版本。</p>
-<p><strong>关键洞察：</strong> torchvision的自定义算子编译时链接torch的C++ API，版本不匹配会导致算子注册接口失效。torchvision 0.21.0对应torch 2.6.x，不能用于torch 2.7.x。</p>
-<h4 id="3-curobo预编译so文件与当前torch版本abi不兼容jit编译又找不到cuda_runtimeh">3. curobo预编译.so文件与当前torch版本ABI不兼容，JIT编译又找不到cuda_runtime.h<a hidden class="anchor" aria-hidden="true" href="#3-curobo预编译so文件与当前torch版本abi不兼容jit编译又找不到cuda_runtimeh">#</a></h4>
-<p><strong>解决方案：</strong> 删除旧.so文件，安装ninja编译工具，设置CUDA_HOME=/path/to/conda.env和CPATH=/path/to/targets/x86_64-linux/include，通过pip install -e .重新编译。</p>
-<p><strong>关键洞察：</strong> PyTorch版本升级后C++扩展需要重新编译。conda环境中pip安装的nvidia包将CUDA headers放在非标准路径(targets/x86_64-linux/include/)，需要正确配置环境变量才能让JIT编译找到。</p>
-<h3 id="一般问题">一般问题<a hidden class="anchor" aria-hidden="true" href="#一般问题">#</a></h3>
-<h4 id="4-gpu监控工具输出宽度过大且进程重复显示难以阅读">4. GPU监控工具输出宽度过大且进程重复显示，难以阅读<a hidden class="anchor" aria-hidden="true" href="#4-gpu监控工具输出宽度过大且进程重复显示难以阅读">#</a></h4>
-<p><strong>解决方案：</strong> 限制输出为80列，按进程聚合GPU列表，过滤multiprocessing worker等噪声子进程。</p>
-<p><strong>关键洞察：</strong> 原始实现按GPU分组导致一个多卡进程在多个GPU下重复出现。需要按进程聚合并在GPU列显示所有使用的卡号。</p>
-<h2 id="人与ai的方法差异">人与AI的方法差异<a hidden class="anchor" aria-hidden="true" href="#人与ai的方法差异">#</a></h2>
-<h3 id="战略层面">战略层面<a hidden class="anchor" aria-hidden="true" href="#战略层面">#</a></h3>
+<p><strong>Solution:</strong> 升级torchvision到0.22.1+cu126以匹配torch 2.7.1版本</p>
+<p><strong>Key Insight:</strong> torchvision的自定义算子编译时链接torch的C++ API,版本不匹配会导致算子注册接口失效。torchvision 0.21.0对应torch 2.6.x,不能用于torch 2.7.x</p>
+<h4 id="3-curobo预编译so文件与当前torch版本abi不兼容jit编译又找不到cuda_runtimeh">3. curobo预编译.so文件与当前torch版本ABI不兼容,JIT编译又找不到cuda_runtime.h<a hidden class="anchor" aria-hidden="true" href="#3-curobo预编译so文件与当前torch版本abi不兼容jit编译又找不到cuda_runtimeh">#</a></h4>
+<p><strong>Solution:</strong> 删除旧.so文件,安装ninja编译工具,设置CUDA_HOME=/path/to/conda/env和CPATH=/path/to/targets/x86_64-linux/include,通过pip install -e .重新编译</p>
+<p><strong>Key Insight:</strong> PyTorch版本升级后C++扩展需要重新编译。conda环境中pip安装的nvidia包将CUDA headers放在非标准路径(targets/x86_64-linux/include/),需要正确配置环境变量才能让JIT编译找到</p>
+<h3 id="general-issues">General Issues<a hidden class="anchor" aria-hidden="true" href="#general-issues">#</a></h3>
+<h4 id="4-gpu监控工具输出宽度过大且进程重复显示难以阅读">4. GPU监控工具输出宽度过大且进程重复显示,难以阅读<a hidden class="anchor" aria-hidden="true" href="#4-gpu监控工具输出宽度过大且进程重复显示难以阅读">#</a></h4>
+<p><strong>Solution:</strong> 限制输出为80列,按进程聚合GPU列表,过滤multiprocessing worker等子进程噪声</p>
+<p><strong>Key Insight:</strong> 原始实现按GPU分组导致一个多卡进程在多个GPU下重复出现。需要按进程聚合并在GPU列显示所有使用的卡号</p>
+<h2 id="human-vs-ai-approaches">Human vs AI Approaches<a hidden class="anchor" aria-hidden="true" href="#human-vs-ai-approaches">#</a></h2>
+<h3 id="strategic-level">Strategic Level<a hidden class="anchor" aria-hidden="true" href="#strategic-level">#</a></h3>
 <h4 id="macos文件权限问题的解释深度">macOS文件权限问题的解释深度<a hidden class="anchor" aria-hidden="true" href="#macos文件权限问题的解释深度">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>角色</th>
-          <th>方法</th>
+          <th>Role</th>
+          <th>Approach</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td>人类</td>
-          <td>直观提问“为什么会权限不足？”，要求AI解释TCC机制和沙盒机制的底层原理</td>
+          <td>Human</td>
+          <td>直观提问&rsquo;为什么会权限不足?&rsquo;,要求AI解释TCC机制和沙盒机制的底层原理</td>
       </tr>
       <tr>
-          <td>人工智能</td>
-          <td>给出技术解决方案，但没有主动说明背景原理，需要人类追问才给出完整上下文</td>
+          <td>AI</td>
+          <td>给出技术解决方案但没有主动说明背景原理,需要人类追问才给出完整上下文</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析：</strong> 人类的问题导向思维引导AI给出了更完整的背景解释，而不是直接跳到解决方案。人类更关注“为什么”，AI更关注“怎么做”。</p>
+<p><strong>Difference Analysis:</strong> 人类的问题导向思维引导AI给出了更完整的背景解释,而不是直接跳到解决方案。人类更关注&rsquo;为什么&rsquo;,AI更关注&rsquo;怎么做'</p>
 <h4 id="修复方案的选择策略">修复方案的选择策略<a hidden class="anchor" aria-hidden="true" href="#修复方案的选择策略">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>角色</th>
-          <th>方法</th>
+          <th>Role</th>
+          <th>Approach</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td>人类</td>
-          <td>明确选择“两者结合”（沙盒+NSOpenPanel重新授权）的防御性方案</td>
+          <td>Human</td>
+          <td>明确选择&rsquo;两者结合&rsquo;(沙盒+NSOpenPanel重新授权)的防御性方案</td>
       </tr>
       <tr>
-          <td>人工智能</td>
-          <td>提供了两个独立方案（沙盒或重新授权）但没有主动建议组合</td>
+          <td>AI</td>
+          <td>提供了两个独立方案(沙盒或重新授权)但没有主动建议组合</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析：</strong> 人类更倾向于防御性编程（多层保障），人工智能倾向于单一最优方案。人类的组合策略既解决根因又提供降级路径，更鲁棒。</p>
-<h3 id="实施层面">实施层面<a hidden class="anchor" aria-hidden="true" href="#实施层面">#</a></h3>
+<p><strong>Difference Analysis:</strong> 人类更倾向于防御性编程(多层保障),AI倾向于单一最优方案。人类的组合策略既解决根因又提供降级路径,更robust</p>
+<h3 id="implementation-level">Implementation Level<a hidden class="anchor" aria-hidden="true" href="#implementation-level">#</a></h3>
 <h4 id="gpu监控工具的需求理解">GPU监控工具的需求理解<a hidden class="anchor" aria-hidden="true" href="#gpu监控工具的需求理解">#</a></h4>
 <table>
   <thead>
       <tr>
-          <th>角色</th>
-          <th>方法</th>
+          <th>Role</th>
+          <th>Approach</th>
       </tr>
   </thead>
   <tbody>
       <tr>
-          <td>人类</td>
-          <td>纠正“每个进程在一个gpu上只显示一次”而非“每个进程只显示一次”，强调多对多关系</td>
+          <td>Human</td>
+          <td>纠正&rsquo;每个进程在一个gpu上只显示一次&rsquo;而非&rsquo;每个进程只显示一次&rsquo;,强调多对多关系</td>
       </tr>
       <tr>
-          <td>人工智能</td>
-          <td>误解了需求，将多GPU进程聚合为单行，在GPU列显示逗号分隔的卡号</td>
+          <td>AI</td>
+          <td>误解了需求,将多GPU进程聚合为单行,在GPU列显示逗号分隔的卡号</td>
       </tr>
   </tbody>
 </table>
-<p><strong>差异分析：</strong> 人类更准确理解了进程-GPU的多对多关系显示需求，人工智能过度优化导致信息丢失（一个进程在GPU0和GPU1上的资源使用情况应该分两行显示）</p>
-<h2 id="人工智能的局限性">人工智能的局限性<a hidden class="anchor" aria-hidden="true" href="#人工智能的局限性">#</a></h2>
-<h3 id="一般局限性">一般局限性<a hidden class="anchor" aria-hidden="true" href="#一般局限性">#</a></h3>
+<p><strong>Difference Analysis:</strong> 人类更准确理解了进程-GPU的多对多关系显示需求,AI过度优化导致信息丢失(一个进程在GPU0和GPU1上的资源使用情况应该分两行显示)</p>
+<h2 id="ai-limitations">AI Limitations<a hidden class="anchor" aria-hidden="true" href="#ai-limitations">#</a></h2>
+<h3 id="general-limitations">General Limitations<a hidden class="anchor" aria-hidden="true" href="#general-limitations">#</a></h3>
 <ul>
-<li>未能主动解释技术背景（macOS TCC/沙盒机制），需要人类追问才给出完整上下文。人工智能应在提出解决方案时主动说明“为什么”。</li>
-<li>误解GPU监控需求，将进程-GPU的多对多关系简化为一对多聚合，导致信息丢失。对复杂数据关系的可视化需求理解不准确。</li>
-<li>在checkpoint路径问题分析时，开始过度深入代码细节（连续Read操作）而未先与用户确认问题范围。应该先高层次的了解参数映射逻辑。</li>
+<li>未能主动解释技术背景(macOS TCC/沙盒机制),需要人类追问才给出完整上下文。AI应在提出解决方案时主动说明&rsquo;为什么'</li>
+<li>误解GPU监控需求,将进程-GPU的多对多关系简化为一对多聚合,导致信息丢失。对复杂数据关系的可视化需求理解不准确</li>
+<li>在checkpoint路径问题分析时,开始过度深入代码细节(连续Read操作)而未先与用户确认问题范围。应该先high-level理解参数映射逻辑</li>
 </ul>
-<h2 id="学习成果">学习成果<a hidden class="anchor" aria-hidden="true" href="#学习成果">#</a></h2>
-<h3 id="关键学习点">关键学习点<a hidden class="anchor" aria-hidden="true" href="#关键学习点">#</a></h3>
+<h2 id="learnings">Learnings<a hidden class="anchor" aria-hidden="true" href="#learnings">#</a></h2>
+<h3 id="key-learnings">Key Learnings<a hidden class="anchor" aria-hidden="true" href="#key-learnings">#</a></h3>
 <ul>
-<li>macOS TCC权限机制：非沙盒应用无法创建security-scoped bookmark，只能创建non-scoped bookmark（仅解析URL不授予权限），导致历史文件访问在app重启后失效。必须启用App Sandbox才能持久化文件访问权限。</li>
-<li>PyTorch C++扩展ABI兼容性：torchvision的自定义算子（如torchvision::nms）编译时链接torch的C++ API，版本必须精确匹配（torchvision 0.21→torch 2.6，torchvision 0.22→torch 2.7）。版本不匹配会导致算子注册失败。</li>
-<li>conda环境CUDA工具链配置：pip安装的nvidia包将CUDA headers放在targets/x86_64-linux/include/而非标准的include/。JIT编译C++扩展时需要设置CUDA_HOME指向conda env,CPATH包含targets路径。</li>
-<li>防御性编程原则：沙盒+重新授权的组合方案比单一方案更鲁棒。沙盒解决根因（持久化权限），NSOpenPanel提供降级路径（临时授权），两者结合保证用户总能访问文件。</li>
+<li>macOS TCC权限机制: 非沙盒应用无法创建security-scoped bookmark,只能创建non-scoped bookmark(仅解析URL不授予权限),导致历史文件访问在app重启后失效。必须启用App Sandbox才能持久化文件访问权限</li>
+<li>PyTorch C++扩展ABI兼容性: torchvision的自定义算子(如torchvision::nms)编译时链接torch的C++ API,版本必须精确匹配(torchvision 0.21→torch 2.6, torchvision 0.22→torch 2.7)。版本不匹配会导致算子注册失败</li>
+<li>conda环境CUDA工具链配置: pip安装的nvidia包将CUDA headers放在targets/x86_64-linux/include/而非标准的include/。JIT编译C++扩展时需要设置CUDA_HOME指向conda env,CPATH包含targets路径</li>
+<li>防御性编程原则: 沙盒+重新授权的组合方案比单一方案更robust。沙盒解决根因(持久化权限),NSOpenPanel提供降级路径(临时授权),两者结合保证用户总能访问文件</li>
 </ul>
-<h2 id="对话总结">对话总结<a hidden class="anchor" aria-hidden="true" href="#对话总结">#</a></h2>
+<h2 id="conversation-summaries">Conversation Summaries<a hidden class="anchor" aria-hidden="true" href="#conversation-summaries">#</a></h2>
 <h3 id="desktop-video">Desktop Video<a hidden class="anchor" aria-hidden="true" href="#desktop-video">#</a></h3>
 <p><strong>✅ 修复历史记录无法打开旧视频的权限问题</strong>
 <em>07:52:05.359 | claude_code</em>
-用户报告历史记录中旧视频无法打开（Operation not permitted Code=257）。通过日志分析发现App未启用沙盒导致security-scoped bookmark创建失败,ensureFileAccess只尝试.withSecurityScope解析导致non-scoped书签永远失败,最终被macOS TCC拒绝访问。实施了三层修复: 启用App Sandbox权限、修复bookmark解析添加non-scoped回退、showVideo/showImage添加NSOpenPanel重新授权机制。完成代码修改、本地化更新和ChangeLog,构建验证通过</p>
+用户报告历史记录中旧视频无法打开(Operation not permitted Code=257)。通过日志分析发现App未启用沙盒导致security-scoped bookmark创建失败,ensureFileAccess只尝试.withSecurityScope解析导致non-scoped书签永远失败,最终被macOS TCC拒绝访问。实施了三层修复: 启用App Sandbox权限、修复bookmark解析添加non-scoped回退、showVideo/showImage添加NSOpenPanel重新授权机制。完成代码修改、本地化更新和ChangeLog,构建验证通过</p>
 <h3 id="robobrain-gpu-monitor">robobrain GPU monitor<a hidden class="anchor" aria-hidden="true" href="#robobrain-gpu-monitor">#</a></h3>
 <p><strong>🔄 优化GPU监控工具输出格式</strong>
 <em>15:48:28.705 | claude_code</em>
@@ -381,9 +381,9 @@
 <p><strong>🔄 执行依赖修复并解决后续编译问题</strong>
 <em>02:34:02.614 | claude_code</em>
 执行修复计划: 成功升级torchvision到0.22.1+cu126并验证与torch 2.7.1兼容性; 安装ninja编译工具; 删除旧.so文件后通过配置CUDA_HOME和CPATH(指向conda env的targets/x86_64-linux/include/)重新编译curobo; 验证curobo导入正常。重新运行eval.sh后遇到checkpoint路径不存在问题,AI开始分析deploy_policy.yml和eval_policy.py的参数映射逻辑时会话被打断</p>
-<h2 id="令牌使用">令牌使用<a hidden class="anchor" aria-hidden="true" href="#令牌使用">#</a></h2>
+<h2 id="token-usage">Token Usage<a hidden class="anchor" aria-hidden="true" href="#token-usage">#</a></h2>
 <p><img alt="Token Usage" loading="lazy" src="2026-03-12-usage.png"></p>
-<p><strong>总支出：$0.25</strong> — 1.1M令牌</p>
+<p><strong>Total: $0.25</strong> — 1.1M tokens</p>
 
 
   </div>
